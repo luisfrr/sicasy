@@ -14,7 +14,7 @@ let Main = {
 
         if($this.menuButton.length > 0) {
 
-            this.menuButton.off('click.menu').on('click.menu', function (e) {
+            this.menuButton.off('click.menu').on('click.menu', function () {
 
                 let wrapper = document.querySelector('.wrapper');
                 let mask = document.querySelector('.mask');
