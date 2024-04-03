@@ -1,0 +1,42 @@
+<ui:composition
+        xmlns="http://www.w3.org/1999/xhtml"
+        xmlns:h="http://xmlns.jcp.org/jsf/html"
+        xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+        xmlns:p="http://primefaces.org/ui">
+
+    <header class="topbar">
+
+        <div class="topbar-left">
+            <div class="brand">
+                <h6 class="app-name">#{appBean.appName}</h6>
+            </div>
+            <span id="button-menu" class="header-link">
+                <i id="button-menu-icon" class="umm umm-menu-burger"/>
+            </span>
+        </div>
+
+        <div class="topbar-right">
+            <a class="header-link user-info" href="#" onclick="Main.toggleUserDropdown();">
+                <i class="umm umm-user"/>
+                <span class="username">Luis Fer</span>
+            </a>
+            <div class="user-info-dropdown" id="userInfoDropdown">
+                <h:form>
+                    <p:commandLink action="#{userSessionBean.doLogout()}" ajax="false" immediate="true" rendered="false">
+                        <i class="umm umm-cross text-base"/>
+                        <span class="text-base text-color">Cerrar sesión</span>
+                    </p:commandLink>
+                </h:form>
+            </div>
+
+            <a class="header-link hidden" href="#">
+                <i class="umm umm-bell"/>
+            </a>
+            <a class="header-link hidden" href="#">
+                <i class="umm umm-settings"/>
+            </a>
+        </div>
+
+    </header>
+
+</ui:composition>

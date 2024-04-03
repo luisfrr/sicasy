@@ -1,0 +1,109 @@
+@charset "UTF-8";
+:root {
+
+    /* Typography */
+    --font-family-base: 'Poppins', 'Roboto', 'Helvetica', 'Arial', sans-serif;
+
+    /* Pixel value used to responsively scale all typography. Applied to the `<html>` element. */
+    --font-size-root: 16px;
+
+    /* Font Size */
+    --font-size-base: 0.875rem;
+
+    --font-size-4xl: 2rem;
+    --font-size-3xl: 1.75rem;
+    --font-size-2xl: 1.5rem;
+    --font-size-xl: 1.25rem;
+    --font-size-lg: 1rem;
+    --font-size-sm: .75rem;
+    --font-size-xs: 0.625rem;
+
+    /* Heading Size */
+    --font-size-h1: 2.5rem;
+    --font-size-h2: 2rem;
+    --font-size-h3: 1.75rem;
+    --font-size-h4: 1.5rem;
+    --font-size-h5: 1.25rem;
+    --font-size-h6: 1rem;
+
+    /* Font Weight */
+    --font-weight-light: 300;
+    --font-weight-normal: 400;
+    --font-weight-semibold: 500;
+    --font-weight-bold: 800;
+    --font-weight-extra-bold: 900;
+
+    /* Surface Colors */
+    --surface-hover: #F6F9FC;
+    --surface-border: #DFE7EF;
+    --surface-overlay: #FFFFFF;
+    --surface-card: #FFFFFF;
+    --surface-section: #FFFFFF;
+    --surface-ground: #F5F5F5;
+    --surface-header: #F8F9FA;
+    --surface-divider: #DEE2E6;
+
+    /* Global Colors */
+    --text-color: #495357;
+    --text-secondary-color: #6C757D;
+    --text-alternative-color: #A5A9AD;
+    --text-placeholder-color: #A5A9AD;
+    --divider-color: #DEE2E6;
+    --text-error-color: #E24C4C;
+    --text-white: #FFFFFF;
+    --mask-bg: rgba(0, 0, 0, 0.50);
+    --border-component-color: #CED4DA;
+
+    /* Primary Color */
+    --primary-color: #3C7CF5;
+    --primary-light-color: #C0D9FD;
+    --primary-dark-color: #275EE9;
+    --primary-darker-color: #1E49D7;
+    --primary-text-color: #FFFFFF;
+    --highlight-bg: #DBE9FE;
+    --highlight-text-color: #1F3789;
+
+    /* Brand Colors */
+    --brand-50: #EFF6FF;
+    --brand-100: #DBE9FE;
+    --brand-200: #C0D9FD;
+    --brand-300: #94C2FC;
+    --brand-400: #61A0F9;
+    --brand-500: #3C7CF5;
+    --brand-600: #275EE9;
+    --brand-700: #1E49D7;
+    --brand-800: #1F3CAD;
+    --brand-900: #1F3789;
+    --brand-950: #172354;
+
+    /* Spacing */
+    --spacing-0: 0;
+    --spacing-1: 0.125rem; /* 2px */
+    --spacing-2: 0.25rem; /* 4px */
+    --spacing-3: 0.5rem; /* 8px */
+    --spacing-4: 1rem; /* 16px */
+    --spacing-5: 1.5rem; /* 24px */
+    --spacing-6: 2rem; /* 32px */
+    --spacing-7: 2.5rem; /* 40px */
+    --spacing-8: 3rem; /* 48px */
+
+    /* Border Radius */
+    --border-radius-card: 0.25rem;
+    --border-radius-elements: 0.25rem;
+
+    /* Top bar */
+    --topbar-height: 4rem;
+    --topbar-drop-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.20);
+    --topbar-bg-fixed: rgb(255 255 255 / 80%);
+    --topbar-box-shadow: 0 10px 40px 0 rgba(41, 50, 65, 0.06);
+
+    --sidebar-width: 16rem;
+    --sidebar-width-left: -16rem;
+
+    --card-border-radius: var(--border-radius-card);
+    --card-bg: var(--surface-overlay);
+    --card-box-shadow: 0px 1px 4px 0px rgba(0, 0, 0, 0.15);
+
+    --button-border-radius: 0.25rem;
+    --button-drop-shadow: 0px 2px 3px 0px rgba(0, 0, 0, 0.25);
+}

@@ -1,0 +1,169 @@
+/*
+    Font
+ */
+body .ui-widget {
+    font-family: var(--font-family-base);
+    font-weight: var(--font-weight-normal);
+    font-size: var(--font-size-base);
+    text-decoration: none;
+}
+
+
+/*
+    Cards
+ */
+
+.card {
+    display: flex;
+    padding: 2rem 1.5rem;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--spacing-4);
+
+    border-radius: var(--card-border-radius);
+    background: var(--card-bg, #FFF);
+    box-shadow: var(--card-box-shadow);
+}
+
+.card.card-login {
+    position: relative;
+    width: 25rem;
+    gap: var(--spacing-5);
+    padding: var(--spacing-7);
+}
+
+@media screen and (max-width: 992px) {
+    .card.card-login {
+        width: 20rem;
+    }
+}
+
+
+
+/*
+    Buttons
+ */
+
+body .ui-button {
+    background: var(--primary-color);
+    color: var(--primary-color-text);
+    border: 0;
+    margin: 0;
+    outline: 0 none;
+    transition: none;
+    border-radius: var(--button-border-radius);
+    box-shadow: var(--button-drop-shadow);
+
+    display: flex;
+    padding: 0;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: var(--font-family-base);
+}
+
+body .ui-button.ui-button-text-only .ui-button-text {
+    padding: 0.625rem 1.25rem;
+}
+
+body .ui-button .ui-button-text,
+body .ui-button .ui-icon {
+    font-size: var(--font-size-base);
+}
+
+body .ui-button.button-plain {
+    border-radius: 1rem;
+    border: 2px solid var(--primary-color);
+    background: var(--primary-text-color);
+    box-shadow: none;
+    color: var(--primary-color);
+    padding: 0.5rem 1rem;
+}
+
+body .ui-button.button-plain:hover {
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+}
+
+
+body .ui-inputfield {
+    color: var(--text-color);
+    background: var(--surface-section);
+    border: 1px solid var(--surface-border);
+    outline: 0 none;
+    font-size: var(--font-size-base);
+    border-radius: var(--border-radius-elements);
+    transition: none;
+    -webkit-appearance: none;
+    appearance: none;
+
+    display: flex;
+    height: 2.5rem;
+    padding: 0.5rem 1rem;
+    align-items: center;
+    gap: 0.625rem;
+    align-self: stretch;
+}
+
+body .ui-inputfield.ui-state-hover {
+    border-color: var(--primary-color);
+}
+
+body .ui-inputfield.ui-state-focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.2em #E7EEF2;
+}
+
+body .ui-commandlink, body .ui-link {
+    color: var(--text-secondary-color);
+    transition: background-color .2s,color .2s,border-color .2s,box-shadow .2s,opacity .2s;
+}
+body .ui-commandlink:hover, body .ui-link:hover {
+    color: var(--text-color);;
+    text-decoration: none;
+}
+
+body .card {
+    display: flex;
+    padding: 1.5rem;
+    gap: 1rem;
+    border-radius: var(--border-radius-card);
+    background: var(--surface-overlay);
+    box-shadow: var(--card-box-shadow);
+}
+
+body .card .card-body {
+    display: flex;
+    flex-direction: row;
+    gap: 0.5rem;
+    width: 100%;
+}
+
+.label-group {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 0.25rem;
+    align-self: stretch;
+}
+.label-group .label {
+    color: var(--text-secondary-color);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-semibold);
+    font-style: normal;
+    line-height: normal;
+}
+.label-group .value {
+    color: var(--text-color);
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-bold);
+    font-style: normal;
+    line-height: normal;
+}
+
+body .ui-dialog .ui-dialog-titlebar {
+    padding: 1rem 1.5rem;
+}
+
+
+
