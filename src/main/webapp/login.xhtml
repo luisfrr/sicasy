@@ -1,38 +1,39 @@
 <ui:composition template="WEB-INF/facelets/login_layout.xhtml"
                 xmlns="http://www.w3.org/1999/xhtml"
-                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:h="jakarta.faces.html"
+                xmlns:f="jakarta.faces.core"
+                xmlns:ui="jakarta.faces.facelets"
                 xmlns:p="http://primefaces.org/ui"
-                xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+                xmlns:pe="http://primefaces.org/ui/extensions"
+                xmlns:sec="https://joinfaces.org/security">
 
 <ui:define name="title">
-    Bienvenido
+    #{loginView.title}
 </ui:define>
 
 <ui:define name="content">
 
-    <div class="card card-login m-4">
+    <p:outputPanel styleClass="card card-login m-4">
 
         <h5 class="text-center uppercase m-0">#{appBean.appName}</h5>
 
         <p class="text-center font-light">Inicia sesión para continuar...</p>
 
-        <h:form styleClass="w-full flex flex-column gap-4 justify-content-center" prependId="false">
+        <h:form styleClass="w-full flex flex-column gap-4 justify-content-center"
+                prependId="false">
 
-            <p:inputText placeholder="Usuario" id="username" styleClass="w-full"/>
-            <p:password placeholder="Contraseña" id="password" styleClass="w-full"/>
+            <p:inputText placeholder="Usuario" id="username" styleClass="w-full" required="true"/>
+            <p:password placeholder="Contraseña" id="password" styleClass="w-full" required="true"/>
 
             <a href="#" class="text-sm text-secondary-color font-light text-center">¿Olvidó su contraseña?</a>
 
             <div class="flex justify-content-center">
-                <p:commandButton value="Continuar" ajax="false"/>
+                <p:commandButton value="Continuar" ajax="false" validateClient="true"/>
             </div>
 
         </h:form>
 
-
-
-    </div>
-
+    </p:outputPanel>
 
 </ui:define>
 

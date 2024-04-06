@@ -3,8 +3,13 @@ package gob.yucatan.sicasy.business.entities;
 import gob.yucatan.sicasy.business.enums.EstatusRegistro;
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
+import java.util.Set;
 
 @Entity
 @Table(name = "usuario", schema = "sec")
@@ -13,7 +18,7 @@ import java.util.Date;
 @Getter
 @Setter
 @Builder
-public class Usuario {
+public class Usuario implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -31,6 +36,9 @@ public class Usuario {
 
     @Column(name = "email", nullable = false)
     private String email;
+
+    @OneToMany(cascade=CascadeType.ALL, mappedBy="usuario")
+    private Set<UsuarioRol> usuarioRolSet;
 
     @Column(name = "estatus", nullable = false)
     @Enumerated(EnumType.ORDINAL)
@@ -56,4 +64,40 @@ public class Usuario {
 
     @Column(name = "borrado_por")
     private String borradoPor;
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return new ArrayList<>();
+    }
+
+    @Override
+    public String getPassword() {
+        return this.contrasenia;
+    }
+
+    @Override
+    public String getUsername() {
+        return this.usuario;
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return this.estatus != null && this.estatus == EstatusRegistro.ACTIVO;
+    }
+
 }

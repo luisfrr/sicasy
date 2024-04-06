@@ -231,8 +231,8 @@ footer .copyright i {
     gap: 1.5rem;
     flex: 1 0 0;
     align-self: stretch;
-    padding: var(--spacing-5) var(--spacing-4);
-    margin-top: calc(var(--topbar-height) + 1rem);
+    padding: var(--spacing-4);
+    margin-top: var(--topbar-height);
 }
 
 .wrapper .login-content {

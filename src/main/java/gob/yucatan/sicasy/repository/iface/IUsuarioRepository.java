@@ -4,5 +4,10 @@ import gob.yucatan.sicasy.business.entities.Usuario;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
-public interface IUsuarioRepository extends JpaRepository<Long, Usuario>, JpaSpecificationExecutor<Usuario> {
+import java.util.Optional;
+
+public interface IUsuarioRepository extends JpaRepository<Usuario, Long>, JpaSpecificationExecutor<Usuario> {
+
+    Optional<Usuario> findByUsuarioIgnoreCase(String usuario);
+
 }

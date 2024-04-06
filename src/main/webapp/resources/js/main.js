@@ -25,8 +25,8 @@ let Main = {
                 if($this.isMobile()) {
                     wrapper.classList.toggle('menu-mobile-active');
 
-                    menuIcon.classList.toggle('umm-menu-burger');
-                    menuIcon.classList.toggle('umm-cross');
+                    menuIcon.classList.toggle('fi-rr-menu-burger');
+                    menuIcon.classList.toggle('fi-rr--cross');
 
                     mask.classList.toggle('show');
                 } else {
@@ -35,8 +35,8 @@ let Main = {
                         wrapper.classList.toggle('menu-static-inactive');
                     } else {
                         wrapper.classList.toggle('menu-overlay-active');
-                        menuIcon.classList.toggle('umm-menu-burger');
-                        menuIcon.classList.toggle('umm-cross');
+                        menuIcon.classList.toggle('fi-rr-menu-burger');
+                        menuIcon.classList.toggle('fi-rr-cross');
 
                         mask.classList.toggle('show');
                     }

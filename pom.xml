@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.2.4</version>
+        <version>3.2.1</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
 
@@ -18,14 +18,14 @@
 
     <properties>
         <java.version>21</java.version>
-        <joinfaces.version>5.2.4</joinfaces.version>
+        <joinfaces.version>5.2.1</joinfaces.version>
     </properties>
 
     <dependencyManagement>
         <dependencies>
             <dependency>
                 <groupId>org.joinfaces</groupId>
-                <artifactId>joinfaces-bom</artifactId>
+                <artifactId>joinfaces-platform</artifactId>
                 <version>${joinfaces.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
@@ -60,15 +60,21 @@
             <artifactId>security-spring-boot-starter</artifactId>
         </dependency>
 
+<!--        <dependency>-->
+<!--            <groupId>org.joinfaces</groupId>-->
+<!--            <artifactId>rewrite-spring-boot-starter</artifactId>-->
+<!--        </dependency>-->
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-tomcat</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
         <dependency>
             <groupId>org.webjars.npm</groupId>
             <artifactId>primeflex</artifactId>
             <version>3.3.1</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.joinfaces</groupId>
-            <artifactId>rewrite-spring-boot-starter</artifactId>
         </dependency>
 
         <dependency>
@@ -85,8 +91,6 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
-
-
 
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -107,6 +111,11 @@
         </dependency>
 
         <dependency>
+            <groupId>org.hibernate.orm</groupId>
+            <artifactId>hibernate-jpamodelgen</artifactId>
+        </dependency>
+
+        <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-configuration-processor</artifactId>
             <optional>true</optional>
@@ -120,12 +129,6 @@
 
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-tomcat</artifactId>
-            <scope>provided</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
@@ -134,6 +137,11 @@
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-test</artifactId>
             <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>jakarta.xml.bind</groupId>
+            <artifactId>jakarta.xml.bind-api</artifactId>
         </dependency>
 
     </dependencies>
