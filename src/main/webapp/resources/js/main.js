@@ -26,7 +26,7 @@ let Main = {
                     wrapper.classList.toggle('menu-mobile-active');
 
                     menuIcon.classList.toggle('fi-rr-menu-burger');
-                    menuIcon.classList.toggle('fi-rr--cross');
+                    menuIcon.classList.toggle('fi-rr-cross');
 
                     mask.classList.toggle('show');
                 } else {

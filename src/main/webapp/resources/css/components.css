@@ -40,68 +40,89 @@ body .ui-widget {
 
 
 
-/*
-    Buttons
- */
+/*region Buttons */
 
 body .ui-button {
     background: var(--primary-color);
-    color: var(--primary-color-text);
-    border: 0;
+    color: var(--primary-text-color);
+    border: 1px solid var(--primary-color);
     margin: 0;
     outline: 0 none;
-    transition: none;
-    border-radius: var(--button-border-radius);
-    box-shadow: var(--button-drop-shadow);
+    border-radius: var(--border-radius-elements);
+    transition: background-color .2s,color .2s,border-color .2s,box-shadow .2s,opacity .2s
+}
 
+body .ui-button.ui-state-hover {
+    background: var(--primary-dark-color);
+    border-color: var(--primary-dark-color);
+    color: var(--primary-text-color);
+}
+
+body .ui-button.ui-state-focus {
+    outline: 0 none;
+    outline-offset: 0;
+    box-shadow: 0 0 0 .2em var(--highlight-bg);
+}
+
+body .ui-button.ui-state-active,
+body .ui-button.ui-state-down {
+    background: var(--primary-darker-color);
+    border-color: var(--primary-darker-color);
+    color: var(--primary-text-color);
+}
+
+body .ui-button.ui-button-outlined {
+    background-color: var(--primary-text-color);
+    color: var(--primary-color);
+    border: 1px solid;
+}
+
+body .ui-button.ui-button-outlined.ui-state-hover {
+    background: var(--surface-hover);
+    color: var(--primary-dark-color);
+    border-color: var(--primary-dark-color);
+
+}
+
+body .ui-button.ui-button-outlined.ui-state-active,
+body .ui-button.ui-button-outlined.ui-state-down {
+    background: var(--highlight-bg);
+    color: var(--primary-darker-color);
+    border-color: var(--primary-darker-color);
+}
+
+body .ui-splitbutton {
     display: flex;
+    flex-direction: row;
     padding: 0;
-    align-items: center;
-    gap: 0.5rem;
-    font-family: var(--font-family-base);
 }
 
-body .ui-button.ui-button-text-only .ui-button-text {
-    padding: 0.625rem 1.25rem;
-}
+/*endregion Buttons */
 
-body .ui-button .ui-button-text,
-body .ui-button .ui-icon {
+
+/*region Input */
+
+.field .ui-outputlabel .ui-outputlabel-label {
     font-size: var(--font-size-base);
 }
 
-body .ui-button.button-plain {
-    border-radius: 1rem;
-    border: 2px solid var(--primary-color);
-    background: var(--primary-text-color);
-    box-shadow: none;
-    color: var(--primary-color);
-    padding: 0.5rem 1rem;
-}
-
-body .ui-button.button-plain:hover {
-    border-color: var(--primary-color);
-    color: var(--primary-color);
+.ui-selectonemenu .ui-selectonemenu-label {
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 
 body .ui-inputfield {
     color: var(--text-color);
     background: var(--surface-section);
+    padding: .5rem .5rem;
     border: 1px solid var(--surface-border);
     outline: 0 none;
     font-size: var(--font-size-base);
     border-radius: var(--border-radius-elements);
-    transition: none;
+    transition: background-color .2s,color .2s,border-color .2s,box-shadow .2s,opacity .2s;
     -webkit-appearance: none;
-    appearance: none;
-
-    display: flex;
-    height: 2.5rem;
-    padding: 0.5rem 1rem;
-    align-items: center;
-    gap: 0.625rem;
-    align-self: stretch;
+    appearance: none
 }
 
 body .ui-inputfield.ui-state-hover {
@@ -109,9 +130,15 @@ body .ui-inputfield.ui-state-hover {
 }
 
 body .ui-inputfield.ui-state-focus {
-    border-color: var(--primary-color);
-    box-shadow: 0 0 0 0.2em #E7EEF2;
+    border-color: var(--primary-dark-color);
+    outline: 0 none;
+    box-shadow: 0 0 0 .2em var(--highlight-bg);
 }
+
+body .ui-inputfield.ui-state-error {
+    border-color: var(--text-error-color);
+}
+
 
 body .ui-commandlink, body .ui-link {
     color: var(--text-secondary-color);
@@ -121,6 +148,15 @@ body .ui-commandlink:hover, body .ui-link:hover {
     color: var(--text-color);;
     text-decoration: none;
 }
+
+body .ui-icon {
+    font-size: var(--font-size-base);
+}
+
+/*endregion Input */
+
+
+
 
 body .card {
     display: flex;
@@ -164,6 +200,168 @@ body .card .card-body {
 body .ui-dialog .ui-dialog-titlebar {
     padding: 1rem 1.5rem;
 }
+
+
+
+/*region Breadcum */
+
+body .ui-breadcrumb {
+    background: none;
+    border: none;
+    border-radius: 4px;
+    padding: var(--spacing-1);
+}
+
+body .ui-breadcrumb .ui-breadcrumb-items li .ui-menuitem-link .ui-menuitem-text {
+    color: var(--text-secondary-color);
+    font-weight: var(--font-weight-light);
+    font-size: var(--font-size-base);
+}
+
+body .ui-breadcrumb .ui-breadcrumb-items li:not(.ui-breadcrumb-chevron):before {
+    content: "/";
+    margin: 0.5rem;
+    color: var(--text-secondary-color);
+}
+
+body .ui-breadcrumb .ui-breadcrumb-items li:last-child .ui-menuitem-link .ui-menuitem-text {
+    color: var(--text-color);
+    font-weight: var(--font-weight-normal);
+    font-size: var(--font-size-base);
+}
+
+/*endregion Breadcum */
+
+/*region Toolbar */
+
+body .ui-toolbar {
+    border: 1px solid var(--surface-border);
+    background: var(--surface-header);
+    color: var(--text-color);
+    padding: 1rem;
+    border-radius: var(--border-radius-elements);
+}
+
+/*endregion Toolbar */
+
+/*region Panel */
+
+body .ui-panel .ui-panel-titlebar {
+    border: 1px solid var(--surface-border);
+    background: var(--surface-header);
+    color: var(--text-color);
+    padding: 1rem;
+    font-weight: var(--font-weight-bold);
+    border-radius: var(--border-radius-elements) var(--border-radius-elements) 0 0;
+}
+
+/*endregion Panel */
+
+
+/*region Datatable */
+
+body .ui-datatable {
+    border: 1px solid var(--surface-border);
+    border-radius: var(--border-radius-elements);
+}
+
+body .ui-datatable .ui-datatable-header {
+    background: var(--surface-header);
+    border-bottom: 1px solid var(--surface-border);
+    color: var(--text-color);
+    padding: 1rem;
+    font-weight: var(--font-weight-bold);
+    border-top-left-radius: var(--border-radius-elements);
+    border-top-right-radius: var(--border-radius-elements);
+}
+
+body .ui-datatable thead th {
+    background: var(--surface-header);
+    color: var(--text-color);
+    border-bottom: 1px solid var(--surface-border);
+}
+
+body .ui-datatable thead th .ui-column-title {
+    font-weight: var(--font-weight-bold);
+    vertical-align: middle;
+}
+
+body .ui-datatable .ui-paginator {
+    background: var(--surface-section);
+    border: none;
+}
+body .ui-paginator .ui-paginator-current, body .ui-paginator .ui-paginator-rpp-options {
+    padding: 0.5rem;
+    border: 1px solid var(--surface-border);
+    border-radius: var(--border-radius-elements);
+    color: var(--text-color);
+    font-size: var(--font-size-sm);
+}
+body .ui-paginator .ui-paginator-current, body .ui-paginator .ui-paginator-rpp-options:focus-visible {
+    border: 1px solid var(--surface-border);
+    outline: none;
+}
+body .ui-datatable .ui-paginator.ui-paginator-bottom {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+body .ui-paginator .ui-paginator-pages .ui-paginator-page.ui-state-active {
+    background: var(--highlight-bg);
+    color: var(--text-color);
+}
+
+body .ui-datatable.dt-scrollable .ui-datatable-header,
+body .ui-datatable.dt-scrollable .ui-widget-header.ui-datatable-scrollable-header,
+body .ui-datatable.dt-scrollable .ui-datatable-scrollable-body {
+    width: 100% !important;
+}
+body .ui-datatable.dt-scrollable .ui-datatable-scrollable-body {
+    max-height: 480px !important;
+}
+body .ui-datatable.dt-scrollable table.ui-datatable-fs {
+    width: 100%;
+}
+body .ui-datatable.dt-scrollable .ui-widget-header.ui-datatable-scrollable-header .ui-datatable-scrollable-header-box {
+    margin-right: 0 !important;
+}
+
+body .ui-datatable.dt-scrollable-x .ui-datatable-header,
+body .ui-datatable.dt-scrollable-x .ui-widget-header.ui-datatable-scrollable-header,
+body .ui-datatable.dt-scrollable-x .ui-datatable-scrollable-body {
+    width: 100% !important;
+}
+body .ui-datatable.ui-datatable.dt-scrollable-x table.ui-datatable-fs {
+    width: 100%;
+}
+body .ui-datatable.dt-scrollable-x .ui-widget-header.ui-datatable-scrollable-header .ui-datatable-scrollable-header-box {
+    margin-right: 0 !important;
+}
+
+
+
+/*endregion Datatable */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
