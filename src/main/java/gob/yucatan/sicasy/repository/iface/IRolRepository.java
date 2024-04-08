@@ -7,6 +7,6 @@ import org.springframework.data.jpa.repository.Query;
 
 public interface IRolRepository extends JpaRepository<Rol, Long>, JpaSpecificationExecutor<Rol> {
 
-    @Query("select count(distinct usuarioRolSet.idUsuarioRol) from Rol r inner join fetch r.usuarioRolSet usuarioRolSet where usuarioRolSet.rol.idRol = ?1")
+    @Query("select count(distinct usuarioRolSet.idUsuarioRol) from Rol r inner join r.usuarioRolSet usuarioRolSet where usuarioRolSet.rol.idRol = ?1")
     long countUsuariosByRolId(Long idRol);
 }

@@ -77,6 +77,7 @@
             <p:dataTable id="dtExample"
                          var="rol" value="#{rolView.roles}"
                          rows="50"
+                         rowKey="#{rol.idRol}"
                          styleClass="dt-scrollable"
                          scrollable="true"
                          paginator="true" paginatorPosition="bottom"
@@ -108,12 +109,13 @@
                     <h:outputText value="#{rol.estatus.label}"/>
                 </p:column>
 
-                <p:column headerText="Fecha creación">
-                    <h:outputText value="#{rol.fechaCreacion}">
-                    </h:outputText>
-                </p:column>
-
                 <sec:authorize access="hasAuthority('ROLE_OWNER')">
+
+                    <p:column headerText="Fecha creación">
+                        <h:outputText value="#{rol.fechaCreacion}">
+                        </h:outputText>
+                    </p:column>
+
                     <p:column headerText="Creado por">
                         <h:outputText value="#{rol.creadoPor}">
                         </h:outputText>
@@ -139,6 +141,18 @@
                         </h:outputText>
                     </p:column>
                 </sec:authorize>
+
+                <p:column headerText="Acciones">
+
+                    <p:commandButton id="buttonOptions" type="button"
+                                     icon="fi fi-rr-menu-dots-vertical" styleClass="rounded-button ui-button-outlined" />
+                    <p:menu overlay="true" trigger="buttonOptions" my="left top" at="left bottom">
+                        <p:menuitem value="Autorizar" icon="fi fi-rr-check"/>
+                        <p:menuitem value="Editar" icon="fi fi-rr-pencil"/>
+                        <p:menuitem value="Delete" icon="fi fi-rr-trash"/>
+                    </p:menu>
+
+                </p:column>
 
             </p:dataTable>
 
