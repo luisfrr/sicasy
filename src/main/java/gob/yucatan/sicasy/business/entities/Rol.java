@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.Date;
+import java.util.Set;
 
 @Entity
 @Table(name = "rol", schema = "sec")
@@ -28,6 +29,9 @@ public class Rol {
 
     @Column(name = "descripcion")
     private String descripcion;
+
+    @OneToMany(mappedBy = "rol")
+    private Set<UsuarioRol> usuarioRolSet;
 
     @Column(name = "estatus", nullable = false)
     @Enumerated(EnumType.ORDINAL)
@@ -53,5 +57,10 @@ public class Rol {
 
     @Column(name = "borrado_por")
     private String borradoPor;
+
+
+    @Transient
+    private boolean leftJoinUsuarioRolSet;
+
 
 }

@@ -1,0 +1,151 @@
+<ui:composition template="../../WEB-INF/facelets/main_layout.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="jakarta.faces.facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="jakarta.faces.html"
+                xmlns:f="jakarta.faces.core"
+                xmlns:sec="https://joinfaces.org/security">
+
+<ui:define name="title">
+    #{rolView.title}
+</ui:define>
+
+<ui:define name="content">
+
+    <p:outputPanel styleClass="container-fluid">
+
+        <p:growl id="growl" showDetail="true" showSummary="true" skipDetailIfEqualsSummary="true" globalOnly="true"/>
+
+        <h:form id="form_breadcum" styleClass="mb-5">
+            <p:breadCrumb homeDisplay="text">
+                <p:menuitem value="Inicio"/>
+                <p:menuitem value="Seguridad"/>
+                <p:menuitem value="Roles"/>
+            </p:breadCrumb>
+        </h:form>
+
+        <h:form id="form_toolbar" styleClass="mb-5">
+            <p:toolbar>
+                <p:toolbarGroup>
+                    <p:commandButton value="Nuevo" styleClass="mr-4"/>
+                </p:toolbarGroup>
+
+                <p:toolbarGroup align="right">
+                    <p:commandButton value="Exportar" styleClass="ui-button-outlined"/>
+                </p:toolbarGroup>
+            </p:toolbar>
+        </h:form>
+
+        <h:form id="form_filtros" styleClass="mb-5">
+
+            <p:panel header="Filtros" widgetVar="panelFiltros"
+                     toggleable="true" toggleSpeed="500">
+                <f:facet name="options">
+                    <p:menu>
+                        <p:submenu label="Opciones">
+                            <p:menuitem value="Toggle" icon="pi pi-clone"/>
+                        </p:submenu>
+                    </p:menu>
+                </f:facet>
+
+                <p:outputPanel styleClass="grid formgrid mb-2">
+
+                    <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4 xl:col-3">
+                        <p:outputLabel for="@next" value="Nombre" styleClass="block"/>
+                        <p:inputText styleClass="block w-full" placeholder="Ingresa un nombre..."
+                                     value="#{rolView.rolFiltros.nombre}"/>
+                        <span class="text-sm hidden"> </span>
+                    </p:outputPanel>
+
+                </p:outputPanel>
+
+                <f:facet name="footer">
+                    <p:outputPanel styleClass="flex flex-row gap-4 justify-content-end">
+                        <p:commandButton value="Limpiar filtros" styleClass="ui-button-outlined"
+                                         ajax="true" action="#{rolView.limpiarFiltros()}"
+                                         update="form_filtros form_datatable"/>
+                        <p:commandButton value="Buscar" ajax="true" action="#{rolView.buscar()}"
+                                         update="form_datatable"/>
+                    </p:outputPanel>
+                </f:facet>
+            </p:panel>
+
+        </h:form>
+
+        <h:form id="form_datatable" styleClass="mb-5">
+
+            <p:dataTable id="dtExample"
+                         var="rol" value="#{rolView.roles}"
+                         rows="50"
+                         styleClass="dt-scrollable"
+                         scrollable="true"
+                         paginator="true" paginatorPosition="bottom"
+                         paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                         currentPageReportTemplate="{startRecord}-{endRecord} de {totalRecords} registros"
+                         rowsPerPageTemplate="50,100,200,{ShowAll|'Todos'}">
+
+                <f:facet name="header">
+                    Roles
+                </f:facet>
+
+                <p:column headerText="Id">
+                    <h:outputText value="#{rol.idRol}" />
+                </p:column>
+
+                <p:column headerText="Código">
+                    <h:outputText value="#{rol.codigo}"/>
+                </p:column>
+
+                <p:column headerText="Nombre">
+                    <h:outputText value="#{rol.nombre}"/>
+                </p:column>
+
+                <p:column headerText="Descripción">
+                    <h:outputText value="#{rol.descripcion}"/>
+                </p:column>
+
+                <p:column headerText="Estatus">
+                    <h:outputText value="#{rol.estatus.label}"/>
+                </p:column>
+
+                <p:column headerText="Fecha creación">
+                    <h:outputText value="#{rol.fechaCreacion}">
+                    </h:outputText>
+                </p:column>
+
+                <sec:authorize access="hasAuthority('ROLE_OWNER')">
+                    <p:column headerText="Creado por">
+                        <h:outputText value="#{rol.creadoPor}">
+                        </h:outputText>
+                    </p:column>
+
+                    <p:column headerText="Fecha modificación">
+                        <h:outputText value="#{rol.fechaModificacion}">
+                        </h:outputText>
+                    </p:column>
+
+                    <p:column headerText="Modificado por">
+                        <h:outputText value="#{rol.modificadoPor}">
+                        </h:outputText>
+                    </p:column>
+
+                    <p:column headerText="Fecha borrado">
+                        <h:outputText value="#{rol.fechaBorrado}">
+                        </h:outputText>
+                    </p:column>
+
+                    <p:column headerText="Borrado por">
+                        <h:outputText value="#{rol.borradoPor}">
+                        </h:outputText>
+                    </p:column>
+                </sec:authorize>
+
+            </p:dataTable>
+
+        </h:form>
+
+    </p:outputPanel>
+
+</ui:define>
+
+</ui:composition>
