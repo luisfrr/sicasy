@@ -1,32 +1,45 @@
 <ui:composition
         xmlns="http://www.w3.org/1999/xhtml"
-        xmlns:ui="jakarta.faces.facelets">
+        xmlns:ui="jakarta.faces.facelets"
+        xmlns:h="jakarta.faces.html"
+        xmlns:p="http://primefaces.org/ui">
 
     <aside class="sidebar">
 
-        <div class="menu-container">
+        <h:form id="form_sidebar">
+            <div class="menu-container">
 
-            <div class="menu-item menu-item-active">
-                <div class="icon">
-                    <i class="fi fi-rr-home"/>
-                </div>
-                <span class="label">Inicio</span>
-            </div>
+                <p:commandLink styleClass="menu-item menu-item-active" ajax="false" action="#{menuSessionBean.goToHome()}">
+                    <div class="icon">
+                        <i class="fi fi-rr-home"/>
+                    </div>
+                    <span class="label">Inicio</span>
+                </p:commandLink>
 
-            <div class="menu-item">
-                <div class="icon">
-                    <i class="fi fi-rr-car-alt"/>
+                <div class="menu-item">
+                    <div class="icon">
+                        <i class="fi fi-rr-car-alt"/>
+                    </div>
+                    <span class="label">Vehículos</span>
                 </div>
-                <span class="label">Vehículos</span>
-            </div>
 
-            <div class="menu-item">
-                <div class="icon">
-                    <i class="fi fi-rr-shield"/>
+                <div class="menu-item">
+                    <div class="icon">
+                        <i class="fi fi-rr-shield"/>
+                    </div>
+                    <span class="label">Seguros</span>
                 </div>
-                <span class="label">Seguros</span>
+
+                <p:commandLink styleClass="menu-item" ajax="false" action="#{menuSessionBean.goToRoles()}">
+                    <div class="icon">
+                        <i class="fi fi-rr-tags"/>
+                    </div>
+                    <span class="label">Roles</span>
+                </p:commandLink>
+
             </div>
-        </div>
+        </h:form>
+
     </aside>
 
 </ui:composition>
