@@ -69,7 +69,7 @@
     border-radius: var(--border-radius-elements);
 }
 .topbar .header-link:hover {
-    background-color: var(--surface-hover);
+    background-color: var(--highlight-bg);
 }
 .topbar .header-link i {
     color: var(--text-color);

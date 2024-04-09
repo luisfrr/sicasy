@@ -27,7 +27,13 @@
         <h:form id="form_toolbar" styleClass="mb-5">
             <p:toolbar>
                 <p:toolbarGroup>
-                    <p:commandButton value="Nuevo" styleClass="mr-4"/>
+                    <p:commandButton value="Nuevo"
+                                     action="#{rolView.nuevo()}"
+                                     oncomplete="PF('formDialog').show()"
+                                     update="form_dialog"
+                                     styleClass="mr-4">
+                        <p:resetInput target="form_dialog:dialogContent"/>
+                    </p:commandButton>
                 </p:toolbarGroup>
 
                 <p:toolbarGroup align="right">
@@ -40,20 +46,12 @@
 
             <p:panel header="Filtros" widgetVar="panelFiltros"
                      toggleable="true" toggleSpeed="500">
-                <f:facet name="options">
-                    <p:menu>
-                        <p:submenu label="Opciones">
-                            <p:menuitem value="Toggle" icon="pi pi-clone"/>
-                        </p:submenu>
-                    </p:menu>
-                </f:facet>
-
                 <p:outputPanel styleClass="grid formgrid mb-2">
 
                     <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4 xl:col-3">
                         <p:outputLabel for="@next" value="Nombre" styleClass="block"/>
                         <p:inputText styleClass="block w-full" placeholder="Ingresa un nombre..."
-                                     value="#{rolView.rolFiltros.nombre}"/>
+                                     value="#{rolView.rolFilter.nombre}"/>
                         <span class="text-sm hidden"> </span>
                     </p:outputPanel>
 
@@ -77,7 +75,7 @@
             <p:dataTable id="dtExample"
                          var="rol" value="#{rolView.roles}"
                          rows="50"
-                         rowKey="#{rol.idRol}"
+                         rowKey="#{rol.idRol}" rowIndexVar="index"
                          styleClass="dt-scrollable"
                          scrollable="true"
                          paginator="true" paginatorPosition="bottom"
@@ -89,8 +87,8 @@
                     Roles
                 </f:facet>
 
-                <p:column headerText="Id">
-                    <h:outputText value="#{rol.idRol}" />
+                <p:column headerText="No.">
+                    <h:outputText value="#{index + 1}" />
                 </p:column>
 
                 <p:column headerText="Código">
@@ -146,10 +144,15 @@
 
                     <p:commandButton id="buttonOptions" type="button"
                                      icon="fi fi-rr-menu-dots-vertical" styleClass="rounded-button ui-button-outlined" />
-                    <p:menu overlay="true" trigger="buttonOptions" my="left top" at="left bottom">
-                        <p:menuitem value="Autorizar" icon="fi fi-rr-check"/>
-                        <p:menuitem value="Editar" icon="fi fi-rr-pencil"/>
-                        <p:menuitem value="Delete" icon="fi fi-rr-trash"/>
+                    <p:menu overlay="true" trigger="buttonOptions" my="left top" at="left bottom" >
+                        <p:menuitem value="Asignar permisos" icon="fi fi-rr-key"/>
+                        <p:menuitem value="Editar" icon="fi fi-rr-pencil"
+                                    action="#{rolView.editar(rol.idRol)}"
+                                    ajax="true" update="form_dialog"
+                                    oncomplete="PF('formDialog').show()">
+                            <p:resetInput target="form_dialog:dialogContent"/>
+                        </p:menuitem>
+                        <p:menuitem value="Eliminar" icon="fi fi-rr-trash"/>
                     </p:menu>
 
                 </p:column>
@@ -159,6 +162,51 @@
         </h:form>
 
     </p:outputPanel>
+
+    <h:form id="form_dialog">
+        <p:dialog header="#{rolView.formDialogTitle}" widgetVar="formDialog"
+                  minHeight="350" width="450"
+                  showEffect="fade" modal="true"
+                  closable="true" closeOnEscape="true"
+                  cache="false" responsive="true">
+            <p:outputPanel id="dialogContent" styleClass="formgrid grid" rendered="#{rolView.rolSelected != null}">
+
+                <p:outputPanel styleClass="field col-12">
+                    <p:outputLabel for="@next" value="Código" styleClass="block"/>
+                    <p:inputText styleClass="block w-full" required="true"
+                                 value="#{rolView.rolSelected.codigo}"/>
+                    <span class="text-sm">Código único para identificar un rol</span>
+                </p:outputPanel>
+
+                <p:outputPanel styleClass="field col-12">
+                    <p:outputLabel for="@next" value="Nombre" styleClass="block"/>
+                    <p:inputText styleClass="block w-full" required="true"
+                                 value="#{rolView.rolSelected.nombre}"/>
+                    <span class="text-sm hidden"> </span>
+                </p:outputPanel>
+
+                <p:outputPanel styleClass="field col-12">
+                    <p:outputLabel for="@next" value="Descripción" styleClass="block"/>
+                    <p:inputTextarea styleClass="block w-full" rows="3"
+                                 value="#{rolView.rolSelected.descripcion}"/>
+                    <span class="text-sm hidden"> </span>
+                </p:outputPanel>
+
+            </p:outputPanel>
+
+            <f:facet name="footer">
+
+                <p:commandButton value="Cancelar" onclick="PF('formDialog').hide()"
+                                 class="ui-button-outlined"/>
+                <p:commandButton value="Guardar"
+                                 action="#{rolView.guardar()}"
+                                 ajax="true" process="@form"
+                                 update="growl form_datatable"
+                                 validateClient="true"/>
+            </f:facet>
+        </p:dialog>
+    </h:form>
+
 
 </ui:define>
 
