@@ -33,11 +33,11 @@ public class AseguradoraServiceImpl implements IAseguradoraService {
                     Aseguradora_.NOMBRE));
         }
 
-        if (aseguradora.getRepresentante() != null && !aseguradora.getRepresentante().isEmpty()) {
-            searchSpecification.add(new SearchCriteria(SearchOperation.MATCH,
-                    aseguradora.getRepresentante(),
-                    Aseguradora_.REPRESENTANTE));
-        }
+//        if (aseguradora.getRepresentante() != null && !aseguradora.getRepresentante().isEmpty()) {
+//            searchSpecification.add(new SearchCriteria(SearchOperation.MATCH,
+//                    aseguradora.getRepresentante(),
+//                    Aseguradora_.REPRESENTANTE));
+//        }
 
         return aseguradoraRepository.findAll(searchSpecification);
     }

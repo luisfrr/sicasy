@@ -25,7 +25,6 @@ import java.util.List;
 @Slf4j
 public class AseguradoraView {
 
-    private final Object session;
     private @Getter String title;
     private @Getter String titleDialog;
     private @Getter Aseguradora aseguradoraSelected;
