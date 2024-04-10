@@ -13,4 +13,10 @@ public interface IAseguradoraService {
 
     Optional<Aseguradora> findByNombre(String nombre);
 
+    void save(Aseguradora aseguradora);
+
+    void delete(Aseguradora aseguradora);
+
+    void update(Aseguradora aseguradora);
+
 }

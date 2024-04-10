@@ -12,6 +12,7 @@ import jakarta.faces.context.FacesContext;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.primefaces.PrimeFaces;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
@@ -71,9 +72,19 @@ public class AseguradoraView {
                     // si no es null el id entonces es un update
                     this.aseguradoraSelected.setModificadoPor(userSessionBean.getUserName());
                     this.aseguradoraSelected.setFechaModificacion(new Date());
-
-
+                    aseguradoraService.update(aseguradoraSelected);
+                }else {
+                    // id aseguradora null, entonces se inserta nuevo en BD
+                    this.aseguradoraSelected.setCreadoPor(userSessionBean.getUserName());
+                    this.aseguradoraSelected.setFechaCreacion(new Date());
+                    aseguradoraService.save(aseguradoraSelected);
                 }
+
+                FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_INFO,
+                        "Operación exitosa", "Se ha guardado correctamente la información");
+                FacesContext.getCurrentInstance().addMessage(null, msg);
+                PrimeFaces.current().executeScript("PF('formDialog').hide();");
+                this.buscar();
             }
         }catch (Exception ex) {
             String message;
@@ -89,6 +100,8 @@ public class AseguradoraView {
         }
 
     }
+
+    // falta agregar la eliminacion
 
 
 }

@@ -2,6 +2,7 @@ package gob.yucatan.sicasy.services.impl;
 
 import gob.yucatan.sicasy.business.entities.Aseguradora;
 import gob.yucatan.sicasy.business.entities.Aseguradora_;
+import gob.yucatan.sicasy.business.enums.EstatusRegistro;
 import gob.yucatan.sicasy.repository.criteria.SearchCriteria;
 import gob.yucatan.sicasy.repository.criteria.SearchOperation;
 import gob.yucatan.sicasy.repository.criteria.SearchSpecification;
@@ -49,5 +50,23 @@ public class AseguradoraServiceImpl implements IAseguradoraService {
     @Override
     public Optional<Aseguradora> findByNombre(String nombre) {
         return aseguradoraRepository.findByNombreIgnoreCase(nombre);
+    }
+
+    @Override
+    public void save(Aseguradora aseguradora) {
+        aseguradora.setEstatus(EstatusRegistro.ACTIVO);
+        aseguradoraRepository.save(aseguradora);
+
+    }
+
+    @Override
+    public void delete(Aseguradora aseguradora) {
+        aseguradoraRepository.delete(aseguradora);
+    }
+
+    @Override
+    public void update(Aseguradora aseguradora) {
+        aseguradoraRepository.save(aseguradora);
+
     }
 }
