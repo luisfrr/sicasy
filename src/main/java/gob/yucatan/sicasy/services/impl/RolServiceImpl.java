@@ -38,6 +38,11 @@ public class RolServiceImpl implements IRolService {
                     rol.getNombre(),
                     Rol_.NOMBRE));
 
+        if(rol.getEstatus() != null)
+            specification.add(new SearchCriteria(SearchOperation.EQUAL,
+                    rol.getEstatus(),
+                    Rol_.ESTATUS));
+
         if(rol.isLeftJoinUsuarioRolSet())
             specification.add(new SearchFetch(JoinType.LEFT,
                     Rol_.USUARIO_ROL_SET));

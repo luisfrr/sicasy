@@ -103,10 +103,6 @@
                     <h:outputText value="#{rol.descripcion}"/>
                 </p:column>
 
-                <p:column headerText="Estatus">
-                    <h:outputText value="#{rol.estatus.label}"/>
-                </p:column>
-
                 <sec:authorize access="hasAuthority('ROLE_OWNER')">
 
                     <p:column headerText="Fecha creación">
@@ -129,15 +125,6 @@
                         </h:outputText>
                     </p:column>
 
-                    <p:column headerText="Fecha borrado">
-                        <h:outputText value="#{rol.fechaBorrado}">
-                        </h:outputText>
-                    </p:column>
-
-                    <p:column headerText="Borrado por">
-                        <h:outputText value="#{rol.borradoPor}">
-                        </h:outputText>
-                    </p:column>
                 </sec:authorize>
 
                 <p:column headerText="Acciones">
@@ -152,7 +139,11 @@
                                     oncomplete="PF('formDialog').show()">
                             <p:resetInput target="form_dialog:dialogContent"/>
                         </p:menuitem>
-                        <p:menuitem value="Eliminar" icon="fi fi-rr-trash"/>
+                        <p:menuitem value="Eliminar" icon="fi fi-rr-trash"
+                                    ajax="true" action="#{rolView.eliminar(rol.idRol)}"
+                                    update="growl form_datatable">
+                            <p:confirm header="Confirmación" message="¿Está seguro que desea eliminar el rol?" icon="pi pi-exclamation-triangle"/>
+                        </p:menuitem>
                     </p:menu>
 
                 </p:column>

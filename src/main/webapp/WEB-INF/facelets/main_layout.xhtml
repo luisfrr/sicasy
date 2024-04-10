@@ -40,6 +40,10 @@
             <div class="main-content">
                 <ui:insert name="content"/>
             </div>
+            <p:confirmDialog global="true" showEffect="fade" hideEffect="fade" responsive="true" width="350">
+                <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no ui-button-outlined"/>
+                <p:commandButton value="Sí" type="button" styleClass="ui-confirmdialog-yes" />
+            </p:confirmDialog>
             <ui:include src="/WEB-INF/facelets/footer_layout.xhtml"/>
             <div class="mask"> </div>
         </div>

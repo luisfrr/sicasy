@@ -44,18 +44,18 @@ public class Rol {
     @Column(name = "creado_por", nullable = false, updatable = false)
     private String creadoPor;
 
-    @Column(name = "fecha_modificacion")
+    @Column(name = "fecha_modificacion", insertable = false)
     @Temporal(TemporalType.TIMESTAMP)
     private Date fechaModificacion;
 
-    @Column(name = "modificado_por")
+    @Column(name = "modificado_por", insertable = false)
     private String modificadoPor;
 
-    @Column(name = "fecha_borrado")
+    @Column(name = "fecha_borrado", insertable = false)
     @Temporal(TemporalType.TIMESTAMP)
     private Date fechaBorrado;
 
-    @Column(name = "borrado_por")
+    @Column(name = "borrado_por", insertable = false)
     private String borradoPor;
 
 
