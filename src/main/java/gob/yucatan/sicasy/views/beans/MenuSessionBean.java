@@ -19,4 +19,8 @@ public class MenuSessionBean implements Serializable {
         return "/views/seguridad/roles?faces-redirect=true";
     }
 
+    public String goToAseguradoras() {
+        return "/views/catalogos/aseguradoras?faces-redirect=true";
+    }
+
 }
