@@ -142,17 +142,27 @@
 
                     <p:column headerText="Acciones">
 
+                        <p:growl id="message" showDetail="true"/>
+
                         <p:commandButton id="buttonOptions" type="button"
                                          icon="fi fi-rr-menu-dots-vertical" styleClass="rounded-button ui-button-outlined" />
                         <p:menu overlay="true" trigger="buttonOptions" my="left top" at="left bottom" >
                             <p:menuitem value="Asignar permisos" icon="fi fi-rr-key"/>
+
                             <p:menuitem value="Editar" icon="fi fi-rr-pencil"
                                         action="#{aseguradoraView.editar(aseguradora.idAseguradora)}"
                                         ajax="true" update="form_dialog"
                                         oncomplete="PF('formDialog').show()">
                                 <p:resetInput target="form_dialog:dialogContent"/>
                             </p:menuitem>
-                            <p:menuitem value="Eliminar" icon="fi fi-rr-trash"/>
+
+                            <p:menuitem value="Eliminar" icon="fi fi-rr-trash"
+                                        ajax="true" update="form_confirm_dialog"
+                                        oncomplete="PF('confirmDialog').show()"
+                                        action="#{aseguradoraView.doEliminar(aseguradora.idAseguradora)}">
+                            </p:menuitem>
+
+
                         </p:menu>
 
                     </p:column>
@@ -162,6 +172,31 @@
             </h:form>
 
         </p:outputPanel>
+
+        <h:form id="form_confirm_dialog">
+            <p:dialog header="Aviso" widgetVar="confirmDialog"
+                    showEffect="fade" modal="true"
+                    closable="true" closeOnEscape="true"
+                    cache="false" responsive="true">
+                <p:panel>
+                    <p:outputLabel styleClass="block mb-2" value="Está seguro de eliminar el registro?"/>
+
+                    <p:spacer/>
+
+                    <f:facet name="footer">
+
+                        <p:commandButton value="No" onclick="PF('confirmDialog').hide()"
+                                         class="ui-button-outlined"/>
+                        <p:commandButton value="Si"
+                                         action="#{aseguradoraView.eliminar()}"
+                                         ajax="true" process="@form"
+                                         update="growl form_datatable"
+                                         validateClient="true"/>
+                    </f:facet>
+
+                </p:panel>
+            </p:dialog>
+        </h:form>
 
         <h:form id="form_dialog">
             <p:dialog header="#{aseguradoraView.titleDialog}" widgetVar="formDialog"

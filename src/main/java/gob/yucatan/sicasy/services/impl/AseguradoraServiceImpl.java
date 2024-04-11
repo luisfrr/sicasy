@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -32,6 +33,10 @@ public class AseguradoraServiceImpl implements IAseguradoraService {
                     aseguradora.getNombre() ,
                     Aseguradora_.NOMBRE));
         }
+
+        searchSpecification.add(new SearchCriteria(SearchOperation.EQUAL,
+                EstatusRegistro.ACTIVO,
+                Aseguradora_.ESTATUS));
 
 //        if (aseguradora.getRepresentante() != null && !aseguradora.getRepresentante().isEmpty()) {
 //            searchSpecification.add(new SearchCriteria(SearchOperation.MATCH,
@@ -61,7 +66,11 @@ public class AseguradoraServiceImpl implements IAseguradoraService {
 
     @Override
     public void delete(Aseguradora aseguradora) {
-        aseguradoraRepository.delete(aseguradora);
+
+        aseguradora.setEstatus(EstatusRegistro.BORRADO);
+        aseguradora.setFechaBorrado(new Date());
+        aseguradoraRepository.save(aseguradora);
+
     }
 
     @Override
