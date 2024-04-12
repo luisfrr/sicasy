@@ -22,7 +22,8 @@
             </a>
 
             <a class="header-link user-info" href="#" onclick="Main.toggleUserDropdown();">
-                <i class="fi fi-rr-user"/>
+                <p:avatar label="#{userSessionBean.firstLetterName}"
+                          styleClass="mr-2" shape="circle"/>
                 <span class="username">#{userSessionBean.userName}</span>
             </a>
             <div class="user-info-dropdown" id="userInfoDropdown">

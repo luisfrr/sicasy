@@ -508,7 +508,16 @@ body .ui-tabs .ui-tabs-navscroller .ui-tabs-navscroller-btn.ui-state-hover {
 /*endregion Tabs */
 
 
-
+body .topbar .header-link.user-info .ui-avatar {
+    width: 1.5rem;
+    height: 1.5rem;
+    font-size: var(--font-size-base);
+    background-color: var(--highlight-bg);
+}
+body .topbar .header-link.user-info .ui-avatar span.ui-avatar-text {
+    color: var(--text-color);
+    font-weight: var(--font-weight-semibold);
+}
 
 
 

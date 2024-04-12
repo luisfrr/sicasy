@@ -21,6 +21,7 @@ public class UserSessionBean implements Serializable {
 
     private String userName;
     private String fullName;
+    private String firstLetterName;
 
     @PostConstruct
     public void init() {
@@ -34,11 +35,13 @@ public class UserSessionBean implements Serializable {
             Usuario usuario = (Usuario) auth.getDetails();
             this.userName = usuario.getUsername();
             this.fullName = usuario.getNombre();
+            this.firstLetterName = this.fullName.substring(0, 1).toUpperCase();
 
         } catch (Exception e) {
             log.error("No se ha logrado obtener la información del usuario.", e);
             this.userName = "";
             this.fullName = "";
+            this.firstLetterName = "U";
         }
     }
 
