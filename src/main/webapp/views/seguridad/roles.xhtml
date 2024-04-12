@@ -12,18 +12,18 @@
 
 <ui:define name="content">
 
-    <p:outputPanel styleClass="container-fluid">
+    <p:outputPanel id="container" styleClass="container-fluid">
 
         <p:growl id="growl" showDetail="true" showSummary="true" skipDetailIfEqualsSummary="true" globalOnly="true"/>
 
-        <h:form id="form_breadcum" styleClass="mb-5">
-            <p:breadCrumb homeDisplay="text">
-                <p:menuitem value="Inicio"/>
-                <p:menuitem value="Roles"/>
-            </p:breadCrumb>
-        </h:form>
+        <p:outputPanel id="panel_roles" rendered="#{not rolView.showAsignarRoles}">
+            <h:form id="form_breadcum" styleClass="mb-3">
+                <p:breadCrumb homeDisplay="text">
+                    <p:menuitem value="Inicio" ajax="false" action="#{menuSessionBean.goToHome()}"/>
+                    <p:menuitem value="Roles"/>
+                </p:breadCrumb>
+            </h:form>
 
-        <p:outputPanel id="panel_roles">
             <h:form id="form_toolbar" styleClass="mb-5">
                 <p:toolbar>
                     <p:toolbarGroup>
@@ -72,7 +72,7 @@
 
             <h:form id="form_datatable" styleClass="mb-5">
 
-                <p:dataTable id="dtExample"
+                <p:dataTable id="dtRoles"
                              var="rol" value="#{rolView.roles}"
                              rows="50"
                              rowKey="#{rol.idRol}" rowIndexVar="index"
@@ -132,7 +132,9 @@
                         <p:commandButton id="buttonOptions" type="button"
                                          icon="fi fi-rr-menu-dots-vertical" styleClass="rounded-button ui-button-outlined" />
                         <p:menu overlay="true" trigger="buttonOptions" my="left top" at="left bottom" >
-                            <p:menuitem value="Asignar permisos" icon="fi fi-rr-key"/>
+                            <p:menuitem value="Asignar permisos" icon="fi fi-rr-key"
+                                        action="#{rolView.asignarPermisos(rol)}"
+                                        ajax="true" update="container"/>
                             <p:menuitem value="Editar" icon="fi fi-rr-pencil"
                                         action="#{rolView.editar(rol.idRol)}"
                                         ajax="true" update="form_dialog"
@@ -153,10 +155,8 @@
             </h:form>
         </p:outputPanel>
 
-        <p:outputPanel id="panel_asignar_permisos">
-
-
-
+        <p:outputPanel id="panel_asignar_permisos" rendered="#{rolView.showAsignarRoles}">
+            <ui:include src="/views/seguridad/_roles_permisos.xhtml"/>
         </p:outputPanel>
 
     </p:outputPanel>

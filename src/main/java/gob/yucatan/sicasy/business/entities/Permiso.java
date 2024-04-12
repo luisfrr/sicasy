@@ -7,6 +7,7 @@ import lombok.*;
 
 import java.util.Date;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 @Entity
@@ -23,7 +24,7 @@ public class Permiso {
     @Column(name = "permiso_id")
     private Long idPermiso;
 
-    @Column(name = "codigo", nullable = false)
+    @Column(name = "codigo", nullable = false, unique = true)
     private String codigo;
 
     @Column(name = "nombre", nullable = false)
@@ -76,5 +77,19 @@ public class Permiso {
 
     @Column(name = "borrado_por", insertable = false)
     private String borradoPor;
+
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Permiso permiso = (Permiso) o;
+        return Objects.equals(idPermiso, permiso.idPermiso) && Objects.equals(codigo, permiso.codigo);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(idPermiso, codigo);
+    }
 
 }
