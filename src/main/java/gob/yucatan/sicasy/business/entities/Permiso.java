@@ -6,6 +6,8 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "permiso", schema = "sec")
@@ -30,13 +32,25 @@ public class Permiso {
     @Column(name = "descripcion")
     private String descripcion;
 
+    @Column(name = "url")
+    private String url;
+
     @ManyToOne
     @JoinColumn(name = "parent_permiso_id")
-    private Permiso parentPermiso;
+    private Permiso permisoParent;
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "permisoParent")
+    private Set<Permiso> subPermisos = new HashSet<>();
 
     @Column(name = "tipo_permiso", nullable = false)
     @Enumerated(EnumType.ORDINAL)
     private TipoPermiso tipoPermiso;
+
+    @Column(name = "class_name")
+    private String className;
+
+    @Column(name = "method_name")
+    private String methodName;
 
     @Column(name = "estatus", nullable = false)
     @Enumerated(EnumType.ORDINAL)
@@ -49,18 +63,18 @@ public class Permiso {
     @Column(name = "creado_por", nullable = false, updatable = false)
     private String creadoPor;
 
-    @Column(name = "fecha_modificacion")
+    @Column(name = "fecha_modificacion", insertable = false)
     @Temporal(TemporalType.TIMESTAMP)
     private Date fechaModificacion;
 
-    @Column(name = "modificado_por")
+    @Column(name = "modificado_por", insertable = false)
     private String modificadoPor;
 
-    @Column(name = "fecha_borrado")
+    @Column(name = "fecha_borrado", insertable = false)
     @Temporal(TemporalType.TIMESTAMP)
     private Date fechaBorrado;
 
-    @Column(name = "borrado_por")
+    @Column(name = "borrado_por", insertable = false)
     private String borradoPor;
 
 }

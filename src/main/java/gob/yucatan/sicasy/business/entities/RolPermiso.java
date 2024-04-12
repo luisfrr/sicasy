@@ -30,4 +30,6 @@ public class RolPermiso {
     @Enumerated(EnumType.ORDINAL)
     private EstatusPermiso estatusPermiso;
 
+    @Transient
+    private boolean estatusPermisoNotEqual;
 }

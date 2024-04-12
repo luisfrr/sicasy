@@ -508,6 +508,19 @@ body .ui-tabs .ui-tabs-navscroller .ui-tabs-navscroller-btn.ui-state-hover {
 /*endregion Tabs */
 
 
+/*region Growl */
+
+body .ui-growl-item-container {
+    opacity: .95;
+    filter: alpha(opacity = 95);
+}
+
+body .ui-growl-message p {
+    color: var(--text-color);
+}
+
+/*endregion Growl */
+
 body .topbar .header-link.user-info .ui-avatar {
     width: 1.5rem;
     height: 1.5rem;
