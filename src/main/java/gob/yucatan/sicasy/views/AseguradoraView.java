@@ -1,6 +1,8 @@
 package gob.yucatan.sicasy.views;
 
+import gob.yucatan.sicasy.business.annotations.ConfigPermiso;
 import gob.yucatan.sicasy.business.entities.Aseguradora;
+import gob.yucatan.sicasy.business.enums.TipoPermiso;
 import gob.yucatan.sicasy.business.exceptions.BadRequestException;
 import gob.yucatan.sicasy.business.exceptions.NotFoundException;
 import gob.yucatan.sicasy.services.iface.IAseguradoraService;
@@ -24,6 +26,7 @@ import java.util.Optional;
 @Scope("view")
 @RequiredArgsConstructor
 @Slf4j
+@ConfigPermiso(tipo = TipoPermiso.VIEW, codigo = "CATALOGO_ASEGURADORA_VIEW", nombre = "Catálogo de Aseguradoras")
 public class AseguradoraView {
 
     private @Getter String title;
@@ -132,8 +135,8 @@ public class AseguradoraView {
                     "Error", "No se ha encontrado la información de esta Aseguradora.");
             FacesContext.getCurrentInstance().addMessage(null, msg);
         }else {
-            FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                    "Error", "Se ha eliminado exitósamente la información");
+            FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_INFO,
+                    "Aviso", "Se ha eliminado exitósamente la información");
             FacesContext.getCurrentInstance().addMessage(null, msg);
             aseguradoraService.delete(this.aseguradoraSelected);
             this.aseguradoraSelected = null;
