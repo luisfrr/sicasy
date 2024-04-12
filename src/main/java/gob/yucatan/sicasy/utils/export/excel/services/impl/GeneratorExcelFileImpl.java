@@ -1,9 +1,9 @@
 package gob.yucatan.sicasy.utils.export.excel.services.impl;
 
-import edu.umm.platform.utils.export.ExportFile;
-import edu.umm.platform.utils.export.ExportFileType;
-import edu.umm.platform.utils.export.excel.models.*;
-import edu.umm.platform.utils.export.excel.services.iface.IGeneratorExcelFile;
+import gob.yucatan.sicasy.utils.export.ExportFile;
+import gob.yucatan.sicasy.utils.export.ExportFileType;
+import gob.yucatan.sicasy.utils.export.excel.models.*;
+import gob.yucatan.sicasy.utils.export.excel.services.iface.IGeneratorExcelFile;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.usermodel.*;
@@ -283,22 +283,15 @@ public class GeneratorExcelFileImpl implements IGeneratorExcelFile {
     private void createCell(XSSFRow row, int columnCount, Object value, XSSFCellStyle style) {
         Cell cell = row.createCell(columnCount);
 
-        if(value == null) {
-            cell.setBlank();
-        } else if (value instanceof Integer) {
-            cell.setCellValue((Integer) value);
-        } else if (value instanceof Long) {
-            cell.setCellValue((Long) value);
-        } else if (value instanceof Boolean) {
-            cell.setCellValue((Boolean) value);
-        } else if (value instanceof Double) {
-            cell.setCellValue((Double) value);
-        } else if (value instanceof Date) {
-            cell.setCellValue((Date) value);
-        } else if (value instanceof Character) {
-            cell.setCellValue(value.toString());
-        } else {
-            cell.setCellValue((String) value);
+        switch (value) {
+            case null -> cell.setBlank();
+            case Integer i -> cell.setCellValue(i);
+            case Long l -> cell.setCellValue(l);
+            case Boolean b -> cell.setCellValue(b);
+            case Double v -> cell.setCellValue(v);
+            case Date date -> cell.setCellValue(date);
+            case Character c -> cell.setCellValue(c.toString());
+            default -> cell.setCellValue((String) value);
         }
         cell.setCellStyle(style);
     }

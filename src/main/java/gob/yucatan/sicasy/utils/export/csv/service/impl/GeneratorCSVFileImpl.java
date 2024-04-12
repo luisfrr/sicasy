@@ -1,10 +1,10 @@
 package gob.yucatan.sicasy.utils.export.csv.service.impl;
 
-import edu.umm.platform.utils.export.ExportFile;
-import edu.umm.platform.utils.export.ExportFileType;
-import edu.umm.platform.utils.export.csv.models.CsvData;
-import edu.umm.platform.utils.export.csv.models.CsvField;
-import edu.umm.platform.utils.export.csv.service.iface.IGeneratorCSVFile;
+import gob.yucatan.sicasy.utils.export.ExportFile;
+import gob.yucatan.sicasy.utils.export.ExportFileType;
+import gob.yucatan.sicasy.utils.export.csv.models.CsvData;
+import gob.yucatan.sicasy.utils.export.csv.models.CsvField;
+import gob.yucatan.sicasy.utils.export.csv.service.iface.IGeneratorCSVFile;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 import org.apache.logging.log4j.util.Strings;
@@ -74,32 +74,31 @@ public class GeneratorCSVFileImpl implements IGeneratorCSVFile {
 
         String valueStr;
 
-        if(value == null) {
-            valueStr = Strings.EMPTY;
-        } else if (value instanceof Double) {
-            if(dataFormat != null) {
-                Double doubleValue = (Double) value;
-                valueStr = String.format(dataFormat, doubleValue);
-            } else {
-                valueStr = value.toString();
+        switch (value) {
+            case null -> valueStr = Strings.EMPTY;
+            case Double v -> {
+                if (dataFormat != null) {
+                    valueStr = String.format(dataFormat, v);
+                } else {
+                    valueStr = value.toString();
+                }
             }
-        } else if (value instanceof Float) {
-            if(dataFormat != null) {
-                Float floatValue = (Float) value;
-                valueStr = String.format(dataFormat, floatValue);
-            } else {
-                valueStr = value.toString();
+            case Float v -> {
+                if (dataFormat != null) {
+                    valueStr = String.format(dataFormat, v);
+                } else {
+                    valueStr = value.toString();
+                }
             }
-        } else if (value instanceof Date) {
-            if(dataFormat != null) {
-                Date dateValue = (Date) value;
-                DateFormat df = new SimpleDateFormat(dataFormat);
-                valueStr = df.format(dateValue);
-            } else {
-                valueStr = value.toString();
+            case Date date -> {
+                if (dataFormat != null) {
+                    DateFormat df = new SimpleDateFormat(dataFormat);
+                    valueStr = df.format(date);
+                } else {
+                    valueStr = value.toString();
+                }
             }
-        } else {
-            valueStr = value.toString();
+            default -> valueStr = value.toString();
         }
 
         return valueStr;

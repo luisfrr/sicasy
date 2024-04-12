@@ -1,6 +1,6 @@
 package gob.yucatan.sicasy.utils.export.zip.models;
 
-import edu.umm.platform.utils.export.ExportFile;
+import gob.yucatan.sicasy.utils.export.ExportFile;
 import lombok.*;
 
 import java.util.List;

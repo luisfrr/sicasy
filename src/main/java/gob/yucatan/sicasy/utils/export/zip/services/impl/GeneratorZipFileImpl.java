@@ -1,10 +1,10 @@
 package gob.yucatan.sicasy.utils.export.zip.services.impl;
 
-import edu.umm.platform.utils.export.ExportFile;
-import edu.umm.platform.utils.export.ExportFileType;
-import edu.umm.platform.utils.export.zip.models.ZipDataModel;
-import edu.umm.platform.utils.export.zip.models.ZipFolder;
-import edu.umm.platform.utils.export.zip.services.iface.IGeneratorZipFile;
+import gob.yucatan.sicasy.utils.export.ExportFile;
+import gob.yucatan.sicasy.utils.export.ExportFileType;
+import gob.yucatan.sicasy.utils.export.zip.models.ZipDataModel;
+import gob.yucatan.sicasy.utils.export.zip.models.ZipFolder;
+import gob.yucatan.sicasy.utils.export.zip.services.iface.IGeneratorZipFile;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
