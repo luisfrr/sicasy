@@ -5,7 +5,8 @@ import lombok.Getter;
 @Getter
 public enum TipoPermiso {
 
-    MODULE("Módulo"),
+    VIEW("Vista"),
+    CONTROLLER("Controlador"),
     WRITE("Escritura"),
     READ("Lectura");
 
