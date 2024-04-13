@@ -36,6 +36,11 @@ public class RolPermisoServiceImpl implements IRolPermisoService {
                     rolPermiso.getRol().getIdRol(),
                     RolPermiso_.ROL, Rol_.ID_ROL));
 
+        if(rolPermiso.getPermisoParentId() != null)
+            specification.add(new SearchCriteria(SearchOperation.IN,
+                    rolPermiso.getPermisoParentId(),
+                    RolPermiso_.PERMISO, Permiso_.PERMISO_PARENT, Permiso_.ID_PERMISO));
+
         if(rolPermiso.getEstatusPermiso() != null)
             specification.add(new SearchCriteria(SearchOperation.EQUAL,
                     rolPermiso.getEstatusPermiso(),
@@ -89,7 +94,23 @@ public class RolPermisoServiceImpl implements IRolPermisoService {
 
     @Override
     @Transient
-    public void save(RolPermiso rolPermiso) {
+    public void asignarPermiso(RolPermiso rolPermiso) {
+        // Si es un permiso padre
+        if(rolPermiso.getPermiso().getPermisoParent() == null) {
+            // Y si su estatus cambio a SIN_ASIGNAR o DESHABILITADO
+            if(rolPermiso.getEstatusPermiso() == EstatusPermiso.SIN_ASIGNAR ||
+                    rolPermiso.getEstatusPermiso() == EstatusPermiso.DESHABILITADO) {
+                // Se buscan los subPermisos de ese permiso y es rol
+                List<RolPermiso> subPermisos = findAllDynamic(RolPermiso.builder()
+                        .rol(rolPermiso.getRol())
+                        .permisoParentId(rolPermiso.getPermiso().getIdPermiso())
+                        .build());
+                // Y se marcan en SIN_ASIGNAR
+                subPermisos.forEach(subPermiso -> subPermiso.setEstatusPermiso(EstatusPermiso.SIN_ASIGNAR));
+                // Se actualizan en la DB
+                rolPermisoRepository.saveAll(subPermisos);
+            }
+        }
         rolPermisoRepository.save(rolPermiso);
     }
 }

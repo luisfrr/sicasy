@@ -6,18 +6,52 @@
         xmlns:p="http://primefaces.org/ui"
         xmlns:sec="https://joinfaces.org/security">
 
+   <style>
+      body .ui-chkbox .ui-chkbox-box {
+         width: 1.8rem !important;
+         height: 1.8rem !important;
+      }
+      body .ui-chkbox .ui-chkbox-box.ui-state-active.checkbox-green {
+         border-color: var(--primary-color) !important;
+         background: var(--primary-color) !important;
+         color: var(--primary-color-text);
+      }
+      body .ui-chkbox .ui-chkbox-box.ui-state-active.checkbox-red {
+         border-color: var(--text-error-color) !important;
+         background: var(--text-error-color) !important;
+         color: var(--text-white);
+      }
+   </style>
+
    <h:form id="form_breadcum_permisos" styleClass="mb-3">
       <p:breadCrumb homeDisplay="text">
          <p:menuitem value="Inicio" ajax="false" action="#{menuSessionBean.goToHome()}"/>
          <p:menuitem value="Roles" ajax="true" update="container" action="#{rolView.regresar()}"/>
-         <p:menuitem value="Asignar Permisos"/>
+         <p:menuitem value="Configuración de Permisos"/>
       </p:breadCrumb>
    </h:form>
 
    <h:form>
       <p:outputPanel styleClass="mb-5 uppercase">
-         <h5 class="mt-0">Asignar Permisos al Rol: <span class="text-primary">#{rolView.rolSelected.codigo}</span></h5>
+         <h5 class="mt-0 mb-0">Configuración de Permisos: <span class="text-primary">#{rolView.rolSelected.codigo}</span></h5>
       </p:outputPanel>
+   </h:form>
+
+   <h:form id="form_toolbar_permisos" styleClass="mb-5">
+      <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'SEGURIDAD_ROLES_WRITE_ACTUALIZAR_PERMISOS')">
+         <p:toolbar>
+            <p:toolbarGroup>
+            </p:toolbarGroup>
+
+            <p:toolbarGroup align="right">
+               <p:commandButton value="Actualizar Permisos"
+                                ajax="true" action="#{rolView.actualizarPermisos()}"
+                                update="form_datatable_permisos"
+                                oncomplete="triStateCheckbox();"
+                                styleClass="ui-button-outlined" />
+            </p:toolbarGroup>
+         </p:toolbar>
+      </sec:authorize>
    </h:form>
 
    <h:form id="form_filtros_permisos" styleClass="mb-5">
@@ -39,7 +73,8 @@
                                 ajax="true" action="#{rolView.limpiarFiltrosPermisos()}"
                                 update="form_filtros_permisos form_datatable_permisos"/>
                <p:commandButton value="Buscar" ajax="true" action="#{rolView.buscarPermisos()}"
-                                update="form_datatable_permisos"/>
+                                update="form_datatable_permisos"
+                                oncomplete="triStateCheckbox();"/>
             </p:outputPanel>
          </f:facet>
       </p:panel>
@@ -52,7 +87,7 @@
                    var="rolPermiso" value="#{rolView.rolPermisoList}"
                    rows="50"
                    rowKey="#{rolPermiso.permiso.idPermiso}" rowIndexVar="index"
-                   styleClass="dt-scrollable"
+                   styleClass="dt-scrollable-x"
                    scrollable="true"
                    expandedRow="true"
                    paginator="true" paginatorPosition="bottom"
@@ -64,9 +99,8 @@
             Permisos
          </f:facet>
 
-         <p:column headerText="No." width="80" styleClass="text-center">
+         <p:column width="40" styleClass="text-center">
             <p:rowToggler/>
-            <h:outputText value="#{index + 1}" />
          </p:column>
 
          <p:column headerText="Permiso">
@@ -81,14 +115,18 @@
             <h:outputText value="#{rolPermiso.permiso.tipoPermiso.label}"/>
          </p:column>
 
-         <p:column headerText="Habilitar/Bloquear" styleClass="text-center">
-            <p:triStateCheckbox value="#{rolPermiso.checkEstatus}" stateOneTitle="Sin asignar"
-                                stateTwoIcon="fi fi-rr-check" stateTwoTitle="Habilitado"
-                                stateThreeIcon="fi fi-rr-ban" stateThreeTitle="Deshabilitado">
-               <p:ajax event="change" update="growl form_datatable_permisos"
-                       listener="#{rolView.guardarRolPermiso(rolPermiso)}"/>
-            </p:triStateCheckbox>
-         </p:column>
+         <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'SEGURIDAD_ROLES_WRITE_ASIGNAR_PERMISOS')">
+            <p:column headerText="Habilitar/Bloquear" styleClass="text-center" width="200">
+               <p:triStateCheckbox value="#{rolPermiso.checkEstatus}"
+                                   stateOneTitle="Sin asignar"
+                                   stateTwoIcon="fi fi-rr-check" stateTwoTitle="Habilitado"
+                                   stateThreeIcon="fi fi-rr-ban" stateThreeTitle="Deshabilitado">
+                  <p:ajax event="change" update="growl form_datatable_permisos"
+                          listener="#{rolView.asignarPermiso(rolPermiso)}"
+                          oncomplete="triStateCheckbox();"/>
+               </p:triStateCheckbox>
+            </p:column>
+         </sec:authorize>
 
          <p:rowExpansion>
 
@@ -110,14 +148,19 @@
                   <h:outputText value="#{subRolPermiso.permiso.tipoPermiso.label}"/>
                </p:column>
 
-               <p:column headerText="Habilitar/Bloquear" styleClass="text-center">
-                  <p:triStateCheckbox value="#{subRolPermiso.checkEstatus}" stateOneTitle="Sin asignar"
-                                      stateTwoIcon="fi fi-rr-check" stateTwoTitle="Habilitado"
-                                      stateThreeIcon="fi fi-rr-ban" stateThreeTitle="Deshabilitado">
-                     <p:ajax event="change" update="growl form_datatable_permisos"
-                             listener="#{rolView.guardarRolPermiso(subRolPermiso)}"/>
-                  </p:triStateCheckbox>
-               </p:column>
+               <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'SEGURIDAD_ROLES_WRITE_ASIGNAR_PERMISOS')">
+                  <p:column headerText="Habilitar/Bloquear" styleClass="text-center" width="200">
+                     <p:triStateCheckbox value="#{subRolPermiso.checkEstatus}"
+                                         stateOneTitle="Sin asignar"
+                                         stateTwoIcon="fi fi-rr-check" stateTwoTitle="Habilitado"
+                                         stateThreeIcon="fi fi-rr-ban" stateThreeTitle="Deshabilitado"
+                                         disabled="#{rolPermiso.checkEstatus == '0'}">
+                        <p:ajax event="change" update="growl form_datatable_permisos"
+                                listener="#{rolView.asignarPermiso(subRolPermiso)}"
+                                oncomplete="triStateCheckbox();"/>
+                     </p:triStateCheckbox>
+                  </p:column>
+               </sec:authorize>
 
             </p:dataTable>
 
@@ -126,5 +169,21 @@
       </p:dataTable>
 
    </h:form>
+
+   <script>
+      function triStateCheckbox(){
+         let checkboxGreen = $(document.body).children('.wrapper')
+                 .find('.ui-chkbox-box .ui-chkbox-icon.ui-icon.fi.fi-rr-check');
+         let parentCheckboxGreen = checkboxGreen.parent();
+         console.log(parentCheckboxGreen);
+         parentCheckboxGreen.removeClass('checkbox-red').addClass('checkbox-green');
+
+         let checkboxRed = $(document.body).children('.wrapper')
+                 .find('.ui-chkbox-box .ui-chkbox-icon.ui-icon.fi.fi-rr-ban');
+         let parentCheckboxRed = checkboxRed.parent();
+         console.log(parentCheckboxRed);
+         parentCheckboxRed.removeClass('checkbox-green').addClass('checkbox-red');
+      }
+   </script>
 
 </ui:composition>

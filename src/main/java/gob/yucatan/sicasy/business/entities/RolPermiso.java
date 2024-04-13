@@ -39,6 +39,12 @@ public class RolPermiso {
     private List<RolPermiso> subRolPermisoList;
 
     @Transient
+    private List<Long> permisoList;
+
+    @Transient
+    private Long permisoParentId;
+
+    @Transient
     @Getter(AccessLevel.NONE)
     @Setter(AccessLevel.NONE)
     private String checkEstatus;

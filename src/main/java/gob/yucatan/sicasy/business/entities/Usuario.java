@@ -4,12 +4,10 @@ import gob.yucatan.sicasy.business.enums.EstatusRegistro;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.Set;
+import java.util.*;
 
 @Entity
 @Table(name = "usuario", schema = "sec")
@@ -67,7 +65,11 @@ public class Usuario implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return new ArrayList<>();
+        List<GrantedAuthority> authorities = new ArrayList<>();
+        if(this.usuarioRolSet != null && !this.usuarioRolSet.isEmpty()) {
+            this.usuarioRolSet.forEach(usuarioRol -> authorities.add(new SimpleGrantedAuthority(usuarioRol.getRol().getCodigo())));
+        }
+        return authorities;
     }
 
     @Override

@@ -9,6 +9,7 @@ import gob.yucatan.sicasy.business.enums.TipoPermiso;
 import gob.yucatan.sicasy.business.exceptions.BadRequestException;
 import gob.yucatan.sicasy.business.exceptions.NotFoundException;
 import gob.yucatan.sicasy.services.iface.IPermisoScannerService;
+import gob.yucatan.sicasy.services.iface.IPermisoService;
 import gob.yucatan.sicasy.services.iface.IRolPermisoService;
 import gob.yucatan.sicasy.services.iface.IRolService;
 import gob.yucatan.sicasy.views.beans.Messages;
@@ -48,6 +49,7 @@ public class RolView {
     private final IRolService rolService;
     private final UserSessionBean userSessionBean;
     private final IPermisoScannerService permisoScannerService;
+    private final IPermisoService permisoService;
     private final IRolPermisoService rolPermisoService;
 
     @PostConstruct
@@ -58,12 +60,6 @@ public class RolView {
         this.rolSelected = null;
         this.showAsignarRoles = false;
         this.limpiarFiltros();
-
-        //List<Permiso> permisos = permisoScannerService.getPermisos("gob.yucatan.sicasy",
-        //        userSessionBean.getUserName());
-        //permisoService.updateAll(permisos);
-
-        //log.info("Permisos: {}", permisos.size());
     }
 
     public void limpiarFiltros() {
@@ -169,12 +165,13 @@ public class RolView {
         }
     }
 
-    public void asignarPermisos(Rol rol) {
+    @ConfigPermiso(tipo = TipoPermiso.READ, codigo = "SEGURIDAD_ROLES_READ_CONFIGURAR_PERMISOS",
+            nombre = "Ver Configuración de Permisos", descripcion = "Permite ver el botón que abre el configurador de permisos.")
+    public void verConfiguracionPermisos(Rol rol) {
         this.rolSelected = rol;
         this.showAsignarRoles = true;
         this.limpiarFiltrosPermisos();
     }
-
 
     public void regresar() {
         this.rolSelected = null;
@@ -193,16 +190,29 @@ public class RolView {
         this.rolPermisoList = new ArrayList<>();
     }
 
-    public void guardarRolPermiso(RolPermiso rolPermiso) {
-        log.info("guardarRolPermiso RolView");
+    @ConfigPermiso(tipo = TipoPermiso.WRITE, codigo = "SEGURIDAD_ROLES_WRITE_ASIGNAR_PERMISOS",
+            nombre = "Asignar permiso", descripcion = "Acción que permite habilitar, deshabilitar un permiso al rol seleccionado.")
+    public void asignarPermiso(RolPermiso rolPermiso) {
+        log.info("asignarPermiso RolView");
         try {
-            rolPermisoService.save(rolPermiso);
-            Messages.addInfo("¡Guardado!", "La configuración se ha guardado correctamente.");
+            rolPermisoService.asignarPermiso(rolPermiso);
             this.buscarPermisos();
+            Messages.addInfo("¡Listo!", "La configuración se ha guardado correctamente.");
         } catch (Exception e) {
             log.error("Ocurrio un error al guardar el permiso del rol.", e);
             Messages.addError("Ocurrió un error. Intente de nuevo, si el problema persiste contacte al administrador.");
         }
+    }
+
+    @ConfigPermiso(tipo = TipoPermiso.WRITE, codigo = "SEGURIDAD_ROLES_WRITE_ACTUALIZAR_PERMISOS",
+            nombre = "Actualizar permisos", descripcion = "Acción que permite buscar y actualizar los permisos del sistema.")
+    public void actualizarPermisos() {
+        log.info("actualizarPermisos RolView");
+        List<Permiso> permisos = permisoScannerService.getPermisos("gob.yucatan.sicasy",
+                userSessionBean.getUserName());
+        permisoService.updateAll(permisos);
+        log.info("Permisos: {}", permisos.size());
+        this.buscarPermisos();
     }
 
 }

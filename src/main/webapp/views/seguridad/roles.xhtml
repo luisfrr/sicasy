@@ -14,7 +14,8 @@
 
     <p:outputPanel id="container" styleClass="container-fluid">
 
-        <p:growl id="growl" showDetail="true" showSummary="true" skipDetailIfEqualsSummary="true" globalOnly="true"/>
+        <p:growl id="growl" showDetail="true" showSummary="true"
+                 skipDetailIfEqualsSummary="true" globalOnly="true"/>
 
         <p:outputPanel id="panel_roles" rendered="#{not rolView.showAsignarRoles}">
             <h:form id="form_breadcum" styleClass="mb-3">
@@ -25,21 +26,24 @@
             </h:form>
 
             <h:form id="form_toolbar" styleClass="mb-5">
-                <p:toolbar>
-                    <p:toolbarGroup>
-                        <p:commandButton value="Nuevo"
-                                         action="#{rolView.nuevo()}"
-                                         oncomplete="PF('formDialog').show()"
-                                         update="form_dialog"
-                                         styleClass="mr-4">
-                            <p:resetInput target="form_dialog:dialogContent"/>
-                        </p:commandButton>
-                    </p:toolbarGroup>
+                <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'SEGURIDAD_ROLES_WRITE_NUEVO')">
+                    <p:toolbar>
+                        <p:toolbarGroup>
+                            <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'SEGURIDAD_ROLES_WRITE_NUEVO')">
+                                <p:commandButton value="Nuevo"
+                                                 action="#{rolView.nuevo()}"
+                                                 oncomplete="PF('formDialog').show()"
+                                                 update="form_dialog"
+                                                 styleClass="mr-4">
+                                    <p:resetInput target="form_dialog:dialogContent"/>
+                                </p:commandButton>
+                            </sec:authorize>
+                        </p:toolbarGroup>
 
-                    <p:toolbarGroup align="right">
-                        <p:commandButton value="Exportar" styleClass="ui-button-outlined"/>
-                    </p:toolbarGroup>
-                </p:toolbar>
+                        <p:toolbarGroup align="right">
+                        </p:toolbarGroup>
+                    </p:toolbar>
+                </sec:authorize>
             </h:form>
 
             <h:form id="form_filtros" styleClass="mb-5">
@@ -76,7 +80,7 @@
                              var="rol" value="#{rolView.roles}"
                              rows="50"
                              rowKey="#{rol.idRol}" rowIndexVar="index"
-                             styleClass="dt-scrollable"
+                             styleClass="dt-scrollable-x"
                              scrollable="true"
                              paginator="true" paginatorPosition="bottom"
                              paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
@@ -91,64 +95,90 @@
                         <h:outputText value="#{index + 1}" />
                     </p:column>
 
-                    <p:column headerText="Código">
+                    <p:column headerText="Código" width="200">
                         <h:outputText value="#{rol.codigo}"/>
                     </p:column>
 
-                    <p:column headerText="Nombre">
+                    <p:column headerText="Nombre" width="250">
                         <h:outputText value="#{rol.nombre}"/>
                     </p:column>
 
-                    <p:column headerText="Descripción">
+                    <p:column headerText="Descripción" width="350">
                         <h:outputText value="#{rol.descripcion}"/>
                     </p:column>
 
                     <sec:authorize access="hasAuthority('ROLE_OWNER')">
 
-                        <p:column headerText="Fecha creación">
+                        <p:column headerText="Estatus" width="100">
+                            <h:outputText value="#{rol.estatus.label}">
+                            </h:outputText>
+                        </p:column>
+
+                        <p:column headerText="Fecha creación" width="150">
                             <h:outputText value="#{rol.fechaCreacion}">
                             </h:outputText>
                         </p:column>
 
-                        <p:column headerText="Creado por">
+                        <p:column headerText="Creado por" width="150">
                             <h:outputText value="#{rol.creadoPor}">
                             </h:outputText>
                         </p:column>
 
-                        <p:column headerText="Fecha modificación">
+                        <p:column headerText="Fecha modificación" width="150">
                             <h:outputText value="#{rol.fechaModificacion}">
                             </h:outputText>
                         </p:column>
 
-                        <p:column headerText="Modificado por">
+                        <p:column headerText="Modificado por" width="150">
                             <h:outputText value="#{rol.modificadoPor}">
+                            </h:outputText>
+                        </p:column>
+
+                        <p:column headerText="Fecha borrado" width="150">
+                            <h:outputText value="#{rol.fechaBorrado}">
+                            </h:outputText>
+                        </p:column>
+
+                        <p:column headerText="Borrado por" width="150">
+                            <h:outputText value="#{rol.borradoPor}">
                             </h:outputText>
                         </p:column>
 
                     </sec:authorize>
 
-                    <p:column headerText="Acciones">
+                    <sec:authorize access="hasAnyAuthority('ROLE_OWNER','SEGURIDAD_ROLES_READ_CONFIGURAR_PERMISOS', 'SEGURIDAD_ROLES_WRITE_EDITAR', 'SEGURIDAD_ROLES_WRITE_ELIMINAR')">
+                        <p:column headerText="Acciones" width="120">
 
-                        <p:commandButton id="buttonOptions" type="button"
-                                         icon="fi fi-rr-menu-dots-vertical" styleClass="rounded-button ui-button-outlined" />
-                        <p:menu overlay="true" trigger="buttonOptions" my="left top" at="left bottom" >
-                            <p:menuitem value="Asignar permisos" icon="fi fi-rr-key"
-                                        action="#{rolView.asignarPermisos(rol)}"
-                                        ajax="true" update="container"/>
-                            <p:menuitem value="Editar" icon="fi fi-rr-pencil"
-                                        action="#{rolView.editar(rol.idRol)}"
-                                        ajax="true" update="form_dialog"
-                                        oncomplete="PF('formDialog').show()">
-                                <p:resetInput target="form_dialog:dialogContent"/>
-                            </p:menuitem>
-                            <p:menuitem value="Eliminar" icon="fi fi-rr-trash"
-                                        ajax="true" action="#{rolView.eliminar(rol.idRol)}"
-                                        update="growl form_datatable">
-                                <p:confirm header="Confirmación" message="¿Está seguro que desea eliminar el rol?" icon="pi pi-exclamation-triangle"/>
-                            </p:menuitem>
-                        </p:menu>
+                            <p:commandButton id="buttonOptions" type="button"
+                                             icon="fi fi-rr-menu-dots-vertical" styleClass="rounded-button ui-button-outlined" />
+                            <p:menu overlay="true" trigger="buttonOptions" my="left top" at="left bottom" styleClass="w-16rem">
 
-                    </p:column>
+                                <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'SEGURIDAD_ROLES_READ_CONFIGURAR_PERMISOS')">
+                                    <p:menuitem value="Configuración de Permisos"
+                                                action="#{rolView.verConfiguracionPermisos(rol)}"
+                                                ajax="true" update="container"/>
+                                </sec:authorize>
+
+                                <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'SEGURIDAD_ROLES_WRITE_EDITAR')">
+                                    <p:menuitem value="Editar"
+                                                action="#{rolView.editar(rol.idRol)}"
+                                                ajax="true" update="form_dialog"
+                                                oncomplete="PF('formDialog').show()">
+                                        <p:resetInput target="form_dialog:dialogContent"/>
+                                    </p:menuitem>
+                                </sec:authorize>
+
+                                <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'SEGURIDAD_ROLES_WRITE_ELIMINAR')">
+                                    <p:menuitem value="Eliminar"
+                                                ajax="true" action="#{rolView.eliminar(rol.idRol)}"
+                                                update="growl form_datatable">
+                                        <p:confirm header="Confirmación" message="¿Está seguro que desea eliminar el rol?" icon="pi pi-exclamation-triangle"/>
+                                    </p:menuitem>
+                                </sec:authorize>
+                            </p:menu>
+
+                        </p:column>
+                    </sec:authorize>
 
                 </p:dataTable>
 
