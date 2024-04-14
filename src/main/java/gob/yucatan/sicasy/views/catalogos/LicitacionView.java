@@ -80,17 +80,29 @@ public class LicitacionView {
                     licitacionService.update(licitacionSelected);
                 }else {
                     // id null, entonces se inserta nuevo en BD
-                    this.licitacionSelected.setCreadoPor(userSessionBean.getUserName());
-                    this.licitacionSelected.setFechaCreacion(new Date());
-                    licitacionService.save(licitacionSelected);
+
+                    Optional<Licitacion> optLicitacion = licitacionService.findByNumeroLicitacion(licitacionSelected.getNumeroLicitacion());
+                    if (optLicitacion.isEmpty()){ // checar si no existe una licitacion con ese numero de licitacion existente y activa
+                        this.licitacionSelected.setCreadoPor(userSessionBean.getUserName());
+                        this.licitacionSelected.setFechaCreacion(new Date());
+                        licitacionService.save(licitacionSelected);
+
+                        FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_INFO,
+                                "Operación exitosa", "Se ha guardado correctamente la información");
+                        FacesContext.getCurrentInstance().addMessage(null, msg);
+                        PrimeFaces.current().executeScript("PF('formDialog').hide();");
+                        this.buscar();
+                        this.licitacionSelected  = null;
+                    }else {
+                        // si encontramos algun dato ya existente entonces indicamos la observacion
+                        FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_WARN,
+                                "Atención", "Ya existe una licitación con ese numero de licitación guardado!");
+                        FacesContext.getCurrentInstance().addMessage(null, msg);
+                    }
+
                 }
 
-                FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_INFO,
-                        "Operación exitosa", "Se ha guardado correctamente la información");
-                FacesContext.getCurrentInstance().addMessage(null, msg);
-                PrimeFaces.current().executeScript("PF('formDialog').hide();");
-                this.buscar();
-                this.licitacionSelected  = null;
+
             }
         }catch (Exception ex) {
             String message;

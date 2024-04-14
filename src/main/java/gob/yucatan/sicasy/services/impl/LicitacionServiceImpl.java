@@ -61,6 +61,11 @@ public class LicitacionServiceImpl implements ILicitacionService {
     }
 
     @Override
+    public Optional<Licitacion> findByNumeroLicitacion(String numeroLicitacion) {
+        return licitacionRepository.findByNumeroLicitacionAndEstatusRegistro(numeroLicitacion, EstatusRegistro.ACTIVO);
+    }
+
+    @Override
     public void save(Licitacion licitacion) {
         licitacion.setEstatusRegistro(EstatusRegistro.ACTIVO);
         licitacion.setFechaCreacion(new Date());
