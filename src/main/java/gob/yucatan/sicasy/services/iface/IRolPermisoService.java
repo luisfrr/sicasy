@@ -9,6 +9,6 @@ public interface IRolPermisoService {
 
     List<RolPermiso> findAllDynamic(RolPermiso rolPermiso);
     List<RolPermiso> findByRol(Rol rol);
-    void asignarPermiso(RolPermiso rolPermiso);
+    void asignarPermiso(RolPermiso rolPermiso, String userName);
 
 }

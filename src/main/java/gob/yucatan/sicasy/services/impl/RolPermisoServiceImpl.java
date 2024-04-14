@@ -7,6 +7,7 @@ import gob.yucatan.sicasy.repository.criteria.SearchCriteria;
 import gob.yucatan.sicasy.repository.criteria.SearchOperation;
 import gob.yucatan.sicasy.repository.criteria.SearchSpecification;
 import gob.yucatan.sicasy.repository.iface.IRolPermisoRepository;
+import gob.yucatan.sicasy.services.iface.IBitacoraRolService;
 import gob.yucatan.sicasy.services.iface.IPermisoService;
 import gob.yucatan.sicasy.services.iface.IRolPermisoService;
 import jakarta.persistence.Transient;
@@ -14,9 +15,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.util.Comparator;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -25,6 +24,7 @@ public class RolPermisoServiceImpl implements IRolPermisoService {
 
     private final IRolPermisoRepository rolPermisoRepository;
     private final IPermisoService permisoService;
+    private final IBitacoraRolService bitacoraRolService;
 
     @Override
     public List<RolPermiso> findAllDynamic(RolPermiso rolPermiso) {
@@ -94,23 +94,77 @@ public class RolPermisoServiceImpl implements IRolPermisoService {
 
     @Override
     @Transient
-    public void asignarPermiso(RolPermiso rolPermiso) {
+    public void asignarPermiso(RolPermiso rolPermiso, String userName) {
+
+        Long id = rolPermiso.getIdRolPermiso() != null ? rolPermiso.getIdRolPermiso() : 0;
+        Optional<RolPermiso> rolPermisoOptional = this.rolPermisoRepository.findById(id);
+
         // Si es un permiso padre
         if(rolPermiso.getPermiso().getPermisoParent() == null) {
+
             // Y si su estatus cambio a SIN_ASIGNAR o DESHABILITADO
             if(rolPermiso.getEstatusPermiso() == EstatusPermiso.SIN_ASIGNAR ||
                     rolPermiso.getEstatusPermiso() == EstatusPermiso.DESHABILITADO) {
+
+                List<RolPermiso> rolPermisoAnteriorList = new ArrayList<>();
+                rolPermisoOptional.ifPresent(rolPermisoAnteriorList::add);
+
                 // Se buscan los subPermisos de ese permiso y es rol
                 List<RolPermiso> subPermisos = findAllDynamic(RolPermiso.builder()
                         .rol(rolPermiso.getRol())
                         .permisoParentId(rolPermiso.getPermiso().getIdPermiso())
                         .build());
+
+                List<RolPermiso> subPermisosToUpdate = findAllDynamic(RolPermiso.builder()
+                        .rol(rolPermiso.getRol())
+                        .permisoParentId(rolPermiso.getPermiso().getIdPermiso())
+                        .build());
+
+                // Se agregan los subPermisos
+                rolPermisoAnteriorList.addAll(subPermisos);
+
                 // Y se marcan en SIN_ASIGNAR
-                subPermisos.forEach(subPermiso -> subPermiso.setEstatusPermiso(EstatusPermiso.SIN_ASIGNAR));
-                // Se actualizan en la DB
-                rolPermisoRepository.saveAll(subPermisos);
+                subPermisosToUpdate.forEach(subPermiso -> subPermiso.setEstatusPermiso(EstatusPermiso.SIN_ASIGNAR));
+
+                List<RolPermiso> rolPermisoNuevoList = new ArrayList<>();
+                rolPermisoNuevoList.add(rolPermiso);
+                rolPermisoNuevoList.addAll(subPermisosToUpdate);
+
+                // Se guarda la bitacora
+                bitacoraRolService.guardarBitacoraPermisos(rolPermiso.getRol(), rolPermisoAnteriorList,
+                        rolPermisoNuevoList, userName);
+
+                // Se actualiza el permiso principal
+                rolPermisoRepository.save(rolPermiso);
+
+                // Se actualizan los subPermisos en la DB
+                rolPermisoRepository.saveAll(subPermisosToUpdate);
+            } else {
+
+                List<RolPermiso> rolPermisoAnteriorList = new ArrayList<>();
+                rolPermisoOptional.ifPresent(rolPermisoAnteriorList::add);
+
+                List<RolPermiso> rolPermisoNuevoList = List.of(rolPermiso);
+
+                // Se guarda la bitacora
+                bitacoraRolService.guardarBitacoraPermisos(rolPermiso.getRol(), rolPermisoAnteriorList,
+                        rolPermisoNuevoList, userName);
+
+                rolPermisoRepository.save(rolPermiso);
+
             }
+        } else {
+
+            List<RolPermiso> rolPermisoAnteriorList = new ArrayList<>();
+            rolPermisoOptional.ifPresent(rolPermisoAnteriorList::add);
+
+            List<RolPermiso> rolPermisoNuevoList = List.of(rolPermiso);
+
+            // Se guarda la bitacora
+            bitacoraRolService.guardarBitacoraPermisos(rolPermiso.getRol(), rolPermisoAnteriorList,
+                    rolPermisoNuevoList, userName);
+
+            rolPermisoRepository.save(rolPermiso);
         }
-        rolPermisoRepository.save(rolPermiso);
     }
 }

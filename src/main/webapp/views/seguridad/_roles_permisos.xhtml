@@ -85,7 +85,7 @@
 
       <p:dataTable id="dtPermisos"
                    var="rolPermiso" value="#{rolView.rolPermisoList}"
-                   rows="50"
+                   rows="50" rowHover="true"
                    rowKey="#{rolPermiso.permiso.idPermiso}" rowIndexVar="index"
                    styleClass="dt-scrollable-x"
                    scrollable="true"
@@ -133,6 +133,7 @@
             <p:dataTable id="dtSubpermisos"
                          var="subRolPermiso" value="#{rolPermiso.subRolPermisoList}"
                          rowKey="#{subRolPermiso.permiso.idPermiso}"
+                         rowHover="true"
                          styleClass="dt-scrollable"
                          scrollable="true">
 
@@ -154,7 +155,7 @@
                                          stateOneTitle="Sin asignar"
                                          stateTwoIcon="fi fi-rr-check" stateTwoTitle="Habilitado"
                                          stateThreeIcon="fi fi-rr-ban" stateThreeTitle="Deshabilitado"
-                                         disabled="#{rolPermiso.checkEstatus == '0'}">
+                                         disabled="#{rolPermiso.checkEstatus == '0' or rolPermiso.checkEstatus == '2'}">
                         <p:ajax event="change" update="growl form_datatable_permisos"
                                 listener="#{rolView.asignarPermiso(subRolPermiso)}"
                                 oncomplete="triStateCheckbox();"/>

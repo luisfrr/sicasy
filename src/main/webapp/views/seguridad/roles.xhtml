@@ -59,6 +59,18 @@
                             <span class="text-sm hidden"> </span>
                         </p:outputPanel>
 
+                        <sec:authorize access="hasAuthority('ROLE_OWNER')">
+                            <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4 xl:col-3">
+                                <p:outputLabel for="@next" value="Estatus" styleClass="block"/>
+                                <p:selectOneMenu value="#{rolView.rolFilter.estatus}" styleClass="w-full">
+                                    <f:selectItem itemLabel="Todos" itemValue="#{null}"/>
+                                    <f:selectItems value="#{rolView.estatusRegistros}" var="estatus"
+                                                   itemValue="#{estatus}" itemLabel="#{estatus.label}"/>
+                                </p:selectOneMenu>
+                                <span class="text-sm hidden"> </span>
+                            </p:outputPanel>
+                        </sec:authorize>
+
                     </p:outputPanel>
 
                     <f:facet name="footer">
@@ -78,7 +90,7 @@
 
                 <p:dataTable id="dtRoles"
                              var="rol" value="#{rolView.roles}"
-                             rows="50"
+                             rows="50" rowHover="true"
                              rowKey="#{rol.idRol}" rowIndexVar="index"
                              styleClass="dt-scrollable-x"
                              scrollable="true"
@@ -150,7 +162,9 @@
                         <p:column headerText="Acciones" width="120">
 
                             <p:commandButton id="buttonOptions" type="button"
-                                             icon="fi fi-rr-menu-dots-vertical" styleClass="rounded-button ui-button-outlined" />
+                                             icon="fi fi-rr-menu-dots-vertical"
+                                             styleClass="rounded-button ui-button-outlined"
+                                             rendered="#{rol.estatus.label != 'Borrado'}"/>
                             <p:menu overlay="true" trigger="buttonOptions" my="left top" at="left bottom" styleClass="w-16rem">
 
                                 <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'SEGURIDAD_ROLES_READ_CONFIGURAR_PERMISOS')">

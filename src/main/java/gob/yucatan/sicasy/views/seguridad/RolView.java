@@ -45,6 +45,7 @@ public class RolView {
     private @Getter boolean showAsignarRoles;
     private @Getter Permiso permisoFilter;
     private @Getter List<RolPermiso> rolPermisoList;
+    private @Getter EstatusRegistro[] estatusRegistros;
 
     private final IRolService rolService;
     private final UserSessionBean userSessionBean;
@@ -56,6 +57,8 @@ public class RolView {
     public void init() {
         log.info("Init RolView");
         this.title = "Roles";
+
+        this.estatusRegistros = EstatusRegistro.values();
 
         this.rolSelected = null;
         this.showAsignarRoles = false;
@@ -195,7 +198,7 @@ public class RolView {
     public void asignarPermiso(RolPermiso rolPermiso) {
         log.info("asignarPermiso RolView");
         try {
-            rolPermisoService.asignarPermiso(rolPermiso);
+            rolPermisoService.asignarPermiso(rolPermiso, userSessionBean.getUserName());
             this.buscarPermisos();
             Messages.addInfo("¡Listo!", "La configuración se ha guardado correctamente.");
         } catch (Exception e) {
