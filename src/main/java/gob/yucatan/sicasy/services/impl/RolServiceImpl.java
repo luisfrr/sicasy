@@ -10,8 +10,10 @@ import gob.yucatan.sicasy.repository.criteria.SearchFetch;
 import gob.yucatan.sicasy.repository.criteria.SearchOperation;
 import gob.yucatan.sicasy.repository.criteria.SearchSpecification;
 import gob.yucatan.sicasy.repository.iface.IRolRepository;
+import gob.yucatan.sicasy.services.iface.IBitacoraRolService;
 import gob.yucatan.sicasy.services.iface.IRolService;
 import jakarta.persistence.criteria.JoinType;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -27,6 +29,7 @@ import java.util.Optional;
 public class RolServiceImpl implements IRolService {
 
     private final IRolRepository rolRepository;
+    private final IBitacoraRolService bitacoraRolService;
 
     @Override
     public List<Rol> findAllDynamic(Rol rol) {
@@ -56,13 +59,18 @@ public class RolServiceImpl implements IRolService {
     }
 
     @Override
+    @Transactional
     public void save(Rol rol) {
         rol.setEstatus(EstatusRegistro.ACTIVO);
         rol.setFechaCreacion(new Date());
-        rolRepository.save(rol);
+        Rol rolSaved = rolRepository.save(rol);
+
+        // Se guarda en la bitacora
+        bitacoraRolService.guardarBitacora("Nuevo", null, rolSaved, rol.getCreadoPor());
     }
 
     @Override
+    @Transactional
     public void delete(Rol rol) {
         Long ID_ROL_OWNER = 1L;
         if(Objects.equals(rol.getIdRol(), ID_ROL_OWNER))
@@ -78,6 +86,11 @@ public class RolServiceImpl implements IRolService {
             throw new BadRequestException("No se puede borrar un rol que tiene usuarios");
 
         Rol rolToUpdate = rolOptional.get();
+
+        // Se guarda en la bitacora
+        bitacoraRolService.guardarBitacora("Eliminar", rolToUpdate, rol, rol.getBorradoPor());
+
+        // Se actualiza y cambia estatatus
         rolToUpdate.setEstatus(EstatusRegistro.BORRADO);
         rolToUpdate.setFechaBorrado(new Date());
         rolToUpdate.setBorradoPor(rol.getBorradoPor());
@@ -85,6 +98,7 @@ public class RolServiceImpl implements IRolService {
     }
 
     @Override
+    @Transactional
     public void update(Rol rol) {
         Long ID_ROL_OWNER = 1L;
         if(Objects.equals(rol.getIdRol(), ID_ROL_OWNER))
@@ -96,12 +110,16 @@ public class RolServiceImpl implements IRolService {
             throw new NotFoundException("Rol no encontrado");
 
         Rol rolToUpdate = rolOptional.get();
+
+        // Se guarda en la bitacora
+        bitacoraRolService.guardarBitacora("Actualizar", rolToUpdate, rol, rol.getModificadoPor());
+
+        // Se actualizan los datos
         rolToUpdate.setCodigo(rol.getCodigo());
         rolToUpdate.setNombre(rol.getNombre());
         rolToUpdate.setDescripcion(rol.getDescripcion());
         rolToUpdate.setFechaModificacion(new Date());
         rolToUpdate.setModificadoPor(rol.getModificadoPor());
-        rolRepository.save(rolToUpdate);
     }
 
 }

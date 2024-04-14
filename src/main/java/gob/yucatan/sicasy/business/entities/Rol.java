@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.Date;
+import java.util.Objects;
 import java.util.Set;
 
 @Entity
@@ -63,4 +64,16 @@ public class Rol {
     private boolean leftJoinUsuarioRolSet;
 
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Rol rol = (Rol) o;
+        return Objects.equals(idRol, rol.idRol);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(idRol);
+    }
 }
