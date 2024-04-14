@@ -34,9 +34,10 @@ public class AseguradoraServiceImpl implements IAseguradoraService {
                     Aseguradora_.NOMBRE));
         }
 
-        searchSpecification.add(new SearchCriteria(SearchOperation.EQUAL,
-                EstatusRegistro.ACTIVO,
-                Aseguradora_.ESTATUS));
+        if (aseguradora.getEstatus() != null )
+            searchSpecification.add(new SearchCriteria(SearchOperation.EQUAL,
+                    aseguradora.getEstatus(),
+                    Aseguradora_.ESTATUS));
 
 //        if (aseguradora.getRepresentante() != null && !aseguradora.getRepresentante().isEmpty()) {
 //            searchSpecification.add(new SearchCriteria(SearchOperation.MATCH,

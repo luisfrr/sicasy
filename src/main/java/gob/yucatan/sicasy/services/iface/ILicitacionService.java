@@ -1,0 +1,21 @@
+package gob.yucatan.sicasy.services.iface;
+
+import gob.yucatan.sicasy.business.entities.Licitacion;
+
+import java.util.List;
+import java.util.Optional;
+
+public interface ILicitacionService {
+
+    List<Licitacion> findAllDynamic(Licitacion licitacion);
+
+    Optional<Licitacion> findById(Integer id);
+
+    Optional<Licitacion> findByNombre(String nombre);
+
+    void save(Licitacion licitacion);
+
+    void delete(Licitacion licitacion);
+
+    void update(Licitacion licitacion);
+}

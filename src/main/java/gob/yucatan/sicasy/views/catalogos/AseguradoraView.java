@@ -1,12 +1,12 @@
-package gob.yucatan.sicasy.views;
+package gob.yucatan.sicasy.views.catalogos;
 
 import gob.yucatan.sicasy.business.annotations.ConfigPermiso;
 import gob.yucatan.sicasy.business.entities.Aseguradora;
+import gob.yucatan.sicasy.business.enums.EstatusRegistro;
 import gob.yucatan.sicasy.business.enums.TipoPermiso;
 import gob.yucatan.sicasy.business.exceptions.BadRequestException;
 import gob.yucatan.sicasy.business.exceptions.NotFoundException;
 import gob.yucatan.sicasy.services.iface.IAseguradoraService;
-import gob.yucatan.sicasy.services.iface.IUsuarioService;
 import gob.yucatan.sicasy.views.beans.UserSessionBean;
 import jakarta.annotation.PostConstruct;
 import jakarta.faces.application.FacesMessage;
@@ -51,6 +51,7 @@ public class AseguradoraView {
     public void limpiarFiltros(){
         log.info("Limpiando filtros");
         this.aseguradoraFiltroHelper = new Aseguradora();
+        this.aseguradoraFiltroHelper.setEstatus(EstatusRegistro.ACTIVO);
         this.buscar();
     }
 

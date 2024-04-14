@@ -8,6 +8,6 @@ import java.util.Optional;
 
 public interface IPolizaRepository extends CrudRepository<Poliza, Integer>, JpaSpecificationExecutor<Poliza> {
 
-    Optional<Poliza> findById(int id);
+    Optional<Poliza> findById(Integer id);
 
 }
