@@ -1,0 +1,269 @@
+<ui:composition template="../../WEB-INF/facelets/main_layout.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="jakarta.faces.facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="jakarta.faces.html"
+                xmlns:f="jakarta.faces.core"
+                xmlns:sec="https://joinfaces.org/security">
+
+    <ui:define name="title">
+        #{licitacionView.title}
+    </ui:define>
+
+    <ui:define name="content">
+
+        <p:outputPanel styleClass="container-fluid">
+
+            <p:growl id="growl" showDetail="true" showSummary="true" skipDetailIfEqualsSummary="true" globalOnly="true"/>
+
+            <h:form id="form_breadcum" styleClass="mb-5">
+                <p:breadCrumb homeDisplay="text">
+                    <p:menuitem value="Inicio"/>
+                    <p:menuitem value="Catálogos"/>
+                    <p:menuitem value="Licitaciones"/>
+                </p:breadCrumb>
+            </h:form>
+
+            <h:form id="form_toolbar" styleClass="mb-5">
+                <p:toolbar>
+                    <p:toolbarGroup>
+                        <p:commandButton value="Nuevo"
+                                         action="#{licitacionView.agregarLicitacion()}"
+                                         oncomplete="PF('formDialog').show()"
+                                         update="form_dialog"
+                                         styleClass="mr-4">
+                            <p:resetInput target="form_dialog:dialogContent"/>
+                        </p:commandButton>
+                    </p:toolbarGroup>
+
+                    <p:toolbarGroup align="right">
+                        <p:commandButton value="Exportar" styleClass="ui-button-outlined"/>
+                    </p:toolbarGroup>
+                </p:toolbar>
+            </h:form>
+
+            <h:form id="form_filtros" styleClass="mb-5">
+
+                <p:panel header="Filtros" widgetVar="panelFiltros"
+                         toggleable="true" toggleSpeed="500">
+                    <p:outputPanel styleClass="grid formgrid mb-2">
+
+                        <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4 xl:col-3">
+                            <p:outputLabel for="@next" value="licitacion" styleClass="block"/>
+                            <p:inputText styleClass="block w-full" placeholder="Ingresa un nombre..."
+                                         value="#{licitacionView.licitacionFilter.nombre}"/>
+                            <span class="text-sm hidden"> </span>
+                        </p:outputPanel>
+
+                    </p:outputPanel>
+
+                    <f:facet name="footer">
+                        <p:outputPanel styleClass="flex flex-row gap-4 justify-content-end">
+                            <p:commandButton value="Limpiar filtros" styleClass="ui-button-outlined"
+                                             ajax="true" action="#{licitacionView.limpiarFiltros()}"
+                                             update="form_filtros form_datatable"/>
+                            <p:commandButton value="Buscar" ajax="true" action="#{licitacionView.buscar()}"
+                                             update="form_datatable"/>
+                        </p:outputPanel>
+                    </f:facet>
+                </p:panel>
+
+            </h:form>
+
+            <h:form id="form_datatable" styleClass="mb-5">
+
+                <p:dataTable id="dtExample"
+                             var="licitacion" value="#{licitacionView.licitacionList}"
+                             rows="50"
+                             rowKey="#{licitacion.idLicitacion}" rowIndexVar="index"
+                             styleClass="dt-scrollable"
+                             scrollable="true"
+                             paginator="true" paginatorPosition="bottom"
+                             paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             currentPageReportTemplate="{startRecord}-{endRecord} de {totalRecords} registros"
+                             rowsPerPageTemplate="50,100,200,{ShowAll|'Todos'}">
+
+                    <f:facet name="header">
+                        Licitaciones
+                    </f:facet>
+
+                    <p:column headerText="No.">
+                        <h:outputText value="#{index + 1}" />
+                    </p:column>
+
+                    <p:column headerText="Nombre">
+                        <h:outputText value="#{licitacion.nombre}"/>
+                    </p:column>
+
+                    <p:column headerText="Número licitación">
+                        <h:outputText value="#{licitacion.numeroLicitacion}"/>
+                    </p:column>
+
+                    <p:column headerText="Descripción">
+                        <h:outputText value="#{licitacion.descripcion}"/>
+                    </p:column>
+
+                    <p:column headerText="Fecha inicio">
+                        <h:outputText value="#{licitacion.fechaInicio}"/>
+                    </p:column>
+
+                    <p:column headerText="Fecha final">
+                        <h:outputText value="#{licitacion.fechaFinal}"/>
+                    </p:column>
+
+                    <p:column headerText="Estatus">
+                        <h:outputText value="#{licitacion.estatusRegistro.label}"/>
+                    </p:column>
+
+                    <sec:authorize access="hasAnyAuthority('ROLE_OWNER')">
+
+                        <p:column headerText="Fecha creación">
+                            <h:outputText value="#{licitacion.fechaCreacion}">
+                            </h:outputText>
+                        </p:column>
+
+                        <p:column headerText="Creado por">
+                            <h:outputText value="#{licitacion.creadoPor}">
+                            </h:outputText>
+                        </p:column>
+
+                        <p:column headerText="Fecha modificación">
+                            <h:outputText value="#{licitacion.fechaModificacion}">
+                            </h:outputText>
+                        </p:column>
+
+                        <p:column headerText="Modificado por">
+                            <h:outputText value="#{licitacion.modificadoPor}">
+                            </h:outputText>
+                        </p:column>
+
+                        <p:column headerText="Fecha borrado">
+                            <h:outputText value="#{licitacion.fechaBorrado}">
+                            </h:outputText>
+                        </p:column>
+
+                        <p:column headerText="Borrado por">
+                            <h:outputText value="#{licitacion.borradoPor}">
+                            </h:outputText>
+                        </p:column>
+                    </sec:authorize>
+
+                    <p:column headerText="Acciones">
+
+                        <p:growl id="message" showDetail="true"/>
+
+                        <p:commandButton id="buttonOptions" type="button"
+                                         icon="fi fi-rr-menu-dots-vertical" styleClass="rounded-button ui-button-outlined" />
+                        <p:menu overlay="true" trigger="buttonOptions" my="left top" at="left bottom" >
+
+                            <p:menuitem value="Editar" icon="fi fi-rr-pencil"
+                                        action="#{licitacionView.editar(licitacion.idLicitacion)}"
+                                        ajax="true" update="form_dialog"
+                                        oncomplete="PF('formDialog').show()">
+                                <p:resetInput target="form_dialog:dialogContent"/>
+                            </p:menuitem>
+
+                            <p:menuitem value="Eliminar" icon="fi fi-rr-trash"
+                                        ajax="true" update="form_confirm_dialog"
+                                        oncomplete="PF('confirmDialog').show()"
+                                        action="#{licitacionView.doEliminar(licitacion.idLicitacion)}">
+                            </p:menuitem>
+
+
+                        </p:menu>
+
+                    </p:column>
+
+                </p:dataTable>
+
+            </h:form>
+
+        </p:outputPanel>
+
+
+
+
+
+        <h:form id="form_confirm_dialog">
+            <p:dialog header="Aviso" widgetVar="confirmDialog"
+                    showEffect="fade" modal="true"
+                    closable="true" closeOnEscape="true"
+                    cache="false" responsive="true">
+                <p:outputPanel>
+                    <p:outputLabel styleClass="block mb-2" value="¿Está seguro que desea eliminar el registro?"/>
+
+                </p:outputPanel>
+
+                <f:facet name="footer">
+                    <p:commandButton value="No" onclick="PF('confirmDialog').hide()"
+                                     class="ui-button-outlined"/>
+                    <p:commandButton value="Si"
+                                     action="#{licitacionView.eliminar()}"
+                                     ajax="true" process="@form"
+                                     update="growl form_datatable"
+                                     validateClient="true"/>
+                </f:facet>
+            </p:dialog>
+        </h:form>
+
+
+
+
+        <h:form id="form_dialog">
+            <p:dialog header="#{licitacionView.titleDialog}" widgetVar="formDialog"
+                      minHeight="350" width="450"
+                      showEffect="fade" modal="true"
+                      closable="true" closeOnEscape="true"
+                      cache="false" responsive="true">
+                <p:outputPanel id="dialogContent" styleClass="formgrid grid" rendered="#{licitacionView.licitacionSelected != null}">
+
+                    <p:outputPanel styleClass="field col-12">
+                        <p:outputLabel for="@next" value="Nombre" styleClass="block"/>
+                        <p:inputText styleClass="block w-full" required="true"
+                                     value="#{licitacionView.licitacionSelected.nombre}"/>
+                        <span class="text-sm hidden"> </span>
+                    </p:outputPanel>
+
+                    <p:outputPanel styleClass="field col-12">
+                        <p:outputLabel for="@next" value="Número licitación" styleClass="block"/>
+                        <p:inputTextarea styleClass="block w-full"
+                                         value="#{licitacionView.licitacionSelected.numeroLicitacion}"/>
+                        <span class="text-sm hidden"> </span>
+                    </p:outputPanel>
+
+                    <p:outputPanel styleClass="field col-12">
+                        <p:outputLabel for="@next" value="Descripción" styleClass="block"/>
+                        <p:inputTextarea styleClass="block w-full" rows="3"
+                                         value="#{licitacionView.licitacionSelected.descripcion}"/>
+                        <span class="text-sm hidden"> </span>
+                    </p:outputPanel>
+
+                    <p:outputPanel styleClass="field col-12">
+                        <p:outputLabel styleClass="mr-1" for="@next" value="Fecha inicio "/>
+                        <p:calendar id="calFechaInicio" value="#{licitacionView.licitacionSelected.fechaInicio}" showOn="calFechaInicio"/>
+                    </p:outputPanel>
+
+                    <p:outputPanel styleClass="field col-12">
+                        <p:outputLabel styleClass="mr-1" for="@next" value="Fecha final "/>
+                        <p:calendar id="calFechaFin" value="#{licitacionView.licitacionSelected.fechaFinal}" showOn="calFechaFin"/>
+                    </p:outputPanel>
+
+                </p:outputPanel>
+
+                <f:facet name="footer">
+
+                    <p:commandButton value="Cancelar" onclick="PF('formDialog').hide()"
+                                     class="ui-button-outlined"/>
+                    <p:commandButton value="Guardar"
+                                     action="#{licitacionView.guardarLicitacion()}"
+                                     ajax="true" process="@form"
+                                     update="growl form_datatable"
+                                     validateClient="true"/>
+                </f:facet>
+            </p:dialog>
+        </h:form>
+
+
+    </ui:define>
+
+</ui:composition>
