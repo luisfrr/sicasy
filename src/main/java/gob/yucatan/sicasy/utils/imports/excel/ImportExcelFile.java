@@ -87,7 +87,7 @@ public class ImportExcelFile<T> {
                 Class<?> fieldType = getFieldClass(entity, fieldName);
 
                 // Convertir el valor de la celda al tipo de dato apropiado
-                Object cellValue = getCellValue(cell, fieldType, header.getDataFormat());
+                Object cellValue = getCellValue(cell, fieldType);
 
                 // Obtener el método setter del campo correspondiente
                 Method setterMethod = entity.getClass().getMethod("set" + StringUtils.capitalize(fieldName), fieldType);
@@ -104,7 +104,7 @@ public class ImportExcelFile<T> {
         return field.getType();
     }
 
-    private Object getCellValue(Cell cell, Class<?> fieldType, String dataFormat) throws ParseException {
+    private Object getCellValue(Cell cell, Class<?> fieldType) {
         // Convertir el valor de la celda al tipo de dato apropiado
         if (fieldType == String.class) {
             return cell.getStringCellValue();
