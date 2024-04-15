@@ -1,7 +1,6 @@
 package gob.yucatan.sicasy.utils.imports.excel;
 
 import gob.yucatan.sicasy.utils.numbers.DoubleUtil;
-import gob.yucatan.sicasy.utils.numbers.IntegerUtil;
 import org.apache.poi.ss.usermodel.*;
 import org.springframework.util.StringUtils;
 
@@ -12,7 +11,6 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -115,10 +113,6 @@ public class ImportExcelFile<T> {
         } else if (fieldType == Double.class) {
             return DoubleUtil.parse(String.valueOf(cell.getNumericCellValue()));
         } else if (fieldType == Date.class) {
-            // Manejar el caso de fecha
-            // String pattern = dataFormat != null ? dataFormat : "dd/MM/yyyy";
-            // SimpleDateFormat sdf = new SimpleDateFormat(pattern); // Ajusta el formato según sea necesario
-            // return sdf.parse(cell.getStringCellValue());
             return cell.getDateCellValue();
         } else if (fieldType == Boolean.class) {
             return cell.getBooleanCellValue();
