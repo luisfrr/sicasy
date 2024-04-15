@@ -1,11 +1,13 @@
 package gob.yucatan.sicasy.views.catalogos;
 
 import gob.yucatan.sicasy.business.annotations.ConfigPermiso;
+import gob.yucatan.sicasy.business.entities.Anexo;
 import gob.yucatan.sicasy.business.entities.Licitacion;
 import gob.yucatan.sicasy.business.enums.EstatusRegistro;
 import gob.yucatan.sicasy.business.enums.TipoPermiso;
 import gob.yucatan.sicasy.business.exceptions.BadRequestException;
 import gob.yucatan.sicasy.business.exceptions.NotFoundException;
+import gob.yucatan.sicasy.services.iface.IAnexoService;
 import gob.yucatan.sicasy.services.iface.ILicitacionService;
 import gob.yucatan.sicasy.views.beans.UserSessionBean;
 import jakarta.annotation.PostConstruct;
@@ -36,6 +38,7 @@ public class LicitacionView {
     private @Getter List<Licitacion> licitacionList;
 
     private final ILicitacionService licitacionService;
+    private final IAnexoService anexoService;
     private final UserSessionBean userSessionBean;
 
 
@@ -149,12 +152,30 @@ public class LicitacionView {
                     "Error", "No se ha encontrado la información de esta Licitación.");
             FacesContext.getCurrentInstance().addMessage(null, msg);
         }else {
-            FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_INFO,
-                    "Aviso", "Se ha eliminado exitósamente la información");
-            FacesContext.getCurrentInstance().addMessage(null, msg);
-            licitacionService.delete(this.licitacionSelected);
-            this.licitacionSelected = null;
-            this.limpiarFiltros();
+
+            // revisar que no existan anexos activos con la licitacion vinculada je
+            List<Anexo> anexos = null;
+            Licitacion licitacionFilter = new Licitacion();
+            licitacionFilter.setEstatusRegistro(EstatusRegistro.ACTIVO);
+            licitacionFilter.setIdLicitacion(this.licitacionSelected.getIdLicitacion());
+
+            anexos = anexoService.findByLicitacion(licitacionFilter);
+
+            if (anexos.isEmpty()) {
+                FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_INFO,
+                        "Aviso", "Se ha eliminado exitósamente la información");
+                FacesContext.getCurrentInstance().addMessage(null, msg);
+                this.licitacionSelected.setBorradoPor(userSessionBean.getUserName());
+                licitacionService.delete(this.licitacionSelected);
+                this.licitacionSelected = null;
+                this.limpiarFiltros();
+            }else {
+                FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_INFO,
+                        "Atención", "No se pueden eliminar Licitaciones con Anexos Activos agregados");
+                FacesContext.getCurrentInstance().addMessage(null, msg);
+            }
+
+
         }
 
         PrimeFaces.current().executeScript("PF('confirmDialog').hide();");
