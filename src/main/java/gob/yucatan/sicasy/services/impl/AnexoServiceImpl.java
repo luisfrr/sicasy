@@ -36,6 +36,8 @@ public class AnexoServiceImpl implements IAnexoService {
 
         SearchSpecification<Anexo> searchSpecification = new SearchSpecification<>();
 
+//        searchSpecification.add(new SearchFetch(JoinType.INNER, Anexo_.LICITACION));
+
         if (anexo.getNombre() != null)
             searchSpecification.add(new SearchCriteria(SearchOperation.MATCH,
                     anexo.getNombre(),
@@ -49,7 +51,7 @@ public class AnexoServiceImpl implements IAnexoService {
         if (anexo.getEstatusRegistro() != null )
             searchSpecification.add(new SearchCriteria(SearchOperation.EQUAL,
                     anexo.getEstatusRegistro(),
-                    Aseguradora_.ESTATUS));
+                    Anexo_.ESTATUS_REGISTRO));
 
         return anexoRepository.findAll(searchSpecification);
     }

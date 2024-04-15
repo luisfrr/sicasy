@@ -22,8 +22,13 @@ public class MenuSessionBean implements Serializable {
     public String goToAseguradoras() {
         return "/views/catalogos/aseguradoras?faces-redirect=true";
     }
+
     public String goToLicitaciones() {
         return "/views/catalogos/licitaciones?faces-redirect=true";
+    }
+
+    public String goToAnexos() {
+        return "/views/catalogos/anexos?faces-redirect=true";
     }
 
 }
