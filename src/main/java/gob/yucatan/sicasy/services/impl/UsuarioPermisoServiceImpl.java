@@ -12,7 +12,6 @@ import gob.yucatan.sicasy.services.iface.IPermisoService;
 import gob.yucatan.sicasy.services.iface.IUsuarioPermisoService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.core.annotation.MergedAnnotations;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
