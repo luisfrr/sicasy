@@ -32,7 +32,7 @@ public class BitacoraRolSeviceImpl implements IBitacoraRolService {
 
         SearchSpecification<BitacoraRol> specification = new SearchSpecification<>();
 
-        if(bitacoraRol.getRol() != null && bitacoraRol.getIdBitacoraRol() != null)
+        if(bitacoraRol.getRol() != null && bitacoraRol.getRol().getIdRol() != null)
             specification.add(new SearchCriteria(SearchOperation.EQUAL,
                     bitacoraRol.getRol().getIdRol(),
                     BitacoraRol_.ROL, Rol_.ID_ROL));

@@ -49,5 +49,20 @@ public class UsuarioServiceImpl implements IUsuarioService {
         return usuarioRepository.findByUsuarioIgnoreCase(usuario);
     }
 
+    @Override
+    public void save(Usuario usuario) {
+
+    }
+
+    @Override
+    public void delete(Usuario usuario) {
+
+    }
+
+    @Override
+    public void update(Usuario usuario) {
+
+    }
+
 
 }
