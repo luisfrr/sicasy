@@ -34,7 +34,8 @@ import java.util.Optional;
 @RequiredArgsConstructor
 @Slf4j
 @ConfigPermiso(tipo = TipoPermiso.VIEW, codigo = "SEGURIDAD_ROLES_VIEW",
-        nombre = "Módulo de Roles", url = "/views/seguridad/roles.faces")
+        nombre = "Módulo de Roles", descripcion = "Permite ver y filtrar la información de roles.",
+        url = "/views/seguridad/roles.faces")
 public class RolView {
 
     private @Getter String title;
@@ -42,7 +43,7 @@ public class RolView {
     private @Getter Rol rolSelected;
     private @Getter Rol rolFilter;
     private @Getter List<Rol> roles;
-    private @Getter boolean showAsignarRoles;
+    private @Getter boolean showConfigurarPermisos;
     private @Getter Permiso permisoFilter;
     private @Getter List<RolPermiso> rolPermisoList;
     private @Getter EstatusRegistro[] estatusRegistros;
@@ -61,7 +62,7 @@ public class RolView {
         this.estatusRegistros = EstatusRegistro.values();
 
         this.rolSelected = null;
-        this.showAsignarRoles = false;
+        this.showConfigurarPermisos = false;
         this.limpiarFiltros();
     }
 
@@ -74,7 +75,7 @@ public class RolView {
         // Se agrega filtro por default
         this.rolFilter.setEstatus(EstatusRegistro.ACTIVO);
 
-        // Aqui se puede vaciar la lista o buscar todos los registros.
+        // Aquí se puede vaciar la lista o buscar todos los registros.
         // Depende la utilidad que se le quiera dar
         this.buscar();
     }
@@ -136,7 +137,7 @@ public class RolView {
             else if(ex instanceof NotFoundException)
                 message = ex.getMessage();
             else
-                message = "Ocurrió un error innesperado.";
+                message = "Ocurrió un error inesperado.";
             FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_ERROR,
                     "Error", message);
             FacesContext.getCurrentInstance().addMessage(null, msg);
@@ -161,7 +162,7 @@ public class RolView {
             else if(ex instanceof NotFoundException)
                 message = ex.getMessage();
             else
-                message = "Ocurrió un error innesperado.";
+                message = "Ocurrió un error inesperado.";
             FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_ERROR,
                     "Error", message);
             FacesContext.getCurrentInstance().addMessage(null, msg);
@@ -172,13 +173,13 @@ public class RolView {
             nombre = "Ver Configuración de Permisos", descripcion = "Permite ver el botón que abre el configurador de permisos.")
     public void verConfiguracionPermisos(Rol rol) {
         this.rolSelected = rol;
-        this.showAsignarRoles = true;
+        this.showConfigurarPermisos = true;
         this.limpiarFiltrosPermisos();
     }
 
     public void regresar() {
         this.rolSelected = null;
-        this.showAsignarRoles = false;
+        this.showConfigurarPermisos = false;
         this.limpiarFiltrosPermisos();
     }
 

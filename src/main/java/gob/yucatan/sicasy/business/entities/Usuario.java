@@ -1,13 +1,15 @@
 package gob.yucatan.sicasy.business.entities;
 
-import gob.yucatan.sicasy.business.enums.EstatusRegistro;
+import gob.yucatan.sicasy.business.enums.EstatusUsuario;
 import jakarta.persistence.*;
 import lombok.*;
+import org.apache.logging.log4j.util.Strings;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "usuario", schema = "sec")
@@ -47,12 +49,12 @@ public class Usuario implements UserDetails {
     @Column(name = "token_type")
     private String tokenType;
 
-    @OneToMany(cascade=CascadeType.ALL, mappedBy="usuario")
+    @OneToMany(cascade=CascadeType.ALL, mappedBy="usuario", fetch = FetchType.EAGER)
     private Set<UsuarioRol> usuarioRolSet;
 
     @Column(name = "estatus", nullable = false)
     @Enumerated(EnumType.ORDINAL)
-    private EstatusRegistro estatus;
+    private EstatusUsuario estatus;
 
     @Column(name = "fecha_creacion", nullable = false, updatable = false)
     @Temporal(TemporalType.TIMESTAMP)
@@ -74,6 +76,12 @@ public class Usuario implements UserDetails {
 
     @Column(name = "borrado_por")
     private String borradoPor;
+
+    @Transient
+    private boolean rolOwner;
+
+    @Transient
+    private List<Long> idRolList;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -111,7 +119,17 @@ public class Usuario implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return this.estatus != null && this.estatus == EstatusRegistro.ACTIVO;
+        return this.estatus != null && this.estatus == EstatusUsuario.ACTIVO;
+    }
+
+    public String getRoles() {
+        String roles = Strings.EMPTY;
+        if(this.usuarioRolSet != null && !this.usuarioRolSet.isEmpty()) {
+            roles = this.usuarioRolSet.stream()
+                    .map(usuarioRol -> usuarioRol.getRol().getNombre())
+                    .collect(Collectors.joining(", "));
+        }
+        return roles;
     }
 
 }

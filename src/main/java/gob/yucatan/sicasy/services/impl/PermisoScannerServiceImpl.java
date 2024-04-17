@@ -99,6 +99,8 @@ public class PermisoScannerServiceImpl implements IPermisoScannerService {
                             .build());
                 }
 
+                // TODO: Implementar ConfigPermisoArray
+
             }
 
         } catch (Exception e) {

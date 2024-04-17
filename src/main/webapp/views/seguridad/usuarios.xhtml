@@ -1,0 +1,299 @@
+<ui:composition template="../../WEB-INF/facelets/main_layout.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="jakarta.faces.facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="jakarta.faces.html"
+                xmlns:f="jakarta.faces.core"
+                xmlns:sec="https://joinfaces.org/security">
+
+    <ui:define name="title">
+        #{usuarioView.title}
+    </ui:define>
+
+    <ui:define name="content">
+
+        <p:outputPanel id="container" styleClass="container-fluid">
+
+            <p:growl id="growl" showDetail="true" showSummary="true"
+                     skipDetailIfEqualsSummary="true" globalOnly="true"/>
+
+            <p:outputPanel id="panel_roles" rendered="#{not usuarioView.showConfigurarPermisos}">
+                <h:form id="form_breadcrum" styleClass="mb-3">
+                    <p:breadCrumb homeDisplay="text">
+                        <p:menuitem value="Inicio" ajax="false" action="#{menuSessionBean.goToHome()}"/>
+                        <p:menuitem value="Usuario"/>
+                    </p:breadCrumb>
+                </h:form>
+
+                <h:form id="form_toolbar" styleClass="mb-5">
+                    <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'SEGURIDAD_ROLES_WRITE_NUEVO')">
+                        <p:toolbar>
+                            <p:toolbarGroup>
+                                <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'SEGURIDAD_ROLES_WRITE_NUEVO')">
+                                    <p:commandButton value="Nuevo"
+                                                     action="#{usuarioView.nuevo()}"
+                                                     oncomplete="PF('formDialog').show()"
+                                                     update="form_dialog"
+                                                     styleClass="mr-4">
+                                        <p:resetInput target="form_dialog:dialogContent"/>
+                                    </p:commandButton>
+                                </sec:authorize>
+                            </p:toolbarGroup>
+
+                            <p:toolbarGroup align="right">
+                            </p:toolbarGroup>
+                        </p:toolbar>
+                    </sec:authorize>
+                </h:form>
+
+                <h:form id="form_filtros" styleClass="mb-5">
+
+                    <p:panel header="Filtros" widgetVar="panelFiltros"
+                             toggleable="true" toggleSpeed="500">
+                        <p:outputPanel styleClass="grid formgrid mb-2">
+
+                            <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4 xl:col-3">
+                                <p:outputLabel for="@next" value="Usuario" styleClass="block"/>
+                                <p:inputText styleClass="block w-full" placeholder="Ingresa un usuario..."
+                                             value="#{usuarioView.usuarioFilter.usuario}"/>
+                                <span class="text-sm hidden"> </span>
+                            </p:outputPanel>
+
+                            <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4 xl:col-3">
+                                <p:outputLabel for="@next" value="Nombre" styleClass="block"/>
+                                <p:inputText styleClass="block w-full" placeholder="Ingresa un nombre..."
+                                             value="#{usuarioView.usuarioFilter.nombre}"/>
+                                <span class="text-sm hidden"> </span>
+                            </p:outputPanel>
+
+                            <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4 xl:col-3">
+                                <p:outputLabel for="@next" value="Correo electrónico" styleClass="block"/>
+                                <p:inputText styleClass="block w-full" placeholder="Ingresa un correo electrónico..."
+                                             value="#{usuarioView.usuarioFilter.email}"/>
+                                <span class="text-sm hidden"> </span>
+                            </p:outputPanel>
+
+                            <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4 xl:col-3">
+                                <p:outputLabel for="@next" value="Rol" styleClass="block"/>
+                                <p:selectCheckboxMenu filter="true" filterMatchMode="startsWith"
+                                                      label="Roles" multiple="true" emptyLabel="Seleccione..." updateLabel="true"
+                                                      styleClass="w-full" scrollHeight="250"
+                                                      value="#{usuarioView.usuarioFilter.idRolList}">
+                                    <f:selectItems var="rol" value="#{usuarioView.rolList}" itemValue="#{rol.idRol}" itemLabel="#{rol.nombre}"/>
+                                </p:selectCheckboxMenu>
+                                <span class="text-sm hidden"> </span>
+                            </p:outputPanel>
+
+                            <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4 xl:col-3">
+                                <p:outputLabel for="@next" value="Estatus" styleClass="block"/>
+                                <p:selectOneMenu value="#{usuarioView.usuarioFilter.estatus}" styleClass="w-full">
+                                    <f:selectItem itemLabel="Todos" itemValue="#{null}"/>
+                                    <f:selectItems value="#{usuarioView.estatusUsuarios}" var="estatus"
+                                                   itemValue="#{estatus}" itemLabel="#{estatus.label}"/>
+                                </p:selectOneMenu>
+                                <span class="text-sm hidden"> </span>
+                            </p:outputPanel>
+
+                        </p:outputPanel>
+
+                        <f:facet name="footer">
+                            <p:outputPanel styleClass="flex flex-row gap-4 justify-content-end">
+                                <p:commandButton value="Limpiar filtros" styleClass="ui-button-outlined"
+                                                 ajax="true" action="#{usuarioView.limpiarFiltros()}"
+                                                 update="form_filtros form_datatable"/>
+                                <p:commandButton value="Buscar" ajax="true" action="#{usuarioView.buscar()}"
+                                                 update="form_datatable"/>
+                            </p:outputPanel>
+                        </f:facet>
+                    </p:panel>
+
+                </h:form>
+
+                <h:form id="form_datatable" styleClass="mb-5">
+
+                    <p:dataTable id="dtUsuarios"
+                                 var="usuario" value="#{usuarioView.usuarios}"
+                                 rows="50" rowHover="true"
+                                 rowKey="#{usuario.idUsuario}" rowIndexVar="index"
+                                 styleClass="dt-scrollable-x"
+                                 scrollable="true"
+                                 paginator="true" paginatorPosition="bottom"
+                                 paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                 currentPageReportTemplate="{startRecord}-{endRecord} de {totalRecords} registros"
+                                 rowsPerPageTemplate="50,100,200,{ShowAll|'Todos'}">
+
+                        <f:facet name="header">
+                            Usuarios
+                        </f:facet>
+
+                        <p:column headerText="No." width="40">
+                            <h:outputText value="#{index + 1}" />
+                        </p:column>
+
+                        <p:column headerText="Usuario" width="150">
+                            <h:outputText value="#{usuario.usuario}"/>
+                        </p:column>
+
+                        <p:column headerText="Nombre" width="200">
+                            <h:outputText value="#{usuario.nombre}"/>
+                        </p:column>
+
+                        <p:column headerText="Correo electrónico" width="200">
+                            <h:outputText value="#{usuario.email}"/>
+                        </p:column>
+
+                        <p:column headerText="Correo Confirmado" width="100" styleClass="text-center">
+                            <h:outputText value="#{usuario.correoConfirmado == 1 ? 'Sí' : ''}"/>
+                        </p:column>
+
+                        <p:column headerText="Roles" width="200">
+                            <h:outputText value="#{usuario.roles}"/>
+                        </p:column>
+
+                        <p:column headerText="Estatus" width="100">
+                            <h:outputText value="#{usuario.estatus.label}">
+                            </h:outputText>
+                        </p:column>
+
+                        <sec:authorize access="hasAuthority('ROLE_OWNER')">
+
+                            <p:column headerText="Fecha creación" width="150">
+                                <h:outputText value="#{usuario.fechaCreacion}">
+                                </h:outputText>
+                            </p:column>
+
+                            <p:column headerText="Creado por" width="150">
+                                <h:outputText value="#{usuario.creadoPor}">
+                                </h:outputText>
+                            </p:column>
+
+                            <p:column headerText="Fecha modificación" width="150">
+                                <h:outputText value="#{usuario.fechaModificacion}">
+                                </h:outputText>
+                            </p:column>
+
+                            <p:column headerText="Modificado por" width="150">
+                                <h:outputText value="#{usuario.modificadoPor}">
+                                </h:outputText>
+                            </p:column>
+
+                            <p:column headerText="Fecha borrado" width="150">
+                                <h:outputText value="#{usuario.fechaBorrado}">
+                                </h:outputText>
+                            </p:column>
+
+                            <p:column headerText="Borrado por" width="150">
+                                <h:outputText value="#{usuario.borradoPor}">
+                                </h:outputText>
+                            </p:column>
+
+                        </sec:authorize>
+
+                        <sec:authorize access="hasAnyAuthority('ROLE_OWNER','SEGURIDAD_ROLES_READ_CONFIGURAR_PERMISOS', 'SEGURIDAD_ROLES_WRITE_EDITAR', 'SEGURIDAD_ROLES_WRITE_ELIMINAR')">
+                            <p:column headerText="Acciones" width="120">
+
+                                <p:commandButton id="buttonOptions" type="button"
+                                                 icon="fi fi-rr-menu-dots-vertical"
+                                                 styleClass="rounded-button ui-button-outlined"
+                                                 rendered="#{usuario.estatus.label != 'Borrado'}"/>
+                                <p:menu overlay="true" trigger="buttonOptions" my="left top" at="left bottom" styleClass="w-16rem">
+
+                                    <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'SEGURIDAD_ROLES_READ_CONFIGURAR_PERMISOS')">
+                                        <p:menuitem value="Configuración de Permisos"
+                                                    action="#{usuarioView.verConfiguracionPermisos(usuario)}"
+                                                    ajax="true" update="container"/>
+                                    </sec:authorize>
+
+                                    <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'SEGURIDAD_ROLES_WRITE_EDITAR')">
+                                        <p:menuitem value="Editar"
+                                                    action="#{usuarioView.editar(usuario.idUsuario)}"
+                                                    ajax="true" update="form_dialog"
+                                                    oncomplete="PF('formDialog').show()">
+                                            <p:resetInput target="form_dialog:dialogContent"/>
+                                        </p:menuitem>
+                                    </sec:authorize>
+
+                                    <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'SEGURIDAD_ROLES_WRITE_ELIMINAR')">
+                                        <p:menuitem value="Eliminar"
+                                                    ajax="true" action="#{usuarioView.eliminar(usuario.idUsuario)}"
+                                                    update="growl form_datatable">
+                                            <p:confirm header="Confirmación" message="¿Está seguro que desea eliminar el rol?" icon="pi pi-exclamation-triangle"/>
+                                        </p:menuitem>
+                                    </sec:authorize>
+                                </p:menu>
+
+                            </p:column>
+                        </sec:authorize>
+
+                    </p:dataTable>
+
+                </h:form>
+            </p:outputPanel>
+
+            <p:outputPanel id="panel_asignar_permisos" rendered="#{usuarioView.showConfigurarPermisos}">
+                <ui:include src="/views/seguridad/_usuarios_permisos.xhtml"/>
+            </p:outputPanel>
+
+        </p:outputPanel>
+
+        <h:form id="form_dialog">
+            <p:dialog header="#{usuarioView.formDialogTitle}" widgetVar="formDialog"
+                      minHeight="350" width="450"
+                      showEffect="fade" modal="true"
+                      closable="true" closeOnEscape="true"
+                      cache="false" responsive="true">
+                <p:outputPanel id="dialogContent" styleClass="formgrid grid" rendered="#{usuarioView.usuarioSelected != null}">
+
+                    <p:outputPanel styleClass="field col-12">
+                        <p:outputLabel for="@next" value="Usuario" styleClass="block"/>
+                        <p:inputText styleClass="block w-full" required="true"
+                                     value="#{usuarioView.usuarioSelected.usuario}"/>
+                        <span class="text-sm hidden"> </span>
+                    </p:outputPanel>
+
+                    <p:outputPanel styleClass="field col-12">
+                        <p:outputLabel for="@next" value="Nombre" styleClass="block"/>
+                        <p:inputText styleClass="block w-full" required="true"
+                                     value="#{usuarioView.usuarioSelected.nombre}"/>
+                        <span class="text-sm hidden"> </span>
+                    </p:outputPanel>
+
+                    <p:outputPanel styleClass="field col-12">
+                        <p:outputLabel for="@next" value="Correo electrónico" styleClass="block"/>
+                        <p:inputText styleClass="block w-full" rows="3" required="true"
+                                     value="#{usuarioView.usuarioSelected.email}">
+                            <f:validateRegex pattern="^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$" />
+                        </p:inputText>
+                        <span class="text-sm hidden"> </span>
+                    </p:outputPanel>
+
+                    <p:outputPanel styleClass="field col-12">
+                        <p:outputLabel for="@next" value="Roles" styleClass="block"/>
+                        <p:selectCheckboxMenu filter="true" filterMatchMode="startsWith"
+                                              label="Roles" multiple="true" emptyLabel="Seleccione..." updateLabel="true"
+                                              styleClass="w-full" scrollHeight="250"
+                                              value="#{usuarioView.usuarioSelected.idRolList}">
+                            <f:selectItems var="rol" value="#{usuarioView.rolList}" itemValue="#{rol.idRol}" itemLabel="#{rol.nombre}"/>
+                        </p:selectCheckboxMenu>
+                        <span class="text-sm hidden"> </span>
+                    </p:outputPanel>
+
+                </p:outputPanel>
+
+                <f:facet name="footer">
+
+                    <p:commandButton value="Cancelar" onclick="PF('formDialog').hide()"
+                                     class="ui-button-outlined mr-4"/>
+                    <p:commandButton value="Guardar"
+                                     action="#{usuarioView.guardar()}"
+                                     ajax="true" process="@form"
+                                     update="growl form_datatable form_dialog:dialogContent"
+                                     validateClient="true"/>
+                </f:facet>
+            </p:dialog>
+        </h:form>
+
+
+    </ui:define>
+
+</ui:composition>
