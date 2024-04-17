@@ -35,6 +35,18 @@ public class Usuario implements UserDetails {
     @Column(name = "email", nullable = false)
     private String email;
 
+    @Column(name = "correo_confirmado")
+    private Integer correoConfirmado;
+
+    @Column(name = "token")
+    private String token;
+
+    @Column(name = "vigencia_token")
+    private Date vigenciaToken;
+
+    @Column(name = "token_type")
+    private String tokenType;
+
     @OneToMany(cascade=CascadeType.ALL, mappedBy="usuario")
     private Set<UsuarioRol> usuarioRolSet;
 
