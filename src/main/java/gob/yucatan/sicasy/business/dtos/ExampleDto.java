@@ -2,6 +2,8 @@ package gob.yucatan.sicasy.business.dtos;
 
 import lombok.*;
 
+import java.util.Date;
+
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
@@ -13,4 +15,5 @@ public class ExampleDto {
     private Integer age;
     private Integer heigt;
     private Integer weight;
+    private Date dateOfBirth;
 }

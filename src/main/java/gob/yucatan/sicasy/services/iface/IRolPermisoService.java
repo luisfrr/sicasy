@@ -1,6 +1,5 @@
 package gob.yucatan.sicasy.services.iface;
 
-
 import gob.yucatan.sicasy.business.entities.Rol;
 import gob.yucatan.sicasy.business.entities.RolPermiso;
 
@@ -10,5 +9,6 @@ public interface IRolPermisoService {
 
     List<RolPermiso> findAllDynamic(RolPermiso rolPermiso);
     List<RolPermiso> findByRol(Rol rol);
+    void asignarPermiso(RolPermiso rolPermiso, String userName);
 
 }

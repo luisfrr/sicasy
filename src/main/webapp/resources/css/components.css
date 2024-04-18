@@ -525,15 +525,33 @@ body .topbar .header-link.user-info .ui-avatar {
     width: 1.5rem;
     height: 1.5rem;
     font-size: var(--font-size-base);
-    background-color: var(--highlight-bg);
+    background-color: var(--gray-500);
 }
 body .topbar .header-link.user-info .ui-avatar span.ui-avatar-text {
-    color: var(--text-color);
+    color: var(--text-white);
     font-weight: var(--font-weight-semibold);
 }
 
 
+body .ui-chkbox .ui-chkbox-box {
+    border: 1px solid var(--surface-border);
+    background: var(--surface-section);
+}
 
+body .ui-chkbox .ui-chkbox-box.ui-state-hover {
+    border-color: var(--primary-color);
+}
+
+body .ui-chkbox .ui-chkbox-box.ui-state-focus {
+    box-shadow: 0 0 0 .2em var(--highlight-bg);
+    outline: 0 none
+}
+
+body .ui-chkbox .ui-chkbox-box.ui-state-active {
+    border-color: var(--primary-color);
+    background:var(--primary-color);
+    color: var(--primary-text-color);
+}
 
 
 

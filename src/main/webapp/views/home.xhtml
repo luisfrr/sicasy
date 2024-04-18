@@ -78,9 +78,6 @@
                     <p:outputLabel for="@previous" value="Label" styleClass=" ml-2"/>
                 </p:outputPanel>
 
-
-
-
             </p:outputPanel>
         </h:form>
 
@@ -116,9 +113,6 @@
                 </f:facet>
 
                 <p:outputPanel styleClass="grid formgrid mb-2">
-
-
-
                 </p:outputPanel>
 
                 <f:facet name="footer">
@@ -177,6 +171,23 @@
                 </p:column>
             </p:dataTable>
 
+        </h:form>
+
+        <h:form id="form_fileUpload">
+
+            <div class="ui-fluid">
+                <div class="field">
+                    <p:inputTextarea id="customDropZone" widgetVar="textarea"
+                                     rows="5" value="#{homeView.dropZoneText}"/>
+                    <small>
+                        <p:link value="O haz clic aquí para elegir" onclick="PF('uploadDnd').show();return false" style="font-size:inherit"/>.
+                    </small>
+                </div>
+            </div>
+            <p:fileUpload widgetVar="uploadDnd" listener="#{homeView.handleFileUpload}"
+                          fileLimit="1" fileLimitMessage="Solo se permite subir un archivo"
+                          sizeLimit="50000000" allowTypes="/(\.|\/)(xlsx|)$/" dropZone="customDropZone"
+                          update="growl" style="display: none"/>
         </h:form>
 
     </p:outputPanel>
