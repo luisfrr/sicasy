@@ -36,6 +36,7 @@ public class LicitacionView {
     private @Getter Licitacion licitacionSelected;
     private @Getter Licitacion licitacionFilter;
     private @Getter List<Licitacion> licitacionList;
+    private @Getter EstatusRegistro[] estatusRegistros;
 
     private final ILicitacionService licitacionService;
     private final IAnexoService anexoService;
@@ -48,6 +49,7 @@ public class LicitacionView {
         this.title = "Licitaciones";
 
         this.licitacionSelected = null;
+        this.estatusRegistros = EstatusRegistro.values();
         this.limpiarFiltros();
 
     }
@@ -81,6 +83,13 @@ public class LicitacionView {
                     this.licitacionSelected.setModificadoPor(userSessionBean.getUserName());
                     this.licitacionSelected.setFechaModificacion(new Date());
                     licitacionService.update(licitacionSelected);
+
+                    FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_INFO,
+                            "Operación exitosa", "Se ha guardado correctamente la información");
+                    FacesContext.getCurrentInstance().addMessage(null, msg);
+                    PrimeFaces.current().executeScript("PF('formDialog').hide();");
+                    this.buscar();
+                    this.licitacionSelected  = null;
                 }else {
                     // id null, entonces se inserta nuevo en BD
 

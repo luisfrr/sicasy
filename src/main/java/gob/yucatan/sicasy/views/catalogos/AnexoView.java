@@ -37,6 +37,7 @@ public class AnexoView {
     private @Getter Anexo anexoFilter;
     private @Getter Anexo anexoSelected;
     private @Getter List<Anexo> anexoList;
+    private @Getter EstatusRegistro[] estatusRegistros;
     private @Getter List<Licitacion> licitacionesActivasList;
 
     private final IAnexoService anexoService;
@@ -50,6 +51,7 @@ public class AnexoView {
         this.title = "Anexos";
         this.anexoSelected = null;
         this.licitacionesActivasList = null;
+        this.estatusRegistros = EstatusRegistro.values();
         this.limpiarFiltros();
     }
 
@@ -84,23 +86,22 @@ public class AnexoView {
                     this.anexoSelected.setModificadoPor(userSessionBean.getUserName());
                     this.anexoSelected.setFechaModificacion(new Date());
                     anexoService.update(anexoSelected);
-                }else {
-                    // id null, entonces se inserta nuevo en BD
 
+                }else {
+
+                    // id null, entonces se inserta nuevo en BD
                     this.anexoSelected.setCreadoPor(userSessionBean.getUserName());
                     this.anexoSelected.setFechaCreacion(new Date());
                     anexoService.save(anexoSelected);
 
-                    FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_INFO,
-                            "Operación exitosa", "Se ha guardado correctamente la información");
-                    FacesContext.getCurrentInstance().addMessage(null, msg);
-                    PrimeFaces.current().executeScript("PF('formDialog').hide();");
-                    this.buscar();
-                    this.anexoSelected  = null;
-
-
                 }
 
+                FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_INFO,
+                        "Operación exitosa", "Se ha guardado correctamente la información");
+                FacesContext.getCurrentInstance().addMessage(null, msg);
+                PrimeFaces.current().executeScript("PF('formDialog').hide();");
+                this.buscar();
+                this.anexoSelected  = null;
 
             }
         }catch (Exception ex) {
@@ -149,13 +150,21 @@ public class AnexoView {
             FacesContext.getCurrentInstance().addMessage(null, msg);
         }else {
 
-            FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_INFO,
-                    "Aviso", "Se ha eliminado exitósamente la información");
-            FacesContext.getCurrentInstance().addMessage(null, msg);
-            this.anexoSelected.setBorradoPor(userSessionBean.getUserName());
-            anexoService.delete(this.anexoSelected);
-            this.anexoSelected = null;
-            this.limpiarFiltros();
+//            Optional<Licitacion> optionalLicitacion = licitacionService.findById(this.anexoSelected.getLicitacion().getIdLicitacion());
+//
+//            if (optionalLicitacion.isPresent() && optionalLicitacion.get().getEstatusRegistro().equals(EstatusRegistro.ACTIVO)){
+//                FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_WARN,
+//                        "Atención", "No se puede eliminar la información cuando la Licitación esta Activa.");
+//                FacesContext.getCurrentInstance().addMessage(null, msg);
+//            }else {
+                FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_INFO,
+                        "Aviso", "Se ha eliminado exitósamente la información");
+                FacesContext.getCurrentInstance().addMessage(null, msg);
+                this.anexoSelected.setBorradoPor(userSessionBean.getUserName());
+                anexoService.delete(this.anexoSelected);
+                this.anexoSelected = null;
+                this.limpiarFiltros();
+//            }
 
         }
 

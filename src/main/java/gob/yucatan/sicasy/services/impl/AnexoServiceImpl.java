@@ -89,20 +89,12 @@ public class AnexoServiceImpl implements IAnexoService {
         if (optionalAnexo.isEmpty())
             throw new NotFoundException("No se encontró ninguna información");
 
-        Optional<Licitacion> optionalLicitacion = licitacionService.findById(anexo.getLicitacion().getIdLicitacion());
 
-        if (optionalLicitacion.isPresent() && optionalLicitacion.get().getEstatusRegistro().equals(EstatusRegistro.ACTIVO)){
-            throw new NotFoundException("No se puede eliminar la información si la Licitacion esta Activa.");
-        } else if(optionalLicitacion.isPresent() && optionalLicitacion.get().getEstatusRegistro().equals(EstatusRegistro.BORRADO)){
-            // procede a borrar (recordar enviar el usuario que borra en el objeto si no buscar una mejor manera)
-
-            Anexo anexoToUpdate = optionalAnexo.get();
-            anexoToUpdate.setFechaBorrado(new Date());
-            anexoToUpdate.setBorradoPor(anexo.getBorradoPor());
-            anexoToUpdate.setEstatusRegistro(EstatusRegistro.BORRADO);
-            anexoRepository.save(anexoToUpdate);
-
-        }
+        Anexo anexoToUpdate = optionalAnexo.get();
+        anexoToUpdate.setFechaBorrado(new Date());
+        anexoToUpdate.setBorradoPor(anexo.getBorradoPor());
+        anexoToUpdate.setEstatusRegistro(EstatusRegistro.BORRADO);
+        anexoRepository.save(anexoToUpdate);
 
     }
 

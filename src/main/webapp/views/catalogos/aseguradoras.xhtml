@@ -55,6 +55,18 @@
                             <span class="text-sm hidden"> </span>
                         </p:outputPanel>
 
+                        <sec:authorize access="hasAuthority('ROLE_OWNER')">
+                            <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4 xl:col-3">
+                                <p:outputLabel for="@next" value="Estatus" styleClass="block"/>
+                                <p:selectOneMenu value="#{aseguradoraView.aseguradoraFiltroHelper.estatus}" styleClass="w-full">
+                                    <f:selectItem itemLabel="Todos" itemValue="#{null}"/>
+                                    <f:selectItems value="#{aseguradoraView.estatusRegistros}" var="estatus"
+                                                   itemValue="#{estatus}" itemLabel="#{estatus.label}"/>
+                                </p:selectOneMenu>
+                                <span class="text-sm hidden"> </span>
+                            </p:outputPanel>
+                        </sec:authorize>
+
                     </p:outputPanel>
 
                     <f:facet name="footer">
