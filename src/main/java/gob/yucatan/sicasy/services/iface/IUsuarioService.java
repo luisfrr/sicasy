@@ -10,7 +10,7 @@ public interface IUsuarioService {
     List<Usuario> findAllDynamic(Usuario usuario);
     Optional<Usuario> findById(Long id);
     Optional<Usuario> findByUsuario(String usuario);
-    void save(Usuario usuario);
+    Usuario create(Usuario usuario);
     void delete(Usuario usuario);
     void update(Usuario usuario);
 
