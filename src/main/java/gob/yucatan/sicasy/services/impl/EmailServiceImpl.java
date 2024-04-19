@@ -10,7 +10,6 @@ import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
@@ -38,6 +37,7 @@ public class EmailServiceImpl implements IEmailService {
             helper.setText(body, true); // true para habilitar HTML
 
             emailSender.send(message);
+            log.info("Correo enviado correctamente");
         } catch (MessagingException e) {
             log.error("No se ha logrado enviar el correo.");
         }
@@ -46,9 +46,8 @@ public class EmailServiceImpl implements IEmailService {
     @Override
     public void sendMail(EmailTemplateMessage templateMessage) {
         MimeMessage message = emailSender.createMimeMessage();
-        MimeMessageHelper helper = new MimeMessageHelper(message);
-
         try {
+            MimeMessageHelper helper = new MimeMessageHelper(message, true);
             String body = buildBodyMessage(templateMessage.getEmailTemplate(), templateMessage.getDataTemplate());
 
             helper.setTo(templateMessage.getTo());
@@ -56,14 +55,8 @@ public class EmailServiceImpl implements IEmailService {
             helper.setSubject(templateMessage.getSubject());
             helper.setText(body, true); // true para habilitar HTML
 
-            if(body.contains("##_LOGO_##")) {
-                // Adjuntar imagen
-                String logoPath = "static/images/logo.png";
-                ClassPathResource logo = new ClassPathResource(logoPath);
-                helper.addInline("logo", logo);
-            }
-
             emailSender.send(message);
+            log.info("Correo enviado correctamente");
         } catch (MessagingException e) {
             log.error("No se ha logrado enviar el correo.");
         }

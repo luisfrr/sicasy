@@ -111,10 +111,10 @@ public class HomeView implements Serializable {
 
     public void enviarCorreoPrueba() {
         Map<String, String> dataTemplate = new HashMap<>();
-        dataTemplate.put("#EMAIL_TITLE#", "Bienvenido");
+        dataTemplate.put("#EMAIL_TITLE#", "¡Registro exitoso!");
         dataTemplate.put("#EMAIL_DESCRIPTION#", "Te damos la más cordial bienvenida al Sistema Integral de Control de Arrendamiento y Seguros del Estado de Yucatán. Para continuar, te invitamos a activar tu cuenta.");
-        dataTemplate.put("#ACTION_TEXT#", "Activar cuenta");
-        dataTemplate.put("#ACTION_URL#", "https://sicasy.yucatan.gob.mx/");
+        dataTemplate.put("#ACTION_TEXT#", "ACTIVAR CUENTA");
+        dataTemplate.put("#ACTION_URL#", "http://localhost:8080/");
 
         emailService.sendMail(EmailTemplateMessage.builder()
                 .emailTemplate(EmailTemplateEnum.SIMPLE_TEMPLATE)
