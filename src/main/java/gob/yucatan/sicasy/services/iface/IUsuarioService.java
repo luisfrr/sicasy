@@ -10,8 +10,10 @@ public interface IUsuarioService {
     List<Usuario> findAllDynamic(Usuario usuario);
     Optional<Usuario> findById(Long id);
     Optional<Usuario> findByUsuario(String usuario);
+    Optional<Usuario> findByToken(String token);
     Usuario create(Usuario usuario);
     void delete(Usuario usuario);
     void update(Usuario usuario);
+    void activateAccount(Usuario usuario);
 
 }

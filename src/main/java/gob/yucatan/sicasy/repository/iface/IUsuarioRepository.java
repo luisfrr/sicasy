@@ -23,4 +23,7 @@ public interface IUsuarioRepository extends JpaRepository<Usuario, Long>, JpaSpe
             where u.estatus <> ?1 and upper(u.usuario) = upper(?2)""")
     boolean existsByEstatusNotAndEmail(EstatusUsuario estatus, String email);
 
+    @Query("select u from Usuario u where u.token = ?1")
+    Optional<Usuario> findByToken(String token);
+
 }

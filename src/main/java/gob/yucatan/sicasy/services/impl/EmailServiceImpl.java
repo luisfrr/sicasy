@@ -2,6 +2,7 @@ package gob.yucatan.sicasy.services.impl;
 
 import gob.yucatan.sicasy.business.dtos.EmailTemplateMessage;
 import gob.yucatan.sicasy.business.entities.EmailTemplate;
+import gob.yucatan.sicasy.business.entities.Usuario;
 import gob.yucatan.sicasy.business.enums.EmailTemplateEnum;
 import gob.yucatan.sicasy.business.exceptions.BadRequestException;
 import gob.yucatan.sicasy.services.iface.IEmailService;
@@ -10,10 +11,12 @@ import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
@@ -21,6 +24,9 @@ import java.util.Optional;
 @RequiredArgsConstructor
 @Slf4j
 public class EmailServiceImpl implements IEmailService {
+
+    @Value("${app.url}")
+    private String appUrl;
 
     private final JavaMailSender emailSender;
     private final IEmailTemplateService emailTemplateService;
@@ -60,6 +66,32 @@ public class EmailServiceImpl implements IEmailService {
         } catch (MessagingException e) {
             log.error("No se ha logrado enviar el correo.");
         }
+    }
+
+    @Override
+    public void sendActivateAccountEmail(Usuario usuario) {
+        String activateUrl = appUrl + "/views/auth/activate.faces?token=" + usuario.getToken();
+
+        Map<String, String> dataTemplate = getSimpleTemplateData("¡Registro exitoso!", """
+                Necesitamos validar su dirección de correo electrónico y debe asignar una contraseña para activar su cuenta. <br/>
+                Haga clic en el siguiente botón para continuar con la activación.
+                """, "ACTIVAR CUENTA", activateUrl);
+
+        this.sendMail(EmailTemplateMessage.builder()
+                .emailTemplate(EmailTemplateEnum.SIMPLE_TEMPLATE)
+                .to(usuario.getEmail())
+                .subject("SICASY - ¡Registro exitoso!")
+                .dataTemplate(dataTemplate)
+                .build());
+    }
+
+    private static Map<String, String> getSimpleTemplateData(String title, String description, String actionText, String actionUrl) {
+        Map<String, String> dataTemplate = new HashMap<>();
+        dataTemplate.put("#EMAIL_TITLE#", title);
+        dataTemplate.put("#EMAIL_DESCRIPTION#", description);
+        dataTemplate.put("#ACTION_TEXT#", actionText);
+        dataTemplate.put("#ACTION_URL#", actionUrl);
+        return dataTemplate;
     }
 
     private String buildBodyMessage(EmailTemplateEnum emailTemplate, Map<String, String> dataTemplate) {

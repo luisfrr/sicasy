@@ -1,9 +1,7 @@
 package gob.yucatan.sicasy.views.seguridad;
 
 import gob.yucatan.sicasy.business.annotations.ConfigPermiso;
-import gob.yucatan.sicasy.business.dtos.EmailTemplateMessage;
 import gob.yucatan.sicasy.business.entities.*;
-import gob.yucatan.sicasy.business.enums.EmailTemplateEnum;
 import gob.yucatan.sicasy.business.enums.EstatusRegistro;
 import gob.yucatan.sicasy.business.enums.EstatusUsuario;
 import gob.yucatan.sicasy.business.enums.TipoPermiso;
@@ -17,7 +15,6 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.primefaces.PrimeFaces;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
@@ -33,9 +30,6 @@ import java.util.stream.Collectors;
         nombre = "Módulo de Usuarios", descripcion = "Permite ver y filtrar la información de usuarios.",
         url = "/views/seguridad/usuarios.faces")
 public class UsuarioView implements Serializable {
-
-    @Value("${app.url}")
-    private String appUrl;
 
     private @Getter String title;
     private @Getter String formDialogTitle;
@@ -56,7 +50,6 @@ public class UsuarioView implements Serializable {
     private final IUsuarioPermisoService usuarioPermisoService;
     private final IRolService rolService;
     private final IEmailService emailService;
-    private String usuario;
 
     @PostConstruct
     public void init() {
@@ -146,9 +139,9 @@ public class UsuarioView implements Serializable {
                     Usuario usuarioCreated = usuarioService.create(this.usuarioSelected);
 
                     // Enviar correo de activación
-                    this.enviarCorreoActivacion(usuarioCreated);
+                    emailService.sendActivateAccountEmail(usuarioCreated);
                 }
-                Messages.addInfo("Se ha guardado correctamente la información de usuario");
+                Messages.addInfo("¡Registro existoso!","Se ha enviado el correo de activación de cuenta.");
                 PrimeFaces.current().executeScript("PF('formDialog').hide();");
                 this.buscar();
             }
@@ -238,26 +231,5 @@ public class UsuarioView implements Serializable {
         permisoService.updateAll(permisos);
         log.info("Permisos: {}", permisos.size());
         this.buscarPermisos();
-    }
-
-
-    private void enviarCorreoActivacion(Usuario usuario) {
-        String activateUrl = appUrl + "/auth/activate/" + usuario.getToken();
-
-        Map<String, String> dataTemplate = new HashMap<>();
-        dataTemplate.put("#EMAIL_TITLE#", "¡Registro exitoso!");
-        dataTemplate.put("#EMAIL_DESCRIPTION#", """
-                Necesitamos validar su dirección de correo electrónico para activar su cuenta SICASY.
-                Simplemente haga clic en el siguiente botón:
-                """);
-        dataTemplate.put("#ACTION_TEXT#", "ACTIVAR MI CUENTA");
-        dataTemplate.put("#ACTION_URL#", activateUrl);
-
-        emailService.sendMail(EmailTemplateMessage.builder()
-                .emailTemplate(EmailTemplateEnum.SIMPLE_TEMPLATE)
-                .to(usuario.getEmail())
-                .subject("SICASY - ¡Registro exitoso!")
-                .dataTemplate(dataTemplate)
-                .build());
     }
 }

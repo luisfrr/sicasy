@@ -75,6 +75,11 @@ public class UsuarioServiceImpl implements IUsuarioService {
     }
 
     @Override
+    public Optional<Usuario> findByToken(String token) {
+        return usuarioRepository.findByToken(token);
+    }
+
+    @Override
     @Transactional
     public Usuario create(Usuario usuario) {
         List<UsuarioRol> usuarioRolList = new ArrayList<>();
@@ -116,6 +121,31 @@ public class UsuarioServiceImpl implements IUsuarioService {
         // TODO: Implementar funcionalidad editar usuario
     }
 
+    @Override
+    @Transactional
+    public void activateAccount(Usuario usuario) {
+        String username = usuario.getUsuario();
+        String password = usuario.getContrasenia();
+        String passwordEncrypted = passwordEncoder.encode(password);
+
+        usuario.setEstatus(EstatusUsuario.ACTIVO);
+        usuario.setContrasenia(passwordEncrypted);
+        usuario.setCorreoConfirmado(1);
+        usuario.setVigenciaToken(null);
+        usuario.setTokenType(null);
+        usuario.setToken(null);
+        usuario.setFechaModificacion(new Date());
+        usuario.setModificadoPor(username);
+
+        Usuario usuarioAnterior = this.findById(usuario.getIdUsuario()).orElse(null);
+
+        // Guardar bitácora
+        bitacoraUsuarioService.guardarBitacora("Activar cuenta usuario", usuarioAnterior,
+                usuario, usuario.getCreadoPor());
+
+        usuarioRepository.save(usuario);
+    }
+
 
     private void validarCreacionUsuario(Usuario usuario) {
         // Validar si ya existe un usuario que no este borrado y tenga el mismo nombre de usuario
@@ -138,7 +168,7 @@ public class UsuarioServiceImpl implements IUsuarioService {
 
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(new Date()); // Hoy
-        calendar.add(Calendar.HOUR, 24);
+        calendar.add(Calendar.DATE, 3);
 
         usuario.setToken(tokenActivacion);
         usuario.setVigenciaToken(calendar.getTime());
