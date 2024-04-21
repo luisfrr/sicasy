@@ -9,5 +9,6 @@ public interface IEmailService {
     void sendMail(EmailTemplateMessage templateMessage);
 
     void sendActivateAccountEmail(Usuario usuario);
+    void sendResetPasswordEmail(Usuario usuario);
 
 }

@@ -4,6 +4,7 @@ import gob.yucatan.sicasy.business.entities.Usuario;
 import gob.yucatan.sicasy.business.exceptions.BadRequestException;
 import gob.yucatan.sicasy.services.iface.IUsuarioService;
 import gob.yucatan.sicasy.views.beans.Messages;
+import gob.yucatan.sicasy.views.beans.UserSessionBean;
 import jakarta.annotation.PostConstruct;
 import jakarta.faces.context.FacesContext;
 import lombok.Getter;
@@ -32,6 +33,7 @@ public class ActivateView implements Serializable {
     private @Getter boolean showReturnToLogin = false;
     private @Getter boolean showFormPassword = false;
 
+    private final UserSessionBean userSessionBean;
     private final IUsuarioService usuarioService;
 
     @PostConstruct
@@ -80,8 +82,10 @@ public class ActivateView implements Serializable {
             if(!password.equals(confirmPassword))
                 throw new BadRequestException("Las contraseñas no coinciden.");
 
+            usuarioSelected.setModificadoPor(userSessionBean.getUserName());
+
             usuarioSelected.setContrasenia(confirmPassword);
-            usuarioService.activateAccount(usuarioSelected);
+            usuarioService.activarCuenta(usuarioSelected);
 
             showFormPassword = false;
             showReturnToLogin = true;

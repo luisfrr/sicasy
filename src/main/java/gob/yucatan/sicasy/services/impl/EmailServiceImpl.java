@@ -85,6 +85,23 @@ public class EmailServiceImpl implements IEmailService {
                 .build());
     }
 
+    @Override
+    public void sendResetPasswordEmail(Usuario usuario) {
+        String activateUrl = appUrl + "/views/auth/resetpass.faces?token=" + usuario.getToken();
+
+        Map<String, String> dataTemplate = getSimpleTemplateData("Reestablecer contraseña", """
+                Se ha iniciado el proceso para reestablecer la contraseña para ingresar a tu cuenta en SICASY.
+                Si no lo has solicitado, entonces solo omite este mensaje.
+                """, "REESTABLECER", activateUrl);
+
+        this.sendMail(EmailTemplateMessage.builder()
+                .emailTemplate(EmailTemplateEnum.SIMPLE_TEMPLATE)
+                .to(usuario.getEmail())
+                .subject("SICASY - Reestablecer contraseña")
+                .dataTemplate(dataTemplate)
+                .build());
+    }
+
     private static Map<String, String> getSimpleTemplateData(String title, String description, String actionText, String actionUrl) {
         Map<String, String> dataTemplate = new HashMap<>();
         dataTemplate.put("#EMAIL_TITLE#", title);

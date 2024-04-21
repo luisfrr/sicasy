@@ -13,6 +13,9 @@ public interface IUsuarioRepository extends JpaRepository<Usuario, Long>, JpaSpe
     @Query("select u from Usuario u left join fetch u.usuarioRolSet where upper(u.usuario) = upper(?1)")
     Optional<Usuario> findByUsuarioIgnoreCase(String usuario);
 
+    @Query("select u from Usuario u where upper(u.email) = upper(?1)")
+    Optional<Usuario> findByEmailIgnoreCase(String email);
+
     @Query("""
             select (count(u) > 0) from Usuario u
             where u.estatus <> ?1 and upper(u.usuario) = upper(?2)""")
@@ -25,5 +28,15 @@ public interface IUsuarioRepository extends JpaRepository<Usuario, Long>, JpaSpe
 
     @Query("select u from Usuario u where u.token = ?1")
     Optional<Usuario> findByToken(String token);
+
+    @Query("""
+            select (count(u) > 0) from Usuario u
+            where u.estatus <> ?1 and upper(u.usuario) = upper(?2) and u.idUsuario <> ?3""")
+    boolean existsByEstatusNotAndUsuario(EstatusUsuario estatus, String usuario, Long idUsuario);
+
+    @Query("""
+            select (count(u) > 0) from Usuario u
+            where u.estatus <> ?1 and upper(u.usuario) = upper(?2) and u.idUsuario <> ?3""")
+    boolean existsByEstatusNotAndEmail(EstatusUsuario estatus, String email, Long idUsuario);
 
 }

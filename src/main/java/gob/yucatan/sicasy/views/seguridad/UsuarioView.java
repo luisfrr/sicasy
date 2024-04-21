@@ -40,6 +40,7 @@ public class UsuarioView implements Serializable {
     private @Getter List<Rol> rolList;
 
     private @Getter boolean showConfigurarPermisos;
+    private @Getter boolean formEdit;
     private @Getter Permiso permisoFilter;
     private @Getter List<UsuarioPermiso> usuarioPermisoList;
 
@@ -98,6 +99,7 @@ public class UsuarioView implements Serializable {
     public void nuevo() {
         log.info("Nuevo Usuario");
         this.formDialogTitle = "Agregar Usuario";
+        this.formEdit = false;
         this.usuarioSelected = new Usuario();
         this.usuarioSelected.setIdRolList(new ArrayList<>());
     }
@@ -112,6 +114,7 @@ public class UsuarioView implements Serializable {
             Messages.addError("No se ha encontrado la información del usuario.");
         } else {
             formDialogTitle = "Editar Usuario";
+            this.formEdit = true;
             this.usuarioSelected = usuarioOptional.get();
             if(this.usuarioSelected.getUsuarioRolSet() != null) {
                 this.usuarioSelected.setIdRolList(this.usuarioSelected.getUsuarioRolSet().stream()
@@ -132,6 +135,10 @@ public class UsuarioView implements Serializable {
                     this.usuarioSelected.setModificadoPor(userSessionBean.getUserName());
                     this.usuarioSelected.setFechaModificacion(new Date());
                     usuarioService.update(this.usuarioSelected);
+
+                    Messages.addInfo("¡Listo!","Se ha guardado correctamente.");
+                    PrimeFaces.current().executeScript("PF('formDialog').hide();");
+                    this.buscar();
                 } else {
                     // IdUsuario es null es una creacion
                     this.usuarioSelected.setCreadoPor(userSessionBean.getUserName());
@@ -140,10 +147,11 @@ public class UsuarioView implements Serializable {
 
                     // Enviar correo de activación
                     emailService.sendActivateAccountEmail(usuarioCreated);
+
+                    Messages.addInfo("¡Registro existoso!","Se ha enviado el correo de activación de cuenta.");
+                    PrimeFaces.current().executeScript("PF('formDialog').hide();");
+                    this.buscar();
                 }
-                Messages.addInfo("¡Registro existoso!","Se ha enviado el correo de activación de cuenta.");
-                PrimeFaces.current().executeScript("PF('formDialog').hide();");
-                this.buscar();
             }
         } catch (Exception ex) {
             log.error("Error al guardar Usuario", ex);
@@ -168,6 +176,70 @@ public class UsuarioView implements Serializable {
                             .borradoPor(userSessionBean.getUserName())
                             .fechaBorrado(new Date())
                     .build());
+            this.buscar();
+        } catch (Exception ex) {
+            String message;
+            if(ex instanceof BadRequestException)
+                message = ex.getMessage();
+            else if(ex instanceof NotFoundException)
+                message = ex.getMessage();
+            else
+                message = "Ocurrió un error inesperado.";
+            Messages.addError(message);
+        }
+    }
+
+    @ConfigPermiso(tipo = TipoPermiso.WRITE, codigo = "SEGURIDAD_USUARIOS_WRITE_HABILITAR",
+            nombre = "Reestablecer contraseña",
+            descripcion = "Acción que enviar un correo para que el usuario genere su nueva contraseña.")
+    public void reestablecerContrasenia(Long idUsuario) {
+        log.info("Reestablecer contraseña Usuario");
+        try {
+            Usuario usuario = usuarioService.reestablecerPassword(idUsuario, userSessionBean.getUserName());
+            // Enviar correo de activación
+            emailService.sendResetPasswordEmail(usuario);
+            this.buscar();
+        } catch (Exception ex) {
+            String message;
+            if(ex instanceof BadRequestException)
+                message = ex.getMessage();
+            else if(ex instanceof NotFoundException)
+                message = ex.getMessage();
+            else
+                message = "Ocurrió un error inesperado.";
+            Messages.addError(message);
+        }
+    }
+
+    @ConfigPermiso(tipo = TipoPermiso.WRITE, codigo = "SEGURIDAD_USUARIOS_WRITE_HABILITAR",
+            nombre = "Habilitar cuenta de usuario",
+            descripcion = "Acción que habilitar la cuenta de usuario. Cambia a estatus Bloqueado, " +
+                    "por lo que no podrá ingresar al sistema.")
+    public void habilitar(Long idUsuario) {
+        log.info("Habilitar Usuario");
+        try {
+            usuarioService.habilitarCuenta(idUsuario, userSessionBean.getUserName());
+            this.buscar();
+        } catch (Exception ex) {
+            String message;
+            if(ex instanceof BadRequestException)
+                message = ex.getMessage();
+            else if(ex instanceof NotFoundException)
+                message = ex.getMessage();
+            else
+                message = "Ocurrió un error inesperado.";
+            Messages.addError(message);
+        }
+    }
+
+    @ConfigPermiso(tipo = TipoPermiso.WRITE, codigo = "SEGURIDAD_USUARIOS_WRITE_DESHABILITAR",
+            nombre = "Deshabilitar cuenta de usuario",
+            descripcion = "Acción que deshabilitar la cuenta de usuario. Cambia a estatus Activo, " +
+                    "lo que significa que podrá ingresar al sistema (siempre que tenga su correo confirmado).")
+    public void deshabilitar(Long idUsuario) {
+        log.info("Deshabilitar Usuario");
+        try {
+            usuarioService.deshabilitarCuenta(idUsuario, userSessionBean.getUserName());
             this.buscar();
         } catch (Exception ex) {
             String message;

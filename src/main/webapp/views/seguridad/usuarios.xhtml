@@ -204,6 +204,30 @@
                                                     ajax="true" update="container"/>
                                     </sec:authorize>
 
+                                    <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'SEGURIDAD_ROLES_WRITE_ELIMINAR')">
+                                        <p:menuitem value="Reestablecer contraseña" rendered="#{usuario.estatus.label == 'Activo'}"
+                                                    ajax="true" action="#{usuarioView.reestablecerContrasenia(usuario.idUsuario)}"
+                                                    update="growl form_datatable">
+                                            <p:confirm header="Confirmación" message="¿Está seguro que desea reestablecer la contraseña del usuario?" icon="pi pi-exclamation-triangle"/>
+                                        </p:menuitem>
+                                    </sec:authorize>
+
+                                    <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'SEGURIDAD_ROLES_WRITE_ELIMINAR')">
+                                        <p:menuitem value="Habilitar" rendered="#{usuario.estatus.label != 'Activo'}"
+                                                    ajax="true" action="#{usuarioView.habilitar(usuario.idUsuario)}"
+                                                    update="growl form_datatable">
+                                            <p:confirm header="Confirmación" message="¿Está seguro que desea habilitar la cuenta de usuario?" icon="pi pi-exclamation-triangle"/>
+                                        </p:menuitem>
+                                    </sec:authorize>
+
+                                    <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'SEGURIDAD_ROLES_WRITE_ELIMINAR')">
+                                        <p:menuitem value="Dehabilitar" rendered="#{usuario.estatus.label == 'Activo'}"
+                                                    ajax="true" action="#{usuarioView.deshabilitar(usuario.idUsuario)}"
+                                                    update="growl form_datatable">
+                                            <p:confirm header="Confirmación" message="¿Está seguro que desea deshabilitar la cuenta de usuario?" icon="pi pi-exclamation-triangle"/>
+                                        </p:menuitem>
+                                    </sec:authorize>
+
                                     <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'SEGURIDAD_ROLES_WRITE_EDITAR')">
                                         <p:menuitem value="Editar"
                                                     action="#{usuarioView.editar(usuario.idUsuario)}"

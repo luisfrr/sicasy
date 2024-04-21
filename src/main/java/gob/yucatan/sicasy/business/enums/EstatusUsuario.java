@@ -7,8 +7,7 @@ public enum EstatusUsuario {
     BORRADO("Borrado"),
     ACTIVO("Activo"),
     REGISTRADO("Registrado"),
-    BLOQUEADO("Bloqueado"),
-    INACTIVO("Inactivo");
+    BLOQUEADO("Bloqueado");
 
     private final String label;
 

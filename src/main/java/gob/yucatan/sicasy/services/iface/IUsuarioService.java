@@ -14,6 +14,10 @@ public interface IUsuarioService {
     Usuario create(Usuario usuario);
     void delete(Usuario usuario);
     void update(Usuario usuario);
-    void activateAccount(Usuario usuario);
-
+    void activarCuenta(Usuario usuario);
+    void deshabilitarCuenta(Long idUsuario, String userName);
+    void habilitarCuenta(Long idUsuario, String userName);
+    Usuario reestablecerPassword(Long idUsuario, String userName);
+    void olvidasteTuPassword(String correoElectronico);
+    void asignarNuevoPassword(Usuario usuario);
 }
