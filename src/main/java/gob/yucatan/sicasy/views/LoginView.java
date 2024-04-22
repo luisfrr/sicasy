@@ -9,13 +9,14 @@ import org.springframework.stereotype.Component;
 
 import java.io.Serializable;
 
+@Getter
 @Component
 @Scope("view")
 @RequiredArgsConstructor
 @Slf4j
 public class LoginView implements Serializable {
 
-    private @Getter String title;
+    private String title;
 
     @PostConstruct
     private void init() {

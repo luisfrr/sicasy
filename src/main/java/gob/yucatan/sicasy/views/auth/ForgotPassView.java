@@ -27,7 +27,6 @@ public class ForgotPassView implements Serializable {
     private @Getter boolean showReturnToLogin = false;
     private @Getter boolean showFormPassword = false;
 
-    private final UserSessionBean userSessionBean;
     private final IUsuarioService usuarioService;
     private final IEmailService emailService;
 
