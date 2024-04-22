@@ -22,7 +22,10 @@
             <p:inputText placeholder="Usuario" id="username" styleClass="w-full" required="true"/>
             <p:password placeholder="Contraseña" id="password" styleClass="w-full" required="true"/>
 
-            <a href="#" class="text-sm text-secondary-color font-light text-center">¿Olvidó su contraseña?</a>
+            <p:commandLink type="button" ajax="true" action="#{loginView.goToForgotPassword()}"
+                           styleClass="text-sm text-secondary-color font-light text-center">
+                ¿Olvidó su contraseña?
+            </p:commandLink>
 
             <div class="flex justify-content-center">
                 <p:commandButton value="Continuar" ajax="false" validateClient="true"/>

@@ -10,5 +10,6 @@ public interface IEmailService {
 
     void sendActivateAccountEmail(Usuario usuario);
     void sendResetPasswordEmail(Usuario usuario);
+    void sendForgotPasswordEmail(Usuario usuario);
 
 }

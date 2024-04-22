@@ -133,4 +133,27 @@ public class Usuario implements UserDetails {
         return roles;
     }
 
+
+    public Usuario(Usuario original) {
+        this.idUsuario = original.getIdUsuario();
+        this.usuario = original.getUsuario();
+        this.contrasenia = original.getContrasenia();
+        this.nombre = original.getNombre();
+        this.email = original.getEmail();
+        this.correoConfirmado = original.getCorreoConfirmado();
+        this.token = original.getToken();
+        this.vigenciaToken  = original.getVigenciaToken();
+        this.tokenType = original.getTokenType();
+        this.usuarioRolSet  = original.getUsuarioRolSet();
+        this.estatus = original.getEstatus();
+        this.fechaCreacion = original.getFechaCreacion();
+        this.creadoPor  = original.getCreadoPor();
+        this.fechaModificacion = original.getFechaModificacion();
+        this.modificadoPor  = original.getModificadoPor();
+        this.fechaBorrado = original.getFechaBorrado();
+        this.borradoPor  = original.getBorradoPor();
+        this.rolOwner = original.isRolOwner();
+        this.idRolList = original.getIdRolList();
+    }
+
 }

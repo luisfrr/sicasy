@@ -109,6 +109,22 @@ public class BitacoraUsuarioServiceImpl implements IBitacoraUsuarioService {
                                     .build());
                         }
                     }
+
+                    //
+                    if(campo.getName().equals(Usuario_.USUARIO_ROL_SET)) {
+
+                        String rolesAnterior = usuarioAnterior.getRoles();
+                        String rolesNuevo = usuarioNuevo.getRoles();
+
+                        // Comparar los valores y agregar un registro a la bitácora si hay cambios
+                        if (!Objects.equals(rolesAnterior, rolesNuevo)) {
+                            bitacoraCambiosList.add(BitacoraCambios.builder()
+                                    .campo(campo.getName())
+                                    .valorAnterior(rolesAnterior)
+                                    .valorNuevo(rolesNuevo)
+                                    .build());
+                        }
+                    }
                 }
             }
 

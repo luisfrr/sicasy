@@ -21,4 +21,8 @@ public class LoginView implements Serializable {
     private void init() {
         title = "Acceso";
     }
+
+    public String goToForgotPassword() {
+        return "/views/auth/forgotpassword?faces-redirect=true";
+    }
 }

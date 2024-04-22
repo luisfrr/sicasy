@@ -195,7 +195,7 @@ public class UsuarioView implements Serializable {
     public void reestablecerContrasenia(Long idUsuario) {
         log.info("Reestablecer contraseña Usuario");
         try {
-            Usuario usuario = usuarioService.reestablecerPassword(idUsuario, userSessionBean.getUserName());
+            Usuario usuario = usuarioService.restablecerPassword(idUsuario, userSessionBean.getUserName());
             // Enviar correo de activación
             emailService.sendResetPasswordEmail(usuario);
             this.buscar();

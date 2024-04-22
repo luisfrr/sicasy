@@ -15,6 +15,7 @@ import gob.yucatan.sicasy.services.iface.IUsuarioService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.logging.log4j.util.Strings;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -122,19 +123,25 @@ public class UsuarioServiceImpl implements IUsuarioService {
     @Override
     @Transactional
     public void delete(Usuario usuario) {
+        String borradoPor = usuario.getBorradoPor();
+
         Optional<Usuario> usuarioOptional = usuarioRepository.findById(usuario.getIdUsuario());
 
         if(usuarioOptional.isEmpty())
             throw new NotFoundException("Usuario no encontrado");
 
-        final Usuario usuarioAnterior = usuarioOptional.get();
+        usuario = usuarioOptional.get();
+
+        // Guardar información previa para la bitácora
+        Usuario usuarioAnterior = new Usuario(usuario); // Hacer una copia del objeto para la bitácora
 
         // Se asigna estatus borrado
         usuario.setEstatus(EstatusUsuario.BORRADO);
         usuario.setFechaBorrado(new Date());
+        usuario.setBorradoPor(borradoPor);
 
         // Guardar bitácora
-        bitacoraUsuarioService.guardarBitacora("Borrar usuario", usuarioAnterior,
+        bitacoraUsuarioService.guardarBitacora("Eliminar usuario", usuarioAnterior,
                 usuario, usuario.getModificadoPor());
 
         usuarioRepository.save(usuario);
@@ -149,7 +156,8 @@ public class UsuarioServiceImpl implements IUsuarioService {
             throw new NotFoundException("Usuario no encontrado");
 
         // Roles que se van a reemplazar por los nuevos
-        final Usuario usuarioAnterior = usuarioOptional.get();
+        final Usuario usuarioAnterior = usuarioRepository.findById(usuario.getIdUsuario()).orElse(null);
+        assert usuarioAnterior != null;
         Set<UsuarioRol> usuarioRolToDelete = usuarioAnterior.getUsuarioRolSet();
 
         // Roles nuevos
@@ -187,6 +195,10 @@ public class UsuarioServiceImpl implements IUsuarioService {
         String password = usuario.getContrasenia();
         String passwordEncrypted = passwordEncoder.encode(password);
 
+        // Guardar información previa para la bitácora
+        Usuario usuarioAnterior = new Usuario(usuario); // Hacer una copia del objeto para la bitácora
+        
+        // Se modifica el usuario
         usuario.setEstatus(EstatusUsuario.ACTIVO);
         usuario.setContrasenia(passwordEncrypted);
         usuario.setCorreoConfirmado(1);
@@ -195,9 +207,7 @@ public class UsuarioServiceImpl implements IUsuarioService {
         usuario.setToken(null);
         usuario.setFechaModificacion(new Date());
         usuario.setModificadoPor(username);
-
-        Usuario usuarioAnterior = this.findById(usuario.getIdUsuario()).orElse(null);
-
+        
         // Guardar bitácora
         bitacoraUsuarioService.guardarBitacora("Activar cuenta de usuario", usuarioAnterior,
                 usuario, usuario.getModificadoPor());
@@ -208,24 +218,25 @@ public class UsuarioServiceImpl implements IUsuarioService {
     @Override
     @Transactional
     public void deshabilitarCuenta(Long idUsuario, String userName) {
-        Optional<Usuario> usuarioOptional = usuarioRepository.findById(idUsuario);
+        // Encontrar el usuario o lanzar excepción si no se encuentra
+        Usuario usuario = usuarioRepository.findById(idUsuario)
+                .orElseThrow(() -> new NotFoundException("Usuario no encontrado"));
 
-        if(usuarioOptional.isEmpty())
-            throw new NotFoundException("Usuario no encontrado");
+        // Guardar información previa para la bitácora
+        Usuario usuarioAnterior = new Usuario(usuario); // Hacer una copia del objeto para la bitácora
 
-        final Usuario usuarioAnterior = usuarioOptional.get();
-        Usuario usuario = usuarioOptional.get();
-
+        // Actualizar estado y detalles de modificación
         usuario.setEstatus(EstatusUsuario.BLOQUEADO);
         usuario.setFechaModificacion(new Date());
         usuario.setModificadoPor(userName);
 
         // Guardar bitácora
-        bitacoraUsuarioService.guardarBitacora("Deshabilitar cuenta de usuario", usuarioAnterior,
-                usuario, usuario.getModificadoPor());
+        bitacoraUsuarioService.guardarBitacora("Deshabilitar cuenta de usuario", usuarioAnterior, usuario, userName);
 
+        // Guardar cambios
         usuarioRepository.save(usuario);
     }
+
 
     @Override
     @Transactional
@@ -236,8 +247,10 @@ public class UsuarioServiceImpl implements IUsuarioService {
         if(usuarioOptional.isEmpty())
             throw new NotFoundException("Usuario no encontrado");
 
-        final Usuario usuarioAnterior = usuarioOptional.get();
         Usuario usuario = usuarioOptional.get();
+
+        // Guardar información previa para la bitácora
+        Usuario usuarioAnterior = new Usuario(usuario); // Hacer una copia del objeto para la bitácora
 
         usuario.setEstatus(EstatusUsuario.ACTIVO);
         usuario.setFechaModificacion(new Date());
@@ -252,23 +265,26 @@ public class UsuarioServiceImpl implements IUsuarioService {
 
     @Override
     @Transactional
-    public Usuario reestablecerPassword(Long idUsuario, String userName) {
+    public Usuario restablecerPassword(Long idUsuario, String userName) {
 
         Optional<Usuario> usuarioOptional = usuarioRepository.findById(idUsuario);
 
         if(usuarioOptional.isEmpty())
             throw new NotFoundException("Usuario no encontrado");
 
-        final Usuario usuarioAnterior = usuarioOptional.get();
         Usuario usuario = usuarioOptional.get();
 
+        // Guardar información previa para la bitácora
+        Usuario usuarioAnterior = new Usuario(usuario); // Hacer una copia del objeto para la bitácora
+
         // Generar token para validar email
-        generarTokenUsuario(usuario, "Reestablecer contraseña");
+        generarTokenUsuario(usuario, "Restablecer contraseña");
         usuario.setFechaModificacion(new Date());
         usuario.setModificadoPor(userName);
+        usuario.setContrasenia(Strings.EMPTY);
 
         // Guardar bitácora
-        bitacoraUsuarioService.guardarBitacora("Reestablecer contraseña", usuarioAnterior,
+        bitacoraUsuarioService.guardarBitacora("Restablecer contraseña", usuarioAnterior,
                 usuario, usuario.getModificadoPor());
 
         return usuarioRepository.save(usuario);
@@ -276,14 +292,16 @@ public class UsuarioServiceImpl implements IUsuarioService {
 
     @Override
     @Transactional
-    public void olvidasteTuPassword(String correoElectronico) {
+    public Usuario olvidasteTuPassword(String correoElectronico) {
         Optional<Usuario> usuarioOptional = usuarioRepository.findByEmailIgnoreCase(correoElectronico);
 
         if(usuarioOptional.isEmpty())
             throw new NotFoundException("Usuario no encontrado");
 
-        final Usuario usuarioAnterior = usuarioOptional.get();
         Usuario usuario = usuarioOptional.get();
+
+        // Guardar información previa para la bitácora
+        Usuario usuarioAnterior = new Usuario(usuario); // Hacer una copia del objeto para la bitácora
 
         // Generar token para validar email
         generarTokenUsuario(usuario, "Olvidaste tu contraseña");
@@ -294,13 +312,34 @@ public class UsuarioServiceImpl implements IUsuarioService {
         bitacoraUsuarioService.guardarBitacora("Olvidaste tu contraseña", usuarioAnterior,
                 usuario, usuario.getModificadoPor());
 
-        usuarioRepository.save(usuario);
+        return usuarioRepository.save(usuario);
     }
 
     @Override
     @Transactional
     public void asignarNuevoPassword(Usuario usuario) {
+        String username = usuario.getModificadoPor();
+        String password = usuario.getContrasenia();
+        String passwordEncrypted = passwordEncoder.encode(password);
 
+        usuario = this.findById(usuario.getIdUsuario()).orElseThrow(() -> new NotFoundException("Usuario no encontrado"));
+
+        // Guardar información previa para la bitácora
+        Usuario usuarioAnterior = new Usuario(usuario); // Hacer una copia del objeto para la bitácora
+
+        // Se modifica el usuario
+        usuario.setContrasenia(passwordEncrypted);
+        usuario.setVigenciaToken(null);
+        usuario.setTokenType(null);
+        usuario.setToken(null);
+        usuario.setFechaModificacion(new Date());
+        usuario.setModificadoPor(username);
+
+        // Guardar bitácora
+        bitacoraUsuarioService.guardarBitacora("Asignar nueva contraseña", usuarioAnterior,
+                usuario, usuario.getModificadoPor());
+
+        usuarioRepository.save(usuario);
     }
 
     private void validarCreacionUsuario(Usuario usuario) {

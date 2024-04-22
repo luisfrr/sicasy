@@ -87,17 +87,35 @@ public class EmailServiceImpl implements IEmailService {
 
     @Override
     public void sendResetPasswordEmail(Usuario usuario) {
-        String activateUrl = appUrl + "/views/auth/resetpass.faces?token=" + usuario.getToken();
+        String url = appUrl + "/views/auth/resetpassword.faces?token=" + usuario.getToken();
 
-        Map<String, String> dataTemplate = getSimpleTemplateData("Reestablecer contraseña", """
-                Se ha iniciado el proceso para reestablecer la contraseña para ingresar a tu cuenta en SICASY.
-                Si no lo has solicitado, entonces solo omite este mensaje.
-                """, "REESTABLECER", activateUrl);
+        Map<String, String> dataTemplate = getSimpleTemplateData("Restablecer contraseña", """
+                Para concluir con el proceso de restablecer tu contraseña, tendrás que crear una nueva contraseña para ingresar a tu cuenta SICASY.
+                Haga clic en el siguiente botón para asignar una nueva contraseña.
+                """, "NUEVA CONTRASEÑA", url);
 
         this.sendMail(EmailTemplateMessage.builder()
                 .emailTemplate(EmailTemplateEnum.SIMPLE_TEMPLATE)
                 .to(usuario.getEmail())
-                .subject("SICASY - Reestablecer contraseña")
+                .subject("SICASY - Restablecer contraseña")
+                .dataTemplate(dataTemplate)
+                .build());
+    }
+
+    @Override
+    public void sendForgotPasswordEmail(Usuario usuario) {
+        String url = appUrl + "/views/auth/resetpassword.faces?token=" + usuario.getToken();
+
+        Map<String, String> dataTemplate = getSimpleTemplateData("¿Olvidaste tu contraseña?", """
+                Usted recibió este correo electrónico, porque fue solicitado por un usuario de SICASY. <br/>
+                Esto es parte del procedimiento para crear una nueva contraseña en el sistema. <br/>
+                Si NO lo solicitó, ignore este correo electrónico, su contraseña seguirá siendo la misma.
+                """, "NUEVA CONTRASEÑA", url);
+
+        this.sendMail(EmailTemplateMessage.builder()
+                .emailTemplate(EmailTemplateEnum.SIMPLE_TEMPLATE)
+                .to(usuario.getEmail())
+                .subject("SICASY - ¿Olvidaste tu contraseña?")
                 .dataTemplate(dataTemplate)
                 .build());
     }

@@ -17,7 +17,7 @@ public interface IUsuarioService {
     void activarCuenta(Usuario usuario);
     void deshabilitarCuenta(Long idUsuario, String userName);
     void habilitarCuenta(Long idUsuario, String userName);
-    Usuario reestablecerPassword(Long idUsuario, String userName);
-    void olvidasteTuPassword(String correoElectronico);
+    Usuario restablecerPassword(Long idUsuario, String userName);
+    Usuario olvidasteTuPassword(String correoElectronico);
     void asignarNuevoPassword(Usuario usuario);
 }
