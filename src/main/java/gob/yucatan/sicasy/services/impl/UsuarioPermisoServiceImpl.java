@@ -12,6 +12,7 @@ import gob.yucatan.sicasy.services.iface.IPermisoService;
 import gob.yucatan.sicasy.services.iface.IUsuarioPermisoService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -164,5 +165,15 @@ public class UsuarioPermisoServiceImpl implements IUsuarioPermisoService {
             usuarioPermisoRepository.save(usuarioPermiso);
         }
 
+    }
+
+    @Override
+    public List<GrantedAuthority> getAuthorities(Long idUsuario) {
+
+        // TODO: Obtener permisos de usuarios
+
+
+
+        return List.of();
     }
 }
