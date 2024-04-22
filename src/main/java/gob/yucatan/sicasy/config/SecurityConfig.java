@@ -41,6 +41,8 @@ public class SecurityConfig {
                     .authorizeHttpRequests((authorize) -> authorize
                             .requestMatchers(mvc.pattern("/")).permitAll()
                             .requestMatchers(mvc.pattern("/views/auth/activate.faces")).permitAll()
+                            .requestMatchers(mvc.pattern("/views/auth/forgotpassword.faces")).permitAll()
+                            .requestMatchers(mvc.pattern("/views/auth/resetpassword.faces")).permitAll()
                             .requestMatchers(new AntPathRequestMatcher("/jakarta.faces.resource/**")).permitAll()
                             .requestMatchers(new AntPathRequestMatcher("/webjars/**")).permitAll()
                             .anyRequest().authenticated())
