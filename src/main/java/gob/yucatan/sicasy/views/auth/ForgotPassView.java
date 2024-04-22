@@ -5,7 +5,6 @@ import gob.yucatan.sicasy.business.exceptions.BadRequestException;
 import gob.yucatan.sicasy.services.iface.IEmailService;
 import gob.yucatan.sicasy.services.iface.IUsuarioService;
 import gob.yucatan.sicasy.views.beans.Messages;
-import gob.yucatan.sicasy.views.beans.UserSessionBean;
 import jakarta.annotation.PostConstruct;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
