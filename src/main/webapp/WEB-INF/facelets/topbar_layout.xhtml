@@ -28,7 +28,7 @@
             </a>
             <div class="user-info-dropdown" id="userInfoDropdown">
                 <h:form>
-                    <p:commandLink ajax="false" immediate="true">
+                    <p:commandLink action="#{userSessionBean.doLogout()}" ajax="false" immediate="true">
                         <i class="fi fi-rr-sign-out-alt text-base"/>
                         <span class="text-base text-color">Cerrar sesión</span>
                     </p:commandLink>

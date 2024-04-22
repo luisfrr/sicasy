@@ -318,11 +318,13 @@ public class UsuarioServiceImpl implements IUsuarioService {
     @Override
     @Transactional
     public void asignarNuevoPassword(Usuario usuario) {
-        String username = usuario.getModificadoPor();
+
         String password = usuario.getContrasenia();
         String passwordEncrypted = passwordEncoder.encode(password);
 
         usuario = this.findById(usuario.getIdUsuario()).orElseThrow(() -> new NotFoundException("Usuario no encontrado"));
+
+        String username = usuario.getModificadoPor();
 
         // Guardar información previa para la bitácora
         Usuario usuarioAnterior = new Usuario(usuario); // Hacer una copia del objeto para la bitácora

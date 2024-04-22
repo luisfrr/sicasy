@@ -2,6 +2,7 @@ package gob.yucatan.sicasy.views.beans;
 
 import gob.yucatan.sicasy.business.entities.Usuario;
 import jakarta.annotation.PostConstruct;
+import jakarta.faces.context.FacesContext;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -51,6 +52,12 @@ public class UserSessionBean implements Serializable {
 
     public boolean isOwner() {
         return this.authorities != null && this.authorities.stream().anyMatch(g -> g.getAuthority().equals("ROLE_OWNER"));
+    }
+
+    public String doLogout() {
+        SecurityContextHolder.clearContext();
+        FacesContext.getCurrentInstance().getExternalContext().invalidateSession();
+        return "/login?faces-redirect=true";
     }
 
 }

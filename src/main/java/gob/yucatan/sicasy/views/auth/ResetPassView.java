@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Scope;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 import java.io.Serializable;
@@ -33,7 +34,6 @@ public class ResetPassView implements Serializable {
     private @Getter boolean showReturnToLogin = false;
     private @Getter boolean showFormPassword = false;
 
-    private final UserSessionBean userSessionBean;
     private final IUsuarioService usuarioService;
 
     @PostConstruct
@@ -83,7 +83,6 @@ public class ResetPassView implements Serializable {
             if(!password.equals(confirmPassword))
                 throw new BadRequestException("Las contraseñas no coinciden.");
 
-            usuarioSelected.setModificadoPor(userSessionBean.getUserName());
             usuarioSelected.setContrasenia(confirmPassword);
             usuarioService.asignarNuevoPassword(usuarioSelected);
 
@@ -99,6 +98,8 @@ public class ResetPassView implements Serializable {
     }
 
     public String returnToLogin() {
+        SecurityContextHolder.clearContext();
+        FacesContext.getCurrentInstance().getExternalContext().invalidateSession();
         return "/login?faces-redirect=true";
     }
 }

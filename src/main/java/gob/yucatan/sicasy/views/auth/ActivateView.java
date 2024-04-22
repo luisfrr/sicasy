@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Scope;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 import java.io.Serializable;
@@ -99,6 +100,8 @@ public class ActivateView implements Serializable {
     }
 
     public String returnToLogin() {
+        SecurityContextHolder.clearContext();
+        FacesContext.getCurrentInstance().getExternalContext().invalidateSession();
         return "/login?faces-redirect=true";
     }
 }
