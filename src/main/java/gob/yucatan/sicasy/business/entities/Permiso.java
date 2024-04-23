@@ -41,7 +41,7 @@ public class Permiso {
     private Permiso permisoParent;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "permisoParent")
-    private Set<Permiso> subPermisos = new HashSet<>();
+    private Set<Permiso> subPermisos;
 
     @Column(name = "tipo_permiso", nullable = false)
     @Enumerated(EnumType.ORDINAL)
