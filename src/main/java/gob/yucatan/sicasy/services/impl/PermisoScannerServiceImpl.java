@@ -1,6 +1,7 @@
 package gob.yucatan.sicasy.services.impl;
 
 import gob.yucatan.sicasy.business.annotations.ConfigPermiso;
+import gob.yucatan.sicasy.business.annotations.ConfigPermisoArray;
 import gob.yucatan.sicasy.business.entities.Permiso;
 import gob.yucatan.sicasy.business.enums.EstatusRegistro;
 import gob.yucatan.sicasy.business.exceptions.InternalServerErrorException;
@@ -99,8 +100,30 @@ public class PermisoScannerServiceImpl implements IPermisoScannerService {
                             .build());
                 }
 
-                // TODO: Implementar ConfigPermisoArray
+                if(method.isAnnotationPresent(ConfigPermisoArray.class)) {
+                    String packagePath = clazz.getPackageName();
+                    String className = clazz.getSimpleName();
 
+                    ConfigPermisoArray configPermisoArray = method.getAnnotation(ConfigPermisoArray.class);
+
+                    for(ConfigPermiso configPermiso : configPermisoArray.value()) {
+                        subPermisos.add(Permiso.builder()
+                                .codigo(configPermiso.codigo())
+                                .nombre(configPermiso.nombre())
+                                .descripcion(configPermiso.descripcion())
+                                .url(configPermiso.url())
+                                .tipoPermiso(configPermiso.tipo())
+                                .estatus(EstatusRegistro.ACTIVO)
+                                .permisoParent(permisoParent)
+                                .className(packagePath + "." + className)
+                                .methodName(method.getName())
+                                .fechaCreacion(new Date())
+                                .creadoPor(userName)
+                                .fechaModificacion(new Date())
+                                .modificadoPor(userName)
+                                .build());
+                    }
+                }
             }
 
         } catch (Exception e) {

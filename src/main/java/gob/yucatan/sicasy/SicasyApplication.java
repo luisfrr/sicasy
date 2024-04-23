@@ -8,6 +8,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 @SpringBootApplication
+
 @RequiredArgsConstructor
 @Slf4j
 public class SicasyApplication implements CommandLineRunner {
