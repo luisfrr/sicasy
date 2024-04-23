@@ -25,12 +25,17 @@ public class AppBean implements Serializable {
     @Value("${app.version}")
     private String appVersion;
 
+    @Value("${server.servlet.context-path}")
+    private String contextPath;
+
     private Integer year;
 
     @PostConstruct
     public void init() {
         String message = appName + " v" + appVersion + " is running...";
         log.info(message);
+        if(contextPath.equals("/"))
+            contextPath = "";
         year = getCurrentYear();
     }
 

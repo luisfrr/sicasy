@@ -7,9 +7,8 @@ import gob.yucatan.sicasy.business.entities.*;
 import gob.yucatan.sicasy.repository.criteria.SearchCriteria;
 import gob.yucatan.sicasy.repository.criteria.SearchOperation;
 import gob.yucatan.sicasy.repository.criteria.SearchSpecification;
-import gob.yucatan.sicasy.repository.iface.IBitacoraRolRepository;
-import gob.yucatan.sicasy.services.iface.IBitacoraRolService;
-import jakarta.transaction.Transactional;
+import gob.yucatan.sicasy.repository.iface.IBItacoraUsuarioRepository;
+import gob.yucatan.sicasy.services.iface.IBitacoraUsuarioService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -23,65 +22,66 @@ import java.util.Objects;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class BitacoraRolSeviceImpl implements IBitacoraRolService {
+public class BitacoraUsuarioServiceImpl implements IBitacoraUsuarioService {
 
-    private final IBitacoraRolRepository bitacoraRolRepository;
+    private final IBItacoraUsuarioRepository bitacoraUsuarioRepository;
 
     @Override
-    public List<BitacoraRol> findAllDynamic(BitacoraRol bitacoraRol) {
+    public List<BitacoraUsuario> findAllDynamic(BitacoraUsuario bitacoraUsuario) {
 
-        SearchSpecification<BitacoraRol> specification = new SearchSpecification<>();
+        SearchSpecification<BitacoraUsuario> specification = new SearchSpecification<>();
 
-        if(bitacoraRol.getRol() != null && bitacoraRol.getRol().getIdRol() != null)
+        if(bitacoraUsuario.getUsuario() != null && bitacoraUsuario.getUsuario().getIdUsuario() != null)
             specification.add(new SearchCriteria(SearchOperation.EQUAL,
-                    bitacoraRol.getRol().getIdRol(),
-                    BitacoraRol_.ROL, Rol_.ID_ROL));
+                    bitacoraUsuario.getUsuario().getIdUsuario(),
+                    BitacoraUsuario_.USUARIO, Usuario_.ID_USUARIO));
 
-        return bitacoraRolRepository.findAll(specification);
+        return bitacoraUsuarioRepository.findAll(specification);
     }
 
     @Override
-    public List<BitacoraRol> findByRolId(Long rolId) {
+    public List<BitacoraUsuario> findByUsuarioId(Long usuarioId) {
 
-        BitacoraRol bitacoraRol = BitacoraRol.builder()
-                .rol(Rol.builder().idRol(rolId).build())
+        BitacoraUsuario bitacoraUsuario = BitacoraUsuario.builder()
+                .usuario(Usuario.builder().idUsuario(usuarioId).build())
                 .build();
 
-        return this.findAllDynamic(bitacoraRol);
+        return this.findAllDynamic(bitacoraUsuario);
     }
 
     @Override
-    public void save(BitacoraRol bitacoraRol) {
-        bitacoraRolRepository.save(bitacoraRol);
+    public void save(BitacoraUsuario usuario) {
+        bitacoraUsuarioRepository.save(usuario);
     }
 
-
     @Override
-    @Transactional
-    public void guardarBitacora(String accion, Rol rolAnterior, Rol rolNuevo, String userName) {
-
+    public void guardarBitacora(String accion, Usuario usuarioAnterior, Usuario usuarioNuevo, String username) {
         // Resultado final
         List<BitacoraCambios> bitacoraCambiosList = new ArrayList<>();
 
         // Obtener la clase de la entidad Rol
-        Class<?> rolClass = Rol.class;
+        Class<?> usuarioClass = Usuario.class;
 
         // Obtener todos los campos declarados en la clase Rol
-        Field[] campos = rolClass.getDeclaredFields();
+        Field[] campos = usuarioClass.getDeclaredFields();
 
-        List<String> camposToAudit = List.of(Rol_.ID_ROL, Rol_.NOMBRE, Rol_.CODIGO, Rol_.DESCRIPCION, Rol_.ESTATUS);
+        List<String> camposToAudit = List.of(Usuario_.ID_USUARIO, Usuario_.USUARIO,
+                Usuario_.CONTRASENIA, Usuario_.NOMBRE, Usuario_.EMAIL,
+                Usuario_.CORREO_CONFIRMADO, Usuario_.TOKEN,
+                Usuario_.TOKEN_TYPE, Usuario_.VIGENCIA_TOKEN,
+                Usuario_.ESTATUS);
 
         try {
 
             // Sí se está registrando un nuevo rol
-            if (rolAnterior == null) {
+            if (usuarioAnterior == null) {
 
                 // Iterar sobre cada campo
                 for (Field campo : campos) {
                     if(camposToAudit.contains(campo.getName())) {
                         campo.setAccessible(true); // Permitir acceso a campos privados
                         // Obtener el valor del campo en el rol nuevo
-                        Object valorNuevo = campo.get(rolNuevo);
+                        Object valorNuevo = campo.get(usuarioNuevo);
 
                         // Agregar un registro a la bitácora con el campo y el valor nuevo
                         bitacoraCambiosList.add(BitacoraCambios.builder()
@@ -97,8 +97,8 @@ public class BitacoraRolSeviceImpl implements IBitacoraRolService {
                     if(camposToAudit.contains(campo.getName())) {
                         campo.setAccessible(true); // Permitir acceso a campos privados
                         // Obtener el valor del campo en el rol anterior y el rol nuevo
-                        Object valorAnterior = campo.get(rolAnterior);
-                        Object valorNuevo = campo.get(rolNuevo);
+                        Object valorAnterior = campo.get(usuarioAnterior);
+                        Object valorNuevo = campo.get(usuarioNuevo);
 
                         // Comparar los valores y agregar un registro a la bitácora si hay cambios
                         if (!Objects.equals(valorAnterior, valorNuevo)) {
@@ -106,6 +106,22 @@ public class BitacoraRolSeviceImpl implements IBitacoraRolService {
                                     .campo(campo.getName())
                                     .valorAnterior(valorAnterior != null ? valorAnterior.toString() : null)
                                     .valorNuevo(valorNuevo != null ? valorNuevo.toString() : null)
+                                    .build());
+                        }
+                    }
+
+                    //
+                    if(campo.getName().equals(Usuario_.USUARIO_ROL_SET)) {
+
+                        String rolesAnterior = usuarioAnterior.getRoles();
+                        String rolesNuevo = usuarioNuevo.getRoles();
+
+                        // Comparar los valores y agregar un registro a la bitácora si hay cambios
+                        if (!Objects.equals(rolesAnterior, rolesNuevo)) {
+                            bitacoraCambiosList.add(BitacoraCambios.builder()
+                                    .campo(campo.getName())
+                                    .valorAnterior(rolesAnterior)
+                                    .valorNuevo(rolesNuevo)
                                     .build());
                         }
                     }
@@ -130,51 +146,48 @@ public class BitacoraRolSeviceImpl implements IBitacoraRolService {
         // Guardar la información en la tabla bitacora_rol
         // Código para guardar la información omitido por brevedad
 
-        this.save(BitacoraRol.builder()
-                        .accion(accion)
-                        .rol(rolNuevo)
-                        .cambios(cambiosJson)
-                        .fechaModificacion(new Date())
-                        .modificadoPor(userName)
+        this.save(BitacoraUsuario.builder()
+                .accion(accion)
+                .usuario(usuarioNuevo)
+                .cambios(cambiosJson)
+                .fechaModificacion(new Date())
+                .modificadoPor(username)
                 .build());
     }
 
     @Override
-    @Transactional
-    public void guardarBitacoraPermisos(Rol rol, List<RolPermiso> rolPermisoAnteriorList,
-                                        List<RolPermiso> rolPermisoNuevoList,
-                                        String userName) {
-
+    public void guardarBitacoraPermisos(Usuario usuario, List<UsuarioPermiso> usuarioPermisoAnteriorList,
+                                        List<UsuarioPermiso> usuarioPermisoNuevoList, String userName) {
         // Resultado final
         List<BitacoraCambios> bitacoraCambiosList = new ArrayList<>();
 
         // Sí se está registrando un nuevo rol
-        if (rolPermisoAnteriorList == null || rolPermisoAnteriorList.isEmpty()) {
+        if (usuarioPermisoAnteriorList == null || usuarioPermisoAnteriorList.isEmpty()) {
 
-            for (RolPermiso rolPermiso : rolPermisoNuevoList) {
+            for (UsuarioPermiso usuarioPermiso : usuarioPermisoNuevoList) {
                 // Agregar un registro a la bitácora con el campo y el valor nuevo
                 bitacoraCambiosList.add(BitacoraCambios.builder()
-                        .campo(rolPermiso.getPermiso().getNombre())
+                        .campo(usuarioPermiso.getPermiso().getNombre())
                         .valorAnterior(null) // No hay valor anterior en un registro nuevo
-                        .valorNuevo(rolPermiso.getEstatusPermiso() != null ? rolPermiso.getEstatusPermiso().getLabel() : null)
+                        .valorNuevo(usuarioPermiso.getEstatusPermiso() != null ? usuarioPermiso.getEstatusPermiso().getLabel() : null)
                         .build());
             }
 
         } else {
 
-            for (RolPermiso rolPermiso : rolPermisoNuevoList) {
+            for (UsuarioPermiso usuarioPermiso : usuarioPermisoNuevoList) {
 
-                RolPermiso rolPermisoAnterior = rolPermisoAnteriorList.stream()
-                        .filter(r -> Objects.equals(r.getIdRolPermiso(), rolPermiso.getIdRolPermiso()))
+                UsuarioPermiso usuarioPermisoAnterior = usuarioPermisoAnteriorList.stream()
+                        .filter(r -> Objects.equals(r.getIdUsuarioPermiso(), usuarioPermiso.getIdUsuarioPermiso()))
                         .findFirst().orElse(null);
 
-                if(rolPermisoAnterior != null && rolPermiso.getEstatusPermiso() != null &&
-                        !Objects.equals(rolPermisoAnterior.getEstatusPermiso().getLabel(), rolPermiso.getEstatusPermiso().getLabel())) {
+                if(usuarioPermisoAnterior != null && usuarioPermiso.getEstatusPermiso() != null &&
+                        !Objects.equals(usuarioPermisoAnterior.getEstatusPermiso().getLabel(), usuarioPermiso.getEstatusPermiso().getLabel())) {
                     // Agregar un registro a la bitácora con el campo y el valor nuevo
                     bitacoraCambiosList.add(BitacoraCambios.builder()
-                            .campo(rolPermiso.getPermiso().getNombre())
-                            .valorAnterior(rolPermisoAnterior.getEstatusPermiso() != null ? rolPermisoAnterior.getEstatusPermiso().getLabel() : null)
-                            .valorNuevo(rolPermiso.getEstatusPermiso() != null ? rolPermiso.getEstatusPermiso().getLabel() : null)
+                            .campo(usuarioPermiso.getPermiso().getNombre())
+                            .valorAnterior(usuarioPermisoAnterior.getEstatusPermiso() != null ? usuarioPermisoAnterior.getEstatusPermiso().getLabel() : null)
+                            .valorNuevo(usuarioPermiso.getEstatusPermiso() != null ? usuarioPermiso.getEstatusPermiso().getLabel() : null)
                             .build());
                 }
             }
@@ -191,13 +204,13 @@ public class BitacoraRolSeviceImpl implements IBitacoraRolService {
         }
 
         // Guardar la información en la tabla bitacora_rol
-        this.save(BitacoraRol.builder()
+        this.save(BitacoraUsuario.builder()
                 .accion("Configuracion de permisos")
-                .rol(rol)
+                .usuario(usuario)
                 .cambios(cambiosJson)
                 .fechaModificacion(new Date())
                 .modificadoPor(userName)
                 .build());
-    }
 
+    }
 }

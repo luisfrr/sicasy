@@ -18,16 +18,20 @@
 
         <h:form styleClass="w-full flex flex-column gap-4 justify-content-center"
                 prependId="false">
-
             <p:inputText placeholder="Usuario" id="username" styleClass="w-full" required="true"/>
             <p:password placeholder="Contraseña" id="password" styleClass="w-full" required="true"/>
-
-            <a href="#" class="text-sm text-secondary-color font-light text-center">¿Olvidó su contraseña?</a>
 
             <div class="flex justify-content-center">
                 <p:commandButton value="Continuar" ajax="false" validateClient="true"/>
             </div>
 
+        </h:form>
+
+        <h:form prependId="true">
+            <p:link href="#{appBean.contextPath}/views/auth/forgotpassword.faces"
+                    styleClass="text-sm text-secondary-color font-light text-center">
+                ¿Olvidó su contraseña?
+            </p:link>
         </h:form>
 
     </p:outputPanel>

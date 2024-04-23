@@ -1,6 +1,9 @@
 package gob.yucatan.sicasy.views;
 
+import gob.yucatan.sicasy.business.dtos.EmailTemplateMessage;
 import gob.yucatan.sicasy.business.dtos.ExampleDto;
+import gob.yucatan.sicasy.business.enums.EmailTemplateEnum;
+import gob.yucatan.sicasy.services.iface.IEmailService;
 import gob.yucatan.sicasy.utils.imports.excel.ConfigHeaderExcelModel;
 import gob.yucatan.sicasy.utils.imports.excel.ImportExcelFile;
 import gob.yucatan.sicasy.views.beans.Messages;
@@ -18,13 +21,17 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Component
 @Scope("view")
 @RequiredArgsConstructor
 @Slf4j
 public class HomeView implements Serializable {
+
+    private final IEmailService emailService;
 
     private @Getter String title;
     private @Getter List<ExampleDto> exampleList;
@@ -100,6 +107,23 @@ public class HomeView implements Serializable {
             // Por ejemplo, mostrar un mensaje de error
             Messages.addError("Error", "Tipo de archivo no válido");
         }
+    }
+
+    public void enviarCorreoPrueba() {
+        Map<String, String> dataTemplate = new HashMap<>();
+        dataTemplate.put("#EMAIL_TITLE#", "¡Registro exitoso!");
+        dataTemplate.put("#EMAIL_DESCRIPTION#", "Te damos la más cordial bienvenida al Sistema Integral de Control de Arrendamiento y Seguros del Estado de Yucatán. Para continuar, te invitamos a activar tu cuenta.");
+        dataTemplate.put("#ACTION_TEXT#", "ACTIVAR CUENTA");
+        dataTemplate.put("#ACTION_URL#", "http://localhost:8080/");
+
+        emailService.sendMail(EmailTemplateMessage.builder()
+                .emailTemplate(EmailTemplateEnum.SIMPLE_TEMPLATE)
+                        .to("luisfrr27@gmail.com")
+                        .subject("Bienvenido a SICASY")
+                        .dataTemplate(dataTemplate)
+                .build());
+
+//        emailService.sendEmail("luisfrr27@gmail.com", "Bienvenido", "<a href=\"http://localhost:8080/sicasy\">Activar cuenta</a>");
     }
 
 }

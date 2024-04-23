@@ -4,12 +4,16 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Scope;
 import org.springframework.security.config.Customizer;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.servlet.util.matcher.MvcRequestMatcher;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.web.servlet.handler.HandlerMappingIntrospector;
 
 
 /**
@@ -19,6 +23,7 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
  */
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity(securedEnabled = true)
 @RequiredArgsConstructor
 public class SecurityConfig {
 
@@ -31,12 +36,15 @@ public class SecurityConfig {
      * @return the security filter chain.
      **/
     @Bean
-    public SecurityFilterChain configure(HttpSecurity http) {
+    public SecurityFilterChain configure(HttpSecurity http, MvcRequestMatcher.Builder mvc) {
         try {
             return http
                     .csrf(AbstractHttpConfigurer::disable)
                     .authorizeHttpRequests((authorize) -> authorize
-                            .requestMatchers(new AntPathRequestMatcher("/")).permitAll()
+                            .requestMatchers(mvc.pattern("/")).permitAll()
+                            .requestMatchers(mvc.pattern("/views/auth/activate.faces")).permitAll()
+                            .requestMatchers(mvc.pattern("/views/auth/forgotpassword.faces")).permitAll()
+                            .requestMatchers(mvc.pattern("/views/auth/resetpassword.faces")).permitAll()
                             .requestMatchers(new AntPathRequestMatcher("/jakarta.faces.resource/**")).permitAll()
                             .requestMatchers(new AntPathRequestMatcher("/webjars/**")).permitAll()
                             .anyRequest().authenticated())
@@ -63,5 +71,11 @@ public class SecurityConfig {
         catch (Exception ex) {
             throw new BeanCreationException("Wrong spring security configuration", ex);
         }
+    }
+
+    @Scope("prototype")
+    @Bean
+    MvcRequestMatcher.Builder mvc(HandlerMappingIntrospector introspector) {
+        return new MvcRequestMatcher.Builder(introspector);
     }
 }

@@ -1,0 +1,68 @@
+<ui:composition template="../../WEB-INF/facelets/layout.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="jakarta.faces.facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="jakarta.faces.html">
+
+<ui:define name="title">
+    #{activateView.title}
+</ui:define>
+
+<ui:define name="content">
+
+    <p:growl id="growl" showSummary="true" showDetail="true">
+        <p:autoUpdate/>
+    </p:growl>
+
+    <p:outputPanel id="container" styleClass="container-sm h-full">
+
+        <h:form styleClass="w-full h-full flex flex-column justify-content-center align-items-center px-3 md:px-6">
+
+            <h3 class="text-center mt-3 mb-5">#{appBean.appName.toUpperCase()}</h3>
+
+            <p:commandButton value="Ir a iniciar sesión" ajax="false"
+                             action="#{activateView.returnToLogin()}"
+                             rendered="#{activateView.showReturnToLogin}"/>
+
+            <p:card styleClass="w-full" rendered="#{activateView.showFormPassword}">
+
+                <h5 class="text-center mt-3 mb-4">#{activateView.title}</h5>
+
+                <p:outputPanel styleClass="formgrid grid mb-4">
+
+                    <p:outputPanel styleClass="field col-12">
+                        <p:outputLabel for="@next" value="Contraseña" styleClass="block"/>
+                        <p:password value="#{activateView.password}" required="true"
+                                    styleClass=" block w-full"
+                                    match="confirmPass"
+                                    feedback="true" inline="true"
+                                    promptLabel="Ingresa tu contraseña"
+                                    weakLabel="Débil" goodLabel="Buena" strongLabel="Fuerte"/>
+                    </p:outputPanel>
+
+                    <p:outputPanel styleClass="field col-12">
+                        <p:outputLabel for="@next" value="Confirmar contraseña" styleClass="block"/>
+                        <p:password id="confirmPass" required="true"
+                                    value="#{activateView.confirmPassword}"
+                                    styleClass=" block w-full"/>
+                    </p:outputPanel>
+
+                </p:outputPanel>
+
+                <p:outputPanel styleClass="flex justify-content-center">
+                    <p:commandButton value="Activar cuenta" ajax="true"
+                                     action="#{activateView.activarCuenta()}"
+                                     update="container"
+                                     validateClient="true"/>
+                </p:outputPanel>
+
+            </p:card>
+
+        </h:form>
+
+
+    </p:outputPanel>
+
+</ui:define>
+
+</ui:composition>

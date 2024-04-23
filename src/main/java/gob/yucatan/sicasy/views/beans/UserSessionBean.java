@@ -2,15 +2,19 @@ package gob.yucatan.sicasy.views.beans;
 
 import gob.yucatan.sicasy.business.entities.Usuario;
 import jakarta.annotation.PostConstruct;
+import jakarta.faces.context.FacesContext;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Scope;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 import java.io.Serializable;
+import java.util.Collection;
 
 @Getter
 @Component
@@ -22,6 +26,7 @@ public class UserSessionBean implements Serializable {
     private String userName;
     private String fullName;
     private String firstLetterName;
+    private @Getter(AccessLevel.NONE) Collection<? extends GrantedAuthority> authorities;
 
     @PostConstruct
     public void init() {
@@ -36,7 +41,7 @@ public class UserSessionBean implements Serializable {
             this.userName = usuario.getUsername();
             this.fullName = usuario.getNombre();
             this.firstLetterName = this.fullName.substring(0, 1).toUpperCase();
-
+            this.authorities = auth.getAuthorities();
         } catch (Exception e) {
             log.error("No se ha logrado obtener la información del usuario.", e);
             this.userName = "";
@@ -45,5 +50,14 @@ public class UserSessionBean implements Serializable {
         }
     }
 
+    public boolean isOwner() {
+        return this.authorities != null && this.authorities.stream().anyMatch(g -> g.getAuthority().equals("ROLE_OWNER"));
+    }
+
+    public String doLogout() {
+        SecurityContextHolder.clearContext();
+        FacesContext.getCurrentInstance().getExternalContext().invalidateSession();
+        return "/login?faces-redirect=true";
+    }
 
 }

@@ -26,26 +26,26 @@
    <h:form id="form_breadcum_permisos" styleClass="mb-3">
       <p:breadCrumb homeDisplay="text">
          <p:menuitem value="Inicio" ajax="false" action="#{menuSessionBean.goToHome()}"/>
-         <p:menuitem value="Roles" ajax="true" update="container" action="#{rolView.regresar()}"/>
+         <p:menuitem value="Usuarios" ajax="true" update="container" action="#{usuarioView.regresar()}"/>
          <p:menuitem value="Configuración de Permisos"/>
       </p:breadCrumb>
    </h:form>
 
    <h:form>
       <p:outputPanel styleClass="mb-5 uppercase">
-         <h5 class="mt-0 mb-0">Configuración de Permisos: <span class="text-primary">#{rolView.rolSelected.nombre}</span></h5>
+         <h5 class="mt-0 mb-0">Configuración de Permisos: <span class="text-primary">#{usuarioView.usuarioSelected.nombre}</span></h5>
       </p:outputPanel>
    </h:form>
 
    <h:form id="form_toolbar_permisos" styleClass="mb-5">
-      <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'SEGURIDAD_ROLES_WRITE_ACTUALIZAR_PERMISOS')">
+      <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'SEGURIDAD_USUARIOS_WRITE_ACTUALIZAR_PERMISOS')">
          <p:toolbar>
             <p:toolbarGroup>
             </p:toolbarGroup>
 
             <p:toolbarGroup align="right">
                <p:commandButton value="Actualizar Permisos"
-                                ajax="true" action="#{rolView.actualizarPermisos()}"
+                                ajax="true" action="#{usuarioView.actualizarPermisos()}"
                                 update="form_datatable_permisos"
                                 oncomplete="triStateCheckbox();"
                                 styleClass="ui-button-outlined" />
@@ -62,7 +62,7 @@
             <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4 xl:col-3">
                <p:outputLabel for="@next" value="Nombre" styleClass="block"/>
                <p:inputText styleClass="block w-full" placeholder="Ingresa un nombre..."
-                            value="#{rolView.permisoFilter.nombre}"/>
+                            value="#{usuarioView.permisoFilter.nombre}"/>
             </p:outputPanel>
 
          </p:outputPanel>
@@ -70,9 +70,9 @@
          <f:facet name="footer">
             <p:outputPanel styleClass="flex flex-row gap-4 justify-content-end">
                <p:commandButton value="Limpiar filtros" styleClass="ui-button-outlined"
-                                ajax="true" action="#{rolView.limpiarFiltrosPermisos()}"
+                                ajax="true" action="#{usuarioView.limpiarFiltrosPermisos()}"
                                 update="form_filtros_permisos form_datatable_permisos"/>
-               <p:commandButton value="Buscar" ajax="true" action="#{rolView.buscarPermisos()}"
+               <p:commandButton value="Buscar" ajax="true" action="#{usuarioView.buscarPermisos()}"
                                 update="form_datatable_permisos"
                                 oncomplete="triStateCheckbox();"/>
             </p:outputPanel>
@@ -84,9 +84,9 @@
    <h:form id="form_datatable_permisos" styleClass="mb-5">
 
       <p:dataTable id="dtPermisos"
-                   var="rolPermiso" value="#{rolView.rolPermisoList}"
+                   var="usuarioPermiso" value="#{usuarioView.usuarioPermisoList}"
                    rows="50" rowHover="true"
-                   rowKey="#{rolPermiso.permiso.idPermiso}" rowIndexVar="index"
+                   rowKey="#{usuarioPermiso.permiso.idPermiso}" rowIndexVar="index"
                    styleClass="dt-scrollable-x"
                    scrollable="true"
                    expandedRow="true"
@@ -104,25 +104,25 @@
          </p:column>
 
          <p:column headerText="Permiso">
-            <h:outputText value="#{rolPermiso.permiso.nombre}"/>
+            <h:outputText value="#{usuarioPermiso.permiso.nombre}"/>
          </p:column>
 
          <p:column headerText="Descripcion">
-            <h:outputText value="#{rolPermiso.permiso.descripcion}"/>
+            <h:outputText value="#{usuarioPermiso.permiso.descripcion}"/>
          </p:column>
 
          <p:column headerText="Tipo Permiso" width="120">
-            <h:outputText value="#{rolPermiso.permiso.tipoPermiso.label}"/>
+            <h:outputText value="#{usuarioPermiso.permiso.tipoPermiso.label}"/>
          </p:column>
 
-         <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'SEGURIDAD_ROLES_WRITE_ASIGNAR_PERMISOS')">
+         <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'SEGURIDAD_USUARIOS_WRITE_ASIGNAR_PERMISOS')">
             <p:column headerText="Habilitar/Bloquear" styleClass="text-center" width="200">
-               <p:triStateCheckbox value="#{rolPermiso.checkEstatus}"
+               <p:triStateCheckbox value="#{usuarioPermiso.checkEstatus}"
                                    stateOneTitle="Sin asignar"
                                    stateTwoIcon="fi fi-rr-check" stateTwoTitle="Habilitado"
                                    stateThreeIcon="fi fi-rr-ban" stateThreeTitle="Deshabilitado">
                   <p:ajax event="change" update="growl form_datatable_permisos"
-                          listener="#{rolView.asignarPermiso(rolPermiso)}"
+                          listener="#{usuarioView.asignarPermiso(usuarioPermiso)}"
                           oncomplete="triStateCheckbox();"/>
                </p:triStateCheckbox>
             </p:column>
@@ -131,33 +131,33 @@
          <p:rowExpansion>
 
             <p:dataTable id="dtSubpermisos"
-                         var="subRolPermiso" value="#{rolPermiso.subRolPermisoList}"
-                         rowKey="#{subRolPermiso.permiso.idPermiso}"
+                         var="subUsuarioPermiso" value="#{usuarioPermiso.subUsuarioPermisoList}"
+                         rowKey="#{subUsuarioPermiso.permiso.idPermiso}"
                          rowHover="true"
                          styleClass="dt-scrollable"
                          scrollable="true">
 
                <p:column headerText="Permiso">
-                  <h:outputText value="#{subRolPermiso.permiso.nombre}"/>
+                  <h:outputText value="#{subUsuarioPermiso.permiso.nombre}"/>
                </p:column>
 
                <p:column headerText="Descripcion">
-                  <h:outputText value="#{subRolPermiso.permiso.descripcion}"/>
+                  <h:outputText value="#{subUsuarioPermiso.permiso.descripcion}"/>
                </p:column>
 
                <p:column headerText="Tipo Permiso" width="120">
-                  <h:outputText value="#{subRolPermiso.permiso.tipoPermiso.label}"/>
+                  <h:outputText value="#{subUsuarioPermiso.permiso.tipoPermiso.label}"/>
                </p:column>
 
-               <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'SEGURIDAD_ROLES_WRITE_ASIGNAR_PERMISOS')">
+               <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'SEGURIDAD_USUARIOS_WRITE_ASIGNAR_PERMISOS')">
                   <p:column headerText="Habilitar/Bloquear" styleClass="text-center" width="200">
-                     <p:triStateCheckbox value="#{subRolPermiso.checkEstatus}"
+                     <p:triStateCheckbox value="#{subUsuarioPermiso.checkEstatus}"
                                          stateOneTitle="Sin asignar"
                                          stateTwoIcon="fi fi-rr-check" stateTwoTitle="Habilitado"
                                          stateThreeIcon="fi fi-rr-ban" stateThreeTitle="Deshabilitado"
-                                         disabled="#{rolPermiso.checkEstatus == '0' or rolPermiso.checkEstatus == '2'}">
+                                         disabled="#{usuarioPermiso.checkEstatus == '0' or usuarioPermiso.checkEstatus == '2'}">
                         <p:ajax event="change" update="growl form_datatable_permisos"
-                                listener="#{rolView.asignarPermiso(subRolPermiso)}"
+                                listener="#{usuarioView.asignarPermiso(subUsuarioPermiso)}"
                                 oncomplete="triStateCheckbox();"/>
                      </p:triStateCheckbox>
                   </p:column>

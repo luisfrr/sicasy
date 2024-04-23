@@ -17,7 +17,7 @@
         <p:growl id="growl" showDetail="true" showSummary="true"
                  skipDetailIfEqualsSummary="true" globalOnly="true"/>
 
-        <p:outputPanel id="panel_roles" rendered="#{not rolView.showAsignarRoles}">
+        <p:outputPanel id="panel_roles" rendered="#{not rolView.showConfigurarPermisos}">
             <h:form id="form_breadcum" styleClass="mb-3">
                 <p:breadCrumb homeDisplay="text">
                     <p:menuitem value="Inicio" ajax="false" action="#{menuSessionBean.goToHome()}"/>
@@ -199,7 +199,7 @@
             </h:form>
         </p:outputPanel>
 
-        <p:outputPanel id="panel_asignar_permisos" rendered="#{rolView.showAsignarRoles}">
+        <p:outputPanel id="panel_asignar_permisos" rendered="#{rolView.showConfigurarPermisos}">
             <ui:include src="/views/seguridad/_roles_permisos.xhtml"/>
         </p:outputPanel>
 

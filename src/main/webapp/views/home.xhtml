@@ -30,6 +30,9 @@
             <p:outputPanel styleClass="flex flex-row gap-2">
                 <p:commandButton value="Nuevo"/>
 
+                <p:commandButton value="Enviar correo" icon="fi  fi-rr-envelope"
+                                 ajax="true" action="#{homeView.enviarCorreoPrueba()}"/>
+
                 <p:commandButton value="Exportar" styleClass="ui-button-outlined"/>
 
                 <p:splitButton value="Acciones">

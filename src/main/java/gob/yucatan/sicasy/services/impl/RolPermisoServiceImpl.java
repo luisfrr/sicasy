@@ -37,7 +37,7 @@ public class RolPermisoServiceImpl implements IRolPermisoService {
                     RolPermiso_.ROL, Rol_.ID_ROL));
 
         if(rolPermiso.getPermisoParentId() != null)
-            specification.add(new SearchCriteria(SearchOperation.IN,
+            specification.add(new SearchCriteria(SearchOperation.EQUAL,
                     rolPermiso.getPermisoParentId(),
                     RolPermiso_.PERMISO, Permiso_.PERMISO_PARENT, Permiso_.ID_PERMISO));
 
