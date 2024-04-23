@@ -15,5 +15,5 @@ public class EmailTemplateMessage {
     private String to;
     private String subject;
     private EmailTemplateEnum emailTemplate;
-    private Map<String, String> dataTemplate = new HashMap<>();
+    private Map<String, String> dataTemplate;
 }
