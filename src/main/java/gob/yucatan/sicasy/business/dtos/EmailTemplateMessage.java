@@ -3,7 +3,6 @@ package gob.yucatan.sicasy.business.dtos;
 import gob.yucatan.sicasy.business.enums.EmailTemplateEnum;
 import lombok.*;
 
-import java.util.HashMap;
 import java.util.Map;
 
 @AllArgsConstructor
