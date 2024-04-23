@@ -55,6 +55,18 @@
                             <span class="text-sm hidden"> </span>
                         </p:outputPanel>
 
+                        <sec:authorize access="hasAuthority('ROLE_OWNER')">
+                            <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4 xl:col-3">
+                                <p:outputLabel for="@next" value="Estatus" styleClass="block"/>
+                                <p:selectOneMenu value="#{licitacionView.licitacionFilter.estatusRegistro}" styleClass="w-full">
+                                    <f:selectItem itemLabel="Todos" itemValue="#{null}"/>
+                                    <f:selectItems value="#{licitacionView.estatusRegistros}" var="estatus"
+                                                   itemValue="#{estatus}" itemLabel="#{estatus.label}"/>
+                                </p:selectOneMenu>
+                                <span class="text-sm hidden"> </span>
+                            </p:outputPanel>
+                        </sec:authorize>
+
                     </p:outputPanel>
 
                     <f:facet name="footer">
@@ -209,7 +221,7 @@
 
 
 
-        <h:form id="form_dialog">
+        <h:form id="form_dialog" enctype="multipart/form-data">
             <p:dialog header="#{licitacionView.titleDialog}" widgetVar="formDialog"
                       minHeight="350" width="450"
                       showEffect="fade" modal="true"
@@ -226,7 +238,7 @@
 
                     <p:outputPanel styleClass="field col-12">
                         <p:outputLabel for="@next" value="Número licitación" styleClass="block"/>
-                        <p:inputTextarea styleClass="block w-full"
+                        <p:inputText styleClass="block w-full" required="true"
                                          value="#{licitacionView.licitacionSelected.numeroLicitacion}"/>
                         <span class="text-sm hidden"> </span>
                     </p:outputPanel>
@@ -239,14 +251,16 @@
                     </p:outputPanel>
 
                     <p:outputPanel styleClass="field col-12">
-                        <p:outputLabel styleClass="mr-1" for="@next" value="Fecha inicio "/>
-                        <p:calendar id="calFechaInicio" value="#{licitacionView.licitacionSelected.fechaInicio}" showOn="calFechaInicio"/>
+                        <p:outputLabel styleClass="mr-2" value="Fecha inicio "/>
+                        <p:calendar value="#{licitacionView.licitacionSelected.fechaInicio}"/>
                     </p:outputPanel>
 
                     <p:outputPanel styleClass="field col-12">
-                        <p:outputLabel styleClass="mr-1" for="@next" value="Fecha final "/>
-                        <p:calendar id="calFechaFin" value="#{licitacionView.licitacionSelected.fechaFinal}" showOn="calFechaFin"/>
+                        <p:outputLabel styleClass="mr-2"  value="Fecha final "/>
+                        <p:calendar  value="#{licitacionView.licitacionSelected.fechaFinal}" />
                     </p:outputPanel>
+
+                    <p:fileUpload value="#{licitacionView.file}" mode="simple" skinSimple="true"/>
 
                 </p:outputPanel>
 

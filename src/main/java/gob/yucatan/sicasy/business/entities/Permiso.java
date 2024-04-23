@@ -6,7 +6,6 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.Date;
-import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
@@ -41,7 +40,7 @@ public class Permiso {
     private Permiso permisoParent;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "permisoParent")
-    private Set<Permiso> subPermisos = new HashSet<>();
+    private Set<Permiso> subPermisos;
 
     @Column(name = "tipo_permiso", nullable = false)
     @Enumerated(EnumType.ORDINAL)

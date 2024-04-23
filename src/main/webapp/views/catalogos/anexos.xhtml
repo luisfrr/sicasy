@@ -7,7 +7,7 @@
                 xmlns:sec="https://joinfaces.org/security">
 
     <ui:define name="title">
-        #{aseguradoraView.title}
+        #{anexoView.title}
     </ui:define>
 
     <ui:define name="content">
@@ -20,7 +20,7 @@
                 <p:breadCrumb homeDisplay="text">
                     <p:menuitem value="Inicio"/>
                     <p:menuitem value="Catálogos"/>
-                    <p:menuitem value="Aseguradoras"/>
+                    <p:menuitem value="Anexos"/>
                 </p:breadCrumb>
             </h:form>
 
@@ -28,7 +28,7 @@
                 <p:toolbar>
                     <p:toolbarGroup>
                         <p:commandButton value="Nuevo"
-                                         action="#{aseguradoraView.agregarAseguradora()}"
+                                         action="#{anexoView.agregarAnexo()}"
                                          oncomplete="PF('formDialog').show()"
                                          update="form_dialog"
                                          styleClass="mr-4">
@@ -49,32 +49,33 @@
                     <p:outputPanel styleClass="grid formgrid mb-2">
 
                         <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4 xl:col-3">
-                            <p:outputLabel for="@next" value="Aseguradora" styleClass="block"/>
+                            <p:outputLabel for="@next" value="Anexo" styleClass="block"/>
                             <p:inputText styleClass="block w-full" placeholder="Ingresa un nombre..."
-                                         value="#{aseguradoraView.aseguradoraFiltroHelper.nombre}"/>
+                                         value="#{anexoView.anexoFilter.nombre}"/>
                             <span class="text-sm hidden"> </span>
                         </p:outputPanel>
 
                         <sec:authorize access="hasAuthority('ROLE_OWNER')">
                             <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4 xl:col-3">
                                 <p:outputLabel for="@next" value="Estatus" styleClass="block"/>
-                                <p:selectOneMenu value="#{aseguradoraView.aseguradoraFiltroHelper.estatus}" styleClass="w-full">
+                                <p:selectOneMenu value="#{anexoView.anexoFilter.estatusRegistro}" styleClass="w-full">
                                     <f:selectItem itemLabel="Todos" itemValue="#{null}"/>
-                                    <f:selectItems value="#{aseguradoraView.estatusRegistros}" var="estatus"
+                                    <f:selectItems value="#{anexoView.estatusRegistros}" var="estatus"
                                                    itemValue="#{estatus}" itemLabel="#{estatus.label}"/>
                                 </p:selectOneMenu>
                                 <span class="text-sm hidden"> </span>
                             </p:outputPanel>
                         </sec:authorize>
 
+
                     </p:outputPanel>
 
                     <f:facet name="footer">
                         <p:outputPanel styleClass="flex flex-row gap-4 justify-content-end">
                             <p:commandButton value="Limpiar filtros" styleClass="ui-button-outlined"
-                                             ajax="true" action="#{aseguradoraView.limpiarFiltros()}"
+                                             ajax="true" action="#{anexoView.limpiarFiltros()}"
                                              update="form_filtros form_datatable"/>
-                            <p:commandButton value="Buscar" ajax="true" action="#{aseguradoraView.buscar()}"
+                            <p:commandButton value="Buscar" ajax="true" action="#{anexoView.buscar()}"
                                              update="form_datatable"/>
                         </p:outputPanel>
                     </f:facet>
@@ -85,9 +86,9 @@
             <h:form id="form_datatable" styleClass="mb-5">
 
                 <p:dataTable id="dtExample"
-                             var="aseguradora" value="#{aseguradoraView.aseguradorasList}"
+                             var="anexo" value="#{anexoView.anexoList}"
                              rows="50"
-                             rowKey="#{aseguradora.idAseguradora}" rowIndexVar="index"
+                             rowKey="#{anexo.idAnexo}" rowIndexVar="index"
                              styleClass="dt-scrollable"
                              scrollable="true"
                              paginator="true" paginatorPosition="bottom"
@@ -96,7 +97,7 @@
                              rowsPerPageTemplate="50,100,200,{ShowAll|'Todos'}">
 
                     <f:facet name="header">
-                        Aseguradoras
+                        Anexos
                     </f:facet>
 
                     <p:column headerText="No.">
@@ -104,50 +105,62 @@
                     </p:column>
 
                     <p:column headerText="Nombre">
-                        <h:outputText value="#{aseguradora.nombre}"/>
+                        <h:outputText value="#{anexo.nombre}"/>
+                    </p:column>
+
+                    <p:column headerText="Número licitación">
+                        <h:outputText value="#{anexo.licitacion.numeroLicitacion}"/>
                     </p:column>
 
                     <p:column headerText="Descripción">
-                        <h:outputText value="#{aseguradora.descripcion}"/>
+                        <h:outputText value="#{anexo.descripcion}"/>
                     </p:column>
 
-                    <p:column headerText="Representante">
-                        <h:outputText value="#{aseguradora.representante}"/>
+                    <p:column headerText="Fecha inicio">
+                        <h:outputText value="#{anexo.fechaInicio}"/>
+                    </p:column>
+
+                    <p:column headerText="Fecha final">
+                        <h:outputText value="#{anexo.fechaFinal}"/>
+                    </p:column>
+
+                    <p:column headerText="Fecha firma">
+                        <h:outputText value="#{anexo.fechaFirma}"/>
                     </p:column>
 
                     <p:column headerText="Estatus">
-                        <h:outputText value="#{aseguradora.estatus.label}"/>
+                        <h:outputText value="#{anexo.estatusRegistro.label}"/>
                     </p:column>
 
                     <sec:authorize access="hasAnyAuthority('ROLE_OWNER')">
 
                         <p:column headerText="Fecha creación">
-                            <h:outputText value="#{aseguradora.fechaCreacion}">
+                            <h:outputText value="#{anexo.fechaCreacion}">
                             </h:outputText>
                         </p:column>
 
                         <p:column headerText="Creado por">
-                            <h:outputText value="#{aseguradora.creadoPor}">
+                            <h:outputText value="#{anexo.creadoPor}">
                             </h:outputText>
                         </p:column>
 
                         <p:column headerText="Fecha modificación">
-                            <h:outputText value="#{aseguradora.fechaModificacion}">
+                            <h:outputText value="#{anexo.fechaModificacion}">
                             </h:outputText>
                         </p:column>
 
                         <p:column headerText="Modificado por">
-                            <h:outputText value="#{aseguradora.modificadoPor}">
+                            <h:outputText value="#{anexo.modificadoPor}">
                             </h:outputText>
                         </p:column>
 
                         <p:column headerText="Fecha borrado">
-                            <h:outputText value="#{aseguradora.fechaBorrado}">
+                            <h:outputText value="#{anexo.fechaBorrado}">
                             </h:outputText>
                         </p:column>
 
                         <p:column headerText="Borrado por">
-                            <h:outputText value="#{aseguradora.borradoPor}">
+                            <h:outputText value="#{anexo.borradoPor}">
                             </h:outputText>
                         </p:column>
                     </sec:authorize>
@@ -161,7 +174,7 @@
                         <p:menu overlay="true" trigger="buttonOptions" my="left top" at="left bottom" >
 
                             <p:menuitem value="Editar" icon="fi fi-rr-pencil"
-                                        action="#{aseguradoraView.editar(aseguradora.idAseguradora)}"
+                                        action="#{anexoView.editar(anexo.idAnexo)}"
                                         ajax="true" update="form_dialog"
                                         oncomplete="PF('formDialog').show()">
                                 <p:resetInput target="form_dialog:dialogContent"/>
@@ -170,7 +183,7 @@
                             <p:menuitem value="Eliminar" icon="fi fi-rr-trash"
                                         ajax="true" update="form_confirm_dialog"
                                         oncomplete="PF('confirmDialog').show()"
-                                        action="#{aseguradoraView.doEliminar(aseguradora.idAseguradora)}">
+                                        action="#{anexoView.doEliminar(anexo.idAnexo)}">
                             </p:menuitem>
 
 
@@ -202,7 +215,7 @@
                     <p:commandButton value="No" onclick="PF('confirmDialog').hide()"
                                      class="ui-button-outlined"/>
                     <p:commandButton value="Si"
-                                     action="#{aseguradoraView.eliminar()}"
+                                     action="#{anexoView.eliminar()}"
                                      ajax="true" process="@form"
                                      update="growl form_datatable"
                                      validateClient="true"/>
@@ -214,32 +227,50 @@
 
 
         <h:form id="form_dialog">
-            <p:dialog header="#{aseguradoraView.titleDialog}" widgetVar="formDialog"
+            <p:dialog header="#{anexoView.titleDialog}" widgetVar="formDialog"
                       minHeight="350" width="450"
                       showEffect="fade" modal="true"
                       closable="true" closeOnEscape="true"
                       cache="false" responsive="true">
-                <p:outputPanel id="dialogContent" styleClass="formgrid grid" rendered="#{aseguradoraView.aseguradoraSelected != null}">
+                <p:outputPanel id="dialogContent" styleClass="formgrid grid" rendered="#{anexoView.anexoSelected != null}">
 
                     <p:outputPanel styleClass="field col-12">
                         <p:outputLabel for="@next" value="Nombre" styleClass="block"/>
                         <p:inputText styleClass="block w-full" required="true"
-                                     value="#{aseguradoraView.aseguradoraSelected.nombre}"/>
+                                     value="#{anexoView.anexoSelected.nombre}"/>
+                        <span class="text-sm hidden"> </span>
+                    </p:outputPanel>
+
+                    <p:outputPanel styleClass="field col-12">
+                        <p:outputLabel for="@next" value="Licitación" styleClass="block"/>
+                        <p:selectOneMenu  styleClass="block w-full" required="true"
+                                          value="#{anexoView.anexoSelected.licitacion.idLicitacion}">
+                            <f:selectItems value="#{anexoView.licitacionesActivasList}" var="licitacion" itemLabel="#{licitacion.nombre}"
+                                           itemValue="#{licitacion.idLicitacion}"/>
+                        </p:selectOneMenu>
                         <span class="text-sm hidden"> </span>
                     </p:outputPanel>
 
                     <p:outputPanel styleClass="field col-12">
                         <p:outputLabel for="@next" value="Descripción" styleClass="block"/>
                         <p:inputTextarea styleClass="block w-full" rows="3"
-                                         value="#{aseguradoraView.aseguradoraSelected.descripcion}"/>
+                                         value="#{anexoView.anexoSelected.descripcion}"/>
                         <span class="text-sm hidden"> </span>
                     </p:outputPanel>
 
                     <p:outputPanel styleClass="field col-12">
-                        <p:outputLabel for="@next" value="Representante" styleClass="block"/>
-                        <p:inputTextarea styleClass="block w-full" rows="3"
-                                         value="#{aseguradoraView.aseguradoraSelected.representante}"/>
-                        <span class="text-sm hidden"> </span>
+                        <p:outputLabel styleClass="mr-2" value="Fecha inicio "/>
+                        <p:calendar value="#{anexoView.anexoSelected.fechaInicio}"/>
+                    </p:outputPanel>
+
+                    <p:outputPanel styleClass="field col-12">
+                        <p:outputLabel styleClass="mr-2"  value="Fecha final "/>
+                        <p:calendar  value="#{anexoView.anexoSelected.fechaFinal}" />
+                    </p:outputPanel>
+
+                    <p:outputPanel styleClass="field col-12">
+                        <p:outputLabel styleClass="mr-2"  value="Fecha firma "/>
+                        <p:calendar  value="#{anexoView.anexoSelected.fechaFirma}" />
                     </p:outputPanel>
 
                 </p:outputPanel>
@@ -249,7 +280,7 @@
                     <p:commandButton value="Cancelar" onclick="PF('formDialog').hide()"
                                      class="ui-button-outlined"/>
                     <p:commandButton value="Guardar"
-                                     action="#{aseguradoraView.guardarAseguradora()}"
+                                     action="#{anexoView.guardarAnexo()}"
                                      ajax="true" process="@form"
                                      update="growl form_datatable"
                                      validateClient="true"/>

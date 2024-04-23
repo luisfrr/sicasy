@@ -34,6 +34,7 @@ public class AseguradoraView {
     private @Getter Aseguradora aseguradoraSelected;
     private @Getter Aseguradora aseguradoraFiltroHelper;
     private @Getter List<Aseguradora> aseguradorasList;
+    private @Getter EstatusRegistro[] estatusRegistros;
 
     private final IAseguradoraService  aseguradoraService;
     private final UserSessionBean userSessionBean;
@@ -44,6 +45,7 @@ public class AseguradoraView {
         this.title = "Aseguradoras";
 
         this.aseguradoraSelected = null;
+        this.estatusRegistros = EstatusRegistro.values();
         this.limpiarFiltros();
 
     }
@@ -139,6 +141,7 @@ public class AseguradoraView {
             FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_INFO,
                     "Aviso", "Se ha eliminado exitósamente la información");
             FacesContext.getCurrentInstance().addMessage(null, msg);
+            this.aseguradoraSelected.setBorradoPor(userSessionBean.getUserName());
             aseguradoraService.delete(this.aseguradoraSelected);
             this.aseguradoraSelected = null;
             this.limpiarFiltros();

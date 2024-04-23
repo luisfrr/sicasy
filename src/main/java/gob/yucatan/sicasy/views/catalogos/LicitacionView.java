@@ -1,23 +1,33 @@
 package gob.yucatan.sicasy.views.catalogos;
 
 import gob.yucatan.sicasy.business.annotations.ConfigPermiso;
+import gob.yucatan.sicasy.business.entities.Anexo;
 import gob.yucatan.sicasy.business.entities.Licitacion;
 import gob.yucatan.sicasy.business.enums.EstatusRegistro;
 import gob.yucatan.sicasy.business.enums.TipoPermiso;
 import gob.yucatan.sicasy.business.exceptions.BadRequestException;
 import gob.yucatan.sicasy.business.exceptions.NotFoundException;
+import gob.yucatan.sicasy.services.iface.IAnexoService;
 import gob.yucatan.sicasy.services.iface.ILicitacionService;
+import gob.yucatan.sicasy.utils.date.DateFormatUtil;
+import gob.yucatan.sicasy.utils.imports.excel.SaveFile;
 import gob.yucatan.sicasy.views.beans.UserSessionBean;
 import jakarta.annotation.PostConstruct;
 import jakarta.faces.application.FacesMessage;
 import jakarta.faces.context.FacesContext;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.primefaces.PrimeFaces;
+import org.primefaces.model.file.UploadedFile;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.*;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -34,8 +44,11 @@ public class LicitacionView {
     private @Getter Licitacion licitacionSelected;
     private @Getter Licitacion licitacionFilter;
     private @Getter List<Licitacion> licitacionList;
+    private @Getter EstatusRegistro[] estatusRegistros;
+    private @Getter @Setter UploadedFile file;
 
     private final ILicitacionService licitacionService;
+    private final IAnexoService anexoService;
     private final UserSessionBean userSessionBean;
 
 
@@ -45,6 +58,7 @@ public class LicitacionView {
         this.title = "Licitaciones";
 
         this.licitacionSelected = null;
+        this.estatusRegistros = EstatusRegistro.values();
         this.limpiarFiltros();
 
     }
@@ -77,20 +91,51 @@ public class LicitacionView {
                     // si no es null el id entonces es un update
                     this.licitacionSelected.setModificadoPor(userSessionBean.getUserName());
                     this.licitacionSelected.setFechaModificacion(new Date());
+
+                    if (file != null){
+                        String pathfile = SaveFile.saveFileToPath(file.getContent(), file.getFileName(), "C:\\Users\\Aeolos\\Downloads\\");
+                        licitacionSelected.setRutaArchivo(pathfile);
+                    }
+
                     licitacionService.update(licitacionSelected);
+
+                    FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_INFO,
+                            "Operación exitosa", "Se ha guardado correctamente la información");
+                    FacesContext.getCurrentInstance().addMessage(null, msg);
+                    PrimeFaces.current().executeScript("PF('formDialog').hide();");
+                    this.buscar();
+                    this.licitacionSelected  = null;
                 }else {
                     // id null, entonces se inserta nuevo en BD
-                    this.licitacionSelected.setCreadoPor(userSessionBean.getUserName());
-                    this.licitacionSelected.setFechaCreacion(new Date());
-                    licitacionService.save(licitacionSelected);
+
+                    Optional<Licitacion> optLicitacion = licitacionService.findByNumeroLicitacion(licitacionSelected.getNumeroLicitacion());
+                    if (optLicitacion.isEmpty()){ // checar si no existe una licitacion con ese numero de licitacion existente y activa
+                        this.licitacionSelected.setCreadoPor(userSessionBean.getUserName());
+                        this.licitacionSelected.setFechaCreacion(new Date());
+
+                        if (file != null){
+                            String pathfile = SaveFile.saveFileToPath(file.getContent(), file.getFileName(), "C:\\Users\\Aeolos\\Downloads\\");
+                            licitacionSelected.setRutaArchivo(pathfile);
+                        }
+
+                        licitacionService.save(licitacionSelected);
+
+                        FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_INFO,
+                                "Operación exitosa", "Se ha guardado correctamente la información");
+                        FacesContext.getCurrentInstance().addMessage(null, msg);
+                        PrimeFaces.current().executeScript("PF('formDialog').hide();");
+                        this.buscar();
+                        this.licitacionSelected  = null;
+                    }else {
+                        // si encontramos algun dato ya existente entonces indicamos la observacion
+                        FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_WARN,
+                                "Atención", "Ya existe una licitación con ese numero de licitación guardado!");
+                        FacesContext.getCurrentInstance().addMessage(null, msg);
+                    }
+
                 }
 
-                FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_INFO,
-                        "Operación exitosa", "Se ha guardado correctamente la información");
-                FacesContext.getCurrentInstance().addMessage(null, msg);
-                PrimeFaces.current().executeScript("PF('formDialog').hide();");
-                this.buscar();
-                this.licitacionSelected  = null;
+
             }
         }catch (Exception ex) {
             String message;
@@ -137,18 +182,50 @@ public class LicitacionView {
                     "Error", "No se ha encontrado la información de esta Licitación.");
             FacesContext.getCurrentInstance().addMessage(null, msg);
         }else {
-            FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_INFO,
-                    "Aviso", "Se ha eliminado exitósamente la información");
-            FacesContext.getCurrentInstance().addMessage(null, msg);
-            licitacionService.delete(this.licitacionSelected);
-            this.licitacionSelected = null;
-            this.limpiarFiltros();
+
+            // revisar que no existan anexos activos con la licitacion vinculada je
+            List<Anexo> anexos = null;
+            Licitacion licitacionFilter = new Licitacion();
+            licitacionFilter.setEstatusRegistro(EstatusRegistro.ACTIVO);
+            licitacionFilter.setIdLicitacion(this.licitacionSelected.getIdLicitacion());
+
+            anexos = anexoService.findByLicitacion(licitacionFilter);
+
+            if (anexos.isEmpty()) {
+                FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_INFO,
+                        "Aviso", "Se ha eliminado exitósamente la información");
+                FacesContext.getCurrentInstance().addMessage(null, msg);
+                this.licitacionSelected.setBorradoPor(userSessionBean.getUserName());
+                licitacionService.delete(this.licitacionSelected);
+                this.licitacionSelected = null;
+                this.limpiarFiltros();
+            }else {
+                FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_INFO,
+                        "Atención", "No se pueden eliminar Licitaciones con Anexos Activos agregados");
+                FacesContext.getCurrentInstance().addMessage(null, msg);
+            }
+
         }
 
         PrimeFaces.current().executeScript("PF('confirmDialog').hide();");
 
     }
 
-
+//    public String saveFileToPath(byte[] content, String fileName, String path) throws IOException {
+//        // path ejemplo pa windows : C:\Users\Isra\Downloads\
+//        File file = new File(path+fileName);
+//        return Files.write(file.toPath(), content).toString();
+//    }
+//
+//    public void saveFile(InputStream inputStream, String originalFile) throws IOException {
+//        File file = new File("C:\\Users\\Aeolos\\Downloads\\" + originalFile);
+//
+//        try {
+//            Files.copy(inputStream, file.toPath(), StandardCopyOption.REPLACE_EXISTING);
+//
+//        }catch (Exception ex) {
+//            log.info(ex.getMessage());
+//        }
+//    }
 
 }

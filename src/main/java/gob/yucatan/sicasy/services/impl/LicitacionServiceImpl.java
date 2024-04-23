@@ -1,14 +1,12 @@
 package gob.yucatan.sicasy.services.impl;
 
-import gob.yucatan.sicasy.business.entities.Licitacion;
-import gob.yucatan.sicasy.business.entities.Licitacion_;
-import gob.yucatan.sicasy.business.entities.Rol;
-import gob.yucatan.sicasy.business.entities.Rol_;
+import gob.yucatan.sicasy.business.entities.*;
 import gob.yucatan.sicasy.business.enums.EstatusRegistro;
 import gob.yucatan.sicasy.business.exceptions.NotFoundException;
 import gob.yucatan.sicasy.repository.criteria.SearchCriteria;
 import gob.yucatan.sicasy.repository.criteria.SearchOperation;
 import gob.yucatan.sicasy.repository.criteria.SearchSpecification;
+import gob.yucatan.sicasy.repository.iface.IAnexoRepository;
 import gob.yucatan.sicasy.repository.iface.ILicitacionRepository;
 import gob.yucatan.sicasy.services.iface.ILicitacionService;
 import lombok.RequiredArgsConstructor;
@@ -61,6 +59,16 @@ public class LicitacionServiceImpl implements ILicitacionService {
     }
 
     @Override
+    public Optional<Licitacion> findByNumeroLicitacion(String numeroLicitacion) {
+        return licitacionRepository.findByNumeroLicitacionAndEstatusRegistro(numeroLicitacion, EstatusRegistro.ACTIVO);
+    }
+
+    @Override
+    public List<Licitacion> findAllLicitacionActive() {
+        return licitacionRepository.findByEstatusRegistro(EstatusRegistro.ACTIVO);
+    }
+
+    @Override
     public void save(Licitacion licitacion) {
         licitacion.setEstatusRegistro(EstatusRegistro.ACTIVO);
         licitacion.setFechaCreacion(new Date());
@@ -71,9 +79,9 @@ public class LicitacionServiceImpl implements ILicitacionService {
     @Override
     public void delete(Licitacion licitacion) {
 
-        // para borrar la licitacion primero checar si no exite vechiulo o anexo activos que tengan asignada la licitacion
-
-        // pausa ---- nito agregar entidades de vehiculo y anexo para asignar (revisar delete en rolServiceImp)
+        licitacion.setFechaBorrado(new Date());
+        licitacion.setEstatusRegistro(EstatusRegistro.BORRADO);
+        licitacionRepository.save(licitacion);
 
     }
 
@@ -92,6 +100,7 @@ public class LicitacionServiceImpl implements ILicitacionService {
         licitacionToUpdate.setFechaFinal(licitacion.getFechaFinal());
         licitacionToUpdate.setFechaModificacion(new Date());
         licitacionToUpdate.setModificadoPor(licitacion.getModificadoPor());
+        licitacionToUpdate.setRutaArchivo(licitacion.getRutaArchivo());
 
         licitacionRepository.save(licitacionToUpdate);
 

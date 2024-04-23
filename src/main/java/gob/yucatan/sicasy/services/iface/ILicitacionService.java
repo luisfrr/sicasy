@@ -13,6 +13,10 @@ public interface ILicitacionService {
 
     Optional<Licitacion> findByNombre(String nombre);
 
+    Optional<Licitacion> findByNumeroLicitacion(String numeroLicitacion);
+
+    List<Licitacion> findAllLicitacionActive();
+
     void save(Licitacion licitacion);
 
     void delete(Licitacion licitacion);
