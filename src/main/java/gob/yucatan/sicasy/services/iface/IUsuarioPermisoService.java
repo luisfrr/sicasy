@@ -11,6 +11,6 @@ public interface IUsuarioPermisoService {
     List<UsuarioPermiso> findAllDynamic(UsuarioPermiso usuarioPermiso);
     List<UsuarioPermiso> findByUsuario(Usuario usuario);
     void asignarPermiso(UsuarioPermiso usuarioPermiso, String userName);
-    List<GrantedAuthority> getAuthorities(Long idUsuario);
+    List<? extends GrantedAuthority> getAuthorities(Long idUsuario);
 
 }

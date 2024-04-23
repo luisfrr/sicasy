@@ -3,16 +3,18 @@ package gob.yucatan.sicasy.services.impl;
 import gob.yucatan.sicasy.business.entities.*;
 import gob.yucatan.sicasy.business.enums.EstatusPermiso;
 import gob.yucatan.sicasy.business.enums.EstatusRegistro;
+import gob.yucatan.sicasy.business.exceptions.NotFoundException;
 import gob.yucatan.sicasy.repository.criteria.SearchCriteria;
 import gob.yucatan.sicasy.repository.criteria.SearchOperation;
 import gob.yucatan.sicasy.repository.criteria.SearchSpecification;
+import gob.yucatan.sicasy.repository.iface.IRolPermisoRepository;
 import gob.yucatan.sicasy.repository.iface.IUsuarioPermisoRepository;
-import gob.yucatan.sicasy.services.iface.IBitacoraUsuarioService;
-import gob.yucatan.sicasy.services.iface.IPermisoService;
-import gob.yucatan.sicasy.services.iface.IUsuarioPermisoService;
+import gob.yucatan.sicasy.repository.iface.IUsuarioRepository;
+import gob.yucatan.sicasy.services.iface.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -23,6 +25,8 @@ import java.util.*;
 public class UsuarioPermisoServiceImpl implements IUsuarioPermisoService {
 
     private final IUsuarioPermisoRepository usuarioPermisoRepository;
+    private final IUsuarioRepository usuarioRepository;
+    private final IRolPermisoRepository rolPermisoRepository;
     private final IPermisoService permisoService;
     private final IBitacoraUsuarioService bitacoraUsuarioService;
 
@@ -168,12 +172,46 @@ public class UsuarioPermisoServiceImpl implements IUsuarioPermisoService {
     }
 
     @Override
-    public List<GrantedAuthority> getAuthorities(Long idUsuario) {
+    public List<? extends GrantedAuthority> getAuthorities(Long idUsuario) {
 
-        // TODO: Obtener permisos de usuarios
+        // Se busca la información del usuario
+        Optional<Usuario> usuarioOptional = usuarioRepository.findById(idUsuario);
+        if(usuarioOptional.isEmpty())
+            throw new NotFoundException("No se ha encontrado el usuario");
 
+        // Se obtiene la información del usuario
+        Usuario usuario = usuarioOptional.get();
 
+        // Se obtienen los roles del usuario
+        List<Rol> rolList = usuario.getUsuarioRolSet().stream()
+                .map(UsuarioRol::getRol)
+                .toList();
 
-        return List.of();
+        // Se obtienen todos los permisos habilitados por rol
+        List<Permiso> permisoRolList = rolPermisoRepository
+                .findPermisoByRolInAndEstatusPermiso(rolList, EstatusPermiso.HABILITADO);
+
+        // Se obtiene todos los permisos deshabilitados por usuario
+        List<Permiso> permisoDeshabilitadoUsuarioList = usuarioPermisoRepository
+                .findPermisoByUsuarioAndEstatusPermiso(usuario, EstatusPermiso.DESHABILITADO);
+
+        // Se quitan los permisos deshabilitados en caso de que esten habilitado por los permisos de roles
+        permisoRolList.removeAll(permisoDeshabilitadoUsuarioList);
+
+        // Se obtiene todos los permisos habilitados por usuario
+        List<Permiso> permisoHabilitadoUsuarioList = usuarioPermisoRepository
+                .findPermisoByUsuarioAndEstatusPermiso(usuario, EstatusPermiso.HABILITADO);
+
+        // Se obtiene una lista unica de permisos habilitados
+        Set<String> codigoPermisoHabilitado = new HashSet<>();
+        codigoPermisoHabilitado.addAll(permisoRolList.stream().map(Permiso::getCodigo).toList());
+        codigoPermisoHabilitado.addAll(permisoHabilitadoUsuarioList.stream().map(Permiso::getCodigo).toList());
+
+        // Se agrega a la lista final
+        List<SimpleGrantedAuthority> grantedAuthorities = new ArrayList<>();
+        rolList.forEach(rol -> grantedAuthorities.add(new SimpleGrantedAuthority(rol.getCodigo())));
+        codigoPermisoHabilitado.forEach(codigo -> grantedAuthorities.add(new SimpleGrantedAuthority(codigo)));
+
+        return grantedAuthorities;
     }
 }

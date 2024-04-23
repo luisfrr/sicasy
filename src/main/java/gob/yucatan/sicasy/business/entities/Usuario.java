@@ -84,13 +84,13 @@ public class Usuario implements UserDetails {
     @Transient
     private List<Long> idRolList;
 
+    @Transient
+    @Getter(AccessLevel.NONE)
+    private Collection<? extends GrantedAuthority> authorities;
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        List<GrantedAuthority> authorities = new ArrayList<>();
-        if(this.usuarioRolSet != null && !this.usuarioRolSet.isEmpty()) {
-            this.usuarioRolSet.forEach(usuarioRol -> authorities.add(new SimpleGrantedAuthority(usuarioRol.getRol().getCodigo())));
-        }
-        return authorities;
+        return this.authorities;
     }
 
     @Override
