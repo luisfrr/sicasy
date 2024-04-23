@@ -22,6 +22,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.primefaces.PrimeFaces;
 import org.springframework.context.annotation.Scope;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -36,6 +37,7 @@ import java.util.Optional;
 @ConfigPermiso(tipo = TipoPermiso.VIEW, codigo = "SEGURIDAD_ROLES_VIEW",
         nombre = "Módulo de Roles", descripcion = "Permite ver y filtrar la información de roles.",
         url = "/views/seguridad/roles.faces")
+@PreAuthorize("hasAnyAuthority('ROLE_OWNER', 'SEGURIDAD_ROLES_VIEW')")
 public class RolView {
 
     private @Getter String title;
@@ -87,6 +89,7 @@ public class RolView {
 
     @ConfigPermiso(tipo = TipoPermiso.WRITE, codigo = "SEGURIDAD_ROLES_WRITE_NUEVO",
             nombre = "Nuevo rol", descripcion = "Acción que permite agregar un nuevo rol")
+    @PreAuthorize("hasAnyAuthority('ROLE_OWNER', 'SEGURIDAD_ROLES_WRITE_NUEVO')")
     public void nuevo() {
         log.info("nuevo RolView");
         formDialogTitle = "Nuevo Rol";
@@ -95,6 +98,7 @@ public class RolView {
 
     @ConfigPermiso(tipo = TipoPermiso.WRITE, codigo = "SEGURIDAD_ROLES_WRITE_EDITAR",
             nombre = "Editar rol", descripcion = "Acción que permite editar la información de un rol")
+    @PreAuthorize("hasAnyAuthority('ROLE_OWNER', 'SEGURIDAD_ROLES_WRITE_EDITAR')")
     public void editar(Long id) {
         log.info("editar RolView");
         Optional<Rol> rolOptional = rolService.findById(id);
@@ -109,6 +113,7 @@ public class RolView {
         }
     }
 
+    @PreAuthorize("hasAnyAuthority('ROLE_OWNER', 'SEGURIDAD_ROLES_WRITE_NUEVO', 'SEGURIDAD_ROLES_WRITE_EDITAR')")
     public void guardar() {
         log.info("guardar RolView");
         try {
@@ -146,6 +151,7 @@ public class RolView {
 
     @ConfigPermiso(tipo = TipoPermiso.WRITE, codigo = "SEGURIDAD_ROLES_WRITE_ELIMINAR",
             nombre = "Eliminar rol", descripcion = "Acción que permite borrar un rol")
+    @PreAuthorize("hasAnyAuthority('ROLE_OWNER', 'SEGURIDAD_ROLES_WRITE_ELIMINAR')")
     public void eliminar(Long id) {
         log.info("eliminar RolView");
         try {
@@ -171,6 +177,7 @@ public class RolView {
 
     @ConfigPermiso(tipo = TipoPermiso.READ, codigo = "SEGURIDAD_ROLES_READ_CONFIGURAR_PERMISOS",
             nombre = "Ver Configuración de Permisos", descripcion = "Permite ver el botón que abre el configurador de permisos.")
+    @PreAuthorize("hasAnyAuthority('ROLE_OWNER', 'SEGURIDAD_ROLES_READ_CONFIGURAR_PERMISOS')")
     public void verConfiguracionPermisos(Rol rol) {
         this.rolSelected = rol;
         this.showConfigurarPermisos = true;
@@ -196,6 +203,7 @@ public class RolView {
 
     @ConfigPermiso(tipo = TipoPermiso.WRITE, codigo = "SEGURIDAD_ROLES_WRITE_ASIGNAR_PERMISOS",
             nombre = "Asignar permiso", descripcion = "Acción que permite habilitar, deshabilitar un permiso al rol seleccionado.")
+    @PreAuthorize("hasAnyAuthority('ROLE_OWNER', 'SEGURIDAD_ROLES_WRITE_ASIGNAR_PERMISOS')")
     public void asignarPermiso(RolPermiso rolPermiso) {
         log.info("asignarPermiso RolView");
         try {
@@ -210,6 +218,7 @@ public class RolView {
 
     @ConfigPermiso(tipo = TipoPermiso.WRITE, codigo = "SEGURIDAD_ROLES_WRITE_ACTUALIZAR_PERMISOS",
             nombre = "Actualizar permisos", descripcion = "Acción que permite buscar y actualizar los permisos del sistema.")
+    @PreAuthorize("hasAnyAuthority('ROLE_OWNER', 'SEGURIDAD_ROLES_WRITE_ACTUALIZAR_PERMISOS')")
     public void actualizarPermisos() {
         log.info("actualizarPermisos RolView");
         List<Permiso> permisos = permisoScannerService.getPermisos("gob.yucatan.sicasy",

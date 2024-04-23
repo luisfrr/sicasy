@@ -16,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.primefaces.PrimeFaces;
 import org.springframework.context.annotation.Scope;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
 import java.io.Serializable;
@@ -29,6 +30,7 @@ import java.util.stream.Collectors;
 @ConfigPermiso(tipo = TipoPermiso.VIEW, codigo = "SEGURIDAD_USUARIOS_VIEW",
         nombre = "Módulo de Usuarios", descripcion = "Permite ver y filtrar la información de usuarios.",
         url = "/views/seguridad/usuarios.faces")
+@PreAuthorize("hasAnyAuthority('ROLE_OWNER', 'SEGURIDAD_USUARIOS_VIEW')")
 public class UsuarioView implements Serializable {
 
     private @Getter String title;
@@ -96,6 +98,7 @@ public class UsuarioView implements Serializable {
 
     @ConfigPermiso(tipo = TipoPermiso.WRITE, codigo = "SEGURIDAD_USUARIOS_WRITE_NUEVO",
             nombre = "Agregar Usuario", descripcion = "Acción que permite agregar un nuevo usuario")
+    @PreAuthorize("hasAnyAuthority('ROLE_OWNER', 'SEGURIDAD_USUARIOS_WRITE_NUEVO')")
     public void nuevo() {
         log.info("Nuevo Usuario");
         this.formDialogTitle = "Agregar Usuario";
@@ -106,6 +109,7 @@ public class UsuarioView implements Serializable {
 
     @ConfigPermiso(tipo = TipoPermiso.WRITE, codigo = "SEGURIDAD_USUARIOS_WRITE_EDITAR",
             nombre = "Editar Usuario", descripcion = "Acción que permite editar la información básica de un usuario.")
+    @PreAuthorize("hasAnyAuthority('ROLE_OWNER', 'SEGURIDAD_USUARIOS_WRITE_EDITAR')")
     public void editar(Long id) {
         log.info("Editar Usuario");
         Optional<Usuario> usuarioOptional = usuarioService.findById(id);
@@ -126,6 +130,7 @@ public class UsuarioView implements Serializable {
         }
     }
 
+    @PreAuthorize("hasAnyAuthority('ROLE_OWNER', 'SEGURIDAD_USUARIOS_WRITE_NUEVO', 'SEGURIDAD_USUARIOS_WRITE_EDITAR')")
     public void guardar() {
         log.info("Guardar Usuario");
         try {
@@ -168,6 +173,7 @@ public class UsuarioView implements Serializable {
 
     @ConfigPermiso(tipo = TipoPermiso.WRITE, codigo = "SEGURIDAD_USUARIOS_WRITE_ELIMINAR",
             nombre = "Eliminar Usuario", descripcion = "Acción que permite borrar un usuario")
+    @PreAuthorize("hasAnyAuthority('ROLE_OWNER', 'SEGURIDAD_USUARIOS_WRITE_ELIMINAR')")
     public void eliminar(Long idUsuario) {
         log.info("Eliminar Usuario");
         try {
@@ -189,10 +195,11 @@ public class UsuarioView implements Serializable {
         }
     }
 
-    @ConfigPermiso(tipo = TipoPermiso.WRITE, codigo = "SEGURIDAD_USUARIOS_WRITE_HABILITAR",
+    @ConfigPermiso(tipo = TipoPermiso.WRITE, codigo = "SEGURIDAD_USUARIOS_WRITE_RESTABLECER_CONTRASENIA",
             nombre = "Reestablecer contraseña",
-            descripcion = "Acción que enviar un correo para que el usuario genere su nueva contraseña.")
-    public void reestablecerContrasenia(Long idUsuario) {
+            descripcion = "Acción que envía un correo para que el usuario genere su nueva contraseña. Borra la anterior contraseña.")
+    @PreAuthorize("hasAnyAuthority('ROLE_OWNER', 'SEGURIDAD_USUARIOS_WRITE_RESTABLECER_CONTRASENIA')")
+    public void restablecerContrasenia(Long idUsuario) {
         log.info("Reestablecer contraseña Usuario");
         try {
             Usuario usuario = usuarioService.restablecerPassword(idUsuario, userSessionBean.getUserName());
@@ -211,10 +218,11 @@ public class UsuarioView implements Serializable {
         }
     }
 
-    @ConfigPermiso(tipo = TipoPermiso.WRITE, codigo = "SEGURIDAD_USUARIOS_WRITE_HABILITAR",
+    @ConfigPermiso(tipo = TipoPermiso.WRITE, codigo = "SEGURIDAD_USUARIOS_WRITE_HABILITAR_CUENTA",
             nombre = "Habilitar cuenta de usuario",
             descripcion = "Acción que habilitar la cuenta de usuario. Cambia a estatus Bloqueado, " +
                     "por lo que no podrá ingresar al sistema.")
+    @PreAuthorize("hasAnyAuthority('ROLE_OWNER', 'SEGURIDAD_USUARIOS_WRITE_HABILITAR_CUENTA')")
     public void habilitar(Long idUsuario) {
         log.info("Habilitar Usuario");
         try {
@@ -232,10 +240,11 @@ public class UsuarioView implements Serializable {
         }
     }
 
-    @ConfigPermiso(tipo = TipoPermiso.WRITE, codigo = "SEGURIDAD_USUARIOS_WRITE_DESHABILITAR",
+    @ConfigPermiso(tipo = TipoPermiso.WRITE, codigo = "SEGURIDAD_USUARIOS_WRITE_DESHABILITAR_CUENTA",
             nombre = "Deshabilitar cuenta de usuario",
             descripcion = "Acción que deshabilitar la cuenta de usuario. Cambia a estatus Activo, " +
                     "lo que significa que podrá ingresar al sistema (siempre que tenga su correo confirmado).")
+    @PreAuthorize("hasAnyAuthority('ROLE_OWNER', 'SEGURIDAD_USUARIOS_WRITE_DESHABILITAR_CUENTA')")
     public void deshabilitar(Long idUsuario) {
         log.info("Deshabilitar Usuario");
         try {
@@ -255,6 +264,7 @@ public class UsuarioView implements Serializable {
 
     @ConfigPermiso(tipo = TipoPermiso.READ, codigo = "SEGURIDAD_USUARIOS_READ_CONFIGURAR_PERMISOS",
             nombre = "Ver Configuración de Permisos", descripcion = "Permite ver el botón que abre el configurador de permisos.")
+    @PreAuthorize("hasAnyAuthority('ROLE_OWNER', 'SEGURIDAD_USUARIOS_READ_CONFIGURAR_PERMISOS')")
     public void verConfiguracionPermisos(Usuario usuario) {
         log.info("Ver Configuracion Permisos Usuario");
         this.usuarioSelected = usuario;
@@ -282,6 +292,7 @@ public class UsuarioView implements Serializable {
 
     @ConfigPermiso(tipo = TipoPermiso.WRITE, codigo = "SEGURIDAD_USUARIOS_WRITE_ASIGNAR_PERMISOS",
             nombre = "Asignar permiso", descripcion = "Acción que permite habilitar, deshabilitar un permiso al usuario seleccionado.")
+    @PreAuthorize("hasAnyAuthority('ROLE_OWNER', 'SEGURIDAD_USUARIOS_WRITE_ASIGNAR_PERMISOS')")
     public void asignarPermiso(UsuarioPermiso usuarioPermiso) {
         log.info("Asignar Permiso Usuario");
         try {
@@ -296,6 +307,7 @@ public class UsuarioView implements Serializable {
 
     @ConfigPermiso(tipo = TipoPermiso.WRITE, codigo = "SEGURIDAD_USUARIOS_WRITE_ACTUALIZAR_PERMISOS",
             nombre = "Actualizar permisos", descripcion = "Acción que permite buscar y actualizar los permisos del sistema.")
+    @PreAuthorize("hasAnyAuthority('ROLE_OWNER', 'SEGURIDAD_USUARIOS_WRITE_ACTUALIZAR_PERMISOS')")
     public void actualizarPermisos() {
         log.info("Actualizar Permisos Usuario");
         List<Permiso> permisos = permisoScannerService.getPermisos("gob.yucatan.sicasy",

@@ -34,6 +34,8 @@ public class CustomAuthenticationManager implements AuthenticationManager {
 
         Optional<Usuario> usuarioOptional = usuarioService.findByUsuario(username);
 
+        // TODO: Debe tener confirmado su correo para poder ingresar.
+
         if(usuarioOptional.isPresent()) {
             Usuario usuario = usuarioOptional.get();
 

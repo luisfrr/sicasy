@@ -198,21 +198,21 @@
                                                  rendered="#{usuario.estatus.label != 'Borrado'}"/>
                                 <p:menu overlay="true" trigger="buttonOptions" my="left top" at="left bottom" styleClass="w-16rem">
 
-                                    <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'SEGURIDAD_ROLES_READ_CONFIGURAR_PERMISOS')">
+                                    <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'SEGURIDAD_USUARIOS_READ_CONFIGURAR_PERMISOS')">
                                         <p:menuitem value="Configuración de Permisos"
                                                     action="#{usuarioView.verConfiguracionPermisos(usuario)}"
                                                     ajax="true" update="container"/>
                                     </sec:authorize>
 
-                                    <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'SEGURIDAD_ROLES_WRITE_ELIMINAR')">
-                                        <p:menuitem value="Reestablecer contraseña"
-                                                    ajax="true" action="#{usuarioView.reestablecerContrasenia(usuario.idUsuario)}"
+                                    <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'SEGURIDAD_USUARIOS_WRITE_RESTABLECER_CONTRASENIA')">
+                                        <p:menuitem value="Restablecer contraseña"
+                                                    ajax="true" action="#{usuarioView.restablecerContrasenia(usuario.idUsuario)}"
                                                     update="growl form_datatable">
                                             <p:confirm header="Confirmación" message="¿Está seguro que desea restablecer la contraseña del usuario?" icon="pi pi-exclamation-triangle"/>
                                         </p:menuitem>
                                     </sec:authorize>
 
-                                    <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'SEGURIDAD_ROLES_WRITE_ELIMINAR')">
+                                    <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'SEGURIDAD_USUARIOS_WRITE_HABILITAR_CUENTA')">
                                         <p:menuitem value="Habilitar" rendered="#{usuario.estatus.label != 'Activo'}"
                                                     ajax="true" action="#{usuarioView.habilitar(usuario.idUsuario)}"
                                                     update="growl form_datatable">

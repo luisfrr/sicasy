@@ -38,7 +38,7 @@
    </h:form>
 
    <h:form id="form_toolbar_permisos" styleClass="mb-5">
-      <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'SEGURIDAD_ROLES_WRITE_ACTUALIZAR_PERMISOS')">
+      <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'SEGURIDAD_USUARIOS_WRITE_ACTUALIZAR_PERMISOS')">
          <p:toolbar>
             <p:toolbarGroup>
             </p:toolbarGroup>
@@ -115,7 +115,7 @@
             <h:outputText value="#{usuarioPermiso.permiso.tipoPermiso.label}"/>
          </p:column>
 
-         <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'SEGURIDAD_ROLES_WRITE_ASIGNAR_PERMISOS')">
+         <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'SEGURIDAD_USUARIOS_WRITE_ASIGNAR_PERMISOS')">
             <p:column headerText="Habilitar/Bloquear" styleClass="text-center" width="200">
                <p:triStateCheckbox value="#{usuarioPermiso.checkEstatus}"
                                    stateOneTitle="Sin asignar"
@@ -149,7 +149,7 @@
                   <h:outputText value="#{subUsuarioPermiso.permiso.tipoPermiso.label}"/>
                </p:column>
 
-               <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'SEGURIDAD_ROLES_WRITE_ASIGNAR_PERMISOS')">
+               <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'SEGURIDAD_USUARIOS_WRITE_ASIGNAR_PERMISOS')">
                   <p:column headerText="Habilitar/Bloquear" styleClass="text-center" width="200">
                      <p:triStateCheckbox value="#{subUsuarioPermiso.checkEstatus}"
                                          stateOneTitle="Sin asignar"
