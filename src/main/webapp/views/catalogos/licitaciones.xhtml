@@ -221,7 +221,7 @@
 
 
 
-        <h:form id="form_dialog">
+        <h:form id="form_dialog" enctype="multipart/form-data">
             <p:dialog header="#{licitacionView.titleDialog}" widgetVar="formDialog"
                       minHeight="350" width="450"
                       showEffect="fade" modal="true"
@@ -259,6 +259,8 @@
                         <p:outputLabel styleClass="mr-2"  value="Fecha final "/>
                         <p:calendar  value="#{licitacionView.licitacionSelected.fechaFinal}" />
                     </p:outputPanel>
+
+                    <p:fileUpload value="#{licitacionView.file}" mode="simple" skinSimple="true"/>
 
                 </p:outputPanel>
 

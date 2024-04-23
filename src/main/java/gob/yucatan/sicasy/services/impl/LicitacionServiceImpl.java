@@ -100,6 +100,7 @@ public class LicitacionServiceImpl implements ILicitacionService {
         licitacionToUpdate.setFechaFinal(licitacion.getFechaFinal());
         licitacionToUpdate.setFechaModificacion(new Date());
         licitacionToUpdate.setModificadoPor(licitacion.getModificadoPor());
+        licitacionToUpdate.setRutaArchivo(licitacion.getRutaArchivo());
 
         licitacionRepository.save(licitacionToUpdate);
 

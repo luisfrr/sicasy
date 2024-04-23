@@ -9,17 +9,25 @@ import gob.yucatan.sicasy.business.exceptions.BadRequestException;
 import gob.yucatan.sicasy.business.exceptions.NotFoundException;
 import gob.yucatan.sicasy.services.iface.IAnexoService;
 import gob.yucatan.sicasy.services.iface.ILicitacionService;
+import gob.yucatan.sicasy.utils.date.DateFormatUtil;
+import gob.yucatan.sicasy.utils.imports.excel.SaveFile;
 import gob.yucatan.sicasy.views.beans.UserSessionBean;
 import jakarta.annotation.PostConstruct;
 import jakarta.faces.application.FacesMessage;
 import jakarta.faces.context.FacesContext;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.primefaces.PrimeFaces;
+import org.primefaces.model.file.UploadedFile;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.*;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -37,6 +45,7 @@ public class LicitacionView {
     private @Getter Licitacion licitacionFilter;
     private @Getter List<Licitacion> licitacionList;
     private @Getter EstatusRegistro[] estatusRegistros;
+    private @Getter @Setter UploadedFile file;
 
     private final ILicitacionService licitacionService;
     private final IAnexoService anexoService;
@@ -82,6 +91,12 @@ public class LicitacionView {
                     // si no es null el id entonces es un update
                     this.licitacionSelected.setModificadoPor(userSessionBean.getUserName());
                     this.licitacionSelected.setFechaModificacion(new Date());
+
+                    if (file != null){
+                        String pathfile = SaveFile.saveFileToPath(file.getContent(), file.getFileName(), "C:\\Users\\Aeolos\\Downloads\\");
+                        licitacionSelected.setRutaArchivo(pathfile);
+                    }
+
                     licitacionService.update(licitacionSelected);
 
                     FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_INFO,
@@ -97,6 +112,12 @@ public class LicitacionView {
                     if (optLicitacion.isEmpty()){ // checar si no existe una licitacion con ese numero de licitacion existente y activa
                         this.licitacionSelected.setCreadoPor(userSessionBean.getUserName());
                         this.licitacionSelected.setFechaCreacion(new Date());
+
+                        if (file != null){
+                            String pathfile = SaveFile.saveFileToPath(file.getContent(), file.getFileName(), "C:\\Users\\Aeolos\\Downloads\\");
+                            licitacionSelected.setRutaArchivo(pathfile);
+                        }
+
                         licitacionService.save(licitacionSelected);
 
                         FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_INFO,
@@ -184,13 +205,27 @@ public class LicitacionView {
                 FacesContext.getCurrentInstance().addMessage(null, msg);
             }
 
-
         }
 
         PrimeFaces.current().executeScript("PF('confirmDialog').hide();");
 
     }
 
-
+//    public String saveFileToPath(byte[] content, String fileName, String path) throws IOException {
+//        // path ejemplo pa windows : C:\Users\Isra\Downloads\
+//        File file = new File(path+fileName);
+//        return Files.write(file.toPath(), content).toString();
+//    }
+//
+//    public void saveFile(InputStream inputStream, String originalFile) throws IOException {
+//        File file = new File("C:\\Users\\Aeolos\\Downloads\\" + originalFile);
+//
+//        try {
+//            Files.copy(inputStream, file.toPath(), StandardCopyOption.REPLACE_EXISTING);
+//
+//        }catch (Exception ex) {
+//            log.info(ex.getMessage());
+//        }
+//    }
 
 }
