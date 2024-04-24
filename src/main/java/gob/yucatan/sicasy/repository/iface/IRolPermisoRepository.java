@@ -13,7 +13,7 @@ import java.util.List;
 
 public interface IRolPermisoRepository extends JpaRepository<RolPermiso, Long>, JpaSpecificationExecutor<RolPermiso> {
 
-    @Query("select distinct r.permiso from RolPermiso r where r.rol in ?1 and r.estatusPermiso = ?2")
+    @Query("select r.permiso from RolPermiso r where r.rol in ?1 and r.estatusPermiso = ?2")
     List<Permiso> findPermisoByRolInAndEstatusPermiso(Collection<Rol> rols, EstatusPermiso estatusPermiso);
 
 }
