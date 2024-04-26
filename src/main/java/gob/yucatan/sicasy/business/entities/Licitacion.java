@@ -5,6 +5,8 @@ import gob.yucatan.sicasy.business.enums.EstatusRegistro;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 @Entity
@@ -62,6 +64,16 @@ public class Licitacion implements Cloneable {
 
     @Column(name = "borrado_por", insertable = false)
     private String borradoPor;
+
+    public String fechaInicioString(){
+        DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd");
+        return dateFormat.format(fechaInicio);
+    }
+
+    public String fechaFinalString(){
+        DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd");
+        return dateFormat.format(fechaFinal);
+    }
 
     @Override
     public Licitacion clone() {

@@ -10,6 +10,12 @@ import gob.yucatan.sicasy.business.exceptions.NotFoundException;
 import gob.yucatan.sicasy.services.iface.IAnexoService;
 import gob.yucatan.sicasy.services.iface.ILicitacionService;
 import gob.yucatan.sicasy.utils.date.DateFormatUtil;
+import gob.yucatan.sicasy.utils.export.ExportFile;
+import gob.yucatan.sicasy.utils.export.csv.models.CsvData;
+import gob.yucatan.sicasy.utils.export.csv.models.CsvField;
+import gob.yucatan.sicasy.utils.export.csv.service.iface.IGeneratorCSVFile;
+import gob.yucatan.sicasy.utils.export.excel.models.*;
+import gob.yucatan.sicasy.utils.export.excel.services.iface.IGeneratorExcelFile;
 import gob.yucatan.sicasy.utils.imports.excel.SaveFile;
 import gob.yucatan.sicasy.views.beans.UserSessionBean;
 import jakarta.annotation.PostConstruct;
@@ -19,6 +25,10 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.poi.ss.usermodel.HorizontalAlignment;
+import org.apache.poi.ss.usermodel.VerticalAlignment;
+import org.apache.poi.xssf.usermodel.XSSFCellStyle;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.primefaces.PrimeFaces;
 import org.primefaces.model.file.UploadedFile;
 import org.springframework.context.annotation.Scope;
@@ -28,6 +38,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.*;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -50,6 +61,8 @@ public class LicitacionView {
     private final ILicitacionService licitacionService;
     private final IAnexoService anexoService;
     private final UserSessionBean userSessionBean;
+    private final IGeneratorCSVFile generatorCSVFileService;
+    private final IGeneratorExcelFile generatorExcelFile;
 
 
     @PostConstruct
@@ -211,21 +224,72 @@ public class LicitacionView {
 
     }
 
-//    public String saveFileToPath(byte[] content, String fileName, String path) throws IOException {
-//        // path ejemplo pa windows : C:\Users\Isra\Downloads\
-//        File file = new File(path+fileName);
-//        return Files.write(file.toPath(), content).toString();
-//    }
-//
-//    public void saveFile(InputStream inputStream, String originalFile) throws IOException {
-//        File file = new File("C:\\Users\\Aeolos\\Downloads\\" + originalFile);
-//
-//        try {
-//            Files.copy(inputStream, file.toPath(), StandardCopyOption.REPLACE_EXISTING);
-//
-//        }catch (Exception ex) {
-//            log.info(ex.getMessage());
-//        }
-//    }
+    public ExportFile exportFileCSV() throws IOException {
+        log.info("exportFileCSV");
+
+        if (this.licitacionList != null && !this.licitacionList.isEmpty()) {
+
+            List<CsvField> fields = List.of(CsvField.builder().fieldName("Licitacion").propertyExpression("nombre").build(),
+                    CsvField.builder().fieldName("num").propertyExpression("numeroLicitacion").build(),
+                    CsvField.builder().fieldName("Descripcion").propertyExpression("descripcion").build());
+
+            return generatorCSVFileService.createCsvFile(CsvData.builder()
+                            .data(this.licitacionList)
+                            .fields(fields)
+                            .filename("csvTEST.csv")
+                            .printHeaders(true)
+                    .build());
+
+        }else
+            return null;
+
+    }
+
+    public ExportFile exportFileExcel() throws IOException {
+        log.info("exportFileExcel");
+        List<ExcelCell> cellList = new ArrayList<>();
+
+        XSSFWorkbook workbook = generatorExcelFile.createWorkbook();
+
+        XSSFCellStyle centerTopStyle = generatorExcelFile.createCellStyle(CreateCellStyle.builder()
+                .workbook(workbook)
+                .fontSize(12)
+                .fontColor(ExcelFontColor.BLACK)
+                .horizontalAlignment(HorizontalAlignment.CENTER)
+                .verticalAlignment(VerticalAlignment.TOP)
+                .backgroundColor(ExcelBackgroundColor.NO_BG_COLOR)
+                .dataFormat("0")
+                .build());
+
+        XSSFCellStyle leftTopStyle = generatorExcelFile.createCellStyle(CreateCellStyle.builder()
+                .workbook(workbook)
+                .fontSize(12)
+                .fontColor(ExcelFontColor.BLACK)
+                .horizontalAlignment(HorizontalAlignment.LEFT)
+                .verticalAlignment(VerticalAlignment.TOP)
+                .backgroundColor(ExcelBackgroundColor.NO_BG_COLOR)
+                .isWrapText(true)
+                .build());
+
+        cellList.add(ExcelCell.builder().columnName("Licitación").propertyExpression("nombre").cellStyle(centerTopStyle).cellWidth(150).build());
+        cellList.add(ExcelCell.builder().columnName("Número Licitación").propertyExpression("numeroLicitacion").cellStyle(leftTopStyle).cellWidth(450).build());
+        cellList.add(ExcelCell.builder().columnName("Descripción").propertyExpression("descripcion").cellStyle(leftTopStyle).cellWidth(450).build());
+        cellList.add(ExcelCell.builder().columnName("Fecha de inicio").propertyExpression("fechaInicioString()").cellStyle(leftTopStyle).cellWidth(450).build());
+        cellList.add(ExcelCell.builder().columnName("Fecha de termino").propertyExpression("fechaFinalString()").cellStyle(leftTopStyle).cellWidth(450).build());
+
+        ExcelDataSheet excelDataSheet = ExcelDataSheet.builder()
+                .data(this.licitacionList)
+                .cells(cellList)
+                .title("Licitaciones")
+                .sheetName("DATA")
+                .filename("Licitaciones")
+                .autoFilter(true)
+                .agregarFechaGeneracion(true)
+                .appName("SICASY")
+                .build();
+
+        return generatorExcelFile.createExcelFile(workbook, excelDataSheet);
+
+    }
 
 }
