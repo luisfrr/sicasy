@@ -18,6 +18,7 @@ public class ExportFile {
     private ByteArrayOutputStream stream;
     private ExportFileType exportFileType;
     private String fileName;
+    private boolean isUseOriginalFileName;
 
     public String getUniqueFileName() {
         DateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmss");

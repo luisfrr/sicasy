@@ -30,9 +30,28 @@
         <h:outputStylesheet library="css" name="layout.css"/>
         <h:outputStylesheet library="css" name="components.css"/>
 
+        <script type="text/javascript">
+            //<![CDATA[
+            function start() {
+                PF('statusDialog').show();
+            }
+
+            function stop() {
+                PF('statusDialog').hide();
+            }
+            //]]>
+        </script>
     </h:head>
 
     <h:body>
+
+        <p:dialog modal="true" widgetVar="statusDialog" draggable="false" closable="false"
+                  resizable="false">
+            <div class="flex flex-column justify-content-center align-items-center">
+                <i class="pi pi-spinner pi-spin mb-3" style="font-size:3rem"/>
+                <p class="text-center">Descargando el archivo, espere un momento...</p>
+            </div>
+        </p:dialog>
 
         <div class="wrapper menu-overlay">
             <ui:include src="/WEB-INF/facelets/topbar_layout.xhtml"/>

@@ -37,7 +37,10 @@
                     </p:toolbarGroup>
 
                     <p:toolbarGroup align="right">
-                        <p:commandButton value="Exportar" styleClass="ui-button-outlined"/>
+                        <p:commandButton value="Exportar" ajax="false" onclick="PrimeFaces.monitorDownload(start, stop);"
+                                         styleClass="ui-button-outlined">
+                            <p:fileDownload value="#{fileDownloadBean.downloadFile(anexoView.exportFileExcel())}"/>
+                        </p:commandButton>
                     </p:toolbarGroup>
                 </p:toolbar>
             </h:form>

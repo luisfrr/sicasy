@@ -9,6 +9,9 @@ import gob.yucatan.sicasy.business.exceptions.BadRequestException;
 import gob.yucatan.sicasy.business.exceptions.NotFoundException;
 import gob.yucatan.sicasy.services.iface.IAnexoService;
 import gob.yucatan.sicasy.services.iface.ILicitacionService;
+import gob.yucatan.sicasy.utils.export.ExportFile;
+import gob.yucatan.sicasy.utils.export.excel.models.*;
+import gob.yucatan.sicasy.utils.export.excel.services.iface.IGeneratorExcelFile;
 import gob.yucatan.sicasy.views.beans.UserSessionBean;
 import jakarta.annotation.PostConstruct;
 import jakarta.faces.application.FacesMessage;
@@ -16,10 +19,16 @@ import jakarta.faces.context.FacesContext;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.poi.ss.usermodel.HorizontalAlignment;
+import org.apache.poi.ss.usermodel.VerticalAlignment;
+import org.apache.poi.xssf.usermodel.XSSFCellStyle;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.primefaces.PrimeFaces;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -43,6 +52,7 @@ public class AnexoView {
     private final IAnexoService anexoService;
     private final ILicitacionService licitacionService;
     private final UserSessionBean userSessionBean;
+    private final IGeneratorExcelFile generatorExcelFile;
 
     @PostConstruct
     public void init(){
@@ -171,5 +181,54 @@ public class AnexoView {
         PrimeFaces.current().executeScript("PF('confirmDialog').hide();");
 
     }
+
+    public ExportFile exportFileExcel() throws IOException {
+        log.info("exportFileExcel anexo");
+        List<ExcelCell> cellList = new ArrayList<>();
+
+        XSSFWorkbook workbook = generatorExcelFile.createWorkbook();
+
+        XSSFCellStyle centerTopStyle = generatorExcelFile.createCellStyle(CreateCellStyle.builder()
+                .workbook(workbook)
+                .fontSize(12)
+                .fontColor(ExcelFontColor.BLACK)
+                .horizontalAlignment(HorizontalAlignment.CENTER)
+                .verticalAlignment(VerticalAlignment.TOP)
+                .backgroundColor(ExcelBackgroundColor.NO_BG_COLOR)
+                .dataFormat("0")
+                .build());
+
+        XSSFCellStyle leftTopStyle = generatorExcelFile.createCellStyle(CreateCellStyle.builder()
+                .workbook(workbook)
+                .fontSize(12)
+                .fontColor(ExcelFontColor.BLACK)
+                .horizontalAlignment(HorizontalAlignment.LEFT)
+                .verticalAlignment(VerticalAlignment.TOP)
+                .backgroundColor(ExcelBackgroundColor.NO_BG_COLOR)
+                .isWrapText(true)
+                .build());
+
+        cellList.add(ExcelCell.builder().columnName("Anexo").propertyExpression("nombre").cellStyle(centerTopStyle).cellWidth(150).build());
+        cellList.add(ExcelCell.builder().columnName("Número Licitación").propertyExpression("numLicitacionString()").cellStyle(leftTopStyle).cellWidth(450).build());
+        cellList.add(ExcelCell.builder().columnName("Descripción").propertyExpression("descripcion").cellStyle(leftTopStyle).cellWidth(450).build());
+        cellList.add(ExcelCell.builder().columnName("Fecha de inicio").propertyExpression("fechaInicioString()").cellStyle(leftTopStyle).cellWidth(450).build());
+        cellList.add(ExcelCell.builder().columnName("Fecha de termino").propertyExpression("fechaFinalString()").cellStyle(leftTopStyle).cellWidth(450).build());
+        cellList.add(ExcelCell.builder().columnName("Fecha de firma").propertyExpression("fechaFirmaString()").cellStyle(leftTopStyle).cellWidth(450).build());
+
+        ExcelDataSheet excelDataSheet = ExcelDataSheet.builder()
+                .data(this.anexoList)
+                .cells(cellList)
+                .title("Anexos")
+                .sheetName("DATA")
+                .filename("Anexos")
+                .autoFilter(true)
+                .agregarFechaGeneracion(true)
+                .appName("SICASY")
+                .build();
+
+        return generatorExcelFile.createExcelFile(workbook, excelDataSheet);
+
+    }
+
 
 }
