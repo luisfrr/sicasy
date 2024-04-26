@@ -14,7 +14,7 @@ import java.util.Date;
 @Getter
 @Setter
 @Builder
-public class Licitacion {
+public class Licitacion implements Cloneable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -63,5 +63,12 @@ public class Licitacion {
     @Column(name = "borrado_por", insertable = false)
     private String borradoPor;
 
-
+    @Override
+    public Licitacion clone() {
+        try {
+            return (Licitacion) super.clone();
+        } catch (CloneNotSupportedException e) {
+            throw new AssertionError();
+        }
+    }
 }
