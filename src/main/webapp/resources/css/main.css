@@ -578,6 +578,10 @@ p {
     margin-right: var(--spacing-8)  !important;
 }
 
+.mw-auto {
+    min-width: auto !important;
+}
+
 .mask.show {
     display: block;
 }

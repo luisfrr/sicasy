@@ -4,6 +4,7 @@ import gob.yucatan.sicasy.business.enums.EstatusRegistro;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.io.Serializable;
 import java.util.Date;
 
 @Entity
@@ -13,12 +14,13 @@ import java.util.Date;
 @Getter
 @Setter
 @Builder
-public class Vehiculo implements Cloneable {
+@ToString
+public class Vehiculo implements Cloneable, Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "vehiculo_id", nullable = false)
-    private Integer idVehiculo;
+    private Long idVehiculo;
 
     @Column(name = "no_serie", nullable = false)
     private String noSerie;

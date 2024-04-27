@@ -16,12 +16,12 @@
                     <span class="label">Inicio</span>
                 </p:commandLink>
 
-                <div class="menu-item">
+                <p:commandLink styleClass="menu-item" ajax="false" action="#{menuSessionBean.goToVehiculos()}">
                     <div class="icon">
                         <i class="fi fi-rr-car-alt"/>
                     </div>
                     <span class="label">Vehículos</span>
-                </div>
+                </p:commandLink>
 
                 <p:commandLink styleClass="menu-item" ajax="false" action="#{menuSessionBean.goToAseguradoras()}">
                     <div class="icon">

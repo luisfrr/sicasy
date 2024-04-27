@@ -3,6 +3,8 @@ package gob.yucatan.sicasy.business.entities;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.io.Serializable;
+
 @Entity
 @Table(name = "dependencia")
 @AllArgsConstructor
@@ -10,7 +12,7 @@ import lombok.*;
 @Getter
 @Setter
 @Builder
-public class Dependencia implements Cloneable {
+public class Dependencia implements Cloneable, Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -33,7 +35,7 @@ public class Dependencia implements Cloneable {
     private String puesto;
 
     @Column(name = "no_oficio")
-    private Integer noOficio;
+    private String noOficio;
 
     @Override
     public Dependencia clone() {

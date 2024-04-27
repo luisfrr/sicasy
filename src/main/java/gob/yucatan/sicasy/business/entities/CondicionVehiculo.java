@@ -3,6 +3,8 @@ package gob.yucatan.sicasy.business.entities;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.io.Serializable;
+
 @Entity
 @Table(name = "condicion_vehiculo")
 @AllArgsConstructor
@@ -10,7 +12,7 @@ import lombok.*;
 @Getter
 @Setter
 @Builder
-public class CondicionVehiculo implements Cloneable {
+public class CondicionVehiculo implements Cloneable, Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
