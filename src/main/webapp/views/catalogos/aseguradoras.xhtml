@@ -18,7 +18,7 @@
 
             <h:form id="form_breadcum" styleClass="mb-5">
                 <p:breadCrumb homeDisplay="text">
-                    <p:menuitem value="Inicio"/>
+                    <p:menuitem value="Inicio" ajax="false" action="#{menuSessionBean.goToHome()}"/>
                     <p:menuitem value="Catálogos"/>
                     <p:menuitem value="Aseguradoras"/>
                 </p:breadCrumb>

@@ -20,7 +20,11 @@ import gob.yucatan.sicasy.utils.imports.excel.SaveFile;
 import gob.yucatan.sicasy.views.beans.UserSessionBean;
 import jakarta.annotation.PostConstruct;
 import jakarta.faces.application.FacesMessage;
+import jakarta.faces.component.UIComponent;
 import jakarta.faces.context.FacesContext;
+import jakarta.faces.validator.FacesValidator;
+import jakarta.faces.validator.Validator;
+import jakarta.faces.validator.ValidatorException;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -38,10 +42,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.*;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Component
 @Scope("view")
@@ -85,12 +86,14 @@ public class LicitacionView {
 
     public void buscar(){
         log.info("Buscando Licitaciones");
-        this.licitacionList = licitacionService.findAllDynamic(this.licitacionFilter);
+        this.licitacionList = licitacionService.findAllDynamic(this.licitacionFilter).stream()
+                .sorted(Comparator.comparing(Licitacion:: getNumeroLicitacion))
+                .toList();
     }
 
     public void agregarLicitacion(){
         log.info("Agregando licitacion nueva");
-        this.titleDialog = "Agregar Licitacion";
+        this.titleDialog = "Agregar Licitación";
         this.licitacionSelected = new Licitacion();
 
     }
@@ -206,7 +209,7 @@ public class LicitacionView {
 
             if (anexos.isEmpty()) {
                 FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_INFO,
-                        "Aviso", "Se ha eliminado exitósamente la información");
+                        "Aviso", "Se ha eliminado exitosamente la información");
                 FacesContext.getCurrentInstance().addMessage(null, msg);
                 this.licitacionSelected.setBorradoPor(userSessionBean.getUserName());
                 licitacionService.delete(this.licitacionSelected);
@@ -293,3 +296,4 @@ public class LicitacionView {
     }
 
 }
+

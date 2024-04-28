@@ -18,7 +18,7 @@
 
             <h:form id="form_breadcum" styleClass="mb-5">
                 <p:breadCrumb homeDisplay="text">
-                    <p:menuitem value="Inicio"/>
+                    <p:menuitem value="Inicio" ajax="false" action="#{menuSessionBean.goToHome()}"/>
                     <p:menuitem value="Catálogos"/>
                     <p:menuitem value="Anexos"/>
                 </p:breadCrumb>
@@ -103,32 +103,43 @@
                         Anexos
                     </f:facet>
 
-                    <p:column headerText="No.">
+                    <p:column headerText="No." width="20">
                         <h:outputText value="#{index + 1}" />
                     </p:column>
 
-                    <p:column headerText="Nombre">
+                    <p:column headerText="Nombre" width="100">
                         <h:outputText value="#{anexo.nombre}"/>
                     </p:column>
 
-                    <p:column headerText="Número licitación">
+                    <p:column headerText="Número licitación" width="100">
                         <h:outputText value="#{anexo.licitacion.numeroLicitacion}"/>
                     </p:column>
 
-                    <p:column headerText="Descripción">
+                    <p:column headerText="Descripción" width="250">
                         <h:outputText value="#{anexo.descripcion}"/>
                     </p:column>
 
-                    <p:column headerText="Fecha inicio">
-                        <h:outputText value="#{anexo.fechaInicio}"/>
+                    <p:column headerText="Fecha inicio" width="90">
+                        <h:outputText value="#{anexo.fechaInicio}">
+                            <f:convertDateTime pattern="MM-dd-yyyy" />
+                        </h:outputText>
                     </p:column>
 
-                    <p:column headerText="Fecha final">
-                        <h:outputText value="#{anexo.fechaFinal}"/>
+                    <p:column headerText="Fecha final" width="110">
+                        <p:outputPanel styleClass="flex flex-row gap-1">
+                            <h:outputText value="#{anexo.fechaFinal}">
+                                <f:convertDateTime pattern="MM-dd-yyyy"/>
+                            </h:outputText>
+                            <p:badge severity="danger" rendered="#{anexo.getIsExpirationDateFechaFinal()}">
+                                <i class="pi pi-bell "/>
+                            </p:badge>
+                        </p:outputPanel>
                     </p:column>
 
-                    <p:column headerText="Fecha firma">
-                        <h:outputText value="#{anexo.fechaFirma}"/>
+                    <p:column headerText="Fecha firma" width="90">
+                        <h:outputText value="#{anexo.fechaFirma}">
+                            <f:convertDateTime pattern="MM-dd-yyyy"/>
+                        </h:outputText>
                     </p:column>
 
                     <p:column headerText="Estatus">

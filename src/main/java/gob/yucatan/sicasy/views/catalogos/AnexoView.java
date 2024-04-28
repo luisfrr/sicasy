@@ -28,10 +28,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Component
 @Scope("view")
@@ -69,7 +66,8 @@ public class AnexoView {
         log.info("Limpiando filtros");
         this.anexoFilter = new Anexo();
         this.anexoFilter.setEstatusRegistro(EstatusRegistro.ACTIVO);
-        this.licitacionesActivasList = licitacionService.findAllLicitacionActive();
+        this.licitacionesActivasList = licitacionService.findAllLicitacionActive().stream()
+                .sorted(Comparator.comparing(Licitacion::getNumeroLicitacion)).toList();
         this.buscar();
     }
 
@@ -168,7 +166,7 @@ public class AnexoView {
 //                FacesContext.getCurrentInstance().addMessage(null, msg);
 //            }else {
                 FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_INFO,
-                        "Aviso", "Se ha eliminado exitósamente la información");
+                        "Aviso", "Se ha eliminado exitosamente la información");
                 FacesContext.getCurrentInstance().addMessage(null, msg);
                 this.anexoSelected.setBorradoPor(userSessionBean.getUserName());
                 anexoService.delete(this.anexoSelected);

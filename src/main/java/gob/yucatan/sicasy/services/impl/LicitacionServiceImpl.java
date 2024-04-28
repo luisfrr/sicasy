@@ -45,6 +45,8 @@ public class LicitacionServiceImpl implements ILicitacionService {
                     Licitacion_.NUMERO_LICITACION));
 
 
+
+
         return licitacionRepository.findAll(specification);
     }
 

@@ -18,7 +18,7 @@
 
             <h:form id="form_breadcum" styleClass="mb-5">
                 <p:breadCrumb homeDisplay="text">
-                    <p:menuitem value="Inicio"/>
+                    <p:menuitem value="Inicio" ajax="false" action="#{menuSessionBean.goToHome()}"/>
                     <p:menuitem value="Catálogos"/>
                     <p:menuitem value="Licitaciones"/>
                 </p:breadCrumb>
@@ -52,9 +52,9 @@
                     <p:outputPanel styleClass="grid formgrid mb-2">
 
                         <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4 xl:col-3">
-                            <p:outputLabel for="@next" value="licitacion" styleClass="block"/>
-                            <p:inputText styleClass="block w-full" placeholder="Ingresa un nombre..."
-                                         value="#{licitacionView.licitacionFilter.nombre}"/>
+                            <p:outputLabel for="@next" value="licitación" styleClass="block"/>
+                            <p:inputText styleClass="block w-full" placeholder="Buscar por número de licitación"
+                                         value="#{licitacionView.licitacionFilter.numeroLicitacion}"/>
                             <span class="text-sm hidden"> </span>
                         </p:outputPanel>
 
@@ -102,31 +102,35 @@
                         Licitaciones
                     </f:facet>
 
-                    <p:column headerText="No.">
+                    <p:column headerText="No." width="20">
                         <h:outputText value="#{index + 1}" />
                     </p:column>
 
-                    <p:column headerText="Nombre">
-                        <h:outputText value="#{licitacion.nombre}"/>
-                    </p:column>
-
-                    <p:column headerText="Número licitación">
+                    <p:column headerText="Número licitación" width="90">
                         <h:outputText value="#{licitacion.numeroLicitacion}"/>
                     </p:column>
 
-                    <p:column headerText="Descripción">
+                    <p:column headerText="Nombre" width="80">
+                        <h:outputText value="#{licitacion.nombre}"/>
+                    </p:column>
+
+                    <p:column headerText="Descripción" width="250">
                         <h:outputText value="#{licitacion.descripcion}"/>
                     </p:column>
 
-                    <p:column headerText="Fecha inicio">
-                        <h:outputText value="#{licitacion.fechaInicio}"/>
+                    <p:column headerText="Fecha inicio" width="90">
+                        <h:outputText value="#{licitacion.fechaInicio}">
+                            <f:convertDateTime pattern="MM-dd-yyyy"/>
+                        </h:outputText>
                     </p:column>
 
-                    <p:column headerText="Fecha final">
-                        <h:outputText value="#{licitacion.fechaFinal}"/>
+                    <p:column headerText="Fecha final" width="90">
+                        <h:outputText value="#{licitacion.fechaFinal}">
+                            <f:convertDateTime pattern="MM-dd-yyyy"/>
+                        </h:outputText>
                     </p:column>
 
-                    <p:column headerText="Estatus">
+                    <p:column headerText="Estatus" width="60">
                         <h:outputText value="#{licitacion.estatusRegistro.label}"/>
                     </p:column>
 
@@ -233,16 +237,16 @@
                 <p:outputPanel id="dialogContent" styleClass="formgrid grid" rendered="#{licitacionView.licitacionSelected != null}">
 
                     <p:outputPanel styleClass="field col-12">
-                        <p:outputLabel for="@next" value="Nombre" styleClass="block"/>
+                        <p:outputLabel for="@next" value="Número licitación" styleClass="block "/>
                         <p:inputText styleClass="block w-full" required="true"
-                                     value="#{licitacionView.licitacionSelected.nombre}"/>
+                                     value="#{licitacionView.licitacionSelected.numeroLicitacion}"/>
                         <span class="text-sm hidden"> </span>
                     </p:outputPanel>
 
                     <p:outputPanel styleClass="field col-12">
-                        <p:outputLabel for="@next" value="Número licitación" styleClass="block"/>
+                        <p:outputLabel for="@next" value="Nombre" styleClass="block w-full"/>
                         <p:inputText styleClass="block w-full" required="true"
-                                         value="#{licitacionView.licitacionSelected.numeroLicitacion}"/>
+                                     value="#{licitacionView.licitacionSelected.nombre}"/>
                         <span class="text-sm hidden"> </span>
                     </p:outputPanel>
 
@@ -255,15 +259,35 @@
 
                     <p:outputPanel styleClass="field col-12">
                         <p:outputLabel styleClass="mr-2" value="Fecha inicio "/>
-                        <p:calendar value="#{licitacionView.licitacionSelected.fechaInicio}"/>
+                        <p:calendar value="#{licitacionView.licitacionSelected.fechaInicio}" id="id_calendar1"
+                                    inputStyleClass="w-full"
+                                    pattern="MM-dd-yyyy" locale="es">
+                            <p:ajax
+                                    event="change"
+                                    update="@form"/>
+                        </p:calendar>
                     </p:outputPanel>
 
                     <p:outputPanel styleClass="field col-12">
                         <p:outputLabel styleClass="mr-2"  value="Fecha final "/>
-                        <p:calendar  value="#{licitacionView.licitacionSelected.fechaFinal}" />
+                        <p:calendar  id="id_calendar2" value="#{licitacionView.licitacionSelected.fechaFinal}"
+                                     inputStyleClass="w-full"
+                                     pattern="MM-dd-yyyy" locale="es">
+<!--                            <f:validator-->
+<!--                                    validatorId="calendarValidator" />-->
+<!--                            <p:ajax-->
+<!--                                    event="change"-->
+<!--                                    update="id_message id_calendar2"/>-->
+                        </p:calendar>
                     </p:outputPanel>
 
-                    <p:fileUpload value="#{licitacionView.file}" mode="simple" skinSimple="true"/>
+                    <p:fileUpload value="#{licitacionView.file}" mode="simple" label="Elegir archivo"
+                                  allowTypes="/(\.|\/)(pdf)$/" accept=".pdf"
+                                  skinSimple="true"/>
+
+                    <p:message
+                            id="id_message"
+                            for="id_calendar2" />
 
                 </p:outputPanel>
 

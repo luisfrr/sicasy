@@ -139,7 +139,7 @@ public class AseguradoraView {
             FacesContext.getCurrentInstance().addMessage(null, msg);
         }else {
             FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_INFO,
-                    "Aviso", "Se ha eliminado exitósamente la información");
+                    "Aviso", "Se ha eliminado exitosamente la información");
             FacesContext.getCurrentInstance().addMessage(null, msg);
             this.aseguradoraSelected.setBorradoPor(userSessionBean.getUserName());
             aseguradoraService.delete(this.aseguradoraSelected);
