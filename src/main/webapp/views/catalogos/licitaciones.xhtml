@@ -120,13 +120,13 @@
 
                     <p:column headerText="Fecha inicio" width="90">
                         <h:outputText value="#{licitacion.fechaInicio}">
-                            <f:convertDateTime pattern="MM-dd-yyyy"/>
+                            <f:convertDateTime pattern="dd-MM-yyyy"/>
                         </h:outputText>
                     </p:column>
 
                     <p:column headerText="Fecha final" width="90">
                         <h:outputText value="#{licitacion.fechaFinal}">
-                            <f:convertDateTime pattern="MM-dd-yyyy"/>
+                            <f:convertDateTime pattern="dd-MM-yyyy"/>
                         </h:outputText>
                     </p:column>
 
@@ -261,7 +261,7 @@
                         <p:outputLabel styleClass="mr-2" value="Fecha inicio "/>
                         <p:calendar value="#{licitacionView.licitacionSelected.fechaInicio}" id="id_calendar1"
                                     inputStyleClass="w-full"
-                                    pattern="MM-dd-yyyy" locale="es">
+                                    pattern="dd-MM-yyyy" locale="es">
                             <p:ajax
                                     event="change"
                                     update="@form"/>
@@ -272,7 +272,7 @@
                         <p:outputLabel styleClass="mr-2"  value="Fecha final "/>
                         <p:calendar  id="id_calendar2" value="#{licitacionView.licitacionSelected.fechaFinal}"
                                      inputStyleClass="w-full"
-                                     pattern="MM-dd-yyyy" locale="es">
+                                     pattern="dd-MM-yyyy" locale="es">
 <!--                            <f:validator-->
 <!--                                    validatorId="calendarValidator" />-->
 <!--                            <p:ajax-->

@@ -121,14 +121,14 @@
 
                     <p:column headerText="Fecha inicio" width="90">
                         <h:outputText value="#{anexo.fechaInicio}">
-                            <f:convertDateTime pattern="MM-dd-yyyy" />
+                            <f:convertDateTime pattern="dd-MM-yyyy" />
                         </h:outputText>
                     </p:column>
 
                     <p:column headerText="Fecha final" width="110">
                         <p:outputPanel styleClass="flex flex-row gap-1">
                             <h:outputText value="#{anexo.fechaFinal}">
-                                <f:convertDateTime pattern="MM-dd-yyyy"/>
+                                <f:convertDateTime pattern="dd-MM-yyyy"/>
                             </h:outputText>
                             <p:badge severity="danger" rendered="#{anexo.getIsExpirationDateFechaFinal()}">
                                 <i class="pi pi-bell "/>
@@ -138,7 +138,7 @@
 
                     <p:column headerText="Fecha firma" width="90">
                         <h:outputText value="#{anexo.fechaFirma}">
-                            <f:convertDateTime pattern="MM-dd-yyyy"/>
+                            <f:convertDateTime pattern="dd-MM-yyyy"/>
                         </h:outputText>
                     </p:column>
 
