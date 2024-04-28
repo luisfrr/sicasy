@@ -263,31 +263,35 @@
                                     inputStyleClass="w-full"
                                     pattern="dd-MM-yyyy" locale="es">
                             <p:ajax
-                                    event="change"
-                                    update="@form"/>
+                                    event="dateSelect" listener="#{licitacionView.validateFechaInicioFinal}"
+                                    update=":form_dialog:id_message2 :form_dialog:id_calendar2"/>
                         </p:calendar>
+                        <p:message
+                                id="id_message2"
+                                for="id_calendar1" />
                     </p:outputPanel>
 
                     <p:outputPanel styleClass="field col-12">
                         <p:outputLabel styleClass="mr-2"  value="Fecha final "/>
                         <p:calendar  id="id_calendar2" value="#{licitacionView.licitacionSelected.fechaFinal}"
-                                     inputStyleClass="w-full"
+                                     inputStyleClass="w-full" disabled="#{licitacionView.licitacionSelected.fechaInicio == null}"
                                      pattern="dd-MM-yyyy" locale="es">
 <!--                            <f:validator-->
 <!--                                    validatorId="calendarValidator" />-->
-<!--                            <p:ajax-->
-<!--                                    event="change"-->
-<!--                                    update="id_message id_calendar2"/>-->
+                            <p:ajax
+                                    event="dateSelect" listener="#{licitacionView.validateFechaInicioFinal}"
+                                    update=":form_dialog:id_message "/>
                         </p:calendar>
+                        <p:message
+                                id="id_message"
+                                for="id_calendar2" />
                     </p:outputPanel>
 
                     <p:fileUpload value="#{licitacionView.file}" mode="simple" label="Elegir archivo"
                                   allowTypes="/(\.|\/)(pdf)$/" accept=".pdf"
                                   skinSimple="true"/>
 
-                    <p:message
-                            id="id_message"
-                            for="id_calendar2" />
+
 
                 </p:outputPanel>
 
@@ -295,9 +299,9 @@
 
                     <p:commandButton value="Cancelar" onclick="PF('formDialog').hide()"
                                      class="ui-button-outlined"/>
-                    <p:commandButton value="Guardar"
+                    <p:commandButton value="Guardar" id="bnt_saveLicitacion"
                                      action="#{licitacionView.guardarLicitacion()}"
-                                     ajax="true" process="@form"
+                                     ajax="true" process="@form" disabled="#{!licitacionView.fechaFinalValida}"
                                      update="growl form_datatable"
                                      validateClient="true"/>
                 </f:facet>

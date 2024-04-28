@@ -9,7 +9,6 @@ import gob.yucatan.sicasy.business.exceptions.BadRequestException;
 import gob.yucatan.sicasy.business.exceptions.NotFoundException;
 import gob.yucatan.sicasy.services.iface.IAnexoService;
 import gob.yucatan.sicasy.services.iface.ILicitacionService;
-import gob.yucatan.sicasy.utils.date.DateFormatUtil;
 import gob.yucatan.sicasy.utils.export.ExportFile;
 import gob.yucatan.sicasy.utils.export.csv.models.CsvData;
 import gob.yucatan.sicasy.utils.export.csv.models.CsvField;
@@ -20,11 +19,7 @@ import gob.yucatan.sicasy.utils.imports.excel.SaveFile;
 import gob.yucatan.sicasy.views.beans.UserSessionBean;
 import jakarta.annotation.PostConstruct;
 import jakarta.faces.application.FacesMessage;
-import jakarta.faces.component.UIComponent;
 import jakarta.faces.context.FacesContext;
-import jakarta.faces.validator.FacesValidator;
-import jakarta.faces.validator.Validator;
-import jakarta.faces.validator.ValidatorException;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -34,14 +29,12 @@ import org.apache.poi.ss.usermodel.VerticalAlignment;
 import org.apache.poi.xssf.usermodel.XSSFCellStyle;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.primefaces.PrimeFaces;
+import org.primefaces.event.SelectEvent;
 import org.primefaces.model.file.UploadedFile;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.*;
 import java.util.*;
 
 @Component
@@ -53,6 +46,7 @@ public class LicitacionView {
 
     private @Getter String title;
     private @Getter String titleDialog;
+    private @Getter Boolean fechaFinalValida;
     private @Getter Licitacion licitacionSelected;
     private @Getter Licitacion licitacionFilter;
     private @Getter List<Licitacion> licitacionList;
@@ -72,6 +66,7 @@ public class LicitacionView {
         this.title = "Licitaciones";
 
         this.licitacionSelected = null;
+        this.fechaFinalValida = true;
         this.estatusRegistros = EstatusRegistro.values();
         this.limpiarFiltros();
 
@@ -245,6 +240,25 @@ public class LicitacionView {
 
         }else
             return null;
+
+    }
+
+    public void validateFechaInicioFinal(SelectEvent event){
+        log.info("validando fecha final" );
+
+        if (this.licitacionSelected.getFechaInicio() != null && this.licitacionSelected.getFechaFinal() != null){
+
+            if (this.licitacionSelected.getFechaInicio().after(this.licitacionSelected.getFechaFinal())){
+                // la fecha inicio no puede estar dspues de la fecha final
+                this.fechaFinalValida = false;
+                FacesContext.getCurrentInstance().addMessage(event.getComponent().getClientId(),
+                        new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Fecha final inválida."));
+            }else
+                fechaFinalValida = true;
+
+        }
+
+        PrimeFaces.current().ajax().update("form_dialog:bnt_saveLicitacion ");
 
     }
 
