@@ -122,6 +122,17 @@ public class Vehiculo implements Cloneable, Serializable {
     @Column(name = "borrado_por")
     private String borradoPor;
 
+
+    @Transient
+    private Integer condicionId;
+
+    @Transient
+    private String numLicitacion;
+
+    @Transient
+    private String anexoValue;
+
+
     @Override
     public Vehiculo clone() {
         try {

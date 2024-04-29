@@ -43,6 +43,11 @@
                             </sec:authorize>
                         </p:toolbarGroup>
                         <p:toolbarGroup align="right">
+                            <p:commandButton value="Descargar Layout de Vehículos"
+                                             ajax="false" onclick="PrimeFaces.monitorDownload(start, stop);"
+                                             icon="fi fi-rr-download" styleClass="ui-button-flat">
+                                <p:fileDownload value="#{fileDownloadBean.downloadFileByPath(vehiculoView.LAYOUT_VEHICULOS)}"/>
+                            </p:commandButton>
                         </p:toolbarGroup>
                     </p:toolbar>
                 </sec:authorize>
@@ -505,26 +510,30 @@
                                 <span class="text-sm hidden"> </span>
                             </p:outputPanel>
 
-                            <p:outputPanel styleClass="field col-12 mb-4">
+                            <p:outputPanel styleClass="field col-12 mb-5">
                                 <p:outputLabel for="@next" value="Importar layout" styleClass="block"/>
                                 <p:inputTextarea id="dropZoneLayout" widgetVar="dropZoneLayout"
                                                  styleClass="w-full" rows="5" required="true"
-                                                 value="#{homeView.dropZoneText}"/>
+                                                 value="#{vehiculoView.layoutFileUpload}"/>
                                 <span class="text-sm">
-                                    <p:link value="O haz clic aquí para elegir" onclick="PF('uploadLayout').show();return false" style="font-size:inherit"/>
+                                    <p:link value="O haz clic aquí para elegir" onclick="PF('uploadLayout').show();return false"/>
                                 </span>
-                                <p:fileUpload widgetVar="uploadLayout" listener="#{homeView.handleFileUpload}"
+                                <p:fileUpload widgetVar="uploadLayout" listener="#{vehiculoView.importarLayout}"
                                               fileLimit="1" fileLimitMessage="Solo se permite subir un archivo"
                                               sizeLimit="50000000" allowTypes="/(\.|\/)(xlsx|)$/" dropZone="dropZoneLayout"
                                               update="growl" style="display: none"/>
                             </p:outputPanel>
 
-                            <p:outputPanel styleClass="col-12 mb-5">
-                                <p:commandLink ajax="false" onclick="PrimeFaces.monitorDownload(start, stop);">
-                                    <i class="fi fi-rr-download mr-3"/>
-                                    <span>Descargar Layout de Importación de Vehículos</span>
-                                    <p:fileDownload value="#{fileDownloadBean.downloadFile(vehiculoView.layoutVehiculo)}"/>
-                                </p:commandLink>
+                            <p:outputPanel styleClass="field col-12 mt-5 mb-0">
+                                <p:outputPanel styleClass="flex justify-content-end">
+                                    <p:commandButton value="Cancelar" ajax="true" process="@this"
+                                                     action="#{vehiculoView.cerrarModalRegistroVehiculo()}"
+                                                     styleClass="ui-button-outlined mr-4"/>
+                                    <p:commandButton value="Guardar" ajax="true" process="@form"
+                                                     action="#{vehiculoView.guardarImportacionVehiculo()}"
+                                                     update="growl @form form_datatable"
+                                                     validateClient="true"/>
+                                </p:outputPanel>
                             </p:outputPanel>
 
                         </h:form>
