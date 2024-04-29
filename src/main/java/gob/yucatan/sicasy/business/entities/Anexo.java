@@ -15,7 +15,7 @@ import java.util.Date;
 @Getter
 @Setter
 @Builder
-public class Anexo {
+public class Anexo implements Cloneable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -86,4 +86,14 @@ public class Anexo {
         return licitacion.getNumeroLicitacion();
     }
 
+    @Override
+    public Anexo clone() {
+        try {
+            Anexo clone = (Anexo) super.clone();
+            clone.licitacion = this.licitacion.clone();
+            return clone;
+        } catch (CloneNotSupportedException e) {
+            throw new AssertionError();
+        }
+    }
 }

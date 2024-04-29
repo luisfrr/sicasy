@@ -3,6 +3,7 @@ package gob.yucatan.sicasy.utils.imports.excel;
 import gob.yucatan.sicasy.utils.export.ExportFile;
 import lombok.Getter;
 import org.primefaces.model.DefaultStreamedContent;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.annotation.RequestScope;
 
@@ -10,7 +11,7 @@ import java.io.ByteArrayInputStream;
 import java.io.Serializable;
 
 @Component
-@RequestScope
+@Scope("request")
 @Getter
 public class FileDownloadBean implements Serializable {
 
