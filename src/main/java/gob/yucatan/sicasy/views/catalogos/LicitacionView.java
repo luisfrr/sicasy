@@ -304,7 +304,7 @@ public class LicitacionView {
             InputStream input = new FileInputStream(fi);
             ExternalContext externalContext = FacesContext.getCurrentInstance().getExternalContext();
             downloadedLicitacionFile = DefaultStreamedContent.builder()
-                    .name(URLEncoder.encode(fi.getName(), StandardCharsets.UTF_8))
+                    .name(fi.getName())
                     .contentType(externalContext.getMimeType(fi.getName()))
                     .stream( () -> input )
                     .build();

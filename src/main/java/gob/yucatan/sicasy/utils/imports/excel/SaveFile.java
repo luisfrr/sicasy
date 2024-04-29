@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
+import java.text.Normalizer;
 
 @Slf4j
 public class SaveFile {
@@ -26,7 +27,9 @@ public class SaveFile {
         }
 
         log.info("guardando archivo en {}{}", path, fileName);
-        File file = new File(System.getProperty("user.home")+path+fileName);
+        File file = new File(System.getProperty("user.home")+path+
+                Normalizer.normalize(fileName, Normalizer.Form.NFKD)
+                .replaceAll("[^\\p{ASCII}]", ""));
         return Files.write(file.toPath(), content).toString();
     }
 
