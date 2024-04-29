@@ -9,7 +9,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.primefaces.model.DefaultStreamedContent;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-import org.springframework.web.context.annotation.RequestScope;
 
 import java.io.*;
 
