@@ -34,8 +34,8 @@ public class Vehiculo implements Cloneable, Serializable {
     @Column(name = "modelo", nullable = false)
     private String modelo;
 
-    @Column(name = "tipo_vehiculo")
-    private String tipoVehiculo;
+    @Column(name = "anio", nullable = false)
+    private Integer anio;
 
     @Column(name = "no_motor", nullable = false)
     private String noMotor;

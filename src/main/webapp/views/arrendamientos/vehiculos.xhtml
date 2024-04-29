@@ -34,7 +34,7 @@
                                 <p:commandButton id="btn_acciones_vehiculos" type="button" value="Acciones"
                                                  iconPos="right" icon="fi fi-rr-angle-small-down"/>
                                 <p:menu overlay="true" trigger="btn_acciones_vehiculos" my="left top" at="left bottom">
-                                    <p:menuitem value="Registrar nuevos vehículos"/>
+                                    <p:menuitem value="Registrar nuevos vehículos" ajax="true" action="#{vehiculoView.abrirModalRegistroVehiculo()}"/>
                                     <p:menuitem value="Solicitar autorización"/>
                                     <p:menuitem value="Autorizar solicitud"/>
                                     <p:menuitem value="Rechazar solicitud"/>
@@ -123,10 +123,10 @@
 
                         <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4 xl:col-3">
                             <p:outputLabel for="@next" value="Tipo" styleClass="block"/>
-                            <p:selectOneMenu value="#{vehiculoView.vehiculoFilter.tipoVehiculo}" styleClass="w-full mw-auto">
+                            <p:selectOneMenu value="#{vehiculoView.vehiculoFilter.anio}" styleClass="w-full mw-auto">
                                 <f:selectItem itemLabel="Todos" itemValue="#{null}"/>
-                                <f:selectItems value="#{vehiculoView.tipoVehiculoList}" var="tipoVehiculo"
-                                               itemValue="#{tipoVehiculo}" itemLabel="#{tipoVehiculo}"/>
+                                <f:selectItems value="#{vehiculoView.anioList}" var="anio"
+                                               itemValue="#{anio}" itemLabel="#{anio}"/>
                             </p:selectOneMenu>
                             <span class="text-sm hidden"> </span>
                         </p:outputPanel>
@@ -184,7 +184,7 @@
                     </p:column>
 
                     <p:column headerText="Tipo" width="150">
-                        <h:outputText value="#{vehiculo.tipoVehiculo}"/>
+                        <h:outputText value="#{vehiculo.anio}"/>
                     </p:column>
 
                     <p:column headerText="Color" width="100">
@@ -299,8 +299,245 @@
 
             </h:form>
 
-
         </p:outputPanel>
+
+        <p:dialog header="Registrar nuevos vehículos"
+                  id="registrar-vehiculo-dialog" widgetVar="registrarVehiculoDialog"
+                  height="450" width="800"
+                  showEffect="fade" modal="true"
+                  closable="true" closeOnEscape="true"
+                  cache="false" responsive="true">
+
+            <p:outputPanel id="registrar-vehiculo-dialog-content" styleClass="formgrid grid">
+
+                <p:tabView id="tab-view" rendered="#{vehiculoView.showNuevoFormDialog}">
+                    <p:tab id="registro-individual" title="Registro individual">
+
+                        <h:form id="individual-form" styleClass="formgrid grid">
+
+                            <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4">
+                                <p:outputLabel for="@next" value="Dependencia" styleClass="block"/>
+                                <p:selectOneMenu value="#{vehiculoView.vehiculoSelected.dependencia.idDependencia}"
+                                                 styleClass="w-full mw-auto" required="true">
+                                    <f:selectItem itemLabel="Seleccione uno..." itemValue="#{null}"/>
+                                    <f:selectItems value="#{vehiculoView.dependenciaList}" var="dependencia"
+                                                   itemValue="#{dependencia.idDependencia}" itemLabel="#{dependencia.abreviatura} - #{dependencia.nombre}"/>
+                                </p:selectOneMenu>
+                                <span class="text-sm hidden"> </span>
+                            </p:outputPanel>
+
+                            <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4">
+                                <p:outputLabel for="@next" value="No. Serie" styleClass="block"/>
+                                <p:inputText styleClass="block w-full" required="true"
+                                             value="#{vehiculoView.vehiculoSelected.noSerie}"/>
+                                <span class="text-sm hidden"> </span>
+                            </p:outputPanel>
+
+                            <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4">
+                                <p:outputLabel for="@next" value="Placa" styleClass="block"/>
+                                <p:inputText styleClass="block w-full" required="true"
+                                             value="#{vehiculoView.vehiculoSelected.placa}"/>
+                                <span class="text-sm hidden"> </span>
+                            </p:outputPanel>
+
+                            <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4">
+                                <p:outputLabel for="@next" value="Marca" styleClass="block"/>
+                                <p:inputText styleClass="block w-full" required="true"
+                                             placeholder="Ej. Nissan"
+                                             value="#{vehiculoView.vehiculoSelected.marca}"/>
+                                <span class="text-sm hidden"> </span>
+                            </p:outputPanel>
+
+                            <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4">
+                                <p:outputLabel for="@next" value="Modelo" styleClass="block"/>
+                                <p:inputText styleClass="block w-full" required="true"
+                                             placeholder="Ej. Altima"
+                                             value="#{vehiculoView.vehiculoSelected.modelo}"/>
+                                <span class="text-sm hidden"> </span>
+                            </p:outputPanel>
+
+                            <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4">
+                                <p:outputLabel for="@next" value="Año" styleClass="block"/>
+                                <p:inputNumber styleClass="block w-full" required="true"
+                                             placeholder="Ej. 2022"
+                                             value="#{vehiculoView.vehiculoSelected.anio}"/>
+                                <span class="text-sm hidden"> </span>
+                            </p:outputPanel>
+
+                            <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4">
+                                <p:outputLabel for="@next" value="No. Motor" styleClass="block"/>
+                                <p:inputText styleClass="block w-full" required="true"
+                                               value="#{vehiculoView.vehiculoSelected.noMotor}"/>
+                                <span class="text-sm hidden"> </span>
+                            </p:outputPanel>
+
+                            <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4">
+                                <p:outputLabel for="@next" value="Color" styleClass="block"/>
+                                <p:inputText styleClass="block w-full" required="true"
+                                               placeholder="Ej. Rojo"
+                                               value="#{vehiculoView.vehiculoSelected.noMotor}"/>
+                                <span class="text-sm hidden"> </span>
+                            </p:outputPanel>
+
+                            <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4">
+                                <p:outputLabel for="@next" value="Condición" styleClass="block"/>
+                                <p:selectOneMenu value="#{vehiculoView.vehiculoSelected.condicionVehiculo.idCondicionVehiculo}"
+                                                 styleClass="w-full mw-auto" required="true">
+                                    <f:selectItem itemLabel="Seleccione uno..." itemValue="#{null}"/>
+                                    <f:selectItems value="#{vehiculoView.condicionVehiculoList}" var="condicionVehiculo"
+                                                   itemValue="#{condicionVehiculo.idCondicionVehiculo}" itemLabel="#{condicionVehiculo.nombre}"/>
+                                </p:selectOneMenu>
+                                <span class="text-sm hidden"> </span>
+                            </p:outputPanel>
+
+                            <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4">
+                                <p:outputLabel for="@next" value="No. Factura" styleClass="block"/>
+                                <p:inputText styleClass="block w-full" required="true"
+                                             value="#{vehiculoView.vehiculoSelected.noFactura}"/>
+                                <span class="text-sm hidden"> </span>
+                            </p:outputPanel>
+
+                            <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4">
+                                <p:outputLabel for="@next" value="Valor factura" styleClass="block"/>
+                                <p:inputNumber styleClass="block w-full" required="true"
+                                             value="#{vehiculoView.vehiculoSelected.montoFactura}"/>
+                                <span class="text-sm hidden"> </span>
+                            </p:outputPanel>
+
+                            <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4">
+                                <p:outputLabel for="@next" value="Renta mensual" styleClass="block"/>
+                                <p:inputNumber styleClass="block w-full" required="true"
+                                               value="#{vehiculoView.vehiculoSelected.rentaMensual}"/>
+                                <span class="text-sm hidden"> </span>
+                            </p:outputPanel>
+
+                            <p:outputPanel styleClass="field col-12">
+                                <p:outputLabel for="@next" value="Descripción" styleClass="block"/>
+                                <p:inputTextarea styleClass="block w-full" rows="2"  autoResize="true"
+                                             value="#{vehiculoView.vehiculoSelected.descripcionVehiculo}"/>
+                                <span class="text-sm hidden"> </span>
+                            </p:outputPanel>
+
+                            <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4">
+                                <p:outputLabel for="@next" value="Licitación" styleClass="block"/>
+                                <p:selectOneMenu value="#{vehiculoView.vehiculoSelected.licitacion.idLicitacion}"
+                                                 styleClass="w-full mw-auto">
+                                    <f:selectItem itemLabel="Seleccione una..." itemValue="#{null}"/>
+                                    <f:selectItems value="#{vehiculoView.licitacionFormList}" var="licitacion"
+                                                   itemValue="#{licitacion.idLicitacion}" itemLabel="#{licitacion.numeroLicitacion}"/>
+                                    <p:ajax event="change" listener="#{vehiculoView.onChangeLicitacionForm()}" update="registrar-vehiculo-dialog-content"/>
+                                </p:selectOneMenu>
+                                <span class="text-sm hidden"> </span>
+                            </p:outputPanel>
+
+                            <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4">
+                                <p:outputLabel for="@next" value="Anexo" styleClass="block"/>
+                                <p:selectOneMenu value="#{vehiculoView.vehiculoSelected.anexo.idAnexo}"
+                                                 styleClass="w-full mw-auto">
+                                    <f:selectItem itemLabel="Seleccione una..." itemValue="#{null}"/>
+                                    <f:selectItems value="#{vehiculoView.anexoFormList}" var="anexo"
+                                                   itemValue="#{anexo.idAnexo}" itemLabel="#{anexo.nombre}"/>
+                                </p:selectOneMenu>
+                                <span class="text-sm hidden"> </span>
+                            </p:outputPanel>
+
+                            <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4">
+                                <p:outputLabel for="@next" value="Dependencia asignada" styleClass="block"/>
+                                <p:selectOneMenu value="#{vehiculoView.vehiculoSelected.dependenciaAsignada.idDependencia}"
+                                                 styleClass="w-full mw-auto">
+                                    <f:selectItem itemLabel="Seleccione una..." itemValue="#{null}"/>
+                                    <f:selectItems value="#{vehiculoView.dependenciaList}" var="dependencia"
+                                                   itemValue="#{dependencia.idDependencia}" itemLabel="#{dependencia.abreviatura} - #{dependencia.nombre}"/>
+                                </p:selectOneMenu>
+                                <span class="text-sm hidden"> </span>
+                            </p:outputPanel>
+
+                            <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4">
+                                <p:outputLabel for="@next" value="Reguardante" styleClass="block"/>
+                                <p:inputText styleClass="block w-full"
+                                             value="#{vehiculoView.vehiculoSelected.resguardante}"/>
+                                <span class="text-sm hidden"> </span>
+                            </p:outputPanel>
+
+                            <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4">
+                                <p:outputLabel for="@next" value="Área reguardante" styleClass="block"/>
+                                <p:inputText styleClass="block w-full"
+                                             value="#{vehiculoView.vehiculoSelected.areaResguardante}"/>
+                                <span class="text-sm hidden"> </span>
+                            </p:outputPanel>
+
+                            <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4">
+                                <p:outputLabel for="@next" value="Proveedor" styleClass="block"/>
+                                <p:inputText styleClass="block w-full"
+                                             value="#{vehiculoView.vehiculoSelected.proveedor}"/>
+                                <span class="text-sm hidden"> </span>
+                            </p:outputPanel>
+
+                            <p:outputPanel styleClass="field col-12 mt-5 mb-0">
+
+                                <p:outputPanel styleClass="flex justify-content-end">
+                                    <p:commandButton value="Cancelar" ajax="true" process="@this"
+                                                     action="#{vehiculoView.cerrarModalRegistroVehiculo()}"
+                                                     styleClass="ui-button-outlined mr-4"/>
+                                    <p:commandButton value="Guardar" ajax="true" process="@form"
+                                                     action="#{vehiculoView.guardarNuevoVehiculo()}"
+                                                     update="growl @form form_datatable"
+                                                     validateClient="true"/>
+                                </p:outputPanel>
+
+                            </p:outputPanel>
+
+                        </h:form>
+
+                    </p:tab>
+                    <p:tab id="registro-layout" title="Importar layout">
+
+                        <h:form id="layout-form" styleClass="formgrid grid">
+
+                            <p:outputPanel styleClass="field col-12">
+                                <p:outputLabel for="@next" value="Dependencia" styleClass="block"/>
+                                <p:selectOneMenu value="#{vehiculoView.vehiculoSelected.dependencia.idDependencia}"
+                                                 styleClass="w-full mw-auto" required="true">
+                                    <f:selectItem itemLabel="Seleccione uno..." itemValue="#{null}"/>
+                                    <f:selectItems value="#{vehiculoView.dependenciaList}" var="dependencia"
+                                                   itemValue="#{dependencia.idDependencia}" itemLabel="#{dependencia.abreviatura} - #{dependencia.nombre}"/>
+                                </p:selectOneMenu>
+                                <span class="text-sm hidden"> </span>
+                            </p:outputPanel>
+
+                            <p:outputPanel styleClass="field col-12 mb-4">
+                                <p:outputLabel for="@next" value="Importar layout" styleClass="block"/>
+                                <p:inputTextarea id="dropZoneLayout" widgetVar="dropZoneLayout"
+                                                 styleClass="w-full" rows="5" required="true"
+                                                 value="#{homeView.dropZoneText}"/>
+                                <span class="text-sm">
+                                    <p:link value="O haz clic aquí para elegir" onclick="PF('uploadLayout').show();return false" style="font-size:inherit"/>
+                                </span>
+                                <p:fileUpload widgetVar="uploadLayout" listener="#{homeView.handleFileUpload}"
+                                              fileLimit="1" fileLimitMessage="Solo se permite subir un archivo"
+                                              sizeLimit="50000000" allowTypes="/(\.|\/)(xlsx|)$/" dropZone="dropZoneLayout"
+                                              update="growl" style="display: none"/>
+                            </p:outputPanel>
+
+                            <p:outputPanel styleClass="col-12 mb-5">
+                                <p:commandLink ajax="false" onclick="PrimeFaces.monitorDownload(start, stop);">
+                                    <i class="fi fi-rr-download mr-3"/>
+                                    <span>Descargar Layout de Importación de Vehículos</span>
+                                    <p:fileDownload value="#{fileDownloadBean.downloadFile(vehiculoView.layoutVehiculo)}"/>
+                                </p:commandLink>
+                            </p:outputPanel>
+
+                        </h:form>
+
+                    </p:tab>
+                </p:tabView>
+
+
+
+            </p:outputPanel>
+        </p:dialog>
+        
+        
 
     </p:outputPanel>
 

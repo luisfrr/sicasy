@@ -68,10 +68,10 @@ public class VehiculoServiceImpl implements IVehiculoService {
                     vehiculo.getModelo(),
                     Vehiculo_.MODELO));
 
-        if(vehiculo.getTipoVehiculo() != null && !vehiculo.getTipoVehiculo().isEmpty())
+        if(vehiculo.getAnio() != null)
             specification.add(new SearchCriteria(SearchOperation.EQUAL,
-                    vehiculo.getTipoVehiculo(),
-                    Vehiculo_.TIPO_VEHICULO));
+                    vehiculo.getAnio(),
+                    Vehiculo_.ANIO));
 
         if(vehiculo.getNoSerie() != null && !vehiculo.getNoSerie().isEmpty())
             specification.add(new SearchCriteria(SearchOperation.EQUAL,
@@ -84,6 +84,26 @@ public class VehiculoServiceImpl implements IVehiculoService {
                     Vehiculo_.ESTATUS_REGISTRO));
 
         return vehiculoRepository.findAll(specification);
+    }
+
+    @Override
+    public List<Vehiculo> findAllByNoSerie(List<String> noSerieList) {
+        return vehiculoRepository.findVehiculosActivosByNoSerie(noSerieList);
+    }
+
+    @Override
+    public List<String> findDistinctMarcas() {
+        return vehiculoRepository.findDistinctMarcasByEstatusActivo();
+    }
+
+    @Override
+    public List<String> findDistinctModelo(String marca) {
+        return vehiculoRepository.findDistinctModeloByEstatusActivo(marca);
+    }
+
+    @Override
+    public List<Integer> findDistinctAnio(String marca, String modelo) {
+        return vehiculoRepository.findDistinctAnioByEstatusActivo(marca, modelo);
     }
 
     @Override
