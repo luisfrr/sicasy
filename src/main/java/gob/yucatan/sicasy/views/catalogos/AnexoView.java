@@ -105,7 +105,7 @@ public class AnexoView implements Serializable {
                     this.anexoSelected.setFechaModificacion(new Date());
 
                     if (anexoFile != null){
-                        String pathfile = SaveFile.saveFileToPath(anexoFile.getContent(), anexoFile.getFileName(), "C:\\Users\\Aeolos\\Downloads\\");
+                        String pathfile = SaveFile.saveFileToPath(anexoFile.getContent(), anexoFile.getFileName(), "\\Downloads\\");
                         anexoSelected.setRutaArchivo(pathfile);
                     }
 
@@ -124,7 +124,7 @@ public class AnexoView implements Serializable {
                         this.anexoSelected.setCreadoPor(userSessionBean.getUserName());
                         this.anexoSelected.setFechaCreacion(new Date());
                         if (anexoFile != null){
-                            String pathfile = SaveFile.saveFileToPath(anexoFile.getContent(), anexoFile.getFileName(), "C:\\Users\\Aeolos\\Downloads\\");
+                            String pathfile = SaveFile.saveFileToPath(anexoFile.getContent(), anexoFile.getFileName(), "\\Downloads\\");
                             anexoSelected.setRutaArchivo(pathfile);
                         }
                         anexoService.save(anexoSelected);

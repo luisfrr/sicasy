@@ -37,6 +37,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 @Component
@@ -106,7 +108,7 @@ public class LicitacionView {
                     this.licitacionSelected.setFechaModificacion(new Date());
 
                     if (file != null){
-                        String pathfile = SaveFile.saveFileToPath(file.getContent(), file.getFileName(), "C:\\Users\\Aeolos\\Downloads\\");
+                        String pathfile = SaveFile.saveFileToPath(file.getContent(), file.getFileName(), "\\Downloads\\");
                         licitacionSelected.setRutaArchivo(pathfile);
                     }
 
@@ -127,7 +129,7 @@ public class LicitacionView {
                         this.licitacionSelected.setFechaCreacion(new Date());
 
                         if (file != null){
-                            String pathfile = SaveFile.saveFileToPath(file.getContent(), file.getFileName(), "C:\\Users\\Aeolos\\Downloads\\");
+                            String pathfile = SaveFile.saveFileToPath(file.getContent(), file.getFileName(), "\\Downloads\\");
                             licitacionSelected.setRutaArchivo(pathfile);
                         }
 
@@ -302,7 +304,7 @@ public class LicitacionView {
             InputStream input = new FileInputStream(fi);
             ExternalContext externalContext = FacesContext.getCurrentInstance().getExternalContext();
             downloadedLicitacionFile = DefaultStreamedContent.builder()
-                    .name(fi.getName())
+                    .name(URLEncoder.encode(fi.getName(), StandardCharsets.UTF_8))
                     .contentType(externalContext.getMimeType(fi.getName()))
                     .stream( () -> input )
                     .build();

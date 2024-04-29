@@ -26,7 +26,7 @@ public class SaveFile {
         }
 
         log.info("guardando archivo en {}{}", path, fileName);
-        File file = new File(path+fileName);
+        File file = new File(System.getProperty("user.home")+path+fileName);
         return Files.write(file.toPath(), content).toString();
     }
 
