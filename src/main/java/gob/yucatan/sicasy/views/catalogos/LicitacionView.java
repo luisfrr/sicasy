@@ -10,15 +10,13 @@ import gob.yucatan.sicasy.business.exceptions.NotFoundException;
 import gob.yucatan.sicasy.services.iface.IAnexoService;
 import gob.yucatan.sicasy.services.iface.ILicitacionService;
 import gob.yucatan.sicasy.utils.export.ExportFile;
-import gob.yucatan.sicasy.utils.export.csv.models.CsvData;
-import gob.yucatan.sicasy.utils.export.csv.models.CsvField;
-import gob.yucatan.sicasy.utils.export.csv.service.iface.IGeneratorCSVFile;
 import gob.yucatan.sicasy.utils.export.excel.models.*;
 import gob.yucatan.sicasy.utils.export.excel.services.iface.IGeneratorExcelFile;
 import gob.yucatan.sicasy.utils.imports.excel.SaveFile;
 import gob.yucatan.sicasy.views.beans.UserSessionBean;
 import jakarta.annotation.PostConstruct;
 import jakarta.faces.application.FacesMessage;
+import jakarta.faces.context.ExternalContext;
 import jakarta.faces.context.FacesContext;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -30,11 +28,15 @@ import org.apache.poi.xssf.usermodel.XSSFCellStyle;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.primefaces.PrimeFaces;
 import org.primefaces.event.SelectEvent;
+import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.file.UploadedFile;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.*;
 
 @Component
@@ -52,11 +54,11 @@ public class LicitacionView {
     private @Getter List<Licitacion> licitacionList;
     private @Getter EstatusRegistro[] estatusRegistros;
     private @Getter @Setter UploadedFile file;
+    private @Getter @Setter DefaultStreamedContent downloadedLicitacionFile;
 
     private final ILicitacionService licitacionService;
     private final IAnexoService anexoService;
     private final UserSessionBean userSessionBean;
-    private final IGeneratorCSVFile generatorCSVFileService;
     private final IGeneratorExcelFile generatorExcelFile;
 
 
@@ -195,7 +197,7 @@ public class LicitacionView {
         }else {
 
             // revisar que no existan anexos activos con la licitacion vinculada je
-            List<Anexo> anexos = null;
+            List<Anexo> anexos;
             Licitacion licitacionFilter = new Licitacion();
             licitacionFilter.setEstatusRegistro(EstatusRegistro.ACTIVO);
             licitacionFilter.setIdLicitacion(this.licitacionSelected.getIdLicitacion());
@@ -219,27 +221,6 @@ public class LicitacionView {
         }
 
         PrimeFaces.current().executeScript("PF('confirmDialog').hide();");
-
-    }
-
-    public ExportFile exportFileCSV() throws IOException {
-        log.info("exportFileCSV");
-
-        if (this.licitacionList != null && !this.licitacionList.isEmpty()) {
-
-            List<CsvField> fields = List.of(CsvField.builder().fieldName("Licitacion").propertyExpression("nombre").build(),
-                    CsvField.builder().fieldName("num").propertyExpression("numeroLicitacion").build(),
-                    CsvField.builder().fieldName("Descripcion").propertyExpression("descripcion").build());
-
-            return generatorCSVFileService.createCsvFile(CsvData.builder()
-                            .data(this.licitacionList)
-                            .fields(fields)
-                            .filename("csvTEST.csv")
-                            .printHeaders(true)
-                    .build());
-
-        }else
-            return null;
 
     }
 
@@ -306,6 +287,31 @@ public class LicitacionView {
                 .build();
 
         return generatorExcelFile.createExcelFile(workbook, excelDataSheet);
+
+    }
+
+    public DefaultStreamedContent downloadLicitacionFile(String filePath) {
+        log.info("downloadAnexoFile anexo");
+        File fi = new File(filePath);
+        try {
+            if (!fi.exists()) {
+                FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                        "Error", "No se encontró el archivo.");
+                FacesContext.getCurrentInstance().addMessage(null, msg);
+            }
+            InputStream input = new FileInputStream(fi);
+            ExternalContext externalContext = FacesContext.getCurrentInstance().getExternalContext();
+            downloadedLicitacionFile = DefaultStreamedContent.builder()
+                    .name(fi.getName())
+                    .contentType(externalContext.getMimeType(fi.getName()))
+                    .stream( () -> input )
+                    .build();
+
+            return downloadedLicitacionFile;
+        }catch (Exception e) {
+            log.error(e.getMessage());
+            return null;
+        }
 
     }
 

@@ -6,8 +6,6 @@ import gob.yucatan.sicasy.utils.date.DateFormatUtil;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 
 @Entity
@@ -65,8 +63,6 @@ public class Licitacion {
 
     @Column(name = "borrado_por", insertable = false)
     private String borradoPor;
-
-
 
     public String fechaInicioString(){
         return DateFormatUtil.convertToFormat(fechaInicio, "dd-MM-yyyy");

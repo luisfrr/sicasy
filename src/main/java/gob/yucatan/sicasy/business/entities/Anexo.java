@@ -1,6 +1,7 @@
 package gob.yucatan.sicasy.business.entities;
 
 import gob.yucatan.sicasy.business.enums.EstatusRegistro;
+import gob.yucatan.sicasy.utils.date.DateFormatUtil;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
@@ -73,18 +74,15 @@ public class Anexo {
 
 
     public String fechaInicioString(){
-        DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd");
-        return dateFormat.format(fechaInicio);
+        return DateFormatUtil.convertToFormat(fechaInicio,"dd-MM-yyyy");
     }
 
     public String fechaFinalString(){
-        DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd");
-        return dateFormat.format(fechaFinal);
+        return DateFormatUtil.convertToFormat(fechaFinal,"dd-MM-yyyy");
     }
 
     public String fechaFirmaString(){
-        DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd");
-        return dateFormat.format(fechaFirma);
+        return DateFormatUtil.convertToFormat(fechaFirma, "dd-MM-yyyy");
     }
 
     public String numLicitacionString(){
@@ -92,17 +90,17 @@ public class Anexo {
     }
 
     public Boolean getIsExpirationDateFechaFinal(){
-        Instant instant = fechaFinal.toInstant();
 
-        // Replace JVM's timezone, ZoneId.systemDefault() with the applicable timezone
-        // e.g. ZoneId.of("Etc/UTC")
-        LocalDate date = instant.atZone(ZoneId.systemDefault()).toLocalDate();
-        LocalDate today = LocalDate.now(ZoneId.systemDefault());
+        if (fechaFinal != null){
+            Instant instant = fechaFinal.toInstant();
 
-        // return true si la fecha esta despues de la fecha de hoy menos 30 dias
-        if (date.isAfter(today.minusDays(30))) {
-            System.out.println("fecha final proxima rebasa los 10 dias de tolerancia");
-            return true;
+            // Replace JVM's timezone, ZoneId.systemDefault() with the applicable timezone
+            // e.g. ZoneId.of("Etc/UTC")
+            LocalDate date = instant.atZone(ZoneId.systemDefault()).toLocalDate();
+            LocalDate today = LocalDate.now(ZoneId.systemDefault());
+
+            // return true si la fecha esta despues de la fecha de hoy menos 30 dias
+            return date.isAfter(today.minusDays(30));
         }
 
         return false;

@@ -182,6 +182,11 @@
                                 <p:resetInput target="form_dialog:dialogContent"/>
                             </p:menuitem>
 
+                            <p:menuitem value="Descargar archivo" ajax="false" onclick="PrimeFaces.monitorDownload(start, stop);"
+                                        disabled="#{licitacion.rutaArchivo == null}" icon="fi-rr-download">
+                                <p:fileDownload value="#{licitacionView.downloadLicitacionFile(licitacion.rutaArchivo)}" />
+                            </p:menuitem>
+
                             <p:menuitem value="Eliminar" icon="fi fi-rr-trash"
                                         ajax="true" update="form_confirm_dialog"
                                         oncomplete="PF('confirmDialog').show()"
@@ -258,7 +263,7 @@
                     </p:outputPanel>
 
                     <p:outputPanel styleClass="field col-12">
-                        <p:outputLabel styleClass="mr-2" value="Fecha inicio "/>
+                        <p:outputLabel value="Fecha inicio " styleClass="block"/>
                         <p:calendar value="#{licitacionView.licitacionSelected.fechaInicio}" id="id_calendar1"
                                     inputStyleClass="w-full"
                                     pattern="dd-MM-yyyy" locale="es">
@@ -272,7 +277,7 @@
                     </p:outputPanel>
 
                     <p:outputPanel styleClass="field col-12">
-                        <p:outputLabel styleClass="mr-2"  value="Fecha final "/>
+                        <p:outputLabel  value="Fecha final " styleClass="block"/>
                         <p:calendar  id="id_calendar2" value="#{licitacionView.licitacionSelected.fechaFinal}"
                                      inputStyleClass="w-full" disabled="#{licitacionView.licitacionSelected.fechaInicio == null}"
                                      pattern="dd-MM-yyyy" locale="es">
@@ -291,14 +296,13 @@
                                   allowTypes="/(\.|\/)(pdf)$/" accept=".pdf"
                                   skinSimple="true"/>
 
-
-
                 </p:outputPanel>
 
                 <f:facet name="footer">
 
                     <p:commandButton value="Cancelar" onclick="PF('formDialog').hide()"
                                      class="ui-button-outlined"/>
+
                     <p:commandButton value="Guardar" id="bnt_saveLicitacion"
                                      action="#{licitacionView.guardarLicitacion()}"
                                      ajax="true" process="@form" disabled="#{!licitacionView.fechaFinalValida}"

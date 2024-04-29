@@ -14,6 +14,8 @@ public interface IAnexoService {
 
     List<Anexo> findByLicitacion(Licitacion licitacion);
 
+    List<Anexo> findByNombreAndLicitacion(String nombre, Licitacion licitacion);
+
     Optional<Anexo> findByNombre(String nombre);
 
     void save(Anexo anexo);

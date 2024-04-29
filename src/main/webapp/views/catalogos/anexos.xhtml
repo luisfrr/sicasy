@@ -58,6 +58,13 @@
                             <span class="text-sm hidden"> </span>
                         </p:outputPanel>
 
+                        <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4 xl:col-3">
+                            <p:outputLabel for="@next" value="Número de licitación" styleClass="block"/>
+                            <p:inputText styleClass="block w-full" placeholder="Ingresa un número..."
+                                         value="#{anexoView.anexoFilter.licitacion.numeroLicitacion}"/>
+                            <span class="text-sm hidden"> </span>
+                        </p:outputPanel>
+
                         <sec:authorize access="hasAuthority('ROLE_OWNER')">
                             <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4 xl:col-3">
                                 <p:outputLabel for="@next" value="Estatus" styleClass="block"/>
@@ -142,7 +149,7 @@
                         </h:outputText>
                     </p:column>
 
-                    <p:column headerText="Estatus">
+                    <p:column headerText="Estatus" width="60">
                         <h:outputText value="#{anexo.estatusRegistro.label}"/>
                     </p:column>
 
@@ -194,6 +201,11 @@
                                 <p:resetInput target="form_dialog:dialogContent"/>
                             </p:menuitem>
 
+                            <p:menuitem value="Descargar archivo" ajax="false" onclick="PrimeFaces.monitorDownload(start, stop);"
+                                        disabled="#{anexo.rutaArchivo == null}" icon="fi-rr-download">
+                                <p:fileDownload value="#{anexoView.downloadAnexoFile(anexo.rutaArchivo)}" />
+                            </p:menuitem>
+
                             <p:menuitem value="Eliminar" icon="fi fi-rr-trash"
                                         ajax="true" update="form_confirm_dialog"
                                         oncomplete="PF('confirmDialog').show()"
@@ -210,8 +222,6 @@
             </h:form>
 
         </p:outputPanel>
-
-
 
 
 
@@ -239,8 +249,7 @@
 
 
 
-
-        <h:form id="form_dialog">
+        <h:form id="form_dialog" enctype="multipart/form-data">
             <p:dialog header="#{anexoView.titleDialog}" widgetVar="formDialog"
                       minHeight="350" width="450"
                       showEffect="fade" modal="true"
@@ -256,10 +265,11 @@
                     </p:outputPanel>
 
                     <p:outputPanel styleClass="field col-12">
-                        <p:outputLabel for="@next" value="Licitación" styleClass="block"/>
+                        <p:outputLabel for="@next" value="Número licitación" styleClass="block"/>
                         <p:selectOneMenu  styleClass="block w-full" required="true"
                                           value="#{anexoView.anexoSelected.licitacion.idLicitacion}">
-                            <f:selectItems value="#{anexoView.licitacionesActivasList}" var="licitacion" itemLabel="#{licitacion.nombre}"
+                            <f:selectItem  itemValue="#{null}" itemLabel="Seleccione uno..."/>
+                            <f:selectItems value="#{anexoView.licitacionesActivasList}" var="licitacion" itemLabel="#{licitacion.numeroLicitacion}"
                                            itemValue="#{licitacion.idLicitacion}"/>
                         </p:selectOneMenu>
                         <span class="text-sm hidden"> </span>
@@ -273,30 +283,45 @@
                     </p:outputPanel>
 
                     <p:outputPanel styleClass="field col-12">
-                        <p:outputLabel styleClass="mr-2" value="Fecha inicio "/>
-                        <p:calendar value="#{anexoView.anexoSelected.fechaInicio}"/>
+                        <p:outputLabel for="@next" styleClass="block" value="Fecha inicio "/>
+                        <p:calendar value="#{anexoView.anexoSelected.fechaInicio}"
+                                    inputStyleClass="w-full"
+                                    pattern="dd-MM-yyyy" locale="es"/>
                     </p:outputPanel>
 
                     <p:outputPanel styleClass="field col-12">
-                        <p:outputLabel styleClass="mr-2"  value="Fecha final "/>
-                        <p:calendar  value="#{anexoView.anexoSelected.fechaFinal}" />
+                        <p:outputLabel for="@next" styleClass="block"  value="Fecha final "/>
+                        <p:calendar  value="#{anexoView.anexoSelected.fechaFinal}"
+                                     inputStyleClass="w-full"
+                                     pattern="dd-MM-yyyy" locale="es"/>
                     </p:outputPanel>
 
                     <p:outputPanel styleClass="field col-12">
-                        <p:outputLabel styleClass="mr-2"  value="Fecha firma "/>
-                        <p:calendar  value="#{anexoView.anexoSelected.fechaFirma}" />
+                        <p:outputLabel for="@next" styleClass="block"  value="Fecha firma "/>
+                        <p:calendar  value="#{anexoView.anexoSelected.fechaFirma}"
+                                     inputStyleClass="w-full"
+                                     pattern="dd-MM-yyyy" locale="es"/>
                     </p:outputPanel>
+
+                    <p:fileUpload value="#{anexoView.anexoFile}" mode="simple" label="Elegir archivo"
+                                  allowTypes="/(\.|\/)(pdf)$/" accept=".pdf"
+                                  skinSimple="true"/>
 
                 </p:outputPanel>
 
                 <f:facet name="footer">
 
+                    <p:message
+                            id="id_message"
+                            for="btn_guardarAnexo" />
+
                     <p:commandButton value="Cancelar" onclick="PF('formDialog').hide()"
                                      class="ui-button-outlined"/>
-                    <p:commandButton value="Guardar"
+
+                    <p:commandButton value="Guardar" id="btn_guardarAnexo"
                                      action="#{anexoView.guardarAnexo()}"
                                      ajax="true" process="@form"
-                                     update="growl form_datatable"
+                                     update="growl id_message form_datatable"
                                      validateClient="true"/>
                 </f:facet>
             </p:dialog>

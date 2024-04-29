@@ -15,4 +15,6 @@ public interface IAnexoRepository extends JpaRepository<Anexo, Long>, JpaSpecifi
 
     List<Anexo> findByLicitacionAndEstatusRegistro(Licitacion licitacion, EstatusRegistro estatusRegistro);
 
+    List<Anexo> findByNombreAndEstatusRegistroAndLicitacion(String nombre, EstatusRegistro estatusRegistro, Licitacion licitacion);
+
 }
