@@ -1,6 +1,5 @@
 package gob.yucatan.sicasy.views.domain;
 
-import gob.yucatan.sicasy.business.dtos.ExampleDto;
 import gob.yucatan.sicasy.business.entities.*;
 import gob.yucatan.sicasy.services.iface.*;
 import gob.yucatan.sicasy.utils.imports.excel.ConfigHeaderExcelModel;
