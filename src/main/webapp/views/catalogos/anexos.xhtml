@@ -203,7 +203,7 @@
 
                             <p:menuitem value="Descargar archivo" ajax="false" onclick="PrimeFaces.monitorDownload(start, stop);"
                                         disabled="#{anexo.rutaArchivo == null}" icon="fi-rr-download">
-                                <p:fileDownload value="#{anexoView.downloadAnexoFile(anexo.rutaArchivo)}" />
+                                <p:fileDownload value="#{fileDownloadBean.downloadFileByPath(anexo.rutaArchivo)}" />
                             </p:menuitem>
 
                             <p:menuitem value="Eliminar" icon="fi fi-rr-trash"

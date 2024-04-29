@@ -184,7 +184,7 @@
 
                             <p:menuitem value="Descargar archivo" ajax="false" onclick="PrimeFaces.monitorDownload(start, stop);"
                                         disabled="#{licitacion.rutaArchivo == null}" icon="fi-rr-download">
-                                <p:fileDownload value="#{licitacionView.downloadLicitacionFile(licitacion.rutaArchivo)}" />
+                                <p:fileDownload value="#{fileDownloadBean.downloadFileByPath(licitacion.rutaArchivo)}" />
                             </p:menuitem>
 
                             <p:menuitem value="Eliminar" icon="fi fi-rr-trash"
