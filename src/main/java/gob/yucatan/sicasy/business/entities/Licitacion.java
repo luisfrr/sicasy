@@ -2,11 +2,10 @@ package gob.yucatan.sicasy.business.entities;
 
 
 import gob.yucatan.sicasy.business.enums.EstatusRegistro;
+import gob.yucatan.sicasy.utils.date.DateFormatUtil;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 
 @Entity
@@ -66,13 +65,11 @@ public class Licitacion implements Cloneable {
     private String borradoPor;
 
     public String fechaInicioString(){
-        DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd");
-        return dateFormat.format(fechaInicio);
+        return DateFormatUtil.convertToFormat(fechaInicio, "dd-MM-yyyy");
     }
 
     public String fechaFinalString(){
-        DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd");
-        return dateFormat.format(fechaFinal);
+        return DateFormatUtil.convertToFormat(fechaFinal, "dd-MM-yyyy");
     }
 
     @Override

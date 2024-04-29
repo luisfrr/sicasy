@@ -9,11 +9,7 @@ import gob.yucatan.sicasy.business.exceptions.BadRequestException;
 import gob.yucatan.sicasy.business.exceptions.NotFoundException;
 import gob.yucatan.sicasy.services.iface.IAnexoService;
 import gob.yucatan.sicasy.services.iface.ILicitacionService;
-import gob.yucatan.sicasy.utils.date.DateFormatUtil;
 import gob.yucatan.sicasy.utils.export.ExportFile;
-import gob.yucatan.sicasy.utils.export.csv.models.CsvData;
-import gob.yucatan.sicasy.utils.export.csv.models.CsvField;
-import gob.yucatan.sicasy.utils.export.csv.service.iface.IGeneratorCSVFile;
 import gob.yucatan.sicasy.utils.export.excel.models.*;
 import gob.yucatan.sicasy.utils.export.excel.services.iface.IGeneratorExcelFile;
 import gob.yucatan.sicasy.utils.imports.excel.SaveFile;
@@ -30,18 +26,13 @@ import org.apache.poi.ss.usermodel.VerticalAlignment;
 import org.apache.poi.xssf.usermodel.XSSFCellStyle;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.primefaces.PrimeFaces;
+import org.primefaces.event.SelectEvent;
 import org.primefaces.model.file.UploadedFile;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.*;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Component
 @Scope("view")
@@ -52,6 +43,7 @@ public class LicitacionView {
 
     private @Getter String title;
     private @Getter String titleDialog;
+    private @Getter Boolean fechaFinalValida;
     private @Getter Licitacion licitacionSelected;
     private @Getter Licitacion licitacionFilter;
     private @Getter List<Licitacion> licitacionList;
@@ -61,7 +53,6 @@ public class LicitacionView {
     private final ILicitacionService licitacionService;
     private final IAnexoService anexoService;
     private final UserSessionBean userSessionBean;
-    private final IGeneratorCSVFile generatorCSVFileService;
     private final IGeneratorExcelFile generatorExcelFile;
 
 
@@ -71,6 +62,7 @@ public class LicitacionView {
         this.title = "Licitaciones";
 
         this.licitacionSelected = null;
+        this.fechaFinalValida = true;
         this.estatusRegistros = EstatusRegistro.values();
         this.limpiarFiltros();
 
@@ -85,12 +77,14 @@ public class LicitacionView {
 
     public void buscar(){
         log.info("Buscando Licitaciones");
-        this.licitacionList = licitacionService.findAllDynamic(this.licitacionFilter);
+        this.licitacionList = licitacionService.findAllDynamic(this.licitacionFilter).stream()
+                .sorted(Comparator.comparing(Licitacion:: getNumeroLicitacion))
+                .toList();
     }
 
     public void agregarLicitacion(){
         log.info("Agregando licitacion nueva");
-        this.titleDialog = "Agregar Licitacion";
+        this.titleDialog = "Agregar Licitación";
         this.licitacionSelected = new Licitacion();
 
     }
@@ -106,7 +100,7 @@ public class LicitacionView {
                     this.licitacionSelected.setFechaModificacion(new Date());
 
                     if (file != null){
-                        String pathfile = SaveFile.saveFileToPath(file.getContent(), file.getFileName(), "C:\\Users\\Aeolos\\Downloads\\");
+                        String pathfile = SaveFile.saveFileToPath(file.getContent(), file.getFileName(), "\\Downloads\\");
                         licitacionSelected.setRutaArchivo(pathfile);
                     }
 
@@ -127,7 +121,7 @@ public class LicitacionView {
                         this.licitacionSelected.setFechaCreacion(new Date());
 
                         if (file != null){
-                            String pathfile = SaveFile.saveFileToPath(file.getContent(), file.getFileName(), "C:\\Users\\Aeolos\\Downloads\\");
+                            String pathfile = SaveFile.saveFileToPath(file.getContent(), file.getFileName(), "\\Downloads\\");
                             licitacionSelected.setRutaArchivo(pathfile);
                         }
 
@@ -197,7 +191,7 @@ public class LicitacionView {
         }else {
 
             // revisar que no existan anexos activos con la licitacion vinculada je
-            List<Anexo> anexos = null;
+            List<Anexo> anexos;
             Licitacion licitacionFilter = new Licitacion();
             licitacionFilter.setEstatusRegistro(EstatusRegistro.ACTIVO);
             licitacionFilter.setIdLicitacion(this.licitacionSelected.getIdLicitacion());
@@ -206,7 +200,7 @@ public class LicitacionView {
 
             if (anexos.isEmpty()) {
                 FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_INFO,
-                        "Aviso", "Se ha eliminado exitósamente la información");
+                        "Aviso", "Se ha eliminado exitosamente la información");
                 FacesContext.getCurrentInstance().addMessage(null, msg);
                 this.licitacionSelected.setBorradoPor(userSessionBean.getUserName());
                 licitacionService.delete(this.licitacionSelected);
@@ -224,24 +218,22 @@ public class LicitacionView {
 
     }
 
-    public ExportFile exportFileCSV() throws IOException {
-        log.info("exportFileCSV");
+    public void validateFechaInicioFinal(SelectEvent event){
+        log.info("validando fecha final" );
 
-        if (this.licitacionList != null && !this.licitacionList.isEmpty()) {
+        if (this.licitacionSelected.getFechaInicio() != null && this.licitacionSelected.getFechaFinal() != null){
 
-            List<CsvField> fields = List.of(CsvField.builder().fieldName("Licitacion").propertyExpression("nombre").build(),
-                    CsvField.builder().fieldName("num").propertyExpression("numeroLicitacion").build(),
-                    CsvField.builder().fieldName("Descripcion").propertyExpression("descripcion").build());
+            if (this.licitacionSelected.getFechaInicio().after(this.licitacionSelected.getFechaFinal())){
+                // la fecha inicio no puede estar dspues de la fecha final
+                this.fechaFinalValida = false;
+                FacesContext.getCurrentInstance().addMessage(event.getComponent().getClientId(),
+                        new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Fecha final inválida."));
+            }else
+                fechaFinalValida = true;
 
-            return generatorCSVFileService.createCsvFile(CsvData.builder()
-                            .data(this.licitacionList)
-                            .fields(fields)
-                            .filename("csvTEST.csv")
-                            .printHeaders(true)
-                    .build());
+        }
 
-        }else
-            return null;
+        PrimeFaces.current().ajax().update("form_dialog:bnt_saveLicitacion ");
 
     }
 
@@ -293,3 +285,4 @@ public class LicitacionView {
     }
 
 }
+

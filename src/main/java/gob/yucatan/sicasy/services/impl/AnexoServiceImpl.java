@@ -1,22 +1,16 @@
 package gob.yucatan.sicasy.services.impl;
 
-import gob.yucatan.sicasy.business.entities.Anexo;
-import gob.yucatan.sicasy.business.entities.Anexo_;
-import gob.yucatan.sicasy.business.entities.Aseguradora_;
-import gob.yucatan.sicasy.business.entities.Licitacion;
+import gob.yucatan.sicasy.business.entities.*;
 import gob.yucatan.sicasy.business.enums.EstatusRegistro;
 import gob.yucatan.sicasy.business.exceptions.NotFoundException;
 import gob.yucatan.sicasy.repository.criteria.SearchCriteria;
-import gob.yucatan.sicasy.repository.criteria.SearchFetch;
 import gob.yucatan.sicasy.repository.criteria.SearchOperation;
 import gob.yucatan.sicasy.repository.criteria.SearchSpecification;
 import gob.yucatan.sicasy.repository.iface.IAnexoRepository;
 import gob.yucatan.sicasy.services.iface.IAnexoService;
 import gob.yucatan.sicasy.services.iface.ILicitacionService;
-import jakarta.persistence.criteria.JoinType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -29,7 +23,6 @@ import java.util.Optional;
 public class AnexoServiceImpl implements IAnexoService {
 
     private final IAnexoRepository anexoRepository;
-    private final ILicitacionService licitacionService;
 
     @Override
     public List<Anexo> findAllDynamic(Anexo anexo) {
@@ -43,10 +36,10 @@ public class AnexoServiceImpl implements IAnexoService {
                     anexo.getNombre(),
                     Anexo_.NOMBRE));
 
-        if (anexo.getLicitacion() != null)
-            searchSpecification.add(new SearchCriteria(SearchOperation.EQUAL,
-                    anexo.getLicitacion(),
-                    Anexo_.LICITACION));
+        if (anexo.getLicitacion() != null && anexo.getLicitacion().getNumeroLicitacion() != null)
+            searchSpecification.add(new SearchCriteria(SearchOperation.MATCH,
+                    anexo.getLicitacion().getNumeroLicitacion(),
+                    Anexo_.LICITACION, Licitacion_.NUMERO_LICITACION));
 
         if (anexo.getEstatusRegistro() != null )
             searchSpecification.add(new SearchCriteria(SearchOperation.EQUAL,
@@ -64,6 +57,11 @@ public class AnexoServiceImpl implements IAnexoService {
     @Override
     public List<Anexo> findByLicitacion(Licitacion licitacion) {
         return anexoRepository.findByLicitacionAndEstatusRegistro(licitacion, EstatusRegistro.ACTIVO);
+    }
+
+    @Override
+    public List<Anexo> findByNombreAndLicitacion(String nombre, Licitacion licitacion) {
+        return anexoRepository.findByNombreAndEstatusRegistroAndLicitacion(nombre, EstatusRegistro.ACTIVO, licitacion);
     }
 
 
