@@ -16,9 +16,7 @@ import gob.yucatan.sicasy.utils.imports.excel.SaveFile;
 import gob.yucatan.sicasy.views.beans.UserSessionBean;
 import jakarta.annotation.PostConstruct;
 import jakarta.faces.application.FacesMessage;
-import jakarta.faces.context.ExternalContext;
 import jakarta.faces.context.FacesContext;
-import jakarta.faces.event.AbortProcessingException;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -28,13 +26,11 @@ import org.apache.poi.ss.usermodel.VerticalAlignment;
 import org.apache.poi.xssf.usermodel.XSSFCellStyle;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.primefaces.PrimeFaces;
-import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.file.UploadedFile;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import java.io.*;
-import java.net.URLEncoder;
 import java.util.*;
 
 @Component
@@ -53,7 +49,6 @@ public class AnexoView implements Serializable {
     private @Getter EstatusRegistro[] estatusRegistros;
     private @Getter List<Licitacion> licitacionesActivasList;
     private @Getter @Setter UploadedFile anexoFile;
-    private @Getter @Setter DefaultStreamedContent downloadedAnexoFile;
 
     private final IAnexoService anexoService;
     private final ILicitacionService licitacionService;
@@ -250,31 +245,6 @@ public class AnexoView implements Serializable {
                 .build();
 
         return generatorExcelFile.createExcelFile(workbook, excelDataSheet);
-
-    }
-
-    public DefaultStreamedContent downloadAnexoFile(String filePath) {
-        log.info("downloadAnexoFile anexo");
-        File fi = new File(filePath);
-        try {
-            if (!fi.exists()) {
-                FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                        "Error", "No se encontró el archivo.");
-                FacesContext.getCurrentInstance().addMessage(null, msg);
-            }
-            InputStream input = new FileInputStream(fi);
-            ExternalContext externalContext = FacesContext.getCurrentInstance().getExternalContext();
-            downloadedAnexoFile = DefaultStreamedContent.builder()
-                    .name(fi.getName())
-                    .contentType(externalContext.getMimeType(fi.getName()))
-                    .stream( () -> input )
-                    .build();
-
-            return downloadedAnexoFile;
-        }catch (Exception e) {
-            log.error(e.getMessage());
-            return null;
-        }
 
     }
 
