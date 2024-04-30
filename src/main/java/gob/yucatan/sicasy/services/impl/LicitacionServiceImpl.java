@@ -6,7 +6,6 @@ import gob.yucatan.sicasy.business.exceptions.NotFoundException;
 import gob.yucatan.sicasy.repository.criteria.SearchCriteria;
 import gob.yucatan.sicasy.repository.criteria.SearchOperation;
 import gob.yucatan.sicasy.repository.criteria.SearchSpecification;
-import gob.yucatan.sicasy.repository.iface.IAnexoRepository;
 import gob.yucatan.sicasy.repository.iface.ILicitacionRepository;
 import gob.yucatan.sicasy.services.iface.ILicitacionService;
 import lombok.RequiredArgsConstructor;

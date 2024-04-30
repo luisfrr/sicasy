@@ -553,7 +553,9 @@ body .ui-chkbox .ui-chkbox-box.ui-state-active {
     color: var(--primary-text-color);
 }
 
-
+body .ui-inputnumber.w-full input {
+    width: 100% !important;
+}
 
 
 

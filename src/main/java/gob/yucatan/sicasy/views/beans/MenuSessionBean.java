@@ -23,6 +23,10 @@ public class MenuSessionBean implements Serializable {
         return "/views/seguridad/usuarios?faces-redirect=true";
     }
 
+    public String goToVehiculos() {
+        return "/views/arrendamientos/vehiculos?faces-redirect=true";
+    }
+
     public String goToAseguradoras() {
         return "/views/catalogos/aseguradoras?faces-redirect=true";
     }

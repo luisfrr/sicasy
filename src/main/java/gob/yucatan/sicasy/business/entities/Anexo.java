@@ -6,8 +6,6 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -21,7 +19,7 @@ import java.util.Date;
 @Setter
 @Builder
 @Slf4j
-public class Anexo {
+public class Anexo implements Cloneable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -107,4 +105,14 @@ public class Anexo {
     }
 
 
+    @Override
+    public Anexo clone() {
+        try {
+            Anexo clone = (Anexo) super.clone();
+            clone.licitacion = this.licitacion.clone();
+            return clone;
+        } catch (CloneNotSupportedException e) {
+            throw new AssertionError();
+        }
+    }
 }

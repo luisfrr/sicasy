@@ -15,7 +15,7 @@ import java.util.Date;
 @Getter
 @Setter
 @Builder
-public class Licitacion {
+public class Licitacion implements Cloneable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -72,4 +72,12 @@ public class Licitacion {
         return DateFormatUtil.convertToFormat(fechaFinal, "dd-MM-yyyy");
     }
 
+    @Override
+    public Licitacion clone() {
+        try {
+            return (Licitacion) super.clone();
+        } catch (CloneNotSupportedException e) {
+            throw new AssertionError();
+        }
+    }
 }

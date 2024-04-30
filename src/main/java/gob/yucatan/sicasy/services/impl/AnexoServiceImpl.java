@@ -8,7 +8,6 @@ import gob.yucatan.sicasy.repository.criteria.SearchOperation;
 import gob.yucatan.sicasy.repository.criteria.SearchSpecification;
 import gob.yucatan.sicasy.repository.iface.IAnexoRepository;
 import gob.yucatan.sicasy.services.iface.IAnexoService;
-import gob.yucatan.sicasy.services.iface.ILicitacionService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
