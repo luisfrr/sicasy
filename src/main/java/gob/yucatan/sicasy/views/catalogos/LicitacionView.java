@@ -227,7 +227,7 @@ public class LicitacionView {
                 // la fecha inicio no puede estar dspues de la fecha final
                 this.fechaFinalValida = false;
                 FacesContext.getCurrentInstance().addMessage(event.getComponent().getClientId(),
-                        new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Fecha final inválida."));
+                        new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Fecha selecionada inválida."));
             }else
                 fechaFinalValida = true;
 
