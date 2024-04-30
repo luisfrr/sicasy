@@ -284,16 +284,31 @@
 
                     <p:outputPanel styleClass="field col-12">
                         <p:outputLabel for="@next" styleClass="block" value="Fecha inicio "/>
-                        <p:calendar value="#{anexoView.anexoSelected.fechaInicio}"
+                        <p:calendar value="#{anexoView.anexoSelected.fechaInicio}" id="id_calendar1"
                                     inputStyleClass="w-full"
-                                    pattern="dd-MM-yyyy" locale="es"/>
+                                    pattern="dd-MM-yyyy" locale="es">
+                            <p:ajax
+                                    event="dateSelect" listener="#{anexoView.validateFechaInicioFinal}"
+                                    update=":form_dialog:id_message2 :form_dialog:id_message :form_dialog:id_calendar2 :form_dialog:id_calendar1"/>
+                        </p:calendar>
+                        <p:message
+                                id="id_message2"
+                                for="id_calendar1" />
                     </p:outputPanel>
 
                     <p:outputPanel styleClass="field col-12">
                         <p:outputLabel for="@next" styleClass="block"  value="Fecha final "/>
                         <p:calendar  value="#{anexoView.anexoSelected.fechaFinal}"
-                                     inputStyleClass="w-full"
-                                     pattern="dd-MM-yyyy" locale="es"/>
+                                     inputStyleClass="w-full" id="id_calendar2"
+                                     disabled="#{anexoView.anexoSelected.fechaInicio == null}"
+                                     pattern="dd-MM-yyyy" locale="es">
+                            <p:ajax
+                                    event="dateSelect" listener="#{anexoView.validateFechaInicioFinal}"
+                                    update=":form_dialog:id_message :form_dialog:id_message2 :form_dialog:id_calendar1 :form_dialog:id_calendar2"/>
+                        </p:calendar>
+                        <p:message
+                                id="id_message"
+                                for="id_calendar2" />
                     </p:outputPanel>
 
                     <p:outputPanel styleClass="field col-12">
@@ -311,17 +326,13 @@
 
                 <f:facet name="footer">
 
-                    <p:message
-                            id="id_message"
-                            for="btn_guardarAnexo" />
-
                     <p:commandButton value="Cancelar" onclick="PF('formDialog').hide()"
                                      class="ui-button-outlined"/>
 
                     <p:commandButton value="Guardar" id="btn_guardarAnexo"
                                      action="#{anexoView.guardarAnexo()}"
-                                     ajax="true" process="@form"
-                                     update="growl id_message form_datatable"
+                                     ajax="true" process="@form" disabled="#{!anexoView.fechasValidadasCorrectas}"
+                                     update="growl form_datatable"
                                      validateClient="true"/>
                 </f:facet>
             </p:dialog>

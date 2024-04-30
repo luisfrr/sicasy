@@ -26,6 +26,7 @@ import org.apache.poi.ss.usermodel.VerticalAlignment;
 import org.apache.poi.xssf.usermodel.XSSFCellStyle;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.primefaces.PrimeFaces;
+import org.primefaces.event.SelectEvent;
 import org.primefaces.model.file.UploadedFile;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -42,6 +43,7 @@ public class AnexoView implements Serializable {
 
     private @Getter String title;
     private @Getter String titleDialog;
+    private @Getter Boolean fechasValidadasCorrectas;
 
     private @Getter Anexo anexoFilter;
     private @Getter Anexo anexoSelected;
@@ -61,6 +63,7 @@ public class AnexoView implements Serializable {
 
         this.title = "Anexos";
         this.anexoSelected = null;
+        this.fechasValidadasCorrectas = true;
         this.licitacionesActivasList = null;
         this.estatusRegistros = EstatusRegistro.values();
         this.limpiarFiltros();
@@ -245,6 +248,25 @@ public class AnexoView implements Serializable {
                 .build();
 
         return generatorExcelFile.createExcelFile(workbook, excelDataSheet);
+
+    }
+
+    public void validateFechaInicioFinal(SelectEvent event){
+        log.info("validando fecha final" );
+
+        if (this.anexoSelected.getFechaInicio() != null && this.anexoSelected.getFechaFinal() != null){
+
+            if (this.anexoSelected.getFechaInicio().after(this.anexoSelected.getFechaFinal())){
+                // la fecha inicio no puede estar dspues de la fecha final
+                this.fechasValidadasCorrectas = false;
+                FacesContext.getCurrentInstance().addMessage(event.getComponent().getClientId(),
+                        new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Fecha selecionada inválida."));
+            }else
+                fechasValidadasCorrectas = true;
+
+        }
+
+        PrimeFaces.current().ajax().update("form_dialog:btn_guardarAnexo ");
 
     }
 

@@ -269,7 +269,7 @@
                                     pattern="dd-MM-yyyy" locale="es">
                             <p:ajax
                                     event="dateSelect" listener="#{licitacionView.validateFechaInicioFinal}"
-                                    update=":form_dialog:id_message2 :form_dialog:id_calendar2"/>
+                                    update=":form_dialog:id_message2 :form_dialog:id_message :form_dialog:id_calendar2"/>
                         </p:calendar>
                         <p:message
                                 id="id_message2"
@@ -281,11 +281,9 @@
                         <p:calendar  id="id_calendar2" value="#{licitacionView.licitacionSelected.fechaFinal}"
                                      inputStyleClass="w-full" disabled="#{licitacionView.licitacionSelected.fechaInicio == null}"
                                      pattern="dd-MM-yyyy" locale="es">
-<!--                            <f:validator-->
-<!--                                    validatorId="calendarValidator" />-->
                             <p:ajax
                                     event="dateSelect" listener="#{licitacionView.validateFechaInicioFinal}"
-                                    update=":form_dialog:id_message "/>
+                                    update=":form_dialog:id_message :form_dialog:id_message2"/>
                         </p:calendar>
                         <p:message
                                 id="id_message"
