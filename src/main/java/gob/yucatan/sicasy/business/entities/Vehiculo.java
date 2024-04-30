@@ -79,7 +79,7 @@ public class Vehiculo implements Cloneable, Serializable {
     private EstatusVehiculo estatusVehiculo;
 
     @ManyToOne
-    @JoinColumn(name = "condicion_vehiculo_id")
+    @JoinColumn(name = "condicion_vehiculo_id", nullable = false)
     private CondicionVehiculo condicionVehiculo;
 
     @Column(name = "resguardante")

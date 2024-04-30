@@ -308,7 +308,7 @@
 
         <p:dialog header="Registrar nuevos vehículos"
                   id="registrar-vehiculo-dialog" widgetVar="registrarVehiculoDialog"
-                  height="450" width="800"
+                  height="450" width="850"
                   showEffect="fade" modal="true"
                   closable="true" closeOnEscape="true"
                   cache="false" responsive="true">
@@ -380,7 +380,7 @@
                                 <p:outputLabel for="@next" value="Color" styleClass="block"/>
                                 <p:inputText styleClass="block w-full" required="true"
                                                placeholder="Ej. Rojo"
-                                               value="#{vehiculoView.vehiculoSelected.noMotor}"/>
+                                               value="#{vehiculoView.vehiculoSelected.color}"/>
                                 <span class="text-sm hidden"> </span>
                             </p:outputPanel>
 
@@ -499,7 +499,7 @@
 
                         <h:form id="layout-form" styleClass="formgrid grid">
 
-                            <p:outputPanel styleClass="field col-12">
+                            <p:outputPanel styleClass="field col-12" rendered="#{not vehiculoView.showErrorImportacion}">
                                 <p:outputLabel for="@next" value="Dependencia" styleClass="block"/>
                                 <p:selectOneMenu value="#{vehiculoView.vehiculoSelected.dependencia.idDependencia}"
                                                  styleClass="w-full mw-auto" required="true">
@@ -510,11 +510,12 @@
                                 <span class="text-sm hidden"> </span>
                             </p:outputPanel>
 
-                            <p:outputPanel styleClass="field col-12 mb-5">
+                            <p:outputPanel styleClass="field col-12 mb-5" rendered="#{not vehiculoView.showErrorImportacion}">
                                 <p:outputLabel for="@next" value="Importar layout" styleClass="block"/>
                                 <p:inputTextarea id="dropZoneLayout" widgetVar="dropZoneLayout"
-                                                 styleClass="w-full" rows="5" required="true"
-                                                 value="#{vehiculoView.layoutFileUpload}"/>
+                                                 styleClass="w-full dropzone mb-3" rows="5" required="true"
+                                                 placeholder="Arrastra y suelta aquí el archivo de importación de vehículos"
+                                                 value="#{vehiculoView.layoutFileUpload}" readonly="true"/>
                                 <span class="text-sm">
                                     <p:link value="O haz clic aquí para elegir" onclick="PF('uploadLayout').show();return false"/>
                                 </span>
@@ -524,7 +525,32 @@
                                               update="growl" style="display: none"/>
                             </p:outputPanel>
 
-                            <p:outputPanel styleClass="field col-12 mt-5 mb-0">
+                            <p:outputPanel styleClass="field col-12 mb-5" rendered="#{vehiculoView.showErrorImportacion}">
+                                <p:dataTable var="acuse" value="#{vehiculoView.acuseImportacionList}"
+                                             rows="25" rowHover="true"
+                                             rowIndexVar="index"
+                                             styleClass="dt-scrollable-x"
+                                             scrollable="true" scrollHeight="230" size="small"
+                                             paginator="true" paginatorPosition="bottom"
+                                             paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                             currentPageReportTemplate="{startRecord}-{endRecord} de {totalRecords} registros"
+                                             rowsPerPageTemplate="25,100,200,{ShowAll|'Todos'}">
+                                    <f:facet name="header">
+                                        Se encontraron error al importar el layout
+                                    </f:facet>
+
+                                    <p:column headerText="Vehículo" width="180">
+                                        <h:outputText value="#{acuse.titulo}"/>
+                                    </p:column>
+
+                                    <p:column headerText="Error" style="min-width: 200px">
+                                        <h:outputText value="#{acuse.mensaje}"/>
+                                    </p:column>
+
+                                </p:dataTable>
+                            </p:outputPanel>
+
+                            <p:outputPanel styleClass="field col-12 mt-5 mb-0" rendered="#{not vehiculoView.showErrorImportacion}">
                                 <p:outputPanel styleClass="flex justify-content-end">
                                     <p:commandButton value="Cancelar" ajax="true" process="@this"
                                                      action="#{vehiculoView.cerrarModalRegistroVehiculo()}"
@@ -535,18 +561,11 @@
                                                      validateClient="true"/>
                                 </p:outputPanel>
                             </p:outputPanel>
-
                         </h:form>
-
                     </p:tab>
                 </p:tabView>
-
-
-
             </p:outputPanel>
         </p:dialog>
-        
-        
 
     </p:outputPanel>
 

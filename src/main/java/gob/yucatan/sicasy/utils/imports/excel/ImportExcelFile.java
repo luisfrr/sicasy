@@ -107,7 +107,7 @@ public class ImportExcelFile<T> {
     private Object getCellValue(Cell cell, Class<?> fieldType) {
         // Convertir el valor de la celda al tipo de dato apropiado
         if (fieldType == String.class) {
-            return cell.getStringCellValue();
+            return cell.getStringCellValue().trim();
         } else if (fieldType == Integer.class) {
             return DoubleUtil.parse(String.valueOf(cell.getNumericCellValue())).intValue();
         } else if (fieldType == Double.class) {

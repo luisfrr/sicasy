@@ -1,17 +1,26 @@
 package gob.yucatan.sicasy.services.impl;
 
+import gob.yucatan.sicasy.business.dtos.AcuseImportacion;
 import gob.yucatan.sicasy.business.entities.*;
+import gob.yucatan.sicasy.business.enums.EstatusRegistro;
+import gob.yucatan.sicasy.business.exceptions.BadRequestException;
 import gob.yucatan.sicasy.business.exceptions.NotFoundException;
 import gob.yucatan.sicasy.repository.criteria.SearchCriteria;
 import gob.yucatan.sicasy.repository.criteria.SearchOperation;
 import gob.yucatan.sicasy.repository.criteria.SearchSpecification;
+import gob.yucatan.sicasy.repository.iface.IAnexoRepository;
+import gob.yucatan.sicasy.repository.iface.ILicitacionRepository;
 import gob.yucatan.sicasy.repository.iface.IVehiculoRepository;
 import gob.yucatan.sicasy.services.iface.IVehiculoService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -19,6 +28,8 @@ import java.util.List;
 public class VehiculoServiceImpl implements IVehiculoService {
 
     private final IVehiculoRepository vehiculoRepository;
+    private final ILicitacionRepository licitacionRepository;
+    private final IAnexoRepository anexoRepository;
 
     @Override
     public List<Vehiculo> findAllDynamic(Vehiculo vehiculo) {
@@ -120,7 +131,26 @@ public class VehiculoServiceImpl implements IVehiculoService {
 
     @Override
     public Vehiculo agregar(Vehiculo vehiculo) {
-        return null;
+        Integer ESTATUS_VEHICULO_REGISTRADO = 1;
+
+        // Validar si ya existe un vehiculo con ese no. de serie
+        Optional<Vehiculo> vehiculoOptional = vehiculoRepository.findVehiculoActivoByNoSerie(vehiculo.getNoSerie());
+
+        if(vehiculoOptional.isPresent())
+            throw new BadRequestException("Ya existe un vehículo con ese número de serie.");
+
+        if(vehiculo.getAnexo().getIdAnexo() == null)
+            vehiculo.setAnexo(null);
+        if(vehiculo.getLicitacion().getIdLicitacion() == null)
+            vehiculo.setLicitacion(null);
+        if(vehiculo.getDependenciaAsignada().getIdDependencia() == null)
+            vehiculo.setDependenciaAsignada(null);
+
+        // Se agrega el estatus vehículo
+        vehiculo.setEstatusVehiculo(EstatusVehiculo.builder().idEstatusVehiculo(ESTATUS_VEHICULO_REGISTRADO).build());
+        vehiculo.setEstatusRegistro(EstatusRegistro.ACTIVO);
+
+        return vehiculoRepository.save(vehiculo);
     }
 
     @Override
@@ -134,7 +164,140 @@ public class VehiculoServiceImpl implements IVehiculoService {
     }
 
     @Override
-    public Vehiculo importar(List<Vehiculo> vehiculos) {
-        return null;
+    @Transactional
+    public List<AcuseImportacion> importar(List<Vehiculo> vehiculos, Integer idDependencia, String username) {
+
+        List<AcuseImportacion> acuseImportacionList = new ArrayList<>();
+
+        this.validarImportacion(acuseImportacionList, vehiculos, idDependencia, username);
+
+        if(acuseImportacionList.stream().anyMatch(acuseImportacion -> acuseImportacion.getError() == 1)) {
+            return acuseImportacionList;
+        }
+
+        try {
+            vehiculoRepository.saveAll(vehiculos);
+        } catch (Exception e) {
+            acuseImportacionList.add(AcuseImportacion.builder()
+                    .titulo("Error al guardar la información")
+                    .mensaje(e.getMessage())
+                    .error(1)
+                    .build());
+        }
+
+        return acuseImportacionList;
+    }
+
+    private void validarImportacion(List<AcuseImportacion> acuseImportacionList, List<Vehiculo> vehiculos, Integer idDependencia, String username) {
+        Integer ESTATUS_VEHICULO_REGISTRADO = 1;
+
+        for (Vehiculo vehiculo : vehiculos) {
+            try {
+                // Validacion de campos obligatorios
+                if(vehiculo.getNoSerie() == null || vehiculo.getNoSerie().isEmpty())
+                    throw new BadRequestException("El campo No. Serie es obligatorio");
+
+                if(vehiculo.getPlaca() == null || vehiculo.getPlaca().isEmpty())
+                    throw new BadRequestException("El campo Placa es obligatorio");
+
+                if(vehiculo.getMarca() == null || vehiculo.getMarca().isEmpty())
+                    throw new BadRequestException("El campo Marca es obligatorio");
+
+                if(vehiculo.getModelo() == null || vehiculo.getModelo().isEmpty())
+                    throw new BadRequestException("El campo Modelo es obligatorio");
+
+                if(vehiculo.getAnio() == null)
+                    throw new BadRequestException("El campo Año es obligatorio");
+
+                if(vehiculo.getNoMotor() == null || vehiculo.getNoMotor().isEmpty())
+                    throw new BadRequestException("El campo No. Motor es obligatorio");
+
+                if(vehiculo.getColor() == null || vehiculo.getColor().isEmpty())
+                    throw new BadRequestException("El campo Color es obligatorio");
+
+                if(vehiculo.getCondicionId() == null)
+                    throw new BadRequestException("El campo Condición es obligatorio");
+                else if(vehiculo.getCondicionId() < 1 || vehiculo.getCondicionId() > 3)
+                    throw new BadRequestException("El campo Condición solo acepta valor 1, 2 o 3.");
+
+
+                if(vehiculo.getNoFactura() == null || vehiculo.getNoFactura().isEmpty())
+                    throw new BadRequestException("El campo No. Factura es obligatorio");
+
+                if(vehiculo.getMontoFactura() == null)
+                    throw new BadRequestException("El campo Valor Factura es obligatorio");
+
+                if(vehiculo.getRentaMensual() == null)
+                    throw new BadRequestException("El campo Renta Mensual es obligatorio");
+
+                // Se agregan los campos que hacen referencia a otras tablas
+                vehiculo.setDependencia(Dependencia.builder().idDependencia(idDependencia).build());
+
+                if(vehiculo.getCondicionId() != null)
+                    vehiculo.setCondicionVehiculo(CondicionVehiculo.builder()
+                            .idCondicionVehiculo(vehiculo.getCondicionId())
+                            .build());
+
+                if(vehiculo.getNumLicitacion() != null) {
+                    Licitacion licitacion = licitacionRepository
+                            .findByNumeroLicitacionAndEstatusRegistro(vehiculo.getNumLicitacion(),
+                                    EstatusRegistro.ACTIVO)
+                            .orElseThrow(() -> new NotFoundException("No se encontro la licitacion con el número de licitacion: "
+                                    + vehiculo.getNumLicitacion()));
+                    vehiculo.setLicitacion(licitacion);
+                }
+
+                if(vehiculo.getNumLicitacion() != null) {
+                    Anexo anexo = anexoRepository
+                            .findAnexoActivoByNombreAndLicitacion(vehiculo.getAnexoValue(),
+                                    vehiculo.getLicitacion())
+                            .orElseThrow(() -> new NotFoundException("No se encontro el anexo. Anexo: " + vehiculo.getAnexoValue() +
+                                    ", número de licitación: "+ vehiculo.getNumLicitacion()));
+                    vehiculo.setAnexo(anexo);
+                }
+
+                vehiculo.setEstatusVehiculo(EstatusVehiculo.builder()
+                        .idEstatusVehiculo(ESTATUS_VEHICULO_REGISTRADO)
+                        .build());
+                vehiculo.setEstatusRegistro(EstatusRegistro.ACTIVO);
+                vehiculo.setFechaCreacion(new Date());
+                vehiculo.setCreadoPor(username);
+
+            } catch (Exception e) {
+                acuseImportacionList.add(AcuseImportacion.builder()
+                                .titulo(vehiculo.getNoSerie())
+                                .mensaje(e.getMessage())
+                                .error(1)
+                        .build());
+            }
+        }
+
+        List<String> noSerieList = vehiculos.stream()
+                .map(Vehiculo::getNoSerie)
+                .distinct()
+                .toList();
+        List<Vehiculo> existsVehiculoByNoSerie = vehiculoRepository.findVehiculosActivosByNoSerie(noSerieList);
+
+        // Si la lista no es vacia, quiere decir ya existen algunos vehiculos registrados
+        if(!existsVehiculoByNoSerie.isEmpty()) {
+            existsVehiculoByNoSerie.forEach(v -> acuseImportacionList.add(AcuseImportacion.builder()
+                    .titulo(v.getNoSerie())
+                    .mensaje("Ya existe un vehículo registrado con ese número de serie")
+                    .error(1)
+                    .build()));
+        }
+
+        // Si es diferente quiere decir que un número de serie se está duplicando en el layout
+        if(noSerieList.size() != vehiculos.size()) {
+            List<String> noSerieDuplicadosLayout = vehiculos.stream()
+                    .map(Vehiculo::getNoSerie)
+                    .filter(noSerie -> !noSerieList.contains(noSerie))
+                    .toList();
+            noSerieDuplicadosLayout.forEach(noSerie -> acuseImportacionList.add(AcuseImportacion.builder()
+                    .titulo(noSerie)
+                    .mensaje("El número de serie esta duplicado en este layout.")
+                    .error(1)
+                    .build()));
+        }
     }
 }

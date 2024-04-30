@@ -1,10 +1,14 @@
 package gob.yucatan.sicasy.views.domain;
 
+import gob.yucatan.sicasy.business.dtos.AcuseImportacion;
 import gob.yucatan.sicasy.business.entities.*;
+import gob.yucatan.sicasy.business.exceptions.BadRequestException;
+import gob.yucatan.sicasy.business.exceptions.NotFoundException;
 import gob.yucatan.sicasy.services.iface.*;
 import gob.yucatan.sicasy.utils.imports.excel.ConfigHeaderExcelModel;
 import gob.yucatan.sicasy.utils.imports.excel.ImportExcelFile;
 import gob.yucatan.sicasy.views.beans.Messages;
+import gob.yucatan.sicasy.views.beans.UserSessionBean;
 import jakarta.annotation.PostConstruct;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +24,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
 
 @Component
@@ -28,6 +33,7 @@ import java.util.List;
 @Slf4j
 public class VehiculoView implements Serializable {
 
+    private final UserSessionBean userSessionBean;
     private @Getter String LAYOUT_VEHICULOS = "C:\\sicasy\\files\\layout\\layout_vehiculo.xlsx";
 
     private @Getter String title;
@@ -37,6 +43,8 @@ public class VehiculoView implements Serializable {
     private @Getter @Setter Vehiculo vehiculoSelected;
     private @Getter @Setter Vehiculo vehiculoFilter;
     private @Getter boolean showNuevoFormDialog;
+    private @Getter boolean showErrorImportacion;
+    private @Getter @Setter List<AcuseImportacion> acuseImportacionList;
 
     private @Getter List<Dependencia> dependenciaList;
     private @Getter List<CondicionVehiculo> condicionVehiculoList;
@@ -89,6 +97,7 @@ public class VehiculoView implements Serializable {
 
         this.vehiculoList = new ArrayList<>();
         this.vehiculoSelectedList = new ArrayList<>();
+        PrimeFaces.current().ajax().update("form_filtros");
     }
 
     public void buscar() {
@@ -110,6 +119,10 @@ public class VehiculoView implements Serializable {
         this.loadLicitacionesForm();
         this.loadAnexosForm();
 
+        this.layoutFileUpload = null;
+        this.showErrorImportacion = false;
+        this.acuseImportacionList = null;
+
         PrimeFaces.current().ajax().update("registrar-vehiculo-dialog-content");
         PrimeFaces.current().executeScript("PF('registrarVehiculoDialog').show()");
     }
@@ -123,11 +136,61 @@ public class VehiculoView implements Serializable {
     }
 
     public void guardarNuevoVehiculo() {
-
+        log.info("guardar nuevo vehiculo");
+        try {
+            if(this.vehiculoSelected != null) {
+                this.vehiculoSelected.setCreadoPor(userSessionBean.getUserName());
+                this.vehiculoSelected.setFechaCreacion(new Date());
+                vehiculoService.agregar(this.vehiculoSelected);
+                Messages.addInfo("Se ha registrado correctamente el vehículo");
+                this.limpiarFiltros();
+                this.buscar();
+                this.cerrarModalRegistroVehiculo();
+            }
+        } catch (Exception e) {
+            log.error("Error al guardar nuevo vehiculo", e);
+            String message;
+            if(e instanceof BadRequestException)
+                message = e.getMessage();
+            else if(e instanceof NotFoundException)
+                message = e.getMessage();
+            else
+                message = "Ocurrió un error inesperado. Intenta de nuevo más tarde.";
+            Messages.addError(message);
+        }
     }
 
     public void guardarImportacionVehiculo() {
+        log.info("guardar importacion vehiculo");
+        try {
+            if(this.vehiculoSelected != null && this.vehiculoImportList != null) {
+                this.acuseImportacionList = vehiculoService.importar(this.vehiculoImportList,
+                        this.vehiculoSelected.getDependencia().getIdDependencia(),
+                        userSessionBean.getUserName());
 
+                // Si alguno marco error entonces no se guardó nada y se muestra el acuse
+                if(acuseImportacionList.stream().anyMatch(a -> a.getError() == 1)) {
+                    this.showErrorImportacion = true;
+                }
+                else {
+                    // Si no, entonces se guardó correctamente
+                    Messages.addInfo("Todos los vehículos se han registrado correctamente");
+                    this.limpiarFiltros();
+                    this.buscar();
+                    this.cerrarModalRegistroVehiculo();
+                }
+            }
+        } catch (Exception e) {
+            log.error("Error al guardar nuevo vehiculo", e);
+            String message;
+            if(e instanceof BadRequestException)
+                message = e.getMessage();
+            else if(e instanceof NotFoundException)
+                message = e.getMessage();
+            else
+                message = "Ocurrió un error inesperado. Intenta de nuevo más tarde.";
+            Messages.addError(message);
+        }
     }
 
     public void importarLayout(FileUploadEvent event) throws IOException {
@@ -162,8 +225,8 @@ public class VehiculoView implements Serializable {
             this.vehiculoImportList = importExcelFile.processExcelFile(fileContent, vehiculoClass, list);
 
             this.layoutFileUpload = fileName;
-            PrimeFaces.current().ajax().update("layout-form");
-            log.info("Se ha importado correctamente la información. data size: {}", this.vehiculoImportList.size());
+            PrimeFaces.current().ajax().update("tab-view:layout-form:dropZoneLayout");
+            log.info("Se ha cargado la información del layout correctamente. Vehículos a importar: {}", this.vehiculoImportList.size());
         } else {
             // Manejar otros tipos de archivos si es necesario
             // Por ejemplo, mostrar un mensaje de error

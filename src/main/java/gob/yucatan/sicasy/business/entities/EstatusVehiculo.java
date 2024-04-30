@@ -17,7 +17,7 @@ public class EstatusVehiculo implements Cloneable, Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "estatus_vehiculo_id", nullable = false)
-    private String idEstatusVehiculo;
+    private Integer idEstatusVehiculo;
 
     @Column(name = "nombre", nullable = false)
     private String nombre;

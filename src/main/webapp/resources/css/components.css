@@ -557,8 +557,9 @@ body .ui-inputnumber.w-full input {
     width: 100% !important;
 }
 
-
-
+body .ui-inputfield.dropzone {
+    border-style: dashed !important;
+}
 
 
 

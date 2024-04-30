@@ -1,5 +1,6 @@
 package gob.yucatan.sicasy.services.iface;
 
+import gob.yucatan.sicasy.business.dtos.AcuseImportacion;
 import gob.yucatan.sicasy.business.entities.Vehiculo;
 
 import java.util.List;
@@ -16,6 +17,6 @@ public interface IVehiculoService {
     Vehiculo agregar(Vehiculo vehiculo);
     Vehiculo editar(Vehiculo vehiculo);
     Vehiculo eliminar(Vehiculo vehiculo);
-    Vehiculo importar(List<Vehiculo> vehiculos);
+    List<AcuseImportacion> importar(List<Vehiculo> vehiculos, Integer idDependencia, String username);
 
 }
