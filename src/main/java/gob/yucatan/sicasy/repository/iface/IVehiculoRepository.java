@@ -1,7 +1,6 @@
 package gob.yucatan.sicasy.repository.iface;
 
 import gob.yucatan.sicasy.business.entities.Vehiculo;
-import gob.yucatan.sicasy.business.enums.EstatusRegistro;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
