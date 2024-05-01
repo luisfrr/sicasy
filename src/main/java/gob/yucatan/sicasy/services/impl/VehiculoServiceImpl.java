@@ -20,7 +20,6 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -98,6 +97,35 @@ public class VehiculoServiceImpl implements IVehiculoService {
     }
 
     @Override
+    public Vehiculo findById(Long idVehiculo) {
+        return vehiculoRepository.findById(idVehiculo)
+                .orElseThrow(() -> new NotFoundException("No se ha encontrado el vehículo con el id: " + idVehiculo));
+    }
+
+    @Override
+    public Vehiculo findFullById(Long idVehiculo) {
+
+        Vehiculo vehiculo = findById(idVehiculo);
+
+        if(vehiculo.getLicitacion() != null && vehiculo.getLicitacion().getIdLicitacion() != null)
+            vehiculo.setNumLicitacion(vehiculo.getLicitacion().getNumeroLicitacion());
+        else {
+            vehiculo.setLicitacion(new Licitacion());
+        }
+
+        if(vehiculo.getAnexo() != null && vehiculo.getAnexo().getIdAnexo() != null)
+            vehiculo.setAnexoValue(vehiculo.getAnexo().getNombre());
+        else {
+            vehiculo.setAnexo(new Anexo());
+        }
+
+        if(vehiculo.getDependenciaAsignada() == null)
+            vehiculo.setDependenciaAsignada(new Dependencia());
+
+        return vehiculo;
+    }
+
+    @Override
     public List<Vehiculo> findAllByNoSerie(List<String> noSerieList) {
         return vehiculoRepository.findVehiculosActivosByNoSerie(noSerieList);
     }
@@ -118,12 +146,6 @@ public class VehiculoServiceImpl implements IVehiculoService {
     }
 
     @Override
-    public Vehiculo findById(Long idVehiculo) {
-        return vehiculoRepository.findById(idVehiculo)
-                .orElseThrow(() -> new NotFoundException("No se ha encontrado el vehículo con el id: " + idVehiculo));
-    }
-
-    @Override
     public Vehiculo findByNoSerie(String noSerie) {
         return vehiculoRepository.findVehiculoActivoByNoSerie(noSerie)
                 .orElseThrow(() -> new NotFoundException("No se ha encontrado el vehículo con el número de serie " + noSerie));
@@ -134,9 +156,7 @@ public class VehiculoServiceImpl implements IVehiculoService {
         Integer ESTATUS_VEHICULO_REGISTRADO = 1;
 
         // Validar si ya existe un vehiculo con ese no. de serie
-        Optional<Vehiculo> vehiculoOptional = vehiculoRepository.findVehiculoActivoByNoSerie(vehiculo.getNoSerie());
-
-        if(vehiculoOptional.isPresent())
+        if(vehiculoRepository.existsByEstatusRegistroActivoAndNoSerie(vehiculo.getNoSerie()))
             throw new BadRequestException("Ya existe un vehículo con ese número de serie.");
 
         if(vehiculo.getAnexo().getIdAnexo() == null)
@@ -154,13 +174,51 @@ public class VehiculoServiceImpl implements IVehiculoService {
     }
 
     @Override
-    public Vehiculo editar(Vehiculo vehiculo) {
-        return null;
-    }
+    public void editar(Vehiculo vehiculo) {
 
-    @Override
-    public Vehiculo eliminar(Vehiculo vehiculo) {
-        return null;
+        Vehiculo vehiculoToUpdate = this.findById(vehiculo.getIdVehiculo());
+
+        // Validar si ya existe un vehiculo con ese no. de serie
+        if(vehiculoRepository.existsByEstatusRegistroActivoAndNoSerieAndIdVehiculoNot(vehiculo.getNoSerie(),
+                vehiculo.getIdVehiculo()))
+            throw new BadRequestException("Ya existe un vehículo con ese número de serie.");
+
+        if(vehiculo.getLicitacion().getIdLicitacion() == null)
+            vehiculoToUpdate.setLicitacion(null);
+        else
+            vehiculoToUpdate.setLicitacion(vehiculo.getLicitacion());
+
+        if(vehiculo.getAnexo().getIdAnexo() == null)
+            vehiculoToUpdate.setAnexo(null);
+        else
+            vehiculoToUpdate.setAnexo(vehiculo.getAnexo());
+
+        if(vehiculo.getDependenciaAsignada().getIdDependencia() == null)
+            vehiculoToUpdate.setDependenciaAsignada(null);
+        else
+            vehiculoToUpdate.setDependenciaAsignada(vehiculo.getDependenciaAsignada());
+
+        vehiculoToUpdate.setDependencia(vehiculo.getDependencia());
+        vehiculoToUpdate.setNoSerie(vehiculo.getNoSerie());
+        vehiculoToUpdate.setPlaca(vehiculo.getPlaca());
+        vehiculoToUpdate.setMarca(vehiculo.getMarca());
+        vehiculoToUpdate.setModelo(vehiculo.getModelo());
+        vehiculoToUpdate.setAnio(vehiculo.getAnio());
+        vehiculoToUpdate.setNoMotor(vehiculo.getNoMotor());
+        vehiculoToUpdate.setColor(vehiculo.getColor());
+        vehiculoToUpdate.setCondicionVehiculo(vehiculo.getCondicionVehiculo());
+        vehiculoToUpdate.setNoFactura(vehiculo.getNoFactura());
+        vehiculoToUpdate.setMontoFactura(vehiculo.getMontoFactura());
+        vehiculoToUpdate.setRentaMensual(vehiculo.getRentaMensual());
+        vehiculoToUpdate.setDescripcionVehiculo(vehiculo.getDescripcionVehiculo());
+        vehiculoToUpdate.setResguardante(vehiculo.getResguardante());
+        vehiculoToUpdate.setAreaResguardante(vehiculo.getAreaResguardante());
+        vehiculoToUpdate.setProveedor(vehiculo.getProveedor());
+
+        vehiculoToUpdate.setModificadoPor(vehiculo.getModificadoPor());
+        vehiculoToUpdate.setFechaModificacion(new Date());
+
+        vehiculoRepository.save(vehiculoToUpdate);
     }
 
     @Override

@@ -1,6 +1,7 @@
 package gob.yucatan.sicasy.repository.iface;
 
 import gob.yucatan.sicasy.business.entities.Vehiculo;
+import gob.yucatan.sicasy.business.enums.EstatusRegistro;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
@@ -24,5 +25,12 @@ public interface IVehiculoRepository extends JpaRepository<Vehiculo, Long>, JpaS
 
     @Query("select distinct v.anio from Vehiculo v where v.estatusRegistro = 1 and (v.marca = ?1 or ?1 is null) and (v.modelo = ?2 or ?2 is null)")
     List<Integer> findDistinctAnioByEstatusActivo(String marca, String modelo);
+
+    @Query("select (count(v) > 0) from Vehiculo v where v.estatusRegistro = 1 and upper(v.noSerie) = upper(?1)")
+    boolean existsByEstatusRegistroActivoAndNoSerie(String noSerie);
+
+    @Query("select (count(v) > 0) from Vehiculo v where v.estatusRegistro = 1 and upper(v.noSerie) = upper(?1) and v.idVehiculo <> ?2 ")
+    boolean existsByEstatusRegistroActivoAndNoSerieAndIdVehiculoNot(String noSerie, Long idVehiculo);
+
 
 }

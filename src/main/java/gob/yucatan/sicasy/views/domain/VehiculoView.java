@@ -37,11 +37,14 @@ public class VehiculoView implements Serializable {
     private @Getter String LAYOUT_VEHICULOS = "C:\\sicasy\\files\\layout\\layout_vehiculo.xlsx";
 
     private @Getter String title;
-    private @Getter List<Vehiculo> vehiculoList;
-    private @Getter List<Vehiculo> vehiculoSelectedList;
-    private @Getter List<Vehiculo> vehiculoImportList;
+    private @Getter @Setter List<Vehiculo> vehiculoList;
+    private @Getter @Setter List<Vehiculo> vehiculoSelectedList;
+    private @Getter @Setter List<Vehiculo> vehiculoImportList;
     private @Getter @Setter Vehiculo vehiculoSelected;
     private @Getter @Setter Vehiculo vehiculoFilter;
+    private @Getter boolean showVehiculosPanel;
+    private @Getter boolean showDetailsPanel;
+    private @Getter boolean readOnlyEditForm;
     private @Getter boolean showNuevoFormDialog;
     private @Getter boolean showErrorImportacion;
     private @Getter @Setter List<AcuseImportacion> acuseImportacionList;
@@ -93,6 +96,8 @@ public class VehiculoView implements Serializable {
         this.loadModelos();
         this.loadTipoVehiculo();
 
+        this.showVehiculosPanel = true;
+        this.showDetailsPanel = false;
         this.showNuevoFormDialog = false;
 
         this.vehiculoList = new ArrayList<>();
@@ -236,7 +241,49 @@ public class VehiculoView implements Serializable {
 
     public void verDetalle(Vehiculo vehiculo) {
         log.info("ver detalle vehiculos");
-        this.vehiculoSelected = vehiculo;
+        this.vehiculoSelected = vehiculoService.findFullById(vehiculo.getIdVehiculo());
+        this.showVehiculosPanel = false;
+        this.showDetailsPanel = true;
+        this.readOnlyEditForm = true;
+
+        this.loadLicitacionesForm();
+        this.loadAnexosForm();
+
+        PrimeFaces.current().ajax().update("container");
+    }
+
+    public void regresar() {
+        log.info("regresar vehiculos");
+        this.vehiculoSelected = null;
+        this.showVehiculosPanel = true;
+        this.showDetailsPanel = false;
+        PrimeFaces.current().ajax().update("container");
+    }
+
+    public void permitirEditar() {
+        this.readOnlyEditForm = false;
+        PrimeFaces.current().ajax().update("tab_view_detalles:form_editar_vehiculo");
+    }
+
+    public void cancelarEdicion() {
+        this.vehiculoSelected = vehiculoService.findFullById(this.vehiculoSelected.getIdVehiculo());
+        this.readOnlyEditForm = true;
+        PrimeFaces.current().ajax().update("tab_view_detalles:form_editar_vehiculo");
+    }
+
+    public void guardarEdicion() {
+        try {
+            this.vehiculoSelected.setModificadoPor(userSessionBean.getUserName());
+            vehiculoService.editar(this.vehiculoSelected);
+            this.vehiculoSelected = vehiculoService.findFullById(this.vehiculoSelected.getIdVehiculo());
+            this.readOnlyEditForm = true;
+            Messages.addInfo("Se ha actualizado correctamente la información del vehículo");
+            PrimeFaces.current().ajax().update("tab_view_detalles:form_editar_vehiculo", "growl");
+        } catch (Exception e) {
+            log.error("Error al guardar la información vehiculo", e);
+            Messages.addError(e.getMessage());
+            PrimeFaces.current().ajax().update("tab_view_detalles:form_editar_vehiculo", "growl");
+        }
     }
 
     public void abrirModalRegistroMantenimiento(Long idVehiculo) {
@@ -353,7 +400,6 @@ public class VehiculoView implements Serializable {
         }
     }
 
-
-
     //endregion private methods
+
 }
