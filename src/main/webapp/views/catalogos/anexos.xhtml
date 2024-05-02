@@ -55,14 +55,17 @@
                             <p:outputLabel for="@next" value="Anexo" styleClass="block"/>
                             <p:inputText styleClass="block w-full" placeholder="Ingresa un nombre..."
                                          value="#{anexoView.anexoFilter.nombre}"/>
-                            <span class="text-sm hidden"> </span>
                         </p:outputPanel>
 
                         <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4 xl:col-3">
                             <p:outputLabel for="@next" value="Número de licitación" styleClass="block"/>
-                            <p:inputText styleClass="block w-full" placeholder="Ingresa un número..."
-                                         value="#{anexoView.anexoFilter.licitacion.numeroLicitacion}"/>
-                            <span class="text-sm hidden"> </span>
+                            <p:selectOneMenu styleClass="block w-full" value="#{anexoView.anexoFilter.licitacion.numeroLicitacion}" >
+                                <f:selectItem  itemValue="#{null}" itemLabel="----"/>
+                                <f:selectItems value="#{anexoView.licitacionesActivasList}" var="licitacion" itemLabel="#{licitacion.numeroLicitacion}"
+                                               itemValue="#{licitacion.numeroLicitacion}"/>
+                            </p:selectOneMenu>
+                            <!--<p:inputText styleClass="block w-full" placeholder="Ingresa un número..."
+                                         value="#{anexoView.anexoFilter.licitacion.numeroLicitacion}"/>-->
                         </p:outputPanel>
 
                         <sec:authorize access="hasAuthority('ROLE_OWNER')">
