@@ -390,7 +390,7 @@ public class VehiculoView implements Serializable {
         } else if(Objects.equals(estatusVehiculo, ESTATUS_VEHICULO_RECHAZADO)) {
             vehiculoService.rechazarSolicitud(idVehiculoList, motivo, userSessionBean.getUserName());
         } else if(Objects.equals(estatusVehiculo, ESTATUS_VEHICULO_CANCELADO)) {
-            vehiculoService.rechazarSolicitud(idVehiculoList, motivo, userSessionBean.getUserName());
+            vehiculoService.cancelarSolicitud(idVehiculoList, motivo, userSessionBean.getUserName());
         }
     }
 
