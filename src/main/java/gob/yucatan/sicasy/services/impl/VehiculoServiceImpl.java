@@ -9,6 +9,7 @@ import gob.yucatan.sicasy.repository.criteria.SearchCriteria;
 import gob.yucatan.sicasy.repository.criteria.SearchOperation;
 import gob.yucatan.sicasy.repository.criteria.SearchSpecification;
 import gob.yucatan.sicasy.repository.iface.IAnexoRepository;
+import gob.yucatan.sicasy.repository.iface.IEstatusVehiculoRepository;
 import gob.yucatan.sicasy.repository.iface.ILicitacionRepository;
 import gob.yucatan.sicasy.repository.iface.IVehiculoRepository;
 import gob.yucatan.sicasy.services.iface.IVehiculoService;
@@ -30,6 +31,7 @@ public class VehiculoServiceImpl implements IVehiculoService {
     private final IVehiculoRepository vehiculoRepository;
     private final ILicitacionRepository licitacionRepository;
     private final IAnexoRepository anexoRepository;
+    private final IEstatusVehiculoRepository estatusVehiculoRepository;
 
     @Override
     public List<Vehiculo> findAllDynamic(Vehiculo vehiculo) {
@@ -188,6 +190,31 @@ public class VehiculoServiceImpl implements IVehiculoService {
         return acuseImportacionList;
     }
 
+    @Override
+    @Transactional
+    public void solicitarAutorizacion(List<Long> idVehiculoList, String username) {
+        Integer ESTATUS_VEHICULO_POR_AUTORIZAR = 2;
+        this.cambioEstatus(ESTATUS_VEHICULO_POR_AUTORIZAR, idVehiculoList, null, username);
+    }
+
+    @Override
+    public void autorizarSolicitud(List<Long> idVehiculoList, String username) {
+        Integer ESTATUS_VEHICULO_ACTIVO = 1;
+        this.cambioEstatus(ESTATUS_VEHICULO_ACTIVO, idVehiculoList, null, username);
+    }
+
+    @Override
+    public void rechazarSolicitud(List<Long> idVehiculoList, String motivo, String username) {
+        Integer ESTATUS_VEHICULO_RECHAZADO= 3;
+        this.cambioEstatus(ESTATUS_VEHICULO_RECHAZADO, idVehiculoList, motivo, username);
+    }
+
+    @Override
+    public void cancelarSolicitud(List<Long> idVehiculoList, String motivo, String username) {
+        Integer ESTATUS_VEHICULO_CANCELADO = 4;
+        this.cambioEstatus(ESTATUS_VEHICULO_CANCELADO, idVehiculoList, motivo, username);
+    }
+
     private void validarImportacion(List<AcuseImportacion> acuseImportacionList, List<Vehiculo> vehiculos, Integer idDependencia, String username) {
         Integer ESTATUS_VEHICULO_REGISTRADO = 1;
 
@@ -298,6 +325,28 @@ public class VehiculoServiceImpl implements IVehiculoService {
                     .mensaje("El número de serie esta duplicado en este layout.")
                     .error(1)
                     .build()));
+        }
+    }
+
+    private void cambioEstatus(Integer estatus, List<Long> idVehiculoList, String motivo, String username) {
+        List<Vehiculo> vehiculoToUpdateList = vehiculoRepository.findAllByIdVehiculo(idVehiculoList);
+
+        if(!vehiculoToUpdateList.isEmpty()) {
+
+            EstatusVehiculo estatusPorAutorizar =estatusVehiculoRepository.findById(estatus)
+                    .orElseThrow(() -> new NotFoundException("No se ha encontrado el estatus solicitado."));
+
+            // Se les agrega el estatus Por Autorizar
+            for (Vehiculo vehiculo : vehiculoToUpdateList) {
+                vehiculo.setEstatusVehiculo(estatusPorAutorizar);
+                vehiculo.setObservaciones(motivo);
+                vehiculo.setModificadoPor(username);
+                vehiculo.setFechaModificacion(new Date());
+            }
+
+            vehiculoRepository.saveAll(vehiculoToUpdateList);
+        } else {
+            throw new BadRequestException("No se han recibido los vehículos por actualizar.");
         }
     }
 }

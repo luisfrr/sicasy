@@ -35,10 +35,14 @@
                                                  iconPos="right" icon="fi fi-rr-angle-small-down"/>
                                 <p:menu overlay="true" trigger="btn_acciones_vehiculos" my="left top" at="left bottom">
                                     <p:menuitem value="Registrar nuevos vehículos" ajax="true" action="#{vehiculoView.abrirModalRegistroVehiculo()}"/>
-                                    <p:menuitem value="Solicitar autorización"/>
-                                    <p:menuitem value="Autorizar solicitud"/>
-                                    <p:menuitem value="Rechazar solicitud"/>
-                                    <p:menuitem value="Cancelar solicitud"/>
+                                    <p:menuitem value="Solicitar autorización" ajax="true" action="#{vehiculoView.solicitarAutorizacion()}">
+                                        <p:confirm header="Confirmación" message="¿Está seguro que desea solicitar la autorización?" icon="pi pi-exclamation-triangle"/>
+                                    </p:menuitem>
+                                    <p:menuitem value="Autorizar solicitud" ajax="true" action="#{vehiculoView.autorizarSolicitud()}">
+                                        <p:confirm header="Confirmación" message="¿Está seguro que desea autorizar las solicitudes?" icon="pi pi-exclamation-triangle"/>
+                                    </p:menuitem>
+                                    <p:menuitem value="Rechazar solicitud" ajax="true" action="#{vehiculoView.confirmarRechazoSolicitud()}"/>
+                                    <p:menuitem value="Cancelar solicitud" ajax="true" action="#{vehiculoView.confirmarCancelacionSolicitud()}"/>
                                 </p:menu>
                             </sec:authorize>
                         </p:toolbarGroup>

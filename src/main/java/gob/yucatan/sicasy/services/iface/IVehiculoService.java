@@ -19,4 +19,9 @@ public interface IVehiculoService {
     Vehiculo eliminar(Vehiculo vehiculo);
     List<AcuseImportacion> importar(List<Vehiculo> vehiculos, Integer idDependencia, String username);
 
+    void solicitarAutorizacion(List<Long> idVehiculoList, String username);
+    void autorizarSolicitud(List<Long> idVehiculoList, String username);
+    void rechazarSolicitud(List<Long> idVehiculoList, String motivo, String username);
+    void cancelarSolicitud(List<Long> idVehiculoList, String motivo, String username);
+
 }
