@@ -7,6 +7,7 @@ import gob.yucatan.sicasy.business.exceptions.NotFoundException;
 import gob.yucatan.sicasy.services.iface.*;
 import gob.yucatan.sicasy.utils.imports.excel.ConfigHeaderExcelModel;
 import gob.yucatan.sicasy.utils.imports.excel.ImportExcelFile;
+import gob.yucatan.sicasy.views.beans.AppBean;
 import gob.yucatan.sicasy.views.beans.Messages;
 import gob.yucatan.sicasy.views.beans.UserSessionBean;
 import jakarta.annotation.PostConstruct;
@@ -22,10 +23,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 @Component
 @Scope("view")
@@ -33,8 +31,12 @@ import java.util.List;
 @Slf4j
 public class VehiculoView implements Serializable {
 
-    private final UserSessionBean userSessionBean;
-    private @Getter String LAYOUT_VEHICULOS = "C:\\sicasy\\files\\layout\\layout_vehiculo.xlsx";
+    private @Getter final String LAYOUT_VEHICULOS = "C:\\sicasy\\files\\layout\\layout_vehiculo.xlsx";
+    private @Getter final Integer ESTATUS_VEHICULO_ACTIVO = 1;
+    private @Getter final Integer ESTATUS_VEHICULO_REGISTRADO = 2;
+    private @Getter final Integer ESTATUS_VEHICULO_POR_AUTORIZAR = 3;
+    private @Getter final Integer ESTATUS_VEHICULO_RECHAZADO = 4;
+    private @Getter final Integer ESTATUS_VEHICULO_CANCELADO = 5;
 
     private @Getter String title;
     private @Getter @Setter List<Vehiculo> vehiculoList;
@@ -62,6 +64,8 @@ public class VehiculoView implements Serializable {
     private @Getter List<Anexo> anexoFormList;
     private @Getter String layoutFileUpload;
 
+    private final AppBean appBean;
+    private final UserSessionBean userSessionBean;
     private final IVehiculoService vehiculoService;
     private final IDependenciaService dependenciaService;
     private final ICondicionVehiculoService condicionVehiculoService;
@@ -239,6 +243,24 @@ public class VehiculoView implements Serializable {
         }
     }
 
+    public void solicitarAutorizacion() {
+        try {
+            this.cambiarEstatus(ESTATUS_VEHICULO_POR_AUTORIZAR, null);
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            Messages.addError(e.getMessage());
+        }
+    }
+
+    public void autorizarSolicitud() {
+        try {
+            this.cambiarEstatus(ESTATUS_VEHICULO_ACTIVO, null);
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            Messages.addError(e.getMessage());
+        }
+    }
+
     public void verDetalle(Vehiculo vehiculo) {
         log.info("ver detalle vehiculos");
         this.vehiculoSelected = vehiculoService.findFullById(vehiculo.getIdVehiculo());
@@ -397,6 +419,25 @@ public class VehiculoView implements Serializable {
                         .toList();
         } else {
             this.anexoFormList = new ArrayList<>();
+        }
+    }
+
+    private void cambiarEstatus(Integer estatusVehiculo, String motivo) {
+        if(this.vehiculoSelectedList.isEmpty())
+            throw new BadRequestException("No ha seleccionado ningún vehículo.");
+
+        List<Long> idVehiculoList = vehiculoSelectedList.stream()
+                .map(Vehiculo::getIdVehiculo)
+                .toList();
+
+        if(Objects.equals(estatusVehiculo, ESTATUS_VEHICULO_POR_AUTORIZAR)) {
+            vehiculoService.solicitarAutorizacion(idVehiculoList, userSessionBean.getUserName());
+        } else if (Objects.equals(estatusVehiculo, ESTATUS_VEHICULO_ACTIVO)) {
+            vehiculoService.autorizarSolicitud(idVehiculoList, userSessionBean.getUserName());
+        } else if(Objects.equals(estatusVehiculo, ESTATUS_VEHICULO_RECHAZADO)) {
+            vehiculoService.rechazarSolicitud(idVehiculoList, motivo, userSessionBean.getUserName());
+        } else if(Objects.equals(estatusVehiculo, ESTATUS_VEHICULO_CANCELADO)) {
+            vehiculoService.cancelarSolicitud(idVehiculoList, motivo, userSessionBean.getUserName());
         }
     }
 
