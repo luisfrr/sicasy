@@ -1,6 +1,7 @@
 package gob.yucatan.sicasy.utils.imports.excel;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.compress.utils.FileNameUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -8,6 +9,7 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.text.Normalizer;
+import java.util.UUID;
 
 @Slf4j
 public class SaveFile {
@@ -29,6 +31,15 @@ public class SaveFile {
         File file = new File(System.getProperty("user.home")+path+
                 Normalizer.normalize(fileName, Normalizer.Form.NFKD)
                 .replaceAll("[^\\p{ASCII}]", ""));
+        return Files.write(file.toPath(), content).toString();
+    }
+
+    public static String importFileToPath(byte[] content, String fileName, String path) throws IOException {
+        UUID uuid = UUID.randomUUID();
+        String uniqueFileName = uuid + "." + FileNameUtils.getExtension(fileName);
+        String fullPath = path + uniqueFileName;
+
+        File file = new File(fullPath);
         return Files.write(file.toPath(), content).toString();
     }
 

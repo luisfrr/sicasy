@@ -7,7 +7,7 @@ import gob.yucatan.sicasy.business.exceptions.NotFoundException;
 import gob.yucatan.sicasy.services.iface.*;
 import gob.yucatan.sicasy.utils.imports.excel.ConfigHeaderExcelModel;
 import gob.yucatan.sicasy.utils.imports.excel.ImportExcelFile;
-import gob.yucatan.sicasy.views.beans.AppBean;
+import gob.yucatan.sicasy.utils.imports.excel.SaveFile;
 import gob.yucatan.sicasy.views.beans.Messages;
 import gob.yucatan.sicasy.views.beans.UserSessionBean;
 import jakarta.annotation.PostConstruct;
@@ -18,6 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.primefaces.PrimeFaces;
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.model.file.UploadedFile;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
@@ -31,26 +32,36 @@ import java.util.*;
 @Slf4j
 public class VehiculoView implements Serializable {
 
-    private @Getter final String LAYOUT_VEHICULOS = "C:\\sicasy\\files\\layout\\layout_vehiculo.xlsx";
+    @Value("${app.files.folder.layouts.importar-vehiculo}")
+    private @Getter String LAYOUT_VEHICULOS;
+
+    @Value("${app.files.folder.vehiculos}")
+    private @Getter String FOLDER_VEHICULOS;
 
     private @Getter final Integer ACCION_RECHAZAR_SOLICITUD = 3;
     private @Getter final Integer ACCION_CANCELAR_SOLICITUD = 4;
     private @Getter final Integer ACCION_SOLICITAR_BAJA = 5;
     private @Getter final Integer ACCION_SOLICITAR_MODIFICACION = 6;
 
+    // Generales
     private @Getter String title;
     private @Getter @Setter List<Vehiculo> vehiculoList;
     private @Getter @Setter List<Vehiculo> vehiculoSelectedList;
     private @Getter @Setter List<Vehiculo> vehiculoImportList;
     private @Getter @Setter Vehiculo vehiculoSelected;
     private @Getter @Setter Vehiculo vehiculoFilter;
-    private @Getter boolean showVehiculosPanel;
-    private @Getter boolean showDetailsPanel;
-    private @Getter boolean readOnlyEditForm;
+    private @Getter boolean showVehiculosPanel; // Seccion completa de filtrado
+
+    // Registro nuevos
     private @Getter boolean showNuevoFormDialog;
     private @Getter boolean showErrorImportacion;
     private @Getter @Setter List<AcuseImportacion> acuseImportacionList;
 
+    // Seccion completa de detalles del vehículo
+    private @Getter boolean showDetailsPanel;
+    private @Getter boolean readOnlyEditForm;
+
+    // Se usa para los filtros
     private @Getter List<Dependencia> dependenciaList;
     private @Getter List<CondicionVehiculo> condicionVehiculoList;
     private @Getter List<EstatusVehiculo> estatusVehiculoList;
@@ -60,16 +71,21 @@ public class VehiculoView implements Serializable {
     private @Getter List<String> modeloList;
     private @Getter List<Integer> anioList;
 
+    // Se usa para registros nuevos y edición
     private @Getter List<Licitacion> licitacionFormList;
     private @Getter List<Anexo> anexoFormList;
     private @Getter String layoutFileUpload;
 
+    // Se usan para confirmacion de cambio de estatus
     private @Getter boolean showConfirmEstatus;
     private @Getter Integer confirmAccion;
     private @Getter String confirmMensaje;
     private @Getter @Setter String confirmMotivo;
 
-    private final AppBean appBean;
+    // Se usa para adjuntar fotos
+    private @Getter boolean showAdjuntarFotos;
+    private @Getter Vehiculo vehiculoFotoSelected;
+
     private final UserSessionBean userSessionBean;
     private final IVehiculoService vehiculoService;
     private final IDependenciaService dependenciaService;
@@ -77,6 +93,7 @@ public class VehiculoView implements Serializable {
     private final IEstatusVehiculoService estatusVehiculoService;
     private final ILicitacionService licitacionService;
     private final IAnexoService anexoService;
+    private final IVehiculoFotoService vehiculoFotoService;
 
 
     @PostConstruct
@@ -110,6 +127,7 @@ public class VehiculoView implements Serializable {
         this.showNuevoFormDialog = false;
 
         this.showConfirmEstatus = false;
+        this.showAdjuntarFotos = false;
 
         this.vehiculoList = new ArrayList<>();
         this.vehiculoSelectedList = new ArrayList<>();
@@ -394,9 +412,46 @@ public class VehiculoView implements Serializable {
 
     public void abrirModalAdjuntarFotos(Long idVehiculo) {
         log.info("abrir modal adjuntar fotos");
-        this.vehiculoSelected = vehiculoService.findById(idVehiculo);
+        this.showAdjuntarFotos = true;
+        this.vehiculoFotoSelected = vehiculoService.findById(idVehiculo);
+        PrimeFaces.current().ajax().update("form_adjuntar_fotos", "growl");
+        PrimeFaces.current().executeScript("PF('adjuntarFotosDialog').show();");
     }
 
+    public void cerrarModalAdjuntarFotos() {
+        log.info("cerrar modal adjuntar fotos");
+        this.showAdjuntarFotos = false;
+        this.vehiculoFotoSelected = null;
+        PrimeFaces.current().ajax().update("form_adjuntar_fotos");
+        PrimeFaces.current().executeScript("PF('adjuntarFotosDialog').hide();");
+    }
+
+    public void subirFotoVehiculo(FileUploadEvent event) {
+        log.info("subir foto vehiculo");
+        String fileName = event.getFile().getFileName();
+        try {
+            if(this.vehiculoFotoSelected != null) {
+                String filePath = SaveFile.importFileToPath(event.getFile().getContent(), fileName, FOLDER_VEHICULOS);
+
+                VehiculoFoto vehiculoFoto = VehiculoFoto.builder()
+                        .vehiculo(this.vehiculoFotoSelected)
+                        .rutaArchivo(filePath)
+                        .nombreArchivo(fileName)
+                        .fechaCreacion(new Date())
+                        .creadoPor(userSessionBean.getUserName())
+                        .borrado(0)
+                        .build();
+
+                vehiculoFotoService.guardarFoto(vehiculoFoto);
+                Messages.addInfo("Se ha gurdado correctamente la foto: " + fileName);
+            } else {
+                Messages.addWarn("No se ha seleccionado el vehículo");
+            }
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            Messages.addError("No se ha logrado guardar la foto: " + fileName);
+        }
+    }
 
     //region Events
 

@@ -1,0 +1,54 @@
+<ui:composition
+        xmlns="http://www.w3.org/1999/xhtml"
+        xmlns:h="http://xmlns.jcp.org/jsf/html"
+        xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+        xmlns:p="http://primefaces.org/ui">
+
+   <h:form id="form_adjuntar_fotos">
+
+      <p:dialog header="Adjuntar fotos"
+                id="adjuntar-fotos-dialog" widgetVar="adjuntarFotosDialog"
+                height="450" width="800"
+                showEffect="fade" modal="true"
+                closable="false" closeOnEscape="false"
+                cache="false" responsive="true">
+
+         <p:outputPanel id="adjuntar-fotos-dialog-content" styleClass="formgrid grid"
+                        rendered="#{vehiculoView.showAdjuntarFotos}">
+
+            <p:outputPanel styleClass="field col-12">
+               <p:outputLabel for="@next" value="No. Serie" styleClass="block"/>
+               <p:inputText styleClass="block w-full" readonly="true" value="#{vehiculoView.vehiculoFotoSelected.noSerie}"/>
+               <span class="text-sm hidden"> </span>
+            </p:outputPanel>
+
+            <p:outputPanel styleClass="field col-12 mb-5">
+               <p:fileUpload listener="#{vehiculoView.subirFotoVehiculo}" mode="advanced" dragDropSupport="true"
+                             chooseButtonTitle="Elegir" chooseLabel="Elegir"
+                             cancelButtonTitle="Cancelar" cancelLabel="Cancelar"
+                             uploadButtonTitle="Subir" uploadLabel="Subir"
+                             multiple="true" update="growl" sizeLimit="10000000" fileLimit="5"
+                             fileLimitMessage="Has superado el número máximo de archivos"
+                             invalidFileMessage="Archivo no válido"
+                             invalidSizeMessage="Has superado el tamaño máximo por archivo"
+                             allowTypes="/(\.|\/)(jpe?g|png)$/"/>
+               <span class="text-sm">Sólo se permiten archivos .jpg, .jpeg y .png. Máximo 5 archivos</span>
+            </p:outputPanel>
+
+            <p:outputPanel styleClass="field col-12 mb-0">
+
+               <p:outputPanel styleClass="flex justify-content-end">
+                  <p:commandButton value="Cerrar" ajax="true" process="@this"
+                                   action="#{vehiculoView.cerrarModalAdjuntarFotos()}"
+                                   styleClass="ui-button-outlined"/>
+               </p:outputPanel>
+
+            </p:outputPanel>
+
+         </p:outputPanel>
+
+      </p:dialog>
+
+   </h:form>
+
+</ui:composition>

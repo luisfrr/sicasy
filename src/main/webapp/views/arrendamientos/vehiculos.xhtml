@@ -319,6 +319,7 @@
                                 <sec:authorize access="hasAnyAuthority('ROLE_OWNER')">
                                     <p:menuitem value="Adjuntar fotos"
                                                 ajax="true" action="#{vehiculoView.abrirModalAdjuntarFotos(vehiculo.idVehiculo)}"
+                                                oncomplete="Main.changeChooseLabel();"
                                                 update="growl form_datatable">
                                     </p:menuitem>
                                 </sec:authorize>
@@ -339,6 +340,8 @@
         <ui:include src="/views/arrendamientos/_detalle_vehiculos.xhtml"/>
 
         <ui:include src="/views/arrendamientos/_confirmacion_cambio_estatus.xhtml"/>
+
+        <ui:include src="/views/arrendamientos/_adjuntar_fotos_dialog.xhtml"/>
 
     </p:outputPanel>
 
