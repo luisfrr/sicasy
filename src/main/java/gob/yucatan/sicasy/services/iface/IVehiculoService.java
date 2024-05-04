@@ -24,5 +24,7 @@ public interface IVehiculoService {
     void autorizarSolicitud(List<Long> idVehiculoList, String username);
     void rechazarSolicitud(List<Long> idVehiculoList, String motivo, String username);
     void cancelarSolicitud(List<Long> idVehiculoList, String motivo, String username);
+    void solicitarModificacion(List<Long> idVehiculoList, String motivo, String username);
+    void solicitarBaja(List<Long> idVehiculoList, String motivo, String username);
 
 }

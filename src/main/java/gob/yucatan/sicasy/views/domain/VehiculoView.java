@@ -32,11 +32,11 @@ import java.util.*;
 public class VehiculoView implements Serializable {
 
     private @Getter final String LAYOUT_VEHICULOS = "C:\\sicasy\\files\\layout\\layout_vehiculo.xlsx";
-    private @Getter final Integer ESTATUS_VEHICULO_ACTIVO = 1;
-    private @Getter final Integer ESTATUS_VEHICULO_REGISTRADO = 2;
-    private @Getter final Integer ESTATUS_VEHICULO_POR_AUTORIZAR = 3;
-    private @Getter final Integer ESTATUS_VEHICULO_RECHAZADO = 4;
-    private @Getter final Integer ESTATUS_VEHICULO_CANCELADO = 5;
+
+    private @Getter final Integer ACCION_RECHAZAR_SOLICITUD = 1;
+    private @Getter final Integer ACCION_CANCELAR_SOLICITUD = 2;
+    private @Getter final Integer ACCION_SOLICITAR_BAJA = 3;
+    private @Getter final Integer ACCION_SOLICITAR_MODIFICACION = 4;
 
     private @Getter String title;
     private @Getter @Setter List<Vehiculo> vehiculoList;
@@ -63,6 +63,11 @@ public class VehiculoView implements Serializable {
     private @Getter List<Licitacion> licitacionFormList;
     private @Getter List<Anexo> anexoFormList;
     private @Getter String layoutFileUpload;
+
+    private @Getter boolean showConfirmEstatus;
+    private @Getter Integer confirmAccion;
+    private @Getter String confirmMensaje;
+    private @Getter @Setter String confirmMotivo;
 
     private final AppBean appBean;
     private final UserSessionBean userSessionBean;
@@ -104,6 +109,8 @@ public class VehiculoView implements Serializable {
         this.showDetailsPanel = false;
         this.showNuevoFormDialog = false;
 
+        this.showConfirmEstatus = false;
+
         this.vehiculoList = new ArrayList<>();
         this.vehiculoSelectedList = new ArrayList<>();
         PrimeFaces.current().ajax().update("form_filtros");
@@ -112,6 +119,7 @@ public class VehiculoView implements Serializable {
     public void buscar() {
         log.info("buscar vehiculos");
         this.vehiculoList = vehiculoService.findAllDynamic(this.vehiculoFilter);
+        PrimeFaces.current().ajax().update("form_datatable");
     }
 
     public void abrirModalRegistroVehiculo() {
@@ -244,8 +252,12 @@ public class VehiculoView implements Serializable {
     }
 
     public void solicitarAutorizacion() {
+        log.info("Solicitando autorizacion");
         try {
-            this.cambiarEstatus(ESTATUS_VEHICULO_POR_AUTORIZAR, null);
+            List<Long> idVehiculoSelectedList =  this.getIdVehiculoSelectedList();
+            vehiculoService.solicitarAutorizacion(idVehiculoSelectedList, userSessionBean.getUserName());
+            this.buscar();
+            Messages.addInfo("Se ha enviado la solicitud de autorización");
         } catch (Exception e) {
             log.error(e.getMessage());
             Messages.addError(e.getMessage());
@@ -253,12 +265,80 @@ public class VehiculoView implements Serializable {
     }
 
     public void autorizarSolicitud() {
+        log.info("Autorizando solicitud");
         try {
-            this.cambiarEstatus(ESTATUS_VEHICULO_ACTIVO, null);
+            List<Long> idVehiculoSelectedList =  this.getIdVehiculoSelectedList();
+            vehiculoService.autorizarSolicitud(idVehiculoSelectedList, userSessionBean.getUserName());
+            this.buscar();
+            Messages.addInfo("Se han autorizado correctamente las solicitudes");
         } catch (Exception e) {
             log.error(e.getMessage());
             Messages.addError(e.getMessage());
         }
+    }
+
+    public void abrirConfirmEstatusDialog(Integer confirmAccion) {
+        log.info("Abrir Confirm Estatus");
+        this.showConfirmEstatus = true;
+        this.confirmAccion = confirmAccion;
+        this.confirmMotivo = "";
+
+        if(Objects.equals(confirmAccion, ACCION_RECHAZAR_SOLICITUD)) {
+            this.confirmMensaje = "¿Está seguro que desea rechazar las solicitudes? Esto regresa el estatus del vehiculo a REGISTRADO.";
+        } else if (Objects.equals(confirmAccion, ACCION_CANCELAR_SOLICITUD)) {
+            this.confirmMensaje = "¿Está seguro que desea cancelar las solicitudes? Una vez canceladas ya no podrás visualizar este registro.";
+        } else if (Objects.equals(confirmAccion, ACCION_SOLICITAR_BAJA)) {
+            this.confirmMensaje = "¿Está seguro que desea solicitar la baja de los vehículos? Una vez dados de baja, solo se muestran en reportes históricos.";
+        } else if (Objects.equals(confirmAccion, ACCION_SOLICITAR_MODIFICACION)) {
+            this.confirmMensaje = "¿Está seguro que desea solicitar la baja de los vehículos? Una vez dados de baja, solo se muestran en reportes históricos.";
+        }
+
+        PrimeFaces.current().ajax().update("confirm-estatus-dialog");
+        PrimeFaces.current().executeScript("PF('confirmEstatusDialog').show()");
+    }
+
+    public void confirmarEstatusDialog() {
+        log.info("confirmar estatus dialog");
+        try {
+            List<Long> idVehiculoSelectedList =  this.getIdVehiculoSelectedList();
+            vehiculoService.autorizarSolicitud(idVehiculoSelectedList, userSessionBean.getUserName());
+
+            boolean success = false;
+            if(Objects.equals(this.confirmAccion, ACCION_RECHAZAR_SOLICITUD)) {
+                vehiculoService.rechazarSolicitud(idVehiculoSelectedList, this.confirmMotivo, userSessionBean.getUserName());
+                Messages.addInfo("Se han rechazado correctamente las solicitudes de los vehículos seleccionados");
+                success = true;
+            } else if (Objects.equals(this.confirmAccion, ACCION_CANCELAR_SOLICITUD)) {
+                vehiculoService.cancelarSolicitud(idVehiculoSelectedList, this.confirmMotivo, userSessionBean.getUserName());
+                Messages.addInfo("Se han cancelado correctamente los registros de los vehículos seleccionados");
+                success = true;
+            } else if (Objects.equals(this.confirmAccion, ACCION_SOLICITAR_BAJA)) {
+                vehiculoService.solicitarBaja(idVehiculoSelectedList, this.confirmMotivo, userSessionBean.getUserName());
+                Messages.addInfo("Se han dado de baja los vehículos seleccionados");
+                success = true;
+            } else if (Objects.equals(this.confirmAccion, ACCION_SOLICITAR_MODIFICACION)) {
+                vehiculoService.solicitarModificacion(idVehiculoSelectedList, this.confirmMotivo, userSessionBean.getUserName());
+                Messages.addInfo("Se ha solicitado la modificación de los vehículos seleccionados.");
+                success = true;
+            }
+
+            if(success)
+                this.buscar();
+
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            Messages.addError(e.getMessage());
+        }
+    }
+
+    public void cerrarConfirmEstatusDialog() {
+        log.info("Cerrar Confirm Estatus");
+        this.showConfirmEstatus = false;
+        this.confirmAccion = null;
+        this.confirmMotivo = "";
+        this.confirmMensaje = "";
+        PrimeFaces.current().ajax().update("confirm-estatus-dialog");
+        PrimeFaces.current().executeScript("PF('confirmEstatusDialog').hide()");
     }
 
     public void verDetalle(Vehiculo vehiculo) {
@@ -422,23 +502,13 @@ public class VehiculoView implements Serializable {
         }
     }
 
-    private void cambiarEstatus(Integer estatusVehiculo, String motivo) {
+    private List<Long> getIdVehiculoSelectedList() {
         if(this.vehiculoSelectedList.isEmpty())
             throw new BadRequestException("No ha seleccionado ningún vehículo.");
 
-        List<Long> idVehiculoList = vehiculoSelectedList.stream()
+        return vehiculoSelectedList.stream()
                 .map(Vehiculo::getIdVehiculo)
                 .toList();
-
-        if(Objects.equals(estatusVehiculo, ESTATUS_VEHICULO_POR_AUTORIZAR)) {
-            vehiculoService.solicitarAutorizacion(idVehiculoList, userSessionBean.getUserName());
-        } else if (Objects.equals(estatusVehiculo, ESTATUS_VEHICULO_ACTIVO)) {
-            vehiculoService.autorizarSolicitud(idVehiculoList, userSessionBean.getUserName());
-        } else if(Objects.equals(estatusVehiculo, ESTATUS_VEHICULO_RECHAZADO)) {
-            vehiculoService.rechazarSolicitud(idVehiculoList, motivo, userSessionBean.getUserName());
-        } else if(Objects.equals(estatusVehiculo, ESTATUS_VEHICULO_CANCELADO)) {
-            vehiculoService.cancelarSolicitud(idVehiculoList, motivo, userSessionBean.getUserName());
-        }
     }
 
     //endregion private methods

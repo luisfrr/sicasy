@@ -41,8 +41,22 @@
                                     <p:menuitem value="Autorizar solicitud" ajax="true" action="#{vehiculoView.autorizarSolicitud()}">
                                         <p:confirm header="Confirmación" message="¿Está seguro que desea autorizar las solicitudes?" icon="pi pi-exclamation-triangle"/>
                                     </p:menuitem>
-                                    <p:menuitem value="Rechazar solicitud" ajax="true" action="#{vehiculoView.confirmarRechazoSolicitud()}"/>
-                                    <p:menuitem value="Cancelar solicitud" ajax="true" action="#{vehiculoView.confirmarCancelacionSolicitud()}"/>
+                                    <p:menuitem value="Rechazar solicitud" ajax="true"
+                                                action="#{vehiculoView.abrirConfirmEstatusDialog(vehiculoView.ACCION_RECHAZAR_SOLICITUD)}">
+                                        <p:resetInput target="confirm-estatus-dialog"/>
+                                    </p:menuitem>
+                                    <p:menuitem value="Cancelar solicitud" ajax="true"
+                                                action="#{vehiculoView.abrirConfirmEstatusDialog(vehiculoView.ACCION_CANCELAR_SOLICITUD)}">
+                                        <p:resetInput target="confirm-estatus-dialog"/>
+                                    </p:menuitem>
+                                    <p:menuitem value="Solicitar baja" ajax="true"
+                                                action="#{vehiculoView.abrirConfirmEstatusDialog(vehiculoView.ACCION_SOLICITAR_BAJA)}">
+                                        <p:resetInput target="confirm-estatus-dialog"/>
+                                    </p:menuitem>
+                                    <p:menuitem value="Solicitar modificación" ajax="true"
+                                                action="#{vehiculoView.abrirConfirmEstatusDialog(vehiculoView.ACCION_SOLICITAR_MODIFICACION)}">
+                                        <p:resetInput target="confirm-estatus-dialog"/>
+                                    </p:menuitem>
                                 </p:menu>
                             </sec:authorize>
                         </p:toolbarGroup>
@@ -165,8 +179,8 @@
                              var="vehiculo" value="#{vehiculoView.vehiculoList}"
                              rows="50" rowHover="true"
                              rowKey="#{vehiculo.idVehiculo}" rowIndexVar="index"
+                             rowSelectMode="add"
                              selection="#{vehiculoView.vehiculoSelectedList}"
-                             selectionPageOnly="false" rowSelectMode="none"
                              styleClass="dt-scrollable-x"
                              scrollable="true"
                              paginator="true" paginatorPosition="bottom"
@@ -178,6 +192,12 @@
                         Vehículos
                     </f:facet>
 
+                    <p:ajax event="rowSelect" update="form_toolbar"/>
+                    <p:ajax event="rowUnselect" update="form_toolbar"/>
+                    <p:ajax event="rowSelectCheckbox" update="form_toolbar"/>
+                    <p:ajax event="rowUnselectCheckbox" update="form_toolbar"/>
+                    <p:ajax event="toggleSelect" update="form_toolbar"/>
+                    
                     <p:column selectionMode="multiple" style="width:16px;text-align:center"/>
 
                     <p:column headerText="No." width="40">
@@ -317,6 +337,47 @@
         <ui:include src="/views/arrendamientos/_registrar_nuevos_vehiculos.xhtml"/>
 
         <ui:include src="/views/arrendamientos/_detalle_vehiculos.xhtml"/>
+
+        <p:dialog header="Confirmación"
+                  id="confirm-estatus-dialog" widgetVar="confirmEstatusDialog"
+                  minHeight="300" width="500"
+                  showEffect="fade" modal="true"
+                  closable="false" closeOnEscape="false"
+                  cache="false" responsive="true">
+
+            <h:form id="confirm-estatus-dialog-content">
+                <p:outputPanel styleClass="formgrid grid" rendered="#{vehiculoView.showConfirmEstatus}">
+
+                    <p:outputPanel styleClass="col-12 mb-4">
+                        <h:outputText styleClass="text-lg" value="#{vehiculoView.confirmMensaje}"/>
+                    </p:outputPanel>
+
+                    <p:outputPanel styleClass="field col-12 mb-5">
+                        <p:outputLabel for="@next" value="Motivo" styleClass="block"/>
+                        <p:inputTextarea styleClass="block w-full" rows="2"  autoResize="true" required="true"
+                                         value="#{vehiculoView.confirmMotivo}"/>
+                        <span class="text-sm hidden"> </span>
+                    </p:outputPanel>
+
+                    <p:outputPanel styleClass="field col-12 mb-0">
+
+                        <p:outputPanel styleClass="flex justify-content-end">
+                            <p:commandButton value="No" ajax="true" process="@this"
+                                             action="#{vehiculoView.cerrarConfirmEstatusDialog()}"
+                                             styleClass="ui-button-outlined mr-4"/>
+                            <p:commandButton value="Sí" ajax="true" process="@form"
+                                             action="#{vehiculoView.confirmarEstatusDialog()}"
+                                             validateClient="true"/>
+                        </p:outputPanel>
+
+                    </p:outputPanel>
+
+                </p:outputPanel>
+            </h:form>
+
+
+        </p:dialog>
+
 
     </p:outputPanel>
 

@@ -2,11 +2,13 @@ package gob.yucatan.sicasy.views.beans;
 
 import jakarta.faces.application.FacesMessage;
 import jakarta.faces.context.FacesContext;
+import org.primefaces.PrimeFaces;
 
 public class Messages {
 
     public static void addMessage(FacesMessage.Severity severity, String summary, String detail) {
         FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity, summary, detail));
+        PrimeFaces.current().ajax().update("growl");
     }
 
     public static void addInfo(String summary, String detail) {

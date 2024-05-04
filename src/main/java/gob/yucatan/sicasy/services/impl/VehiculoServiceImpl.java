@@ -21,11 +21,18 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class VehiculoServiceImpl implements IVehiculoService {
+
+    private final Integer ESTATUS_VEHICULO_REGISTRADO = 1;
+    private final Integer ESTATUS_VEHICULO_POR_AUTORIZAR = 2;
+    private final Integer ESTATUS_VEHICULO_ACTIVO = 3;
+    private final Integer ESTATUS_VEHICULO_BAJA = 4;
+    private final Integer ESTATUS_VEHICULO_CANCELADO = 5;
 
     private final IVehiculoRepository vehiculoRepository;
     private final ILicitacionRepository licitacionRepository;
@@ -251,26 +258,43 @@ public class VehiculoServiceImpl implements IVehiculoService {
     @Override
     @Transactional
     public void solicitarAutorizacion(List<Long> idVehiculoList, String username) {
-        Integer ESTATUS_VEHICULO_POR_AUTORIZAR = 2;
+        // Al solicitar una autorizacion cambia a estatus por autorizar
         this.cambioEstatus(ESTATUS_VEHICULO_POR_AUTORIZAR, idVehiculoList, null, username);
     }
 
     @Override
+    @Transactional
     public void autorizarSolicitud(List<Long> idVehiculoList, String username) {
-        Integer ESTATUS_VEHICULO_ACTIVO = 1;
+        // Al autorizar una solicitud cambia a estatus activo
         this.cambioEstatus(ESTATUS_VEHICULO_ACTIVO, idVehiculoList, null, username);
     }
 
     @Override
+    @Transactional
     public void rechazarSolicitud(List<Long> idVehiculoList, String motivo, String username) {
-        Integer ESTATUS_VEHICULO_RECHAZADO= 3;
-        this.cambioEstatus(ESTATUS_VEHICULO_RECHAZADO, idVehiculoList, motivo, username);
+        // Al rechazar una solicitud regresa a estatus registrado
+        this.cambioEstatus(ESTATUS_VEHICULO_REGISTRADO, idVehiculoList, motivo, username);
     }
 
     @Override
+    @Transactional
     public void cancelarSolicitud(List<Long> idVehiculoList, String motivo, String username) {
-        Integer ESTATUS_VEHICULO_CANCELADO = 4;
+        // Al cancelar una solicitud cambia a estatus cancelado
         this.cambioEstatus(ESTATUS_VEHICULO_CANCELADO, idVehiculoList, motivo, username);
+    }
+
+    @Override
+    @Transactional
+    public void solicitarModificacion(List<Long> idVehiculoList, String motivo, String username) {
+        // Al solicitar una modificación cambia a estatus registrado
+        this.cambioEstatus(ESTATUS_VEHICULO_REGISTRADO, idVehiculoList, motivo, username);
+    }
+
+    @Override
+    @Transactional
+    public void solicitarBaja(List<Long> idVehiculoList, String motivo, String username) {
+        // Al solicitar una baja cambia a estatus baja
+        this.cambioEstatus(ESTATUS_VEHICULO_BAJA, idVehiculoList, motivo, username);
     }
 
     private void validarImportacion(List<AcuseImportacion> acuseImportacionList, List<Vehiculo> vehiculos, Integer idDependencia, String username) {
@@ -386,20 +410,78 @@ public class VehiculoServiceImpl implements IVehiculoService {
         }
     }
 
-    private void cambioEstatus(Integer estatus, List<Long> idVehiculoList, String motivo, String username) {
+    private void cambioEstatus(Integer estatusPorAsignar, List<Long> idVehiculoList, String motivo, String username) {
         List<Vehiculo> vehiculoToUpdateList = vehiculoRepository.findAllByIdVehiculo(idVehiculoList);
 
         if(!vehiculoToUpdateList.isEmpty()) {
 
-            EstatusVehiculo estatusPorAutorizar =estatusVehiculoRepository.findById(estatus)
+            EstatusVehiculo estatusVehiculo = estatusVehiculoRepository.findById(estatusPorAsignar)
                     .orElseThrow(() -> new NotFoundException("No se ha encontrado el estatus solicitado."));
 
-            // Se les agrega el estatus Por Autorizar
+            List<Integer> distinctEstatusVehiculos = vehiculoToUpdateList.stream()
+                    .map(Vehiculo::getEstatusVehiculo)
+                    .map(EstatusVehiculo::getIdEstatusVehiculo)
+                    .distinct()
+                    .toList();
+
+            // Si los vehiculos seleccionados tienen diferentes estatus
+            // entonces no se puede actualizar. Todos deben tener el mismo estatus.
+            if(distinctEstatusVehiculos.size() > 1) {
+                throw new BadRequestException("Asegurate de seleccionar vehículos con el mismo estatus.");
+            }
+
+            // Se obtiene el estatus actual de todos los vehiculas a actualizar
+            Integer estatusActual = distinctEstatusVehiculos.getFirst();
+
+            boolean cancelado = false;
+
+            // Si estatus que se va a asignar es POR AUTORIZAR
+            if(Objects.equals(estatusPorAsignar, ESTATUS_VEHICULO_POR_AUTORIZAR)){
+                // Si el estatus actual no es REGISTRADO entonces no se puede cambiar a POR AUTORIZAR
+                if(!Objects.equals(estatusActual, ESTATUS_VEHICULO_REGISTRADO)) {
+                    throw new BadRequestException("Para solicitar la autorización asegúrate de seleccionar vehículos con estatus REGISTRADO.");
+                }
+            } // Si estatus que se va a asignar es CANCELADO
+            else if (Objects.equals(estatusPorAsignar, ESTATUS_VEHICULO_CANCELADO)) {
+                // Si el estatus actual no es POR AUTORIZAR entonces no se puede cambiar a CANCELADO
+                if(!Objects.equals(estatusActual, ESTATUS_VEHICULO_POR_AUTORIZAR)) {
+                    throw new BadRequestException("Para cancelar las solicitudes asegúrate de seleccionar vehículos con estatus POR AUTORIZAR.");
+                }
+                cancelado = true;
+            } // Si estatus que se va a asignar es ACTIVO
+            else if (Objects.equals(estatusPorAsignar, ESTATUS_VEHICULO_ACTIVO)) {
+                // Si el estatus actual no es POR AUTORIZAR entonces no se puede cambiar a ACTIVO
+                if(!Objects.equals(estatusActual, ESTATUS_VEHICULO_POR_AUTORIZAR)) {
+                    throw new BadRequestException("Para autorizar las solicitudes asegúrate de seleccionar vehículos con estatus POR AUTORIZAR.");
+                }
+            } // Si estatus que se va a asignar es BAJA
+            else if(Objects.equals(estatusPorAsignar, ESTATUS_VEHICULO_BAJA)) {
+                // Si el estatus actual no es ACTIVO entonces no se puede cambiar a BAJA
+                if(!Objects.equals(estatusActual, ESTATUS_VEHICULO_ACTIVO)) {
+                    throw new BadRequestException("Para solicitar la baja asegúrate de seleccionar vehículos con estatus ACTIVO.");
+                }
+            }
+            else if(Objects.equals(estatusPorAsignar, ESTATUS_VEHICULO_REGISTRADO)) {
+                // Si el estatus actual no es ACTIVO o BAJA entonces no se puede cambiar a REGISTRADO
+                if(!Objects.equals(estatusActual, ESTATUS_VEHICULO_ACTIVO) || !Objects.equals(estatusActual, ESTATUS_VEHICULO_BAJA)) {
+                    throw new BadRequestException("Para solicitar la modificación asegúrate de seleccionar únicamente vehículos con estatus ACTIVO o BAJA.");
+                } // Si el estatus actual no es POR AUTORIZAR entonces no se puede cambiar a REGISTRADO
+                else if(!Objects.equals(estatusActual, ESTATUS_VEHICULO_POR_AUTORIZAR)) {
+                    throw new BadRequestException("Para rechazar la solicitud asegúrate de seleccionar vehículos con estatus POR AUTORIZAR.");
+                }
+            }
+
             for (Vehiculo vehiculo : vehiculoToUpdateList) {
-                vehiculo.setEstatusVehiculo(estatusPorAutorizar);
+                vehiculo.setEstatusVehiculo(estatusVehiculo);
                 vehiculo.setObservaciones(motivo);
                 vehiculo.setModificadoPor(username);
                 vehiculo.setFechaModificacion(new Date());
+
+                if(cancelado) {
+                    vehiculo.setEstatusRegistro(EstatusRegistro.BORRADO);
+                    vehiculo.setFechaBorrado(new Date());
+                    vehiculo.setBorradoPor(username);
+                }
             }
 
             vehiculoRepository.saveAll(vehiculoToUpdateList);
