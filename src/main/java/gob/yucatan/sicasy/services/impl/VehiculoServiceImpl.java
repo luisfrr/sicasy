@@ -32,7 +32,13 @@ public class VehiculoServiceImpl implements IVehiculoService {
     private final Integer ESTATUS_VEHICULO_POR_AUTORIZAR = 2;
     private final Integer ESTATUS_VEHICULO_ACTIVO = 3;
     private final Integer ESTATUS_VEHICULO_BAJA = 4;
-    private final Integer ESTATUS_VEHICULO_CANCELADO = 5;
+
+    private final Integer ACCION_SOLICITAR_AUTORIZACION = 1;
+    private final Integer ACCION_AUTORIZAR_SOLICITUD = 2;
+    private final Integer ACCION_RECHAZAR_SOLICITUD = 3;
+    private final Integer ACCION_CANCELAR_SOLICITUD = 4;
+    private final Integer ACCION_SOLICITAR_BAJA = 5;
+    private final Integer ACCION_SOLICITAR_MODIFICACION = 6;
 
     private final IVehiculoRepository vehiculoRepository;
     private final ILicitacionRepository licitacionRepository;
@@ -259,42 +265,49 @@ public class VehiculoServiceImpl implements IVehiculoService {
     @Transactional
     public void solicitarAutorizacion(List<Long> idVehiculoList, String username) {
         // Al solicitar una autorizacion cambia a estatus por autorizar
-        this.cambioEstatus(ESTATUS_VEHICULO_POR_AUTORIZAR, idVehiculoList, null, username);
+        this.cambioEstatus(ACCION_SOLICITAR_AUTORIZACION, ESTATUS_VEHICULO_POR_AUTORIZAR,
+                idVehiculoList, null, username);
     }
 
     @Override
     @Transactional
     public void autorizarSolicitud(List<Long> idVehiculoList, String username) {
         // Al autorizar una solicitud cambia a estatus activo
-        this.cambioEstatus(ESTATUS_VEHICULO_ACTIVO, idVehiculoList, null, username);
+        this.cambioEstatus(ACCION_AUTORIZAR_SOLICITUD, ESTATUS_VEHICULO_ACTIVO,
+                idVehiculoList, null, username);
     }
 
     @Override
     @Transactional
     public void rechazarSolicitud(List<Long> idVehiculoList, String motivo, String username) {
         // Al rechazar una solicitud regresa a estatus registrado
-        this.cambioEstatus(ESTATUS_VEHICULO_REGISTRADO, idVehiculoList, motivo, username);
+        this.cambioEstatus(ACCION_RECHAZAR_SOLICITUD, ESTATUS_VEHICULO_REGISTRADO,
+                idVehiculoList, motivo, username);
     }
 
     @Override
     @Transactional
     public void cancelarSolicitud(List<Long> idVehiculoList, String motivo, String username) {
         // Al cancelar una solicitud cambia a estatus cancelado
-        this.cambioEstatus(ESTATUS_VEHICULO_CANCELADO, idVehiculoList, motivo, username);
+        Integer ESTATUS_VEHICULO_CANCELADO = 5;
+        this.cambioEstatus(ACCION_CANCELAR_SOLICITUD, ESTATUS_VEHICULO_CANCELADO,
+                idVehiculoList, motivo, username);
     }
 
     @Override
     @Transactional
     public void solicitarModificacion(List<Long> idVehiculoList, String motivo, String username) {
         // Al solicitar una modificación cambia a estatus registrado
-        this.cambioEstatus(ESTATUS_VEHICULO_REGISTRADO, idVehiculoList, motivo, username);
+        this.cambioEstatus(ACCION_SOLICITAR_MODIFICACION, ESTATUS_VEHICULO_REGISTRADO,
+                idVehiculoList, motivo, username);
     }
 
     @Override
     @Transactional
     public void solicitarBaja(List<Long> idVehiculoList, String motivo, String username) {
         // Al solicitar una baja cambia a estatus baja
-        this.cambioEstatus(ESTATUS_VEHICULO_BAJA, idVehiculoList, motivo, username);
+        this.cambioEstatus(ACCION_SOLICITAR_BAJA, ESTATUS_VEHICULO_BAJA,
+                idVehiculoList, motivo, username);
     }
 
     private void validarImportacion(List<AcuseImportacion> acuseImportacionList, List<Vehiculo> vehiculos, Integer idDependencia, String username) {
@@ -410,7 +423,7 @@ public class VehiculoServiceImpl implements IVehiculoService {
         }
     }
 
-    private void cambioEstatus(Integer estatusPorAsignar, List<Long> idVehiculoList, String motivo, String username) {
+    private void cambioEstatus(Integer accion, Integer estatusPorAsignar, List<Long> idVehiculoList, String motivo, String username) {
         List<Vehiculo> vehiculoToUpdateList = vehiculoRepository.findAllByIdVehiculo(idVehiculoList);
 
         if(!vehiculoToUpdateList.isEmpty()) {
@@ -435,39 +448,43 @@ public class VehiculoServiceImpl implements IVehiculoService {
 
             boolean cancelado = false;
 
-            // Si estatus que se va a asignar es POR AUTORIZAR
-            if(Objects.equals(estatusPorAsignar, ESTATUS_VEHICULO_POR_AUTORIZAR)){
-                // Si el estatus actual no es REGISTRADO entonces no se puede cambiar a POR AUTORIZAR
+            // Si la accion es solicitar autorizacion
+            if(Objects.equals(accion, ACCION_SOLICITAR_AUTORIZACION)) {
+                // El estatus actual debe ser REGISTADO, si no entonces marca error
                 if(!Objects.equals(estatusActual, ESTATUS_VEHICULO_REGISTRADO)) {
                     throw new BadRequestException("Para solicitar la autorización asegúrate de seleccionar vehículos con estatus REGISTRADO.");
                 }
-            } // Si estatus que se va a asignar es CANCELADO
-            else if (Objects.equals(estatusPorAsignar, ESTATUS_VEHICULO_CANCELADO)) {
-                // Si el estatus actual no es POR AUTORIZAR entonces no se puede cambiar a CANCELADO
+            } // Si la accion es autorizar solicitud
+            else if(Objects.equals(accion, ACCION_AUTORIZAR_SOLICITUD)) {
+                // El estatus actual debe ser POR AUTORIZAR, si no entonces marca error
+                if(!Objects.equals(estatusActual, ESTATUS_VEHICULO_POR_AUTORIZAR)) {
+                    throw new BadRequestException("Para autorizar las solicitudes asegúrate de seleccionar vehículos con estatus POR AUTORIZAR.");
+                }
+            }  // Si la accion es rechazar solicitud
+            else if (Objects.equals(accion, ACCION_RECHAZAR_SOLICITUD)) {
+                // El estatus actual debe ser POR AUTORIZAR, si no entonces marca error
+                if(!Objects.equals(estatusActual, ESTATUS_VEHICULO_POR_AUTORIZAR)) {
+                    throw new BadRequestException("Para rechazar la solicitud asegúrate de seleccionar vehículos con estatus POR AUTORIZAR.");
+                }
+            } // Si la accion es cancelar solicitud
+            else if(Objects.equals(accion, ACCION_CANCELAR_SOLICITUD)) {
+                // TODO: Validar si es la primera por autorizar
+                // El estatus actual debe ser POR AUTORIZAR, si no entonces marca error
                 if(!Objects.equals(estatusActual, ESTATUS_VEHICULO_POR_AUTORIZAR)) {
                     throw new BadRequestException("Para cancelar las solicitudes asegúrate de seleccionar vehículos con estatus POR AUTORIZAR.");
                 }
                 cancelado = true;
-            } // Si estatus que se va a asignar es ACTIVO
-            else if (Objects.equals(estatusPorAsignar, ESTATUS_VEHICULO_ACTIVO)) {
-                // Si el estatus actual no es POR AUTORIZAR entonces no se puede cambiar a ACTIVO
-                if(!Objects.equals(estatusActual, ESTATUS_VEHICULO_POR_AUTORIZAR)) {
-                    throw new BadRequestException("Para autorizar las solicitudes asegúrate de seleccionar vehículos con estatus POR AUTORIZAR.");
-                }
-            } // Si estatus que se va a asignar es BAJA
-            else if(Objects.equals(estatusPorAsignar, ESTATUS_VEHICULO_BAJA)) {
-                // Si el estatus actual no es ACTIVO entonces no se puede cambiar a BAJA
+            } // Si la accion es solicitar baja
+            else if (Objects.equals(accion, ACCION_SOLICITAR_BAJA)) {
+                // El estatus actual debe ser ACTIVO, si no entonces marca error
                 if(!Objects.equals(estatusActual, ESTATUS_VEHICULO_ACTIVO)) {
                     throw new BadRequestException("Para solicitar la baja asegúrate de seleccionar vehículos con estatus ACTIVO.");
                 }
-            }
-            else if(Objects.equals(estatusPorAsignar, ESTATUS_VEHICULO_REGISTRADO)) {
-                // Si el estatus actual no es ACTIVO o BAJA entonces no se puede cambiar a REGISTRADO
+            } // Si la accion es solicitar modificación
+            else if (Objects.equals(accion, ACCION_SOLICITAR_MODIFICACION)) {
+                // El estatus actual debe ser ACTIVO o BAJA, si no entonces marca error
                 if(!Objects.equals(estatusActual, ESTATUS_VEHICULO_ACTIVO) || !Objects.equals(estatusActual, ESTATUS_VEHICULO_BAJA)) {
                     throw new BadRequestException("Para solicitar la modificación asegúrate de seleccionar únicamente vehículos con estatus ACTIVO o BAJA.");
-                } // Si el estatus actual no es POR AUTORIZAR entonces no se puede cambiar a REGISTRADO
-                else if(!Objects.equals(estatusActual, ESTATUS_VEHICULO_POR_AUTORIZAR)) {
-                    throw new BadRequestException("Para rechazar la solicitud asegúrate de seleccionar vehículos con estatus POR AUTORIZAR.");
                 }
             }
 

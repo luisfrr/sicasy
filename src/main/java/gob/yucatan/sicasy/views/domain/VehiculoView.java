@@ -33,10 +33,10 @@ public class VehiculoView implements Serializable {
 
     private @Getter final String LAYOUT_VEHICULOS = "C:\\sicasy\\files\\layout\\layout_vehiculo.xlsx";
 
-    private @Getter final Integer ACCION_RECHAZAR_SOLICITUD = 1;
-    private @Getter final Integer ACCION_CANCELAR_SOLICITUD = 2;
-    private @Getter final Integer ACCION_SOLICITAR_BAJA = 3;
-    private @Getter final Integer ACCION_SOLICITAR_MODIFICACION = 4;
+    private @Getter final Integer ACCION_RECHAZAR_SOLICITUD = 3;
+    private @Getter final Integer ACCION_CANCELAR_SOLICITUD = 4;
+    private @Getter final Integer ACCION_SOLICITAR_BAJA = 5;
+    private @Getter final Integer ACCION_SOLICITAR_MODIFICACION = 6;
 
     private @Getter String title;
     private @Getter @Setter List<Vehiculo> vehiculoList;
@@ -286,7 +286,7 @@ public class VehiculoView implements Serializable {
         if(Objects.equals(confirmAccion, ACCION_RECHAZAR_SOLICITUD)) {
             this.confirmMensaje = "¿Está seguro que desea rechazar las solicitudes? Esto regresa el estatus del vehiculo a REGISTRADO.";
         } else if (Objects.equals(confirmAccion, ACCION_CANCELAR_SOLICITUD)) {
-            this.confirmMensaje = "¿Está seguro que desea cancelar las solicitudes? Una vez canceladas ya no podrás visualizar este registro.";
+            this.confirmMensaje = "¿Está seguro que desea cancelar las solicitudes? Una vez canceladas ya no podrás visualizar estos registros.";
         } else if (Objects.equals(confirmAccion, ACCION_SOLICITAR_BAJA)) {
             this.confirmMensaje = "¿Está seguro que desea solicitar la baja de los vehículos? Una vez dados de baja, solo se muestran en reportes históricos.";
         } else if (Objects.equals(confirmAccion, ACCION_SOLICITAR_MODIFICACION)) {
@@ -301,7 +301,6 @@ public class VehiculoView implements Serializable {
         log.info("confirmar estatus dialog");
         try {
             List<Long> idVehiculoSelectedList =  this.getIdVehiculoSelectedList();
-            vehiculoService.autorizarSolicitud(idVehiculoSelectedList, userSessionBean.getUserName());
 
             boolean success = false;
             if(Objects.equals(this.confirmAccion, ACCION_RECHAZAR_SOLICITUD)) {
