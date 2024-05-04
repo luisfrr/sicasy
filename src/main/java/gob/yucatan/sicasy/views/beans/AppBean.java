@@ -37,6 +37,11 @@ public class AppBean implements Serializable {
         if(contextPath.equals("/"))
             contextPath = "";
         year = getCurrentYear();
+
+        String osName = System.getProperty("os.name");
+        String osVersion = System.getProperty("os.version");
+        String osArch = System.getProperty("os.arch");
+        log.info("Sistema operativo: {}, {}, {}", osName, osVersion, osArch);
     }
 
     private int getCurrentYear() {

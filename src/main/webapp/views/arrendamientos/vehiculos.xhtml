@@ -319,6 +319,7 @@
                                 <sec:authorize access="hasAnyAuthority('ROLE_OWNER')">
                                     <p:menuitem value="Adjuntar fotos"
                                                 ajax="true" action="#{vehiculoView.abrirModalAdjuntarFotos(vehiculo.idVehiculo)}"
+                                                oncomplete="Main.changeChooseLabel();"
                                                 update="growl form_datatable">
                                     </p:menuitem>
                                 </sec:authorize>
@@ -338,46 +339,9 @@
 
         <ui:include src="/views/arrendamientos/_detalle_vehiculos.xhtml"/>
 
-        <p:dialog header="Confirmación"
-                  id="confirm-estatus-dialog" widgetVar="confirmEstatusDialog"
-                  minHeight="300" width="500"
-                  showEffect="fade" modal="true"
-                  closable="false" closeOnEscape="false"
-                  cache="false" responsive="true">
+        <ui:include src="/views/arrendamientos/_confirmacion_cambio_estatus.xhtml"/>
 
-            <h:form id="confirm-estatus-dialog-content">
-                <p:outputPanel styleClass="formgrid grid" rendered="#{vehiculoView.showConfirmEstatus}">
-
-                    <p:outputPanel styleClass="col-12 mb-4">
-                        <h:outputText styleClass="text-lg" value="#{vehiculoView.confirmMensaje}"/>
-                    </p:outputPanel>
-
-                    <p:outputPanel styleClass="field col-12 mb-5">
-                        <p:outputLabel for="@next" value="Motivo" styleClass="block"/>
-                        <p:inputTextarea styleClass="block w-full" rows="2"  autoResize="true" required="true"
-                                         value="#{vehiculoView.confirmMotivo}"/>
-                        <span class="text-sm hidden"> </span>
-                    </p:outputPanel>
-
-                    <p:outputPanel styleClass="field col-12 mb-0">
-
-                        <p:outputPanel styleClass="flex justify-content-end">
-                            <p:commandButton value="No" ajax="true" process="@this"
-                                             action="#{vehiculoView.cerrarConfirmEstatusDialog()}"
-                                             styleClass="ui-button-outlined mr-5"/>
-                            <p:commandButton value="Sí" ajax="true" process="@form"
-                                             action="#{vehiculoView.confirmarEstatusDialog()}"
-                                             validateClient="true"/>
-                        </p:outputPanel>
-
-                    </p:outputPanel>
-
-                </p:outputPanel>
-            </h:form>
-
-
-        </p:dialog>
-
+        <ui:include src="/views/arrendamientos/_adjuntar_fotos_dialog.xhtml"/>
 
     </p:outputPanel>
 
