@@ -7,7 +7,7 @@
 
    <p:outputPanel id="panel_detalle" rendered="#{vehiculoView.showDetailsPanel}">
 
-      <h:form id="form_breadcrumb_detalle" styleClass="mb-3">
+      <h:form id="form_breadcrumb_detalle" styleClass="mb-5">
          <p:breadCrumb homeDisplay="text">
             <p:menuitem value="Inicio" ajax="false" action="#{menuSessionBean.goToHome()}"/>
             <p:menuitem value="Vehículos" ajax="true" action="#{vehiculoView.regresar()}"/>
@@ -186,10 +186,43 @@
             </h:form>
             <p:outputPanel styleClass="grid">
                <p:outputPanel styleClass="col-12 md:col-6 mb-5">
-                  Galeria
+                  <h:form id="form_galeria">
+                     <p:panel header="Fotos" widgetVar="panelFotosVehiculo" styleClass="mb-5">
+                        <f:facet name="actions">
+                           <p:commandLink styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default flex justify-content-center align-items-center"
+                                          ajax="true" action="#{vehiculoView.abrirModalAdjuntarFotos(vehiculoView.vehiculoSelected.idVehiculo)}"
+                                          oncomplete="Main.changeChooseLabel();" update="growl">
+                              <i class="fi fi-rr-add-image"/>
+                           </p:commandLink>
+                        </f:facet>
+                        <p:galleria value="#{vehiculoView.vehiculoFotoList}" var="vehiculoFoto" numVisible="5"
+                                    widgetVar="vehiculoFotoGaleria"
+                                    rendered="#{vehiculoView.vehiculoFotoList.size() > 0}"
+                                    responsiveOptions="#{vehiculoView.responsiveOptions}"
+                                    circular="true" autoPlay="true" transitionInterval="5000"
+                                    showCaption="true" style="max-width: 800px">
+                           <p:graphicImage value="#{fileBean.getFile(vehiculoFoto.rutaArchivo)}" alt="#{vehiculoFoto.nombreArchivo}"
+                                           style="width: 100%; display: block;" stream="false" />
+                           <f:facet name="caption">
+                              <h5 class="mb-2 text-white">#{vehiculoFoto.nombreArchivo}</h5>
+                              <p:outputPanel class="flex justify-content-between align-items-center">
+                                 <p class="text-white">#{vehiculoFoto.fechaCreacion}</p>
+                                 <p:commandLink styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default flex justify-content-center align-items-center"
+                                                ajax="true" action="#{vehiculoView.borrarFoto(vehiculoFoto.idVehiculoFoto)}">
+                                    <i class="fi fi-rr-trash text-xl text-white"/>
+                                 </p:commandLink>
+                              </p:outputPanel>
+                           </f:facet>
+                           <f:facet name="thumbnail">
+                              <p:graphicImage value="#{fileBean.getFile(vehiculoFoto.rutaArchivo)}" alt="#{vehiculoFoto.nombreArchivo}"
+                                              style="height: 100px; width: auto; display: block" stream="false" />
+                           </f:facet>
+                        </p:galleria>
+                     </p:panel>
+                  </h:form>
                </p:outputPanel>
                <p:outputPanel styleClass="col-12 md:col-6 mb-5">
-                  Poliza
+                  Polizas
                </p:outputPanel>
             </p:outputPanel>
          </p:tab>

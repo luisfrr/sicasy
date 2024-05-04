@@ -17,6 +17,7 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.primefaces.PrimeFaces;
 import org.primefaces.event.FileUploadEvent;
+import org.primefaces.model.ResponsiveOption;
 import org.primefaces.model.file.UploadedFile;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
@@ -51,6 +52,8 @@ public class VehiculoView implements Serializable {
     private @Getter @Setter Vehiculo vehiculoSelected;
     private @Getter @Setter Vehiculo vehiculoFilter;
     private @Getter boolean showVehiculosPanel; // Seccion completa de filtrado
+    private @Getter @Setter List<VehiculoFoto> vehiculoFotoList;
+    private @Getter List<ResponsiveOption> responsiveOptions;
 
     // Registro nuevos
     private @Getter boolean showNuevoFormDialog;
@@ -101,6 +104,11 @@ public class VehiculoView implements Serializable {
         log.info("Inicializando VehiculoView");
         this.title = "Vehículo";
         this.limpiarFiltros();
+
+        this.responsiveOptions = new ArrayList<>();
+        this.responsiveOptions.add(new ResponsiveOption("1024px", 5));
+        this.responsiveOptions.add(new ResponsiveOption("768px", 3));
+        this.responsiveOptions.add(new ResponsiveOption("560px", 1));
     }
 
     public void limpiarFiltros() {
@@ -131,6 +139,7 @@ public class VehiculoView implements Serializable {
 
         this.vehiculoList = new ArrayList<>();
         this.vehiculoSelectedList = new ArrayList<>();
+        this.vehiculoFotoList = new ArrayList<>();
         PrimeFaces.current().ajax().update("form_filtros");
     }
 
@@ -368,6 +377,8 @@ public class VehiculoView implements Serializable {
         this.loadLicitacionesForm();
         this.loadAnexosForm();
 
+        this.vehiculoFotoList = vehiculoFotoService.getVehiculoFotos(this.vehiculoSelected.getIdVehiculo());
+
         PrimeFaces.current().ajax().update("container");
     }
 
@@ -444,12 +455,29 @@ public class VehiculoView implements Serializable {
 
                 vehiculoFotoService.guardarFoto(vehiculoFoto);
                 Messages.addInfo("Se ha gurdado correctamente la foto: " + fileName);
+
+                if(this.showDetailsPanel) {
+                    this.vehiculoFotoList = vehiculoFotoService.getVehiculoFotos(this.vehiculoFotoSelected.getIdVehiculo());
+                    PrimeFaces.current().ajax().update("tab_view_detalles:form_galeria");
+                }
             } else {
                 Messages.addWarn("No se ha seleccionado el vehículo");
             }
         } catch (Exception e) {
             log.error(e.getMessage(), e);
             Messages.addError("No se ha logrado guardar la foto: " + fileName);
+        }
+    }
+
+    public void borrarFoto(Long vehiculoFotoId) {
+        log.info("borrar foto");
+        try {
+            vehiculoFotoService.borrarFoto(vehiculoFotoId, userSessionBean.getUserName());
+            this.vehiculoFotoList = vehiculoFotoService.getVehiculoFotos(this.vehiculoFotoSelected.getIdVehiculo());
+            PrimeFaces.current().ajax().update("tab_view_detalles:form_galeria");
+
+        } catch (Exception e) {
+            Messages.addError(e.getMessage());
         }
     }
 

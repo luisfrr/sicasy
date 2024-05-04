@@ -1,5 +1,6 @@
 package gob.yucatan.sicasy.utils.imports.excel;
 
+import gob.yucatan.sicasy.utils.image.ImageCompresor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.compress.utils.FileNameUtils;
 
@@ -36,8 +37,15 @@ public class SaveFile {
 
     public static String importFileToPath(byte[] content, String fileName, String path) throws IOException {
         UUID uuid = UUID.randomUUID();
-        String uniqueFileName = uuid + "." + FileNameUtils.getExtension(fileName);
+
+        String extension = FileNameUtils.getExtension(fileName).toLowerCase();
+
+        String uniqueFileName = uuid + "." + extension;
         String fullPath = path + uniqueFileName;
+
+        if(extension.contains("png") || extension.contains("jpg") || extension.contains("jpeg")){
+            content = ImageCompresor.compressImage(content, extension);
+        }
 
         File file = new File(fullPath);
         return Files.write(file.toPath(), content).toString();
