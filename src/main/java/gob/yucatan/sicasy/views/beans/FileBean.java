@@ -1,12 +1,9 @@
 package gob.yucatan.sicasy.views.beans;
 
-import jakarta.faces.application.FacesMessage;
 import jakarta.faces.context.ExternalContext;
 import jakarta.faces.context.FacesContext;
-import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.primefaces.model.DefaultStreamedContent;
-import org.primefaces.model.StreamedContent;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
