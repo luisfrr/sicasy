@@ -26,6 +26,14 @@ public class EstatusVehiculoServiceImpl implements IEstatusVehiculoService {
     }
 
     @Override
+    public List<EstatusVehiculo> findAllDropdown(List<Integer> idEstatusVehiculoList) {
+        return this.findAll().stream()
+                .filter(e -> idEstatusVehiculoList.contains(e.getIdEstatusVehiculo()))
+                .sorted(Comparator.comparing(EstatusVehiculo::getIdEstatusVehiculo))
+                .toList();
+    }
+
+    @Override
     public EstatusVehiculo findById(int id) {
         return estatusVehiculoRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("No se encontro el id del estatus vehiculo"));

@@ -7,6 +7,7 @@ import java.util.List;
 public interface IEstatusVehiculoService {
 
     List<EstatusVehiculo> findAll();
+    List<EstatusVehiculo> findAllDropdown(List<Integer> idEstatusVehiculoList);
     EstatusVehiculo findById(int id);
 
 }

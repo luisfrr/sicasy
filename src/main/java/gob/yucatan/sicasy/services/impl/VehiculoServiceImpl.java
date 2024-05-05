@@ -61,17 +61,15 @@ public class VehiculoServiceImpl implements IVehiculoService {
                     vehiculo.getCondicionVehiculo().getIdCondicionVehiculo(),
                     Vehiculo_.CONDICION_VEHICULO, CondicionVehiculo_.ID_CONDICION_VEHICULO));
 
-        if(vehiculo.getEstatusVehiculo() != null &&
-                vehiculo.getEstatusVehiculo().getIdEstatusVehiculo() != null)
+        if(vehiculo.getIdEstatusVehiculoList() != null && !vehiculo.getIdEstatusVehiculoList().isEmpty()) {
+            specification.add(new SearchCriteria(SearchOperation.IN,
+                    vehiculo.getIdEstatusVehiculoList(),
+                    Vehiculo_.ESTATUS_VEHICULO, EstatusVehiculo_.ID_ESTATUS_VEHICULO));
+        } else if(vehiculo.getEstatusVehiculo() != null) {
             specification.add(new SearchCriteria(SearchOperation.EQUAL,
                     vehiculo.getEstatusVehiculo().getIdEstatusVehiculo(),
                     Vehiculo_.ESTATUS_VEHICULO, EstatusVehiculo_.ID_ESTATUS_VEHICULO));
-
-        if(vehiculo.getEstatusVehiculo() != null &&
-                vehiculo.getEstatusVehiculo().getIdEstatusVehiculo() != null)
-            specification.add(new SearchCriteria(SearchOperation.EQUAL,
-                    vehiculo.getEstatusVehiculo().getIdEstatusVehiculo(),
-                    Vehiculo_.ESTATUS_VEHICULO, EstatusVehiculo_.ID_ESTATUS_VEHICULO));
+        }
 
         if(vehiculo.getLicitacion() != null && vehiculo.getLicitacion().getIdLicitacion() != null)
             specification.add(new SearchCriteria(SearchOperation.EQUAL,

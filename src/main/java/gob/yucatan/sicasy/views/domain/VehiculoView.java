@@ -1,7 +1,10 @@
 package gob.yucatan.sicasy.views.domain;
 
+import gob.yucatan.sicasy.business.annotations.ConfigPermiso;
+import gob.yucatan.sicasy.business.annotations.ConfigPermisoArray;
 import gob.yucatan.sicasy.business.dtos.AcuseImportacion;
 import gob.yucatan.sicasy.business.entities.*;
+import gob.yucatan.sicasy.business.enums.TipoPermiso;
 import gob.yucatan.sicasy.business.exceptions.BadRequestException;
 import gob.yucatan.sicasy.business.exceptions.NotFoundException;
 import gob.yucatan.sicasy.services.iface.*;
@@ -21,6 +24,7 @@ import org.primefaces.model.ResponsiveOption;
 import org.primefaces.model.file.UploadedFile;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -31,6 +35,10 @@ import java.util.*;
 @Scope("view")
 @RequiredArgsConstructor
 @Slf4j
+@ConfigPermiso(tipo = TipoPermiso.VIEW, codigo = "VEHICULOS_VIEW",
+        nombre = "Módulo de Vehículos", descripcion = "Permite ver y filtrar la información de los vehículos.",
+        url = "/views/arrendamientos/vehiculos.faces")
+@PreAuthorize("hasAnyAuthority('ROLE_OWNER', 'VEHICULOS_VIEW')")
 public class VehiculoView implements Serializable {
 
     @Value("${app.files.folder.layouts.importar-vehiculo}")
@@ -54,6 +62,7 @@ public class VehiculoView implements Serializable {
     private @Getter boolean showVehiculosPanel; // Seccion completa de filtrado
     private @Getter @Setter List<VehiculoFoto> vehiculoFotoList;
     private @Getter List<ResponsiveOption> responsiveOptions;
+    private @Getter List<Integer> idEstatusVehiculoList;
 
     // Registro nuevos
     private @Getter boolean showNuevoFormDialog;
@@ -103,6 +112,7 @@ public class VehiculoView implements Serializable {
     public void init() {
         log.info("Inicializando VehiculoView");
         this.title = "Vehículo";
+        this.getPermisosFiltroEstatus();
         this.limpiarFiltros();
 
         this.responsiveOptions = new ArrayList<>();
@@ -120,6 +130,7 @@ public class VehiculoView implements Serializable {
         this.vehiculoFilter.setEstatusVehiculo(new EstatusVehiculo());
         this.vehiculoFilter.setLicitacion(new Licitacion());
         this.vehiculoFilter.setAnexo(new Anexo());
+        this.vehiculoFilter.setIdEstatusVehiculoList(this.idEstatusVehiculoList);
 
         this.loadDependencias();
         this.loadCondicionVehiculos();
@@ -149,6 +160,13 @@ public class VehiculoView implements Serializable {
         PrimeFaces.current().ajax().update("form_datatable");
     }
 
+    @ConfigPermisoArray({
+            @ConfigPermiso(tipo = TipoPermiso.WRITE, codigo = "VEHICULOS_WRITE_REGISTRO_INDIVIDUAL", orden = 1,
+                    nombre = "Registro individual", descripcion = "Permite registrar un nuevo vehículo."),
+            @ConfigPermiso(tipo = TipoPermiso.WRITE, codigo = "VEHICULOS_WRITE_REGISTRO_LAYOUT", orden = 2,
+                    nombre = "Importar layout", descripcion = "Permite registrar vehículos por medio de la importación de un layout."),
+    })
+    @PreAuthorize("hasAnyAuthority('ROLE_OWNER', 'VEHICULOS_WRITE_REGISTRO_INDIVIDUAL', 'VEHICULOS_WRITE_REGISTRO_LAYOUT')")
     public void abrirModalRegistroVehiculo() {
         log.info("abrir modal registro vehiculo");
         this.showNuevoFormDialog = true;
@@ -179,6 +197,7 @@ public class VehiculoView implements Serializable {
         PrimeFaces.current().executeScript("PF('registrarVehiculoDialog').hide()");
     }
 
+    @PreAuthorize("hasAnyAuthority('ROLE_OWNER', 'VEHICULOS_WRITE_REGISTRO_INDIVIDUAL')")
     public void guardarNuevoVehiculo() {
         log.info("guardar nuevo vehiculo");
         try {
@@ -204,6 +223,7 @@ public class VehiculoView implements Serializable {
         }
     }
 
+    @PreAuthorize("hasAnyAuthority('ROLE_OWNER', 'VEHICULOS_WRITE_REGISTRO_LAYOUT')")
     public void guardarImportacionVehiculo() {
         log.info("guardar importacion vehiculo");
         try {
@@ -237,6 +257,7 @@ public class VehiculoView implements Serializable {
         }
     }
 
+    @PreAuthorize("hasAnyAuthority('ROLE_OWNER', 'VEHICULOS_WRITE_REGISTRO_LAYOUT')")
     public void importarLayout(FileUploadEvent event) throws IOException {
         UploadedFile file = event.getFile();
         String fileName = file.getFileName();
@@ -278,10 +299,14 @@ public class VehiculoView implements Serializable {
         }
     }
 
+
+    @ConfigPermiso(tipo = TipoPermiso.WRITE, codigo = "VEHICULOS_WRITE_SOLICITAR_AUTORIZACION", orden = 3,
+            nombre = "Solicitar autorización", descripcion = "Permite cambiar de estado REGISTRADO a POR AUTORIZAR los vehículos seleccionados.")
+    @PreAuthorize("hasAnyAuthority('ROLE_OWNER', 'VEHICULOS_WRITE_SOLICITAR_AUTORIZACION')")
     public void solicitarAutorizacion() {
         log.info("Solicitando autorizacion");
         try {
-            List<Long> idVehiculoSelectedList =  this.getIdVehiculoSelectedList();
+            List<Long> idVehiculoSelectedList = this.getIdVehiculoSelectedList();
             vehiculoService.solicitarAutorizacion(idVehiculoSelectedList, userSessionBean.getUserName());
             this.buscar();
             Messages.addInfo("Se ha enviado la solicitud de autorización");
@@ -291,6 +316,9 @@ public class VehiculoView implements Serializable {
         }
     }
 
+    @ConfigPermiso(tipo = TipoPermiso.WRITE, codigo = "VEHICULOS_WRITE_AUTORIZAR_SOLICITUD", orden = 4,
+            nombre = "Autorizar solicitud", descripcion = "Permite cambiar de estado POR AUTORIZAR a ACTIVO los vehículos seleccionados.")
+    @PreAuthorize("hasAnyAuthority('ROLE_OWNER', 'VEHICULOS_WRITE_AUTORIZAR_SOLICITUD')")
     public void autorizarSolicitud() {
         log.info("Autorizando solicitud");
         try {
@@ -304,6 +332,17 @@ public class VehiculoView implements Serializable {
         }
     }
 
+    @ConfigPermisoArray({
+            @ConfigPermiso(tipo = TipoPermiso.WRITE, codigo = "VEHICULOS_WRITE_RECHAZAR_SOLICITUD", orden = 5,
+                    nombre = "Rechazar solicitud", descripcion = "Permite cambiar de estado POR AUTORIZAR a REGISTRADO los vehículos seleccionados."),
+            @ConfigPermiso(tipo = TipoPermiso.WRITE, codigo = "VEHICULOS_WRITE_CANCELAR_SOLICITUD", orden = 6,
+                    nombre = "Cancelar solicitud", descripcion = "Permite cambiar de estado POR AUTORIZAR a CANCELADO los vehículos seleccionados."),
+            @ConfigPermiso(tipo = TipoPermiso.WRITE, codigo = "VEHICULOS_WRITE_SOLICITAR_BAJA", orden = 7,
+                    nombre = "Solicitar baja", descripcion = "Permite cambiar de estado ACTIVO a BAJA los vehículos seleccionados."),
+            @ConfigPermiso(tipo = TipoPermiso.WRITE, codigo = "VEHICULOS_WRITE_SOLICITAR_MODIFICACION", orden = 8,
+                    nombre = "Solicitar modificación", descripcion = "Permite cambiar de estado ACTIVO o BAJA a REGISTRADO los vehículos seleccionados.")
+    })
+    @PreAuthorize("hasAnyAuthority('ROLE_OWNER', 'VEHICULOS_WRITE_RECHAZAR_SOLICITUD', 'VEHICULOS_WRITE_CANCELAR_SOLICITUD', 'VEHICULOS_WRITE_SOLICITAR_BAJA', 'VEHICULOS_WRITE_SOLICITAR_MODIFICACION')")
     public void abrirConfirmEstatusDialog(Integer confirmAccion) {
         log.info("Abrir Confirm Estatus");
         this.showConfirmEstatus = true;
@@ -324,6 +363,7 @@ public class VehiculoView implements Serializable {
         PrimeFaces.current().executeScript("PF('confirmEstatusDialog').show()");
     }
 
+    @PreAuthorize("hasAnyAuthority('ROLE_OWNER', 'VEHICULOS_WRITE_RECHAZAR_SOLICITUD', 'VEHICULOS_WRITE_CANCELAR_SOLICITUD', 'VEHICULOS_WRITE_SOLICITAR_BAJA', 'VEHICULOS_WRITE_SOLICITAR_MODIFICACION')")
     public void confirmarEstatusDialog() {
         log.info("confirmar estatus dialog");
         try {
@@ -367,6 +407,10 @@ public class VehiculoView implements Serializable {
         PrimeFaces.current().executeScript("PF('confirmEstatusDialog').hide()");
     }
 
+
+    @ConfigPermiso(tipo = TipoPermiso.WRITE, codigo = "VEHICULOS_WRITE_VER_DETALLE", orden = 9,
+            nombre = "Ver detalle del vehículo", descripcion = "Permite ver el detalle la información del vehículo, se accede al panel de edición y bitácoras.")
+    @PreAuthorize("hasAnyAuthority('ROLE_OWNER', 'VEHICULOS_WRITE_VER_DETALLE')")
     public void verDetalle(Vehiculo vehiculo) {
         log.info("ver detalle vehiculos");
         this.vehiculoSelected = vehiculoService.findFullById(vehiculo.getIdVehiculo());
@@ -390,6 +434,9 @@ public class VehiculoView implements Serializable {
         PrimeFaces.current().ajax().update("container");
     }
 
+    @ConfigPermiso(tipo = TipoPermiso.WRITE, codigo = "VEHICULOS_WRITE_EDITAR_VEHICULO", orden = 10,
+            nombre = "Editar vehículo", descripcion = "Permite editar la información del vehículo.")
+    @PreAuthorize("hasAnyAuthority('ROLE_OWNER', 'VEHICULOS_WRITE_EDITAR_VEHICULO')")
     public void permitirEditar() {
         this.readOnlyEditForm = false;
         PrimeFaces.current().ajax().update("tab_view_detalles:form_editar_vehiculo");
@@ -401,6 +448,7 @@ public class VehiculoView implements Serializable {
         PrimeFaces.current().ajax().update("tab_view_detalles:form_editar_vehiculo");
     }
 
+    @PreAuthorize("hasAnyAuthority('ROLE_OWNER', 'VEHICULOS_WRITE_EDITAR_VEHICULO')")
     public void guardarEdicion() {
         try {
             this.vehiculoSelected.setModificadoPor(userSessionBean.getUserName());
@@ -421,6 +469,9 @@ public class VehiculoView implements Serializable {
         this.vehiculoSelected = vehiculoService.findById(idVehiculo);
     }
 
+    @ConfigPermiso(tipo = TipoPermiso.WRITE, codigo = "VEHICULOS_WRITE_ADJUNTAR_FOTOS", orden = 11,
+            nombre = "Adjuntar fotos", descripcion = "Permite adjuntar fotos del vehículo.")
+    @PreAuthorize("hasAnyAuthority('ROLE_OWNER', 'VEHICULOS_WRITE_ADJUNTAR_FOTOS')")
     public void abrirModalAdjuntarFotos(Long idVehiculo) {
         log.info("abrir modal adjuntar fotos");
         this.showAdjuntarFotos = true;
@@ -469,6 +520,9 @@ public class VehiculoView implements Serializable {
         }
     }
 
+    @ConfigPermiso(tipo = TipoPermiso.WRITE, codigo = "VEHICULOS_WRITE_BORRAR_FOTOS", orden = 12,
+            nombre = "Borrar foto", descripcion = "Permite borrar fotos del vehículo.")
+    @PreAuthorize("hasAnyAuthority('ROLE_OWNER', 'VEHICULOS_WRITE_BORRAR_FOTOS')")
     public void borrarFoto(Long vehiculoFotoId) {
         log.info("borrar foto");
         try {
@@ -512,7 +566,7 @@ public class VehiculoView implements Serializable {
     }
 
     private void loadEstatusVehiculos() {
-        this.estatusVehiculoList = estatusVehiculoService.findAll();
+        this.estatusVehiculoList = estatusVehiculoService.findAllDropdown(this.idEstatusVehiculoList);
     }
 
     private void loadLicitaciones() {
@@ -591,6 +645,48 @@ public class VehiculoView implements Serializable {
         return vehiculoSelectedList.stream()
                 .map(Vehiculo::getIdVehiculo)
                 .toList();
+    }
+
+    @ConfigPermisoArray({
+            @ConfigPermiso(tipo = TipoPermiso.READ, codigo = "VEHICULOS_READ_FILTRAR_ESTATUS_REGISTRADO", orden = 13,
+                    nombre = "Filtrar Estatus REGISTRADO", descripcion = "Permite filtrar los vehículos con estatus REGISTRADO."),
+            @ConfigPermiso(tipo = TipoPermiso.READ, codigo = "VEHICULOS_READ_FILTRAR_ESTATUS_POR_AUTORIZAR", orden = 14,
+                    nombre = "Filtrar Estatus POR AUTORIZAR", descripcion = "Permite filtrar los vehículos con estatus POR AUTORIZAR."),
+            @ConfigPermiso(tipo = TipoPermiso.READ, codigo = "VEHICULOS_READ_FILTRAR_ESTATUS_ACTIVO", orden = 15,
+                    nombre = "Filtrar Estatus ACTIVO", descripcion = "Permite filtrar los vehículos con estatus ACTIVO."),
+            @ConfigPermiso(tipo = TipoPermiso.READ, codigo = "VEHICULOS_READ_FILTRAR_ESTATUS_BAJA", orden = 16,
+                    nombre = "Filtrar Estatus BAJA", descripcion = "Permite filtrar los vehículos con estatus BAJA."),
+            @ConfigPermiso(tipo = TipoPermiso.READ, codigo = "VEHICULOS_READ_FILTRAR_ESTATUS_CANCELADO", orden = 17,
+                    nombre = "Filtrar Estatus CANCELADO", descripcion = "Permite filtrar los vehículos con estatus CANCELADO."),
+    })
+    private void getPermisosFiltroEstatus() {
+        Integer ESTATUS_REGISTRADO = 1;
+        Integer ESTATUS_POR_AUTORIZAR = 2;
+        Integer ESTATUS_ACTIVO = 3;
+        Integer ESTATUS_BAJA = 4;
+        Integer ESTATUS_CANCELADO = 5;
+
+        this.idEstatusVehiculoList = new ArrayList<>();
+
+        if(userSessionBean.userHasAuthority("VEHICULOS_READ_FILTRAR_ESTATUS_REGISTRADO") ||
+                userSessionBean.userHasAuthority("ROLE_OWNER"))
+            this.idEstatusVehiculoList.add(ESTATUS_REGISTRADO);
+
+        if(userSessionBean.userHasAuthority("VEHICULOS_READ_FILTRAR_ESTATUS_POR_AUTORIZAR") ||
+                userSessionBean.userHasAuthority("ROLE_OWNER"))
+            this.idEstatusVehiculoList.add(ESTATUS_POR_AUTORIZAR);
+
+        if(userSessionBean.userHasAuthority("VEHICULOS_READ_FILTRAR_ESTATUS_ACTIVO") ||
+                userSessionBean.userHasAuthority("ROLE_OWNER"))
+            this.idEstatusVehiculoList.add(ESTATUS_ACTIVO);
+
+        if(userSessionBean.userHasAuthority("VEHICULOS_READ_FILTRAR_ESTATUS_BAJA") ||
+                userSessionBean.userHasAuthority("ROLE_OWNER"))
+            this.idEstatusVehiculoList.add(ESTATUS_BAJA);
+
+        if(userSessionBean.userHasAuthority("VEHICULOS_READ_FILTRAR_ESTATUS_CANCELADO") ||
+                userSessionBean.userHasAuthority("ROLE_OWNER"))
+            this.idEstatusVehiculoList.add(ESTATUS_CANCELADO);
     }
 
     //endregion private methods

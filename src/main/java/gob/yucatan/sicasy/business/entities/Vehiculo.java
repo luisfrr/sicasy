@@ -6,6 +6,7 @@ import lombok.*;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Table(name = "vehiculo")
@@ -131,6 +132,9 @@ public class Vehiculo implements Cloneable, Serializable {
 
     @Transient
     private String anexoValue;
+
+    @Transient
+    private List<Integer> idEstatusVehiculoList;
 
 
     @Override
