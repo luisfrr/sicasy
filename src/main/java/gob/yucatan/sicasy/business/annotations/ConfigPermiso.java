@@ -15,5 +15,6 @@ public @interface ConfigPermiso {
     String nombre();
     String descripcion() default "";
     String url() default "";
+    int orden() default 0;
 }
 

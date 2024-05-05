@@ -86,7 +86,8 @@ public class UsuarioPermisoServiceImpl implements IUsuarioPermisoService {
         for (UsuarioPermiso usuarioPermisoParent : usuarioPermisoParents) {
             List<UsuarioPermiso> subUsuarioPermisoList = usuarioPermisoList.stream()
                     .filter(up -> Objects.equals(up.getPermiso().getPermisoParent(), usuarioPermisoParent.getPermiso()))
-                    .sorted(Comparator.comparing(r -> r.getPermiso().getNombre()))
+                    .sorted(Comparator.comparing((UsuarioPermiso r) -> r.getPermiso().getTipoPermiso())
+                            .thenComparing((UsuarioPermiso r) -> r.getPermiso().getOrden()))
                     .toList();
 
             usuarioPermisoParent.setSubUsuarioPermisoList(subUsuarioPermisoList);
