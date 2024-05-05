@@ -68,6 +68,11 @@ let Main = {
         return this.wrapper.hasClass('menu-static') && this.isDesktop();
     },
 
+    changeChooseLabel: function () {
+        let chooseButton = this.wrapper.find('.ui-fileupload-choose');
+        chooseButton.find('.ui-button-text').html('Elegir');
+    },
+
 };
 
 $(document).ready(function () {

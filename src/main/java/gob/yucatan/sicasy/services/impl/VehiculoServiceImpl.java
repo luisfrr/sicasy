@@ -9,6 +9,7 @@ import gob.yucatan.sicasy.repository.criteria.SearchCriteria;
 import gob.yucatan.sicasy.repository.criteria.SearchOperation;
 import gob.yucatan.sicasy.repository.criteria.SearchSpecification;
 import gob.yucatan.sicasy.repository.iface.IAnexoRepository;
+import gob.yucatan.sicasy.repository.iface.IEstatusVehiculoRepository;
 import gob.yucatan.sicasy.repository.iface.ILicitacionRepository;
 import gob.yucatan.sicasy.repository.iface.IVehiculoRepository;
 import gob.yucatan.sicasy.services.iface.IVehiculoService;
@@ -20,16 +21,29 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Optional;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class VehiculoServiceImpl implements IVehiculoService {
 
+    private final Integer ESTATUS_VEHICULO_REGISTRADO = 1;
+    private final Integer ESTATUS_VEHICULO_POR_AUTORIZAR = 2;
+    private final Integer ESTATUS_VEHICULO_ACTIVO = 3;
+    private final Integer ESTATUS_VEHICULO_BAJA = 4;
+
+    private final Integer ACCION_SOLICITAR_AUTORIZACION = 1;
+    private final Integer ACCION_AUTORIZAR_SOLICITUD = 2;
+    private final Integer ACCION_RECHAZAR_SOLICITUD = 3;
+    private final Integer ACCION_CANCELAR_SOLICITUD = 4;
+    private final Integer ACCION_SOLICITAR_BAJA = 5;
+    private final Integer ACCION_SOLICITAR_MODIFICACION = 6;
+
     private final IVehiculoRepository vehiculoRepository;
     private final ILicitacionRepository licitacionRepository;
     private final IAnexoRepository anexoRepository;
+    private final IEstatusVehiculoRepository estatusVehiculoRepository;
 
     @Override
     public List<Vehiculo> findAllDynamic(Vehiculo vehiculo) {
@@ -98,6 +112,35 @@ public class VehiculoServiceImpl implements IVehiculoService {
     }
 
     @Override
+    public Vehiculo findById(Long idVehiculo) {
+        return vehiculoRepository.findById(idVehiculo)
+                .orElseThrow(() -> new NotFoundException("No se ha encontrado el vehículo con el id: " + idVehiculo));
+    }
+
+    @Override
+    public Vehiculo findFullById(Long idVehiculo) {
+
+        Vehiculo vehiculo = findById(idVehiculo);
+
+        if(vehiculo.getLicitacion() != null && vehiculo.getLicitacion().getIdLicitacion() != null)
+            vehiculo.setNumLicitacion(vehiculo.getLicitacion().getNumeroLicitacion());
+        else {
+            vehiculo.setLicitacion(new Licitacion());
+        }
+
+        if(vehiculo.getAnexo() != null && vehiculo.getAnexo().getIdAnexo() != null)
+            vehiculo.setAnexoValue(vehiculo.getAnexo().getNombre());
+        else {
+            vehiculo.setAnexo(new Anexo());
+        }
+
+        if(vehiculo.getDependenciaAsignada() == null)
+            vehiculo.setDependenciaAsignada(new Dependencia());
+
+        return vehiculo;
+    }
+
+    @Override
     public List<Vehiculo> findAllByNoSerie(List<String> noSerieList) {
         return vehiculoRepository.findVehiculosActivosByNoSerie(noSerieList);
     }
@@ -118,12 +161,6 @@ public class VehiculoServiceImpl implements IVehiculoService {
     }
 
     @Override
-    public Vehiculo findById(Long idVehiculo) {
-        return vehiculoRepository.findById(idVehiculo)
-                .orElseThrow(() -> new NotFoundException("No se ha encontrado el vehículo con el id: " + idVehiculo));
-    }
-
-    @Override
     public Vehiculo findByNoSerie(String noSerie) {
         return vehiculoRepository.findVehiculoActivoByNoSerie(noSerie)
                 .orElseThrow(() -> new NotFoundException("No se ha encontrado el vehículo con el número de serie " + noSerie));
@@ -134,9 +171,7 @@ public class VehiculoServiceImpl implements IVehiculoService {
         Integer ESTATUS_VEHICULO_REGISTRADO = 1;
 
         // Validar si ya existe un vehiculo con ese no. de serie
-        Optional<Vehiculo> vehiculoOptional = vehiculoRepository.findVehiculoActivoByNoSerie(vehiculo.getNoSerie());
-
-        if(vehiculoOptional.isPresent())
+        if(vehiculoRepository.existsByEstatusRegistroActivoAndNoSerie(vehiculo.getNoSerie()))
             throw new BadRequestException("Ya existe un vehículo con ese número de serie.");
 
         if(vehiculo.getAnexo().getIdAnexo() == null)
@@ -154,13 +189,51 @@ public class VehiculoServiceImpl implements IVehiculoService {
     }
 
     @Override
-    public Vehiculo editar(Vehiculo vehiculo) {
-        return null;
-    }
+    public void editar(Vehiculo vehiculo) {
 
-    @Override
-    public Vehiculo eliminar(Vehiculo vehiculo) {
-        return null;
+        Vehiculo vehiculoToUpdate = this.findById(vehiculo.getIdVehiculo());
+
+        // Validar si ya existe un vehiculo con ese no. de serie
+        if(vehiculoRepository.existsByEstatusRegistroActivoAndNoSerieAndIdVehiculoNot(vehiculo.getNoSerie(),
+                vehiculo.getIdVehiculo()))
+            throw new BadRequestException("Ya existe un vehículo con ese número de serie.");
+
+        if(vehiculo.getLicitacion().getIdLicitacion() == null)
+            vehiculoToUpdate.setLicitacion(null);
+        else
+            vehiculoToUpdate.setLicitacion(vehiculo.getLicitacion());
+
+        if(vehiculo.getAnexo().getIdAnexo() == null)
+            vehiculoToUpdate.setAnexo(null);
+        else
+            vehiculoToUpdate.setAnexo(vehiculo.getAnexo());
+
+        if(vehiculo.getDependenciaAsignada().getIdDependencia() == null)
+            vehiculoToUpdate.setDependenciaAsignada(null);
+        else
+            vehiculoToUpdate.setDependenciaAsignada(vehiculo.getDependenciaAsignada());
+
+        vehiculoToUpdate.setDependencia(vehiculo.getDependencia());
+        vehiculoToUpdate.setNoSerie(vehiculo.getNoSerie());
+        vehiculoToUpdate.setPlaca(vehiculo.getPlaca());
+        vehiculoToUpdate.setMarca(vehiculo.getMarca());
+        vehiculoToUpdate.setModelo(vehiculo.getModelo());
+        vehiculoToUpdate.setAnio(vehiculo.getAnio());
+        vehiculoToUpdate.setNoMotor(vehiculo.getNoMotor());
+        vehiculoToUpdate.setColor(vehiculo.getColor());
+        vehiculoToUpdate.setCondicionVehiculo(vehiculo.getCondicionVehiculo());
+        vehiculoToUpdate.setNoFactura(vehiculo.getNoFactura());
+        vehiculoToUpdate.setMontoFactura(vehiculo.getMontoFactura());
+        vehiculoToUpdate.setRentaMensual(vehiculo.getRentaMensual());
+        vehiculoToUpdate.setDescripcionVehiculo(vehiculo.getDescripcionVehiculo());
+        vehiculoToUpdate.setResguardante(vehiculo.getResguardante());
+        vehiculoToUpdate.setAreaResguardante(vehiculo.getAreaResguardante());
+        vehiculoToUpdate.setProveedor(vehiculo.getProveedor());
+
+        vehiculoToUpdate.setModificadoPor(vehiculo.getModificadoPor());
+        vehiculoToUpdate.setFechaModificacion(new Date());
+
+        vehiculoRepository.save(vehiculoToUpdate);
     }
 
     @Override
@@ -186,6 +259,55 @@ public class VehiculoServiceImpl implements IVehiculoService {
         }
 
         return acuseImportacionList;
+    }
+
+    @Override
+    @Transactional
+    public void solicitarAutorizacion(List<Long> idVehiculoList, String username) {
+        // Al solicitar una autorizacion cambia a estatus por autorizar
+        this.cambioEstatus(ACCION_SOLICITAR_AUTORIZACION, ESTATUS_VEHICULO_POR_AUTORIZAR,
+                idVehiculoList, null, username);
+    }
+
+    @Override
+    @Transactional
+    public void autorizarSolicitud(List<Long> idVehiculoList, String username) {
+        // Al autorizar una solicitud cambia a estatus activo
+        this.cambioEstatus(ACCION_AUTORIZAR_SOLICITUD, ESTATUS_VEHICULO_ACTIVO,
+                idVehiculoList, null, username);
+    }
+
+    @Override
+    @Transactional
+    public void rechazarSolicitud(List<Long> idVehiculoList, String motivo, String username) {
+        // Al rechazar una solicitud regresa a estatus registrado
+        this.cambioEstatus(ACCION_RECHAZAR_SOLICITUD, ESTATUS_VEHICULO_REGISTRADO,
+                idVehiculoList, motivo, username);
+    }
+
+    @Override
+    @Transactional
+    public void cancelarSolicitud(List<Long> idVehiculoList, String motivo, String username) {
+        // Al cancelar una solicitud cambia a estatus cancelado
+        Integer ESTATUS_VEHICULO_CANCELADO = 5;
+        this.cambioEstatus(ACCION_CANCELAR_SOLICITUD, ESTATUS_VEHICULO_CANCELADO,
+                idVehiculoList, motivo, username);
+    }
+
+    @Override
+    @Transactional
+    public void solicitarModificacion(List<Long> idVehiculoList, String motivo, String username) {
+        // Al solicitar una modificación cambia a estatus registrado
+        this.cambioEstatus(ACCION_SOLICITAR_MODIFICACION, ESTATUS_VEHICULO_REGISTRADO,
+                idVehiculoList, motivo, username);
+    }
+
+    @Override
+    @Transactional
+    public void solicitarBaja(List<Long> idVehiculoList, String motivo, String username) {
+        // Al solicitar una baja cambia a estatus baja
+        this.cambioEstatus(ACCION_SOLICITAR_BAJA, ESTATUS_VEHICULO_BAJA,
+                idVehiculoList, motivo, username);
     }
 
     private void validarImportacion(List<AcuseImportacion> acuseImportacionList, List<Vehiculo> vehiculos, Integer idDependencia, String username) {
@@ -298,6 +420,90 @@ public class VehiculoServiceImpl implements IVehiculoService {
                     .mensaje("El número de serie esta duplicado en este layout.")
                     .error(1)
                     .build()));
+        }
+    }
+
+    private void cambioEstatus(Integer accion, Integer estatusPorAsignar, List<Long> idVehiculoList, String motivo, String username) {
+        List<Vehiculo> vehiculoToUpdateList = vehiculoRepository.findAllByIdVehiculo(idVehiculoList);
+
+        if(!vehiculoToUpdateList.isEmpty()) {
+
+            EstatusVehiculo estatusVehiculo = estatusVehiculoRepository.findById(estatusPorAsignar)
+                    .orElseThrow(() -> new NotFoundException("No se ha encontrado el estatus solicitado."));
+
+            List<Integer> distinctEstatusVehiculos = vehiculoToUpdateList.stream()
+                    .map(Vehiculo::getEstatusVehiculo)
+                    .map(EstatusVehiculo::getIdEstatusVehiculo)
+                    .distinct()
+                    .toList();
+
+            // Si los vehiculos seleccionados tienen diferentes estatus
+            // entonces no se puede actualizar. Todos deben tener el mismo estatus.
+            if(distinctEstatusVehiculos.size() > 1) {
+                throw new BadRequestException("Asegurate de seleccionar vehículos con el mismo estatus.");
+            }
+
+            // Se obtiene el estatus actual de todos los vehiculas a actualizar
+            Integer estatusActual = distinctEstatusVehiculos.getFirst();
+
+            boolean cancelado = false;
+
+            // Si la accion es solicitar autorizacion
+            if(Objects.equals(accion, ACCION_SOLICITAR_AUTORIZACION)) {
+                // El estatus actual debe ser REGISTADO, si no entonces marca error
+                if(!Objects.equals(estatusActual, ESTATUS_VEHICULO_REGISTRADO)) {
+                    throw new BadRequestException("Para solicitar la autorización asegúrate de seleccionar vehículos con estatus REGISTRADO.");
+                }
+            } // Si la accion es autorizar solicitud
+            else if(Objects.equals(accion, ACCION_AUTORIZAR_SOLICITUD)) {
+                // El estatus actual debe ser POR AUTORIZAR, si no entonces marca error
+                if(!Objects.equals(estatusActual, ESTATUS_VEHICULO_POR_AUTORIZAR)) {
+                    throw new BadRequestException("Para autorizar las solicitudes asegúrate de seleccionar vehículos con estatus POR AUTORIZAR.");
+                }
+            }  // Si la accion es rechazar solicitud
+            else if (Objects.equals(accion, ACCION_RECHAZAR_SOLICITUD)) {
+                // El estatus actual debe ser POR AUTORIZAR, si no entonces marca error
+                if(!Objects.equals(estatusActual, ESTATUS_VEHICULO_POR_AUTORIZAR)) {
+                    throw new BadRequestException("Para rechazar la solicitud asegúrate de seleccionar vehículos con estatus POR AUTORIZAR.");
+                }
+            } // Si la accion es cancelar solicitud
+            else if(Objects.equals(accion, ACCION_CANCELAR_SOLICITUD)) {
+                // TODO: Validar si es la primera por autorizar
+                // El estatus actual debe ser POR AUTORIZAR, si no entonces marca error
+                if(!Objects.equals(estatusActual, ESTATUS_VEHICULO_POR_AUTORIZAR)) {
+                    throw new BadRequestException("Para cancelar las solicitudes asegúrate de seleccionar vehículos con estatus POR AUTORIZAR.");
+                }
+                cancelado = true;
+            } // Si la accion es solicitar baja
+            else if (Objects.equals(accion, ACCION_SOLICITAR_BAJA)) {
+                // El estatus actual debe ser ACTIVO, si no entonces marca error
+                if(!Objects.equals(estatusActual, ESTATUS_VEHICULO_ACTIVO)) {
+                    throw new BadRequestException("Para solicitar la baja asegúrate de seleccionar vehículos con estatus ACTIVO.");
+                }
+            } // Si la accion es solicitar modificación
+            else if (Objects.equals(accion, ACCION_SOLICITAR_MODIFICACION)) {
+                // El estatus actual debe ser ACTIVO o BAJA, si no entonces marca error
+                if(!Objects.equals(estatusActual, ESTATUS_VEHICULO_ACTIVO) || !Objects.equals(estatusActual, ESTATUS_VEHICULO_BAJA)) {
+                    throw new BadRequestException("Para solicitar la modificación asegúrate de seleccionar únicamente vehículos con estatus ACTIVO o BAJA.");
+                }
+            }
+
+            for (Vehiculo vehiculo : vehiculoToUpdateList) {
+                vehiculo.setEstatusVehiculo(estatusVehiculo);
+                vehiculo.setObservaciones(motivo);
+                vehiculo.setModificadoPor(username);
+                vehiculo.setFechaModificacion(new Date());
+
+                if(cancelado) {
+                    vehiculo.setEstatusRegistro(EstatusRegistro.BORRADO);
+                    vehiculo.setFechaBorrado(new Date());
+                    vehiculo.setBorradoPor(username);
+                }
+            }
+
+            vehiculoRepository.saveAll(vehiculoToUpdateList);
+        } else {
+            throw new BadRequestException("No se han recibido los vehículos por actualizar.");
         }
     }
 }

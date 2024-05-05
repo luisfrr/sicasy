@@ -1,7 +1,5 @@
 package gob.yucatan.sicasy.services.impl;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import gob.yucatan.sicasy.business.dtos.BitacoraCambios;
 import gob.yucatan.sicasy.business.entities.*;
 import gob.yucatan.sicasy.repository.criteria.SearchCriteria;
@@ -9,6 +7,7 @@ import gob.yucatan.sicasy.repository.criteria.SearchOperation;
 import gob.yucatan.sicasy.repository.criteria.SearchSpecification;
 import gob.yucatan.sicasy.repository.iface.IBItacoraUsuarioRepository;
 import gob.yucatan.sicasy.services.iface.IBitacoraUsuarioService;
+import gob.yucatan.sicasy.utils.strings.JsonStringConverter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -134,14 +133,7 @@ public class BitacoraUsuarioServiceImpl implements IBitacoraUsuarioService {
         }
 
         // Convertir bitacoraCambiosList a Text Json
-        ObjectMapper objectMapper = new ObjectMapper();
-        String cambiosJson = "";
-        try {
-            cambiosJson = objectMapper.writeValueAsString(bitacoraCambiosList);
-        } catch (JsonProcessingException e) {
-            // Manejo del error, por ejemplo, loggearlo
-            log.error("No se pudo convertir a JSON String", e);
-        }
+        String cambiosJson = JsonStringConverter.convertToString(bitacoraCambiosList);
 
         // Guardar la información en la tabla bitacora_rol
         // Código para guardar la información omitido por brevedad
@@ -194,14 +186,7 @@ public class BitacoraUsuarioServiceImpl implements IBitacoraUsuarioService {
         }
 
         // Convertir bitacoraCambiosList a Text Json
-        ObjectMapper objectMapper = new ObjectMapper();
-        String cambiosJson = "";
-        try {
-            cambiosJson = objectMapper.writeValueAsString(bitacoraCambiosList);
-        } catch (JsonProcessingException e) {
-            // Manejo del error, por ejemplo, loggearlo
-            log.error("No se pudo convertir a JSON String", e);
-        }
+        String cambiosJson = JsonStringConverter.convertToString(bitacoraCambiosList);
 
         // Guardar la información en la tabla bitacora_rol
         this.save(BitacoraUsuario.builder()

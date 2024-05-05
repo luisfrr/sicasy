@@ -7,6 +7,7 @@ import gob.yucatan.sicasy.business.exceptions.NotFoundException;
 import gob.yucatan.sicasy.services.iface.*;
 import gob.yucatan.sicasy.utils.imports.excel.ConfigHeaderExcelModel;
 import gob.yucatan.sicasy.utils.imports.excel.ImportExcelFile;
+import gob.yucatan.sicasy.utils.imports.excel.SaveFile;
 import gob.yucatan.sicasy.views.beans.Messages;
 import gob.yucatan.sicasy.views.beans.UserSessionBean;
 import jakarta.annotation.PostConstruct;
@@ -16,16 +17,15 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.primefaces.PrimeFaces;
 import org.primefaces.event.FileUploadEvent;
+import org.primefaces.model.ResponsiveOption;
 import org.primefaces.model.file.UploadedFile;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 @Component
 @Scope("view")
@@ -33,19 +33,38 @@ import java.util.List;
 @Slf4j
 public class VehiculoView implements Serializable {
 
-    private final UserSessionBean userSessionBean;
-    private @Getter String LAYOUT_VEHICULOS = "C:\\sicasy\\files\\layout\\layout_vehiculo.xlsx";
+    @Value("${app.files.folder.layouts.importar-vehiculo}")
+    private @Getter String LAYOUT_VEHICULOS;
 
+    @Value("${app.files.folder.vehiculos}")
+    private @Getter String FOLDER_VEHICULOS;
+
+    private @Getter final Integer ACCION_RECHAZAR_SOLICITUD = 3;
+    private @Getter final Integer ACCION_CANCELAR_SOLICITUD = 4;
+    private @Getter final Integer ACCION_SOLICITAR_BAJA = 5;
+    private @Getter final Integer ACCION_SOLICITAR_MODIFICACION = 6;
+
+    // Generales
     private @Getter String title;
-    private @Getter List<Vehiculo> vehiculoList;
-    private @Getter List<Vehiculo> vehiculoSelectedList;
-    private @Getter List<Vehiculo> vehiculoImportList;
+    private @Getter @Setter List<Vehiculo> vehiculoList;
+    private @Getter @Setter List<Vehiculo> vehiculoSelectedList;
+    private @Getter @Setter List<Vehiculo> vehiculoImportList;
     private @Getter @Setter Vehiculo vehiculoSelected;
     private @Getter @Setter Vehiculo vehiculoFilter;
+    private @Getter boolean showVehiculosPanel; // Seccion completa de filtrado
+    private @Getter @Setter List<VehiculoFoto> vehiculoFotoList;
+    private @Getter List<ResponsiveOption> responsiveOptions;
+
+    // Registro nuevos
     private @Getter boolean showNuevoFormDialog;
     private @Getter boolean showErrorImportacion;
     private @Getter @Setter List<AcuseImportacion> acuseImportacionList;
 
+    // Seccion completa de detalles del vehículo
+    private @Getter boolean showDetailsPanel;
+    private @Getter boolean readOnlyEditForm;
+
+    // Se usa para los filtros
     private @Getter List<Dependencia> dependenciaList;
     private @Getter List<CondicionVehiculo> condicionVehiculoList;
     private @Getter List<EstatusVehiculo> estatusVehiculoList;
@@ -55,16 +74,29 @@ public class VehiculoView implements Serializable {
     private @Getter List<String> modeloList;
     private @Getter List<Integer> anioList;
 
+    // Se usa para registros nuevos y edición
     private @Getter List<Licitacion> licitacionFormList;
     private @Getter List<Anexo> anexoFormList;
     private @Getter String layoutFileUpload;
 
+    // Se usan para confirmacion de cambio de estatus
+    private @Getter boolean showConfirmEstatus;
+    private @Getter Integer confirmAccion;
+    private @Getter String confirmMensaje;
+    private @Getter @Setter String confirmMotivo;
+
+    // Se usa para adjuntar fotos
+    private @Getter boolean showAdjuntarFotos;
+    private @Getter Vehiculo vehiculoFotoSelected;
+
+    private final UserSessionBean userSessionBean;
     private final IVehiculoService vehiculoService;
     private final IDependenciaService dependenciaService;
     private final ICondicionVehiculoService condicionVehiculoService;
     private final IEstatusVehiculoService estatusVehiculoService;
     private final ILicitacionService licitacionService;
     private final IAnexoService anexoService;
+    private final IVehiculoFotoService vehiculoFotoService;
 
 
     @PostConstruct
@@ -72,6 +104,11 @@ public class VehiculoView implements Serializable {
         log.info("Inicializando VehiculoView");
         this.title = "Vehículo";
         this.limpiarFiltros();
+
+        this.responsiveOptions = new ArrayList<>();
+        this.responsiveOptions.add(new ResponsiveOption("1024px", 5));
+        this.responsiveOptions.add(new ResponsiveOption("768px", 3));
+        this.responsiveOptions.add(new ResponsiveOption("560px", 1));
     }
 
     public void limpiarFiltros() {
@@ -93,16 +130,23 @@ public class VehiculoView implements Serializable {
         this.loadModelos();
         this.loadTipoVehiculo();
 
+        this.showVehiculosPanel = true;
+        this.showDetailsPanel = false;
         this.showNuevoFormDialog = false;
+
+        this.showConfirmEstatus = false;
+        this.showAdjuntarFotos = false;
 
         this.vehiculoList = new ArrayList<>();
         this.vehiculoSelectedList = new ArrayList<>();
+        this.vehiculoFotoList = new ArrayList<>();
         PrimeFaces.current().ajax().update("form_filtros");
     }
 
     public void buscar() {
         log.info("buscar vehiculos");
         this.vehiculoList = vehiculoService.findAllDynamic(this.vehiculoFilter);
+        PrimeFaces.current().ajax().update("form_datatable");
     }
 
     public void abrirModalRegistroVehiculo() {
@@ -234,9 +278,142 @@ public class VehiculoView implements Serializable {
         }
     }
 
+    public void solicitarAutorizacion() {
+        log.info("Solicitando autorizacion");
+        try {
+            List<Long> idVehiculoSelectedList =  this.getIdVehiculoSelectedList();
+            vehiculoService.solicitarAutorizacion(idVehiculoSelectedList, userSessionBean.getUserName());
+            this.buscar();
+            Messages.addInfo("Se ha enviado la solicitud de autorización");
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            Messages.addError(e.getMessage());
+        }
+    }
+
+    public void autorizarSolicitud() {
+        log.info("Autorizando solicitud");
+        try {
+            List<Long> idVehiculoSelectedList =  this.getIdVehiculoSelectedList();
+            vehiculoService.autorizarSolicitud(idVehiculoSelectedList, userSessionBean.getUserName());
+            this.buscar();
+            Messages.addInfo("Se han autorizado correctamente las solicitudes");
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            Messages.addError(e.getMessage());
+        }
+    }
+
+    public void abrirConfirmEstatusDialog(Integer confirmAccion) {
+        log.info("Abrir Confirm Estatus");
+        this.showConfirmEstatus = true;
+        this.confirmAccion = confirmAccion;
+        this.confirmMotivo = "";
+
+        if(Objects.equals(confirmAccion, ACCION_RECHAZAR_SOLICITUD)) {
+            this.confirmMensaje = "¿Está seguro que desea rechazar las solicitudes? Esto regresa el estatus del vehiculo a REGISTRADO.";
+        } else if (Objects.equals(confirmAccion, ACCION_CANCELAR_SOLICITUD)) {
+            this.confirmMensaje = "¿Está seguro que desea cancelar las solicitudes? Una vez canceladas ya no podrás visualizar estos registros.";
+        } else if (Objects.equals(confirmAccion, ACCION_SOLICITAR_BAJA)) {
+            this.confirmMensaje = "¿Está seguro que desea solicitar la baja de los vehículos? Una vez dados de baja, solo se muestran en reportes históricos.";
+        } else if (Objects.equals(confirmAccion, ACCION_SOLICITAR_MODIFICACION)) {
+            this.confirmMensaje = "¿Está seguro que desea solicitar la baja de los vehículos? Una vez dados de baja, solo se muestran en reportes históricos.";
+        }
+
+        PrimeFaces.current().ajax().update("confirm-estatus-dialog");
+        PrimeFaces.current().executeScript("PF('confirmEstatusDialog').show()");
+    }
+
+    public void confirmarEstatusDialog() {
+        log.info("confirmar estatus dialog");
+        try {
+            List<Long> idVehiculoSelectedList =  this.getIdVehiculoSelectedList();
+
+            boolean success = false;
+            if(Objects.equals(this.confirmAccion, ACCION_RECHAZAR_SOLICITUD)) {
+                vehiculoService.rechazarSolicitud(idVehiculoSelectedList, this.confirmMotivo, userSessionBean.getUserName());
+                Messages.addInfo("Se han rechazado correctamente las solicitudes de los vehículos seleccionados");
+                success = true;
+            } else if (Objects.equals(this.confirmAccion, ACCION_CANCELAR_SOLICITUD)) {
+                vehiculoService.cancelarSolicitud(idVehiculoSelectedList, this.confirmMotivo, userSessionBean.getUserName());
+                Messages.addInfo("Se han cancelado correctamente los registros de los vehículos seleccionados");
+                success = true;
+            } else if (Objects.equals(this.confirmAccion, ACCION_SOLICITAR_BAJA)) {
+                vehiculoService.solicitarBaja(idVehiculoSelectedList, this.confirmMotivo, userSessionBean.getUserName());
+                Messages.addInfo("Se han dado de baja los vehículos seleccionados");
+                success = true;
+            } else if (Objects.equals(this.confirmAccion, ACCION_SOLICITAR_MODIFICACION)) {
+                vehiculoService.solicitarModificacion(idVehiculoSelectedList, this.confirmMotivo, userSessionBean.getUserName());
+                Messages.addInfo("Se ha solicitado la modificación de los vehículos seleccionados.");
+                success = true;
+            }
+
+            if(success)
+                this.buscar();
+
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            Messages.addError(e.getMessage());
+        }
+    }
+
+    public void cerrarConfirmEstatusDialog() {
+        log.info("Cerrar Confirm Estatus");
+        this.showConfirmEstatus = false;
+        this.confirmAccion = null;
+        this.confirmMotivo = "";
+        this.confirmMensaje = "";
+        PrimeFaces.current().ajax().update("confirm-estatus-dialog");
+        PrimeFaces.current().executeScript("PF('confirmEstatusDialog').hide()");
+    }
+
     public void verDetalle(Vehiculo vehiculo) {
         log.info("ver detalle vehiculos");
-        this.vehiculoSelected = vehiculo;
+        this.vehiculoSelected = vehiculoService.findFullById(vehiculo.getIdVehiculo());
+        this.showVehiculosPanel = false;
+        this.showDetailsPanel = true;
+        this.readOnlyEditForm = true;
+
+        this.loadLicitacionesForm();
+        this.loadAnexosForm();
+
+        this.vehiculoFotoList = vehiculoFotoService.getVehiculoFotos(this.vehiculoSelected.getIdVehiculo());
+
+        PrimeFaces.current().ajax().update("container");
+    }
+
+    public void regresar() {
+        log.info("regresar vehiculos");
+        this.vehiculoSelected = null;
+        this.showVehiculosPanel = true;
+        this.showDetailsPanel = false;
+        PrimeFaces.current().ajax().update("container");
+    }
+
+    public void permitirEditar() {
+        this.readOnlyEditForm = false;
+        PrimeFaces.current().ajax().update("tab_view_detalles:form_editar_vehiculo");
+    }
+
+    public void cancelarEdicion() {
+        this.vehiculoSelected = vehiculoService.findFullById(this.vehiculoSelected.getIdVehiculo());
+        this.readOnlyEditForm = true;
+        PrimeFaces.current().ajax().update("tab_view_detalles:form_editar_vehiculo");
+    }
+
+    public void guardarEdicion() {
+        try {
+            this.vehiculoSelected.setModificadoPor(userSessionBean.getUserName());
+            vehiculoService.editar(this.vehiculoSelected);
+            this.vehiculoSelected = vehiculoService.findFullById(this.vehiculoSelected.getIdVehiculo());
+            this.readOnlyEditForm = true;
+            Messages.addInfo("Se ha actualizado correctamente la información del vehículo");
+            PrimeFaces.current().ajax().update("tab_view_detalles:form_editar_vehiculo", "growl");
+        } catch (Exception e) {
+            log.error("Error al guardar la información vehiculo", e);
+            Messages.addError(e.getMessage());
+            PrimeFaces.current().ajax().update("tab_view_detalles:form_editar_vehiculo", "growl");
+        }
     }
 
     public void abrirModalRegistroMantenimiento(Long idVehiculo) {
@@ -246,9 +423,63 @@ public class VehiculoView implements Serializable {
 
     public void abrirModalAdjuntarFotos(Long idVehiculo) {
         log.info("abrir modal adjuntar fotos");
-        this.vehiculoSelected = vehiculoService.findById(idVehiculo);
+        this.showAdjuntarFotos = true;
+        this.vehiculoFotoSelected = vehiculoService.findById(idVehiculo);
+        PrimeFaces.current().ajax().update("form_adjuntar_fotos", "growl");
+        PrimeFaces.current().executeScript("PF('adjuntarFotosDialog').show();");
     }
 
+    public void cerrarModalAdjuntarFotos() {
+        log.info("cerrar modal adjuntar fotos");
+        this.showAdjuntarFotos = false;
+        this.vehiculoFotoSelected = null;
+        PrimeFaces.current().ajax().update("form_adjuntar_fotos");
+        PrimeFaces.current().executeScript("PF('adjuntarFotosDialog').hide();");
+    }
+
+    public void subirFotoVehiculo(FileUploadEvent event) {
+        log.info("subir foto vehiculo");
+        String fileName = event.getFile().getFileName();
+        try {
+            if(this.vehiculoFotoSelected != null) {
+                String filePath = SaveFile.importFileToPath(event.getFile().getContent(), fileName, FOLDER_VEHICULOS);
+
+                VehiculoFoto vehiculoFoto = VehiculoFoto.builder()
+                        .vehiculo(this.vehiculoFotoSelected)
+                        .rutaArchivo(filePath)
+                        .nombreArchivo(fileName)
+                        .fechaCreacion(new Date())
+                        .creadoPor(userSessionBean.getUserName())
+                        .borrado(0)
+                        .build();
+
+                vehiculoFotoService.guardarFoto(vehiculoFoto);
+                Messages.addInfo("Se ha gurdado correctamente la foto: " + fileName);
+
+                if(this.showDetailsPanel) {
+                    this.vehiculoFotoList = vehiculoFotoService.getVehiculoFotos(this.vehiculoFotoSelected.getIdVehiculo());
+                    PrimeFaces.current().ajax().update("tab_view_detalles:form_galeria");
+                }
+            } else {
+                Messages.addWarn("No se ha seleccionado el vehículo");
+            }
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            Messages.addError("No se ha logrado guardar la foto: " + fileName);
+        }
+    }
+
+    public void borrarFoto(Long vehiculoFotoId) {
+        log.info("borrar foto");
+        try {
+            vehiculoFotoService.borrarFoto(vehiculoFotoId, userSessionBean.getUserName());
+            this.vehiculoFotoList = vehiculoFotoService.getVehiculoFotos(this.vehiculoFotoSelected.getIdVehiculo());
+            PrimeFaces.current().ajax().update("tab_view_detalles:form_galeria");
+
+        } catch (Exception e) {
+            Messages.addError(e.getMessage());
+        }
+    }
 
     //region Events
 
@@ -353,7 +584,15 @@ public class VehiculoView implements Serializable {
         }
     }
 
+    private List<Long> getIdVehiculoSelectedList() {
+        if(this.vehiculoSelectedList.isEmpty())
+            throw new BadRequestException("No ha seleccionado ningún vehículo.");
 
+        return vehiculoSelectedList.stream()
+                .map(Vehiculo::getIdVehiculo)
+                .toList();
+    }
 
     //endregion private methods
+
 }
