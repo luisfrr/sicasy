@@ -83,7 +83,8 @@ public class RolPermisoServiceImpl implements IRolPermisoService {
         for (RolPermiso rolPermisoParent : rolPermisoParents) {
             List<RolPermiso> subRolPermisoList = rolPermisoList.stream()
                     .filter(rp -> Objects.equals(rp.getPermiso().getPermisoParent(), rolPermisoParent.getPermiso()))
-                    .sorted(Comparator.comparing(r -> r.getPermiso().getNombre()))
+                    .sorted(Comparator.comparing((RolPermiso r) -> r.getPermiso().getTipoPermiso())
+                            .thenComparing((RolPermiso r) -> r.getPermiso().getOrden()))
                     .toList();
 
             rolPermisoParent.setSubRolPermisoList(subRolPermisoList);

@@ -46,6 +46,9 @@ public class Permiso {
     @Enumerated(EnumType.ORDINAL)
     private TipoPermiso tipoPermiso;
 
+    @Column(name = "orden")
+    private Integer orden;
+
     @Column(name = "class_name")
     private String className;
 
