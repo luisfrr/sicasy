@@ -17,7 +17,8 @@
             <p:growl id="growl" showDetail="true" showSummary="true"
                      skipDetailIfEqualsSummary="true" globalOnly="true"/>
 
-            <p:outputPanel id="panel_roles" rendered="#{not usuarioView.showConfigurarPermisos}">
+            <p:outputPanel id="panel_roles" rendered="#{usuarioView.showPanelPrincipal}">
+
                 <h:form id="form_breadcrum" styleClass="mb-3">
                     <p:breadCrumb homeDisplay="text">
                         <p:menuitem value="Inicio" ajax="false" action="#{menuSessionBean.goToHome()}"/>
@@ -198,6 +199,12 @@
                                                  rendered="#{usuario.estatus.label != 'Borrado'}"/>
                                 <p:menu overlay="true" trigger="buttonOptions" my="left top" at="left bottom" styleClass="w-16rem">
 
+                                    <sec:authorize access="hasAnyAuthority('ROLE_OWNER')">
+                                        <p:menuitem value="Ver bitácora" icon="fi-rr-eye"
+                                                    ajax="true" action="#{usuarioView.verPanelBitacoraUsuario(usuario)}"
+                                                    update="container"/>
+                                    </sec:authorize>
+
                                     <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'SEGURIDAD_USUARIOS_READ_CONFIGURAR_PERMISOS')">
                                         <p:menuitem value="Configuración de Permisos"
                                                     action="#{usuarioView.verConfiguracionPermisos(usuario)}"
@@ -256,6 +263,10 @@
 
             <p:outputPanel id="panel_asignar_permisos" rendered="#{usuarioView.showConfigurarPermisos}">
                 <ui:include src="/views/seguridad/_usuarios_permisos.xhtml"/>
+            </p:outputPanel>
+
+            <p:outputPanel id="panel_bitacora_usuario" rendered="#{usuarioView.showPanelBitacoraUsuario}">
+                <ui:include src="/views/seguridad/_bitacora_usuario.xhtml"/>
             </p:outputPanel>
 
         </p:outputPanel>
