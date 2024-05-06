@@ -169,7 +169,7 @@
                             <p:menu overlay="true" trigger="buttonOptions" my="left top" at="left bottom" styleClass="w-16rem">
 
                                 <sec:authorize access="hasAnyAuthority('ROLE_OWNER')">
-                                    <p:menuitem value="Ver bitácora" icon="fi-rr-eye"
+                                    <p:menuitem value="Ver bitácora"
                                                 ajax="true" action="#{rolView.verBitacoraRol(rol)}"
                                                 update="container"/>
                                 </sec:authorize>

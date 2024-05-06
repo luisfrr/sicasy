@@ -28,6 +28,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.primefaces.PrimeFaces;
 import org.primefaces.event.SelectEvent;
 import org.primefaces.model.file.UploadedFile;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
@@ -40,6 +41,9 @@ import java.util.*;
 @Slf4j
 @ConfigPermiso(tipo = TipoPermiso.VIEW, codigo = "CATALOGO_ANEXO_VIEW", nombre = "Catálogo de Anexos")
 public class AnexoView implements Serializable {
+
+    @Value("${app.files.folder.anexos}")
+    private @Getter String FOLDER_ANEXO;
 
     private @Getter String title;
     private @Getter String titleDialog;
@@ -103,7 +107,7 @@ public class AnexoView implements Serializable {
                     this.anexoSelected.setFechaModificacion(new Date());
 
                     if (anexoFile != null){
-                        String pathfile = SaveFile.saveFileToPath(anexoFile.getContent(), anexoFile.getFileName(), "\\Downloads\\");
+                        String pathfile = SaveFile.importFileToPath(anexoFile.getContent(), anexoFile.getFileName(), FOLDER_ANEXO);
                         anexoSelected.setRutaArchivo(pathfile);
                     }
 
@@ -122,7 +126,7 @@ public class AnexoView implements Serializable {
                         this.anexoSelected.setCreadoPor(userSessionBean.getUserName());
                         this.anexoSelected.setFechaCreacion(new Date());
                         if (anexoFile != null){
-                            String pathfile = SaveFile.saveFileToPath(anexoFile.getContent(), anexoFile.getFileName(), "\\Downloads\\");
+                            String pathfile = SaveFile.importFileToPath(anexoFile.getContent(), anexoFile.getFileName(), FOLDER_ANEXO);
                             anexoSelected.setRutaArchivo(pathfile);
                         }
                         anexoService.save(anexoSelected);

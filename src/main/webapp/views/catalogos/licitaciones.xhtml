@@ -290,7 +290,15 @@
                                 for="id_calendar2" />
                     </p:outputPanel>
 
-                    <p:fileUpload value="#{licitacionView.file}" mode="simple" label="Elegir archivo"
+                    <p:fileUpload value="#{licitacionView.file}"
+                                  sizeLimit="1000000"
+                                  mode="simple" fileLimit="1"
+                                  chooseButtonTitle="Elegir" chooseLabel="Elegir"
+                                  cancelButtonTitle="Cancelar" cancelLabel="Cancelar"
+                                  uploadButtonTitle="Subir" uploadLabel="Subir"
+                                  fileLimitMessage="Has superado el número máximo de archivos"
+                                  invalidFileMessage="Archivo no válido"
+                                  invalidSizeMessage="Has superado el tamaño máximo por archivo"
                                   allowTypes="/(\.|\/)(pdf)$/" accept=".pdf"
                                   skinSimple="true"/>
 

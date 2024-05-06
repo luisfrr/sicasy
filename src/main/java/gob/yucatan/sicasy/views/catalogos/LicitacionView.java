@@ -28,6 +28,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.primefaces.PrimeFaces;
 import org.primefaces.event.SelectEvent;
 import org.primefaces.model.file.UploadedFile;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
@@ -40,6 +41,9 @@ import java.util.*;
 @Slf4j
 @ConfigPermiso(tipo = TipoPermiso.VIEW, codigo = "CATALOGO_LICITACION_VIEW", nombre = "Catálogo de Licitaciones")
 public class LicitacionView {
+
+    @Value("${app.files.folder.licitaciones}")
+    private @Getter String FOLDER_LICITACION;
 
     private @Getter String title;
     private @Getter String titleDialog;
@@ -100,7 +104,7 @@ public class LicitacionView {
                     this.licitacionSelected.setFechaModificacion(new Date());
 
                     if (file != null){
-                        String pathfile = SaveFile.saveFileToPath(file.getContent(), file.getFileName(), "\\Downloads\\");
+                        String pathfile = SaveFile.importFileToPath(file.getContent(), file.getFileName(), FOLDER_LICITACION);
                         licitacionSelected.setRutaArchivo(pathfile);
                     }
 
@@ -121,7 +125,7 @@ public class LicitacionView {
                         this.licitacionSelected.setFechaCreacion(new Date());
 
                         if (file != null){
-                            String pathfile = SaveFile.saveFileToPath(file.getContent(), file.getFileName(), "\\Downloads\\");
+                            String pathfile = SaveFile.importFileToPath(file.getContent(), file.getFileName(), FOLDER_LICITACION);
                             licitacionSelected.setRutaArchivo(pathfile);
                         }
 
