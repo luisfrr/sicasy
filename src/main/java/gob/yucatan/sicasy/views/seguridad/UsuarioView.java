@@ -42,9 +42,12 @@ public class UsuarioView implements Serializable {
     private @Getter List<Rol> rolList;
 
     private @Getter boolean showConfigurarPermisos;
+    private @Getter boolean showPanelPrincipal;
+    private @Getter boolean showPanelBitacoraUsuario;
     private @Getter boolean formEdit;
     private @Getter Permiso permisoFilter;
     private @Getter List<UsuarioPermiso> usuarioPermisoList;
+    private @Getter List<BitacoraUsuario> bitacoraUsuarioList;
 
     private final IUsuarioService usuarioService;
     private final UserSessionBean userSessionBean;
@@ -52,6 +55,7 @@ public class UsuarioView implements Serializable {
     private final IPermisoService permisoService;
     private final IUsuarioPermisoService usuarioPermisoService;
     private final IRolService rolService;
+    private final IBitacoraUsuarioService bitacoraUsuarioService;
     private final IEmailService emailService;
 
     @PostConstruct
@@ -61,6 +65,8 @@ public class UsuarioView implements Serializable {
 
         this.usuarioSelected = null;
         this.showConfigurarPermisos = false;
+        this.showPanelBitacoraUsuario = false;
+        this.showPanelPrincipal = true;
         this.limpiarFiltros();
 
         // Si es owner puede filtrar todos los roles
@@ -269,13 +275,29 @@ public class UsuarioView implements Serializable {
         log.info("Ver Configuracion Permisos Usuario");
         this.usuarioSelected = usuario;
         this.showConfigurarPermisos = true;
+        this.showPanelPrincipal = false;
         this.limpiarFiltrosPermisos();
+    }
+
+//    @ConfigPermiso(tipo = TipoPermiso.READ, codigo = "SEGURIDAD_USUARIOS_READ_VER_BITACORA_USUARIO",
+//            nombre = "Ver bitácoras de usuarios", descripcion = "Permite ver las bitácoras del usuario.")
+//    @PreAuthorize("hasAnyAuthority('ROLE_OWNER', 'SEGURIDAD_USUARIOS_READ_VER_BITACORA_USUARIO')")
+    public void verPanelBitacoraUsuario(Usuario usuario) {
+        log.info("ver bitacora usuario");
+        this.usuarioSelected = usuario;
+
+        // buscar bitacora de usuario
+        this.bitacoraUsuarioList = bitacoraUsuarioService.findByUsuarioId(usuario.getIdUsuario());
+
+        this.showPanelPrincipal = false;
+        this.showPanelBitacoraUsuario = true;
     }
 
     public void regresar() {
         log.info("Regresar Usuario");
         this.usuarioSelected = null;
         this.showConfigurarPermisos = false;
+        this.showPanelPrincipal = true;
         this.limpiarFiltrosPermisos();
     }
 
