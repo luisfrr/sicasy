@@ -226,6 +226,7 @@ public class RolView {
         permisoService.updateAll(permisos);
         log.info("Permisos: {}", permisos.size());
         this.buscarPermisos();
+        Messages.addInfo("Se ha actualizado el listado de permisos.");
     }
 
 }
