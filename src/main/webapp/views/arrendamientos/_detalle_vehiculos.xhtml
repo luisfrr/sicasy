@@ -170,6 +170,18 @@
                                      value="#{vehiculoView.vehiculoSelected.proveedor}"/>
                         <span class="text-sm hidden"> </span>
                      </p:outputPanel>
+                     <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4 xl:col-3">
+                        <p:outputLabel for="@next" value="Director Administrativo" styleClass="block"/>
+                        <p:inputText styleClass="block w-full" disabled="#{vehiculoView.readOnlyEditForm}"
+                                     value="#{vehiculoView.vehiculoSelected.autorizaDirectorAdmin}"/>
+                        <span class="text-sm hidden"> </span>
+                     </p:outputPanel>
+                     <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4 xl:col-3">
+                        <p:outputLabel for="@next" value="Director General" styleClass="block"/>
+                        <p:inputText styleClass="block w-full" disabled="#{vehiculoView.readOnlyEditForm}"
+                                     value="#{vehiculoView.vehiculoSelected.autorizaDirectorGeneral}"/>
+                        <span class="text-sm hidden"> </span>
+                     </p:outputPanel>
                   </p:outputPanel>
                   <p:outputPanel styleClass="w-full" rendered="#{not vehiculoView.readOnlyEditForm}">
                      <p:outputPanel styleClass="flex justify-content-end">

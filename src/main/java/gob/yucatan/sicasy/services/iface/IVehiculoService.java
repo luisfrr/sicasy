@@ -13,7 +13,7 @@ public interface IVehiculoService {
     List<Vehiculo> findAllByNoSerie(List<String> noSerieList);
     List<String> findDistinctMarcas();
     List<String> findDistinctModelo(String marca);
-    List<Integer> findDistinctAnio(String marca, String modelo);
+    List<Integer> findDistinctAnio();
 
     Vehiculo findByNoSerie(String noSerie);
     Vehiculo agregar(Vehiculo vehiculo);

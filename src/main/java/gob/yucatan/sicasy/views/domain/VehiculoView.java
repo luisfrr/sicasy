@@ -139,7 +139,7 @@ public class VehiculoView implements Serializable {
         this.loadAnexos();
         this.loadMarcas();
         this.loadModelos();
-        this.loadTipoVehiculo();
+        this.loadAnios();
 
         this.showVehiculosPanel = true;
         this.showDetailsPanel = false;
@@ -285,6 +285,8 @@ public class VehiculoView implements Serializable {
             list.add(ConfigHeaderExcelModel.builder().header("RESGUARDANTE").fieldName("resguardante").columnIndex(14).build());
             list.add(ConfigHeaderExcelModel.builder().header("AREA_RESGUARDANTE").fieldName("areaResguardante").columnIndex(15).build());
             list.add(ConfigHeaderExcelModel.builder().header("PROVEEDOR").fieldName("proveedor").columnIndex(16).build());
+            list.add(ConfigHeaderExcelModel.builder().header("DIRECTOR_ADMINISTRATIVO").fieldName("autorizaDirectorAdmin").columnIndex(17).build());
+            list.add(ConfigHeaderExcelModel.builder().header("DIRECTOR_GENERAL").fieldName("autorizaDirectorGeneral").columnIndex(18).build());
 
             ImportExcelFile<Vehiculo> importExcelFile = new ImportExcelFile<>();
             this.vehiculoImportList = importExcelFile.processExcelFile(fileContent, vehiculoClass, list);
@@ -464,6 +466,9 @@ public class VehiculoView implements Serializable {
         }
     }
 
+    @ConfigPermiso(tipo = TipoPermiso.WRITE, codigo = "VEHICULOS_WRITE_REGISTRAR_MANTENIMIENTO", orden = 13,
+            nombre = "Adjuntar fotos", descripcion = "Permite adjuntar fotos del vehículo.")
+    @PreAuthorize("hasAnyAuthority('ROLE_OWNER', 'VEHICULOS_WRITE_REGISTRAR_MANTENIMIENTO')")
     public void abrirModalRegistroMantenimiento(Long idVehiculo) {
         log.info("abrir modal registro mantenimiento");
         this.vehiculoSelected = vehiculoService.findById(idVehiculo);
@@ -545,10 +550,6 @@ public class VehiculoView implements Serializable {
         this.loadModelos();
     }
 
-    public void onChangeModeloFilter() {
-        this.loadTipoVehiculo();
-    }
-
     public void onChangeLicitacionForm() {
         this.loadAnexosForm();
     }
@@ -605,13 +606,8 @@ public class VehiculoView implements Serializable {
         }
     }
 
-    private void loadTipoVehiculo() {
-        if(this.vehiculoFilter.getMarca() != null && !this.vehiculoFilter.getMarca().isEmpty() &&
-                this.vehiculoFilter.getModelo() != null && !this.vehiculoFilter.getModelo().isEmpty() ) {
-            this.anioList = vehiculoService.findDistinctAnio(this.vehiculoFilter.getMarca(), this.vehiculoFilter.getModelo());
-        } else {
-            this.anioList = new ArrayList<>();
-        }
+    private void loadAnios() {
+        this.anioList = vehiculoService.findDistinctAnio();
     }
 
     private void loadLicitacionesForm() {

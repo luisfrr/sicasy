@@ -154,8 +154,8 @@ public class VehiculoServiceImpl implements IVehiculoService {
     }
 
     @Override
-    public List<Integer> findDistinctAnio(String marca, String modelo) {
-        return vehiculoRepository.findDistinctAnioByEstatusActivo(marca, modelo);
+    public List<Integer> findDistinctAnio() {
+        return vehiculoRepository.findDistinctAnioByEstatusActivo();
     }
 
     @Override
