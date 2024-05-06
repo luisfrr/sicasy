@@ -1,6 +1,7 @@
 package gob.yucatan.sicasy.views.seguridad;
 
 import gob.yucatan.sicasy.business.annotations.ConfigPermiso;
+import gob.yucatan.sicasy.business.entities.BitacoraRol;
 import gob.yucatan.sicasy.business.entities.Permiso;
 import gob.yucatan.sicasy.business.entities.Rol;
 import gob.yucatan.sicasy.business.entities.RolPermiso;
@@ -8,10 +9,7 @@ import gob.yucatan.sicasy.business.enums.EstatusRegistro;
 import gob.yucatan.sicasy.business.enums.TipoPermiso;
 import gob.yucatan.sicasy.business.exceptions.BadRequestException;
 import gob.yucatan.sicasy.business.exceptions.NotFoundException;
-import gob.yucatan.sicasy.services.iface.IPermisoScannerService;
-import gob.yucatan.sicasy.services.iface.IPermisoService;
-import gob.yucatan.sicasy.services.iface.IRolPermisoService;
-import gob.yucatan.sicasy.services.iface.IRolService;
+import gob.yucatan.sicasy.services.iface.*;
 import gob.yucatan.sicasy.views.beans.Messages;
 import gob.yucatan.sicasy.views.beans.UserSessionBean;
 import jakarta.annotation.PostConstruct;
@@ -46,8 +44,11 @@ public class RolView {
     private @Getter Rol rolFilter;
     private @Getter List<Rol> roles;
     private @Getter boolean showConfigurarPermisos;
+    private @Getter boolean showPanelPrincipal;
+    private @Getter boolean showPanelBitacoraRol;
     private @Getter Permiso permisoFilter;
     private @Getter List<RolPermiso> rolPermisoList;
+    private @Getter List<BitacoraRol> bitacoraRolList;
     private @Getter EstatusRegistro[] estatusRegistros;
 
     private final IRolService rolService;
@@ -55,6 +56,7 @@ public class RolView {
     private final IPermisoScannerService permisoScannerService;
     private final IPermisoService permisoService;
     private final IRolPermisoService rolPermisoService;
+    private final IBitacoraRolService bitacoraRolService;
 
     @PostConstruct
     public void init() {
@@ -65,6 +67,8 @@ public class RolView {
 
         this.rolSelected = null;
         this.showConfigurarPermisos = false;
+        this.showPanelBitacoraRol = false;
+        this.showPanelPrincipal = true;
         this.limpiarFiltros();
     }
 
@@ -181,13 +185,35 @@ public class RolView {
     public void verConfiguracionPermisos(Rol rol) {
         this.rolSelected = rol;
         this.showConfigurarPermisos = true;
+        this.showPanelPrincipal = false;
         this.limpiarFiltrosPermisos();
+    }
+
+    public void verBitacoraRol(Rol rol){
+        this.rolSelected = rol;
+
+        // recupera la bitacora de cambios del rol para la tabla
+        this.bitacoraRolList = bitacoraRolService.findByRolId(rol.getIdRol());
+        log.info("bitacoraRolList: {}", bitacoraRolList.size());
+
+        this.showPanelBitacoraRol = true;
+        this.showConfigurarPermisos = false;
+        this.showPanelPrincipal = false;
+        // podria buscar la informacion de bitacoras del rol selecionado
+
     }
 
     public void regresar() {
         this.rolSelected = null;
         this.showConfigurarPermisos = false;
+        this.showPanelPrincipal = true;
         this.limpiarFiltrosPermisos();
+    }
+
+    public void regresarBitacoras(){
+        this.rolSelected = null;
+        this.showPanelBitacoraRol = false;
+        this.showPanelPrincipal = true;
     }
 
     public void buscarPermisos() {

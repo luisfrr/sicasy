@@ -1,0 +1,121 @@
+<ui:composition
+        xmlns="http://www.w3.org/1999/xhtml"
+        xmlns:h="http://xmlns.jcp.org/jsf/html"
+        xmlns:f="http://xmlns.jcp.org/jsf/core"
+        xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+        xmlns:p="http://primefaces.org/ui"
+        xmlns:sec="https://joinfaces.org/security">
+
+    <p:outputPanel id="panel_detalle_bitacora_rol" rendered="#{rolView.showPanelBitacoraRol}">
+        <h:form id="form_breadcum_bitacora" styleClass="mb-3">
+            <p:breadCrumb homeDisplay="text">
+                <p:menuitem value="Inicio" ajax="false" action="#{menuSessionBean.goToHome()}"/>
+                <p:menuitem value="Roles" ajax="true" update="container" action="#{menuSessionBean.goToRoles()}"/>
+                <p:menuitem value="Bitácora de Rol"/>
+            </p:breadCrumb>
+        </h:form>
+
+        <h:form id="panel_datos_rol">
+            <p:panel header="Datos del Rol" toggleable="true" toggleSpeed="500">
+
+                <p:outputPanel styleClass="grid formgrid mb-2" style="width: 80%;">
+
+                    <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4 xl:col-3">
+                        <p:outputLabel for="@next" value="CODIGO" styleClass="block"/>
+                        <p:inputText styleClass="block w-full" readonly="true"
+                                     value="#{rolView.rolSelected.codigo}"/>
+                    </p:outputPanel>
+
+                    <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4 xl:col-3">
+                        <p:outputLabel for="@next" value="NOMBRE" styleClass="block"/>
+                        <p:inputText styleClass="block w-full" readonly="true"
+                                     value="#{rolView.rolSelected.nombre}"/>
+                    </p:outputPanel>
+
+                    <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4 xl:col-3">
+                        <p:outputLabel for="@next" value="DESCRIPCION" styleClass="block"/>
+                        <p:inputText styleClass="block w-full" readonly="true"
+                                     value="#{rolView.rolSelected.descripcion}"/>
+                    </p:outputPanel>
+
+                    <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4 xl:col-3">
+                        <p:outputLabel for="@next" value="ESTATUS" styleClass="block"/>
+                        <p:inputText styleClass="block w-full" readonly="true"
+                                     value="#{rolView.rolSelected.estatus.label}"/>
+                    </p:outputPanel>
+
+                </p:outputPanel>
+
+
+            </p:panel>
+        </h:form>
+
+        <h:form id="form_datatable_bitacora">
+
+            <p:dataTable id="dt_bitacora_rol"
+                         var="bitacora" value="#{rolView.bitacoraRolList}"
+                         rows="50" rowHover="true"
+                         rowKey="#{bitacora.idBitacoraRol}" rowIndexVar="index"
+                         styleClass="dt-scrollable-x"
+                         scrollable="true"
+                         paginator="true" paginatorPosition="bottom"
+                         paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                         currentPageReportTemplate="{startRecord}-{endRecord} de {totalRecords} registros"
+                         rowsPerPageTemplate="50,100,200,{ShowAll|'Todos'}">
+
+                <f:facet name="header">
+                    Bitácora de actividades
+                </f:facet>
+
+                <p:column headerText="No." width="50" >
+                    <p:rowToggler />
+                    <h:outputText value="#{index + 1}" styleClass="ml-2"/>
+                </p:column>
+
+                <p:column headerText="Actividad" width="250">
+                    <h:outputText value="#{bitacora.accion}"/>
+                </p:column>
+
+                <p:column headerText="Fecha" width="80">
+                    <h:outputText value="#{bitacora.fechaModificacion}"/>
+                </p:column>
+
+                <p:column headerText="Realizado por" width="100">
+                    <h:outputText value="#{bitacora.modificadoPor}"/>
+                </p:column>
+
+                <p:rowExpansion>
+                    <p:dataTable id="dtcambios"
+                                 var="cambios" value="#{bitacora.bitacoraCambios}"
+                                 rowKey="#{cambios.campo}"
+                                 rowHover="true" rowIndexVar="num"
+                                 styleClass="dt-scrollable"
+                                 scrollable="true">
+
+                        <p:column headerText="No." width="50">
+                            <h:outputText value="#{num + 1}" />
+                        </p:column>
+
+                        <p:column headerText="Campo" width="120">
+                            <h:outputText value="#{cambios.campo}"/>
+                        </p:column>
+
+                        <p:column headerText="Anterior" width="120">
+                            <h:outputText value="#{cambios.valorAnterior}"/>
+                        </p:column>
+
+                        <p:column headerText="Nuevo" width="120">
+                            <h:outputText value="#{cambios.valorNuevo}"/>
+                        </p:column>
+
+                    </p:dataTable>
+
+                </p:rowExpansion>
+
+            </p:dataTable>
+        </h:form>
+
+    </p:outputPanel>
+
+
+</ui:composition>

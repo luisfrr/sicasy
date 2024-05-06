@@ -17,7 +17,8 @@
         <p:growl id="growl" showDetail="true" showSummary="true"
                  skipDetailIfEqualsSummary="true" globalOnly="true"/>
 
-        <p:outputPanel id="panel_roles" rendered="#{not rolView.showConfigurarPermisos}">
+        <p:outputPanel id="panel_roles" rendered="#{rolView.showPanelPrincipal}">
+
             <h:form id="form_breadcum" styleClass="mb-3">
                 <p:breadCrumb homeDisplay="text">
                     <p:menuitem value="Inicio" ajax="false" action="#{menuSessionBean.goToHome()}"/>
@@ -167,6 +168,12 @@
                                              rendered="#{rol.estatus.label != 'Borrado'}"/>
                             <p:menu overlay="true" trigger="buttonOptions" my="left top" at="left bottom" styleClass="w-16rem">
 
+                                <sec:authorize access="hasAnyAuthority('ROLE_OWNER')">
+                                    <p:menuitem value="Ver bitácora" icon="fi-rr-eye"
+                                                ajax="true" action="#{rolView.verBitacoraRol(rol)}"
+                                                update="container"/>
+                                </sec:authorize>
+
                                 <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'SEGURIDAD_ROLES_READ_CONFIGURAR_PERMISOS')">
                                     <p:menuitem value="Configuración de Permisos"
                                                 action="#{rolView.verConfiguracionPermisos(rol)}"
@@ -189,6 +196,7 @@
                                         <p:confirm header="Confirmación" message="¿Está seguro que desea eliminar el rol?" icon="pi pi-exclamation-triangle"/>
                                     </p:menuitem>
                                 </sec:authorize>
+
                             </p:menu>
 
                         </p:column>
@@ -201,6 +209,10 @@
 
         <p:outputPanel id="panel_asignar_permisos" rendered="#{rolView.showConfigurarPermisos}">
             <ui:include src="/views/seguridad/_roles_permisos.xhtml"/>
+        </p:outputPanel>
+
+        <p:outputPanel id="panel_bitacoras_roles" rendered="#{rolView.showPanelBitacoraRol}">
+            <ui:include src="/views/seguridad/_bitacora_rol.xhtml"/>
         </p:outputPanel>
 
     </p:outputPanel>
