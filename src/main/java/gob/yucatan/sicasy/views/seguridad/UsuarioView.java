@@ -331,11 +331,12 @@ public class UsuarioView implements Serializable {
             nombre = "Actualizar permisos", descripcion = "Acción que permite buscar y actualizar los permisos del sistema.")
     @PreAuthorize("hasAnyAuthority('ROLE_OWNER', 'SEGURIDAD_USUARIOS_WRITE_ACTUALIZAR_PERMISOS')")
     public void actualizarPermisos() {
-        log.info("Actualizar Permisos Usuario");
+        log.info("Actualizar Permisos");
         List<Permiso> permisos = permisoScannerService.getPermisos("gob.yucatan.sicasy",
                 userSessionBean.getUserName());
         permisoService.updateAll(permisos);
         log.info("Permisos: {}", permisos.size());
         this.buscarPermisos();
+        Messages.addInfo("Se ha actualizado el listado de permisos.");
     }
 }
