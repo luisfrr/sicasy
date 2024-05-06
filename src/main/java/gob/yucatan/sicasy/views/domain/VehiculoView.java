@@ -648,15 +648,15 @@ public class VehiculoView implements Serializable {
     }
 
     @ConfigPermisoArray({
-            @ConfigPermiso(tipo = TipoPermiso.READ, codigo = "VEHICULOS_READ_FILTRAR_ESTATUS_REGISTRADO", orden = 13,
+            @ConfigPermiso(tipo = TipoPermiso.READ, codigo = "VEHICULOS_READ_FILTRAR_ESTATUS_REGISTRADO", orden = 1,
                     nombre = "Filtrar Estatus REGISTRADO", descripcion = "Permite filtrar los vehículos con estatus REGISTRADO."),
-            @ConfigPermiso(tipo = TipoPermiso.READ, codigo = "VEHICULOS_READ_FILTRAR_ESTATUS_POR_AUTORIZAR", orden = 14,
+            @ConfigPermiso(tipo = TipoPermiso.READ, codigo = "VEHICULOS_READ_FILTRAR_ESTATUS_POR_AUTORIZAR", orden = 2,
                     nombre = "Filtrar Estatus POR AUTORIZAR", descripcion = "Permite filtrar los vehículos con estatus POR AUTORIZAR."),
-            @ConfigPermiso(tipo = TipoPermiso.READ, codigo = "VEHICULOS_READ_FILTRAR_ESTATUS_ACTIVO", orden = 15,
+            @ConfigPermiso(tipo = TipoPermiso.READ, codigo = "VEHICULOS_READ_FILTRAR_ESTATUS_ACTIVO", orden = 3,
                     nombre = "Filtrar Estatus ACTIVO", descripcion = "Permite filtrar los vehículos con estatus ACTIVO."),
-            @ConfigPermiso(tipo = TipoPermiso.READ, codigo = "VEHICULOS_READ_FILTRAR_ESTATUS_BAJA", orden = 16,
+            @ConfigPermiso(tipo = TipoPermiso.READ, codigo = "VEHICULOS_READ_FILTRAR_ESTATUS_BAJA", orden = 4,
                     nombre = "Filtrar Estatus BAJA", descripcion = "Permite filtrar los vehículos con estatus BAJA."),
-            @ConfigPermiso(tipo = TipoPermiso.READ, codigo = "VEHICULOS_READ_FILTRAR_ESTATUS_CANCELADO", orden = 17,
+            @ConfigPermiso(tipo = TipoPermiso.READ, codigo = "VEHICULOS_READ_FILTRAR_ESTATUS_CANCELADO", orden = 5,
                     nombre = "Filtrar Estatus CANCELADO", descripcion = "Permite filtrar los vehículos con estatus CANCELADO."),
     })
     private void getPermisosFiltroEstatus() {
