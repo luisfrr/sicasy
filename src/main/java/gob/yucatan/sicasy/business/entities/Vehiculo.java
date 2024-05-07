@@ -123,7 +123,6 @@ public class Vehiculo implements Cloneable, Serializable {
     @Column(name = "borrado_por")
     private String borradoPor;
 
-
     @Transient
     private Integer condicionId;
 
@@ -141,12 +140,12 @@ public class Vehiculo implements Cloneable, Serializable {
     public Vehiculo clone() {
         try {
             Vehiculo clone = (Vehiculo) super.clone();
-            clone.licitacion = this.licitacion.clone();
-            clone.anexo = this.anexo.clone();
-            clone.dependencia = this.dependencia.clone();
-            clone.dependenciaAsignada = this.dependenciaAsignada.clone();
-            clone.estatusVehiculo = this.estatusVehiculo.clone();
-            clone.condicionVehiculo = this.condicionVehiculo.clone();
+            clone.licitacion = this.licitacion != null ? this.licitacion.clone() : null;
+            clone.anexo = this.anexo != null ? this.anexo.clone() : null;
+            clone.dependencia = this.dependencia != null ? this.dependencia.clone() : null;
+            clone.dependenciaAsignada = this.dependenciaAsignada != null ? this.dependenciaAsignada.clone() : null;
+            clone.estatusVehiculo = this.estatusVehiculo != null ? this.estatusVehiculo.clone() : null;
+            clone.condicionVehiculo = this.condicionVehiculo != null ? this.condicionVehiculo.clone() : null;
             return clone;
         } catch (CloneNotSupportedException e) {
             throw new AssertionError();
