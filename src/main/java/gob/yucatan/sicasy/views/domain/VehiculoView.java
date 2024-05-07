@@ -8,6 +8,9 @@ import gob.yucatan.sicasy.business.enums.TipoPermiso;
 import gob.yucatan.sicasy.business.exceptions.BadRequestException;
 import gob.yucatan.sicasy.business.exceptions.NotFoundException;
 import gob.yucatan.sicasy.services.iface.*;
+import gob.yucatan.sicasy.utils.export.ExportFile;
+import gob.yucatan.sicasy.utils.export.excel.models.*;
+import gob.yucatan.sicasy.utils.export.excel.services.iface.IGeneratorExcelFile;
 import gob.yucatan.sicasy.utils.imports.excel.ConfigHeaderExcelModel;
 import gob.yucatan.sicasy.utils.imports.excel.ImportExcelFile;
 import gob.yucatan.sicasy.utils.imports.excel.SaveFile;
@@ -18,6 +21,10 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.poi.ss.usermodel.HorizontalAlignment;
+import org.apache.poi.ss.usermodel.VerticalAlignment;
+import org.apache.poi.xssf.usermodel.XSSFCellStyle;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.primefaces.PrimeFaces;
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.model.ResponsiveOption;
@@ -106,6 +113,7 @@ public class VehiculoView implements Serializable {
     private final ILicitacionService licitacionService;
     private final IAnexoService anexoService;
     private final IVehiculoFotoService vehiculoFotoService;
+    private final IGeneratorExcelFile generatorExcelFile;
 
 
     @PostConstruct
@@ -257,6 +265,8 @@ public class VehiculoView implements Serializable {
         }
     }
 
+    @ConfigPermiso(tipo = TipoPermiso.READ, codigo = "VEHICULOS_READ_OBTENER_LAYOUT", orden = 7,
+            nombre = "Obtener layout de importación", descripcion = "Permite descargar el layout de importación de vehículos.")
     @PreAuthorize("hasAnyAuthority('ROLE_OWNER', 'VEHICULOS_WRITE_REGISTRO_LAYOUT')")
     public void importarLayout(FileUploadEvent event) throws IOException {
         UploadedFile file = event.getFile();
@@ -538,6 +548,87 @@ public class VehiculoView implements Serializable {
         } catch (Exception e) {
             Messages.addError(e.getMessage());
         }
+    }
+
+    @ConfigPermiso(tipo = TipoPermiso.READ, codigo = "VEHICULOS_READ_EXPORTAR_VEHICULOS", orden = 6,
+            nombre = "Exportar", descripcion = "Permite exportar en Excel el listado de vehículos.")
+    @PreAuthorize("hasAnyAuthority('ROLE_OWNER', 'VEHICULOS_READ_EXPORTAR_VEHICULOS')")
+    public ExportFile exportarVehiculos() throws IOException {
+
+        if(this.vehiculoList != null && !this.vehiculoList.isEmpty()) {
+
+            List<ExcelCell> cellList = new ArrayList<>();
+
+            XSSFWorkbook workbook = generatorExcelFile.createWorkbook();
+
+            XSSFCellStyle centerTopStyle = generatorExcelFile.createCellStyle(CreateCellStyle.builder()
+                    .workbook(workbook)
+                    .fontSize(12)
+                    .fontColor(ExcelFontColor.BLACK)
+                    .horizontalAlignment(HorizontalAlignment.CENTER)
+                    .verticalAlignment(VerticalAlignment.TOP)
+                    .backgroundColor(ExcelBackgroundColor.NO_BG_COLOR)
+                    .dataFormat("0")
+                    .build());
+
+            XSSFCellStyle centerFloatTopStyle = generatorExcelFile.createCellStyle(CreateCellStyle.builder()
+                    .workbook(workbook)
+                    .fontSize(12)
+                    .fontColor(ExcelFontColor.BLACK)
+                    .horizontalAlignment(HorizontalAlignment.CENTER)
+                    .verticalAlignment(VerticalAlignment.TOP)
+                    .backgroundColor(ExcelBackgroundColor.NO_BG_COLOR)
+                    .dataFormat("0.00")
+                    .build());
+
+            XSSFCellStyle leftTopStyle = generatorExcelFile.createCellStyle(CreateCellStyle.builder()
+                    .workbook(workbook)
+                    .fontSize(12)
+                    .fontColor(ExcelFontColor.BLACK)
+                    .horizontalAlignment(HorizontalAlignment.LEFT)
+                    .verticalAlignment(VerticalAlignment.TOP)
+                    .backgroundColor(ExcelBackgroundColor.NO_BG_COLOR)
+                    .isWrapText(true)
+                    .build());
+
+            cellList.add(ExcelCell.builder().columnName("ID").propertyExpression("idVehiculo").cellStyle(centerTopStyle).cellAutoSize(true).build());
+            cellList.add(ExcelCell.builder().columnName("NO. SERIE").propertyExpression("noSerie").cellStyle(leftTopStyle).cellAutoSize(true).build());
+            cellList.add(ExcelCell.builder().columnName("PLACA").propertyExpression("placa").cellStyle(leftTopStyle).cellAutoSize(true).build());
+            cellList.add(ExcelCell.builder().columnName("AÑO").propertyExpression("anio").cellStyle(centerTopStyle).cellAutoSize(true).build());
+            cellList.add(ExcelCell.builder().columnName("MARCA").propertyExpression("marca").cellStyle(leftTopStyle).cellAutoSize(true).build());
+            cellList.add(ExcelCell.builder().columnName("MODELO").propertyExpression("modelo").cellStyle(leftTopStyle).cellAutoSize(true).build());
+            cellList.add(ExcelCell.builder().columnName("COLOR").propertyExpression("color").cellStyle(leftTopStyle).cellAutoSize(true).build());
+            cellList.add(ExcelCell.builder().columnName("CODICIÓN").propertyExpression("condicionVehiculo != null ? condicionVehiculo.nombre : \"\"").cellStyle(leftTopStyle).cellAutoSize(true).build());
+            cellList.add(ExcelCell.builder().columnName("ESTATUS").propertyExpression("estatusVehiculo != null ? estatusVehiculo.nombre : \"\"").cellStyle(leftTopStyle).cellAutoSize(true).build());
+            cellList.add(ExcelCell.builder().columnName("DEPENDENCIA").propertyExpression("dependencia != null ? dependencia.abreviatura + \" - \" + dependencia.nombre : \"\"").cellStyle(leftTopStyle).cellAutoSize(true).build());
+            cellList.add(ExcelCell.builder().columnName("DEPENDENCIA ASIGNADA").propertyExpression("dependenciaAsignada != null ? dependenciaAsignada.abreviatura + \" - \" + dependenciaAsignada.nombre : \"\"").cellStyle(leftTopStyle).cellAutoSize(true).build());
+            cellList.add(ExcelCell.builder().columnName("LICITACIÓN").propertyExpression("licitacion != null ? licitacion.numeroLicitacion : \"\"").cellStyle(leftTopStyle).cellAutoSize(true).build());
+            cellList.add(ExcelCell.builder().columnName("ANEXO").propertyExpression("anexo != null ? anexo.nombre : \"\"").cellStyle(leftTopStyle).cellAutoSize(true).build());
+            cellList.add(ExcelCell.builder().columnName("NO. MOTOR").propertyExpression("noMotor").cellStyle(leftTopStyle).cellAutoSize(true).build());
+            cellList.add(ExcelCell.builder().columnName("RENTA MENSUAL").propertyExpression("rentaMensual").cellStyle(centerFloatTopStyle).cellAutoSize(true).build());
+            cellList.add(ExcelCell.builder().columnName("NO. FACTURA").propertyExpression("noFactura").cellStyle(leftTopStyle).cellAutoSize(true).build());
+            cellList.add(ExcelCell.builder().columnName("VALOR FACTURA").propertyExpression("montoFactura").cellStyle(centerFloatTopStyle).cellAutoSize(true).build());
+            cellList.add(ExcelCell.builder().columnName("DESCRIPCIÓN").propertyExpression("descripcionVehiculo").cellStyle(leftTopStyle).cellAutoSize(true).build());
+            cellList.add(ExcelCell.builder().columnName("RESGUARDANTE").propertyExpression("resguardante").cellStyle(leftTopStyle).cellAutoSize(true).build());
+            cellList.add(ExcelCell.builder().columnName("ÁREA RESGUARDANTE").propertyExpression("areaResguardante").cellStyle(leftTopStyle).cellAutoSize(true).build());
+            cellList.add(ExcelCell.builder().columnName("DIRECTOR ADMINISTRATIVO").propertyExpression("autorizaDirectorAdmin").cellStyle(leftTopStyle).cellAutoSize(true).build());
+            cellList.add(ExcelCell.builder().columnName("DIRECTOR GENERAL").propertyExpression("autorizaDirectorGeneral").cellStyle(leftTopStyle).cellAutoSize(true).build());
+            cellList.add(ExcelCell.builder().columnName("PROVEEDOR").propertyExpression("proveedor").cellStyle(leftTopStyle).cellAutoSize(true).build());
+
+            ExcelDataSheet excelDataSheet = ExcelDataSheet.builder()
+                    .data(this.vehiculoList)
+                    .cells(cellList)
+                    .sheetName("VEHICULOS")
+                    .filename("vehiculos")
+                    .autoFilter(true)
+                    .agregarFechaGeneracion(true)
+                    .appName("SICASY")
+                    .build();
+
+            return generatorExcelFile.createExcelFile(workbook, excelDataSheet);
+        }
+
+        return new ExportFile();
     }
 
     //region Events
