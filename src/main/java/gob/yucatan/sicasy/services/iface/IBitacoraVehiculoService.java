@@ -10,6 +10,6 @@ public interface IBitacoraVehiculoService {
     List<BitacoraVehiculo> findByVehiculoId(Long vehiculoId);
     void save(BitacoraVehiculo bitacoraVehiculo);
     void saveAll(List<BitacoraVehiculo> bitacoraVehiculo);
-    BitacoraVehiculo guardarBitacora(String accion, Vehiculo vehiculoAnterior, Vehiculo vehiculoNuevo, String username);
+    BitacoraVehiculo getBitacoraVehiculo(String accion, Vehiculo vehiculoAnterior, Vehiculo vehiculoNuevo, String username);
 
 }

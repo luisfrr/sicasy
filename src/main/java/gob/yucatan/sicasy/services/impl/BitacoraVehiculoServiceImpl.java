@@ -55,7 +55,7 @@ public class BitacoraVehiculoServiceImpl implements IBitacoraVehiculoService {
     }
 
     @Override
-    public BitacoraVehiculo guardarBitacora(String accion, Vehiculo vehiculoAnterior, Vehiculo vehiculoNuevo, String username) {
+    public BitacoraVehiculo getBitacoraVehiculo(String accion, Vehiculo vehiculoAnterior, Vehiculo vehiculoNuevo, String username) {
 
         // Resultado final
         List<BitacoraVehiculoCambio> bitacoraVehiculoCambios = new ArrayList<>();
@@ -72,9 +72,6 @@ public class BitacoraVehiculoServiceImpl implements IBitacoraVehiculoService {
                 Vehiculo_.PROVEEDOR, Vehiculo_.RESGUARDANTE, Vehiculo_.AREA_RESGUARDANTE,
                 Vehiculo_.AUTORIZA_DIRECTOR_ADMIN, Vehiculo_.AUTORIZA_DIRECTOR_GENERAL,
                 Vehiculo_.OBSERVACIONES
-                //,Vehiculo_.LICITACION, Vehiculo_.ANEXO,
-                //Vehiculo_.DEPENDENCIA, Vehiculo_.DEPENDENCIA_ASIGNADA,
-                //Vehiculo_.ESTATUS_VEHICULO, Vehiculo_.CONDICION_VEHICULO
         );
 
         try {
@@ -82,23 +79,72 @@ public class BitacoraVehiculoServiceImpl implements IBitacoraVehiculoService {
             if (vehiculoAnterior == null) {
                 // Iterar sobre cada campo
                 for (Field campo : campos) {
+
+                    String nombreCampo = campo.getName();
+
                     if(camposToAudit.contains(campo.getName())) {
                         campo.setAccessible(true); // Permitir acceso a campos privados
                         // Obtener el valor del campo en el rol nuevo
                         Object valorNuevo = campo.get(vehiculoNuevo);
+                        String tipoDato = valorNuevo.getClass().getName();
                         // Agregar un registro a la bitácora con el campo y el valor nuevo
-                        bitacoraVehiculoCambios.add(BitacoraVehiculoCambio.builder()
-                                .campo(campo.getName())
-                                .tipoDato(valorNuevo.getClass().getName())
-                                .valorAnterior(null) // No hay valor anterior en un registro nuevo
-                                .valorNuevo(valorNuevo.toString())
-                                .fechaModificacion(new Date())
-                                .build());
+                        bitacoraVehiculoCambios.add(this.getBitacoraCambio(nombreCampo, tipoDato, null, valorNuevo.toString()));
+                    }
+
+                    if(campo.getName().equals(Vehiculo_.LICITACION)) {
+                        if(vehiculoNuevo != null && vehiculoNuevo.getLicitacion() != null && vehiculoNuevo.getLicitacion().getIdLicitacion() != null) {
+                            String tipoDato = vehiculoNuevo.getLicitacion().getIdLicitacion().getClass().getName();
+                            String valorNuevo = vehiculoNuevo.getLicitacion().getIdLicitacion().toString();
+                            bitacoraVehiculoCambios.add(this.getBitacoraCambio(nombreCampo, tipoDato, null, valorNuevo));
+                        }
+                    }
+
+                    if(campo.getName().equals(Vehiculo_.ANEXO)) {
+                        if(vehiculoNuevo != null && vehiculoNuevo.getAnexo() != null && vehiculoNuevo.getAnexo().getIdAnexo() != null) {
+                            String tipoDato = vehiculoNuevo.getAnexo().getIdAnexo().getClass().getName();
+                            String valorNuevo = vehiculoNuevo.getAnexo().getIdAnexo().toString();
+                            bitacoraVehiculoCambios.add(this.getBitacoraCambio(nombreCampo, tipoDato, null, valorNuevo));
+                        }
+                    }
+
+                    if(campo.getName().equals(Vehiculo_.DEPENDENCIA)) {
+                        if(vehiculoNuevo != null && vehiculoNuevo.getDependencia() != null && vehiculoNuevo.getDependencia().getIdDependencia() != null) {
+                            String tipoDato = vehiculoNuevo.getDependencia().getIdDependencia().getClass().getName();
+                            String valorNuevo = vehiculoNuevo.getDependencia().getIdDependencia().toString();
+                            bitacoraVehiculoCambios.add(this.getBitacoraCambio(nombreCampo, tipoDato, null, valorNuevo));
+                        }
+                    }
+
+                    if(campo.getName().equals(Vehiculo_.DEPENDENCIA_ASIGNADA)) {
+                        if(vehiculoNuevo != null && vehiculoNuevo.getDependenciaAsignada() != null && vehiculoNuevo.getDependenciaAsignada().getIdDependencia() != null) {
+                            String tipoDato = vehiculoNuevo.getDependenciaAsignada().getIdDependencia().getClass().getName();
+                            String valorNuevo = vehiculoNuevo.getDependenciaAsignada().getIdDependencia().toString();
+                            bitacoraVehiculoCambios.add(this.getBitacoraCambio(nombreCampo, tipoDato, null, valorNuevo));
+                        }
+                    }
+
+                    if(campo.getName().equals(Vehiculo_.ESTATUS_VEHICULO)) {
+                        if(vehiculoNuevo != null && vehiculoNuevo.getEstatusVehiculo() != null && vehiculoNuevo.getEstatusVehiculo().getIdEstatusVehiculo() != null) {
+                            String tipoDato = vehiculoNuevo.getEstatusVehiculo().getIdEstatusVehiculo().getClass().getName();
+                            String valorNuevo = vehiculoNuevo.getEstatusVehiculo().getIdEstatusVehiculo().toString();
+                            bitacoraVehiculoCambios.add(this.getBitacoraCambio(nombreCampo, tipoDato, null, valorNuevo));
+                        }
+                    }
+
+                    if(campo.getName().equals(Vehiculo_.CONDICION_VEHICULO)) {
+                        if(vehiculoNuevo != null && vehiculoNuevo.getEstatusVehiculo() != null && vehiculoNuevo.getEstatusVehiculo().getIdEstatusVehiculo() != null) {
+                            String tipoDato = vehiculoNuevo.getEstatusVehiculo().getIdEstatusVehiculo().getClass().getName();
+                            String valorNuevo = vehiculoNuevo.getEstatusVehiculo().getIdEstatusVehiculo().toString();
+                            bitacoraVehiculoCambios.add(this.getBitacoraCambio(nombreCampo, tipoDato, null, valorNuevo));
+                        }
                     }
                 }
             } else {
                 // Obtener la lista de cambios entre ambas entidades
                 for (Field campo : campos) {
+
+                    String nombreCampo = campo.getName();
+
                     if(camposToAudit.contains(campo.getName())) {
                         campo.setAccessible(true); // Permitir acceso a campos privados
                         // Obtener el valor del campo en el rol anterior y el rol nuevo
@@ -106,15 +152,91 @@ public class BitacoraVehiculoServiceImpl implements IBitacoraVehiculoService {
                         Object valorNuevo = campo.get(vehiculoNuevo);
                         // Comparar los valores y agregar un registro a la bitácora si hay cambios
                         if (!Objects.equals(valorAnterior, valorNuevo)) {
-                            bitacoraVehiculoCambios.add(BitacoraVehiculoCambio.builder()
-                                    .campo(campo.getName())
-                                    .tipoDato(valorNuevo.getClass().getName())
-                                    .valorAnterior(valorAnterior != null ? valorAnterior.toString() : null)
-                                    .valorNuevo(valorNuevo.toString())
-                                    .fechaModificacion(new Date())
-                                    .build());
+                            String tipoDato = valorNuevo.getClass().getName();
+                            String datoAnterior = valorAnterior != null ? valorAnterior.toString() : null;
+                            // Agregar un registro a la bitácora con el campo y el valor nuevo
+                            bitacoraVehiculoCambios.add(this.getBitacoraCambio(nombreCampo, tipoDato, datoAnterior, valorNuevo.toString()));
                         }
                     }
+
+                    if(campo.getName().equals(Vehiculo_.LICITACION)) {
+                        if(vehiculoAnterior.getLicitacion() != null && vehiculoNuevo.getLicitacion() != null) {
+                            Integer datoAnterior = vehiculoAnterior.getLicitacion().getIdLicitacion();
+                            Integer datoNuevo = vehiculoNuevo.getLicitacion().getIdLicitacion();
+                            if (!Objects.equals(datoAnterior, datoNuevo)) {
+                                String tipoDato = datoNuevo.getClass().getName();
+                                String datoAnteriorStr = datoAnterior != null ? datoAnterior.toString() : null;
+                                // Agregar un registro a la bitácora con el campo y el valor nuevo
+                                bitacoraVehiculoCambios.add(this.getBitacoraCambio(nombreCampo, tipoDato, datoAnteriorStr, datoNuevo.toString()));
+                            }
+                        }
+                    }
+
+                    if(campo.getName().equals(Vehiculo_.ANEXO)) {
+                        if(vehiculoAnterior.getAnexo() != null && vehiculoNuevo.getAnexo() != null) {
+                            Long datoAnterior = vehiculoAnterior.getAnexo().getIdAnexo();
+                            Long datoNuevo = vehiculoNuevo.getAnexo().getIdAnexo();
+                            if (!Objects.equals(datoAnterior, datoNuevo)) {
+                                String tipoDato = datoNuevo.getClass().getName();
+                                String datoAnteriorStr = datoAnterior != null ? datoAnterior.toString() : null;
+                                // Agregar un registro a la bitácora con el campo y el valor nuevo
+                                bitacoraVehiculoCambios.add(this.getBitacoraCambio(nombreCampo, tipoDato, datoAnteriorStr, datoNuevo.toString()));
+                            }
+                        }
+                    }
+
+                    if(campo.getName().equals(Vehiculo_.DEPENDENCIA)) {
+                        if(vehiculoAnterior.getDependencia() != null && vehiculoNuevo.getDependencia() != null) {
+                            Integer datoAnterior = vehiculoAnterior.getDependencia().getIdDependencia();
+                            Integer datoNuevo = vehiculoNuevo.getDependencia().getIdDependencia();
+                            if (!Objects.equals(datoAnterior, datoNuevo)) {
+                                String tipoDato = datoNuevo.getClass().getName();
+                                String datoAnteriorStr = datoAnterior != null ? datoAnterior.toString() : null;
+                                // Agregar un registro a la bitácora con el campo y el valor nuevo
+                                bitacoraVehiculoCambios.add(this.getBitacoraCambio(nombreCampo, tipoDato, datoAnteriorStr, datoNuevo.toString()));
+                            }
+                        }
+                    }
+
+                    if(campo.getName().equals(Vehiculo_.DEPENDENCIA_ASIGNADA)) {
+                        if(vehiculoAnterior.getDependenciaAsignada() != null && vehiculoNuevo.getDependenciaAsignada() != null) {
+                            Integer datoAnterior = vehiculoAnterior.getDependenciaAsignada().getIdDependencia();
+                            Integer datoNuevo = vehiculoNuevo.getDependenciaAsignada().getIdDependencia();
+                            if (!Objects.equals(datoAnterior, datoNuevo)) {
+                                String tipoDato = datoNuevo.getClass().getName();
+                                String datoAnteriorStr = datoAnterior != null ? datoAnterior.toString() : null;
+                                // Agregar un registro a la bitácora con el campo y el valor nuevo
+                                bitacoraVehiculoCambios.add(this.getBitacoraCambio(nombreCampo, tipoDato, datoAnteriorStr, datoNuevo.toString()));
+                            }
+                        }
+                    }
+
+                    if(campo.getName().equals(Vehiculo_.ESTATUS_VEHICULO)) {
+                        if(vehiculoAnterior.getEstatusVehiculo() != null && vehiculoNuevo.getEstatusVehiculo() != null) {
+                            Integer datoAnterior = vehiculoAnterior.getEstatusVehiculo().getIdEstatusVehiculo();
+                            Integer datoNuevo = vehiculoNuevo.getEstatusVehiculo().getIdEstatusVehiculo();
+                            if (!Objects.equals(datoAnterior, datoNuevo)) {
+                                String tipoDato = datoNuevo.getClass().getName();
+                                String datoAnteriorStr = datoAnterior != null ? datoAnterior.toString() : null;
+                                // Agregar un registro a la bitácora con el campo y el valor nuevo
+                                bitacoraVehiculoCambios.add(this.getBitacoraCambio(nombreCampo, tipoDato, datoAnteriorStr, datoNuevo.toString()));
+                            }
+                        }
+                    }
+
+                    if(campo.getName().equals(Vehiculo_.CONDICION_VEHICULO)) {
+                        if(vehiculoAnterior.getCondicionVehiculo() != null && vehiculoNuevo.getCondicionVehiculo() != null) {
+                            Integer datoAnterior = vehiculoAnterior.getCondicionVehiculo().getIdCondicionVehiculo();
+                            Integer datoNuevo = vehiculoNuevo.getCondicionVehiculo().getIdCondicionVehiculo();
+                            if (!Objects.equals(datoAnterior, datoNuevo)) {
+                                String tipoDato = datoNuevo.getClass().getName();
+                                String datoAnteriorStr = datoAnterior != null ? datoAnterior.toString() : null;
+                                // Agregar un registro a la bitácora con el campo y el valor nuevo
+                                bitacoraVehiculoCambios.add(this.getBitacoraCambio(nombreCampo, tipoDato, datoAnteriorStr, datoNuevo.toString()));
+                            }
+                        }
+                    }
+
                 }
             }
         } catch (IllegalAccessException e) {
