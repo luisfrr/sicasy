@@ -60,4 +60,8 @@ public class UserSessionBean implements Serializable {
         return "/login?faces-redirect=true";
     }
 
+    public boolean userHasAuthority(String authority) {
+        return this.authorities.stream().anyMatch(g -> g.getAuthority().equals(authority));
+    }
+
 }
