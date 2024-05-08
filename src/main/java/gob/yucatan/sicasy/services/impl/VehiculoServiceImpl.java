@@ -12,6 +12,7 @@ import gob.yucatan.sicasy.repository.iface.IAnexoRepository;
 import gob.yucatan.sicasy.repository.iface.IEstatusVehiculoRepository;
 import gob.yucatan.sicasy.repository.iface.ILicitacionRepository;
 import gob.yucatan.sicasy.repository.iface.IVehiculoRepository;
+import gob.yucatan.sicasy.services.iface.IBitacoraVehiculoService;
 import gob.yucatan.sicasy.services.iface.IVehiculoService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -44,6 +45,7 @@ public class VehiculoServiceImpl implements IVehiculoService {
     private final ILicitacionRepository licitacionRepository;
     private final IAnexoRepository anexoRepository;
     private final IEstatusVehiculoRepository estatusVehiculoRepository;
+    private final IBitacoraVehiculoService bitacoraVehiculoService;
 
     @Override
     public List<Vehiculo> findAllDynamic(Vehiculo vehiculo) {
@@ -61,17 +63,15 @@ public class VehiculoServiceImpl implements IVehiculoService {
                     vehiculo.getCondicionVehiculo().getIdCondicionVehiculo(),
                     Vehiculo_.CONDICION_VEHICULO, CondicionVehiculo_.ID_CONDICION_VEHICULO));
 
-        if(vehiculo.getEstatusVehiculo() != null &&
-                vehiculo.getEstatusVehiculo().getIdEstatusVehiculo() != null)
+        if(vehiculo.getIdEstatusVehiculoList() != null && !vehiculo.getIdEstatusVehiculoList().isEmpty()) {
+            specification.add(new SearchCriteria(SearchOperation.IN,
+                    vehiculo.getIdEstatusVehiculoList(),
+                    Vehiculo_.ESTATUS_VEHICULO, EstatusVehiculo_.ID_ESTATUS_VEHICULO));
+        } else if(vehiculo.getEstatusVehiculo() != null) {
             specification.add(new SearchCriteria(SearchOperation.EQUAL,
                     vehiculo.getEstatusVehiculo().getIdEstatusVehiculo(),
                     Vehiculo_.ESTATUS_VEHICULO, EstatusVehiculo_.ID_ESTATUS_VEHICULO));
-
-        if(vehiculo.getEstatusVehiculo() != null &&
-                vehiculo.getEstatusVehiculo().getIdEstatusVehiculo() != null)
-            specification.add(new SearchCriteria(SearchOperation.EQUAL,
-                    vehiculo.getEstatusVehiculo().getIdEstatusVehiculo(),
-                    Vehiculo_.ESTATUS_VEHICULO, EstatusVehiculo_.ID_ESTATUS_VEHICULO));
+        }
 
         if(vehiculo.getLicitacion() != null && vehiculo.getLicitacion().getIdLicitacion() != null)
             specification.add(new SearchCriteria(SearchOperation.EQUAL,
@@ -156,8 +156,8 @@ public class VehiculoServiceImpl implements IVehiculoService {
     }
 
     @Override
-    public List<Integer> findDistinctAnio(String marca, String modelo) {
-        return vehiculoRepository.findDistinctAnioByEstatusActivo(marca, modelo);
+    public List<Integer> findDistinctAnio() {
+        return vehiculoRepository.findDistinctAnioByEstatusActivo();
     }
 
     @Override
@@ -185,13 +185,19 @@ public class VehiculoServiceImpl implements IVehiculoService {
         vehiculo.setEstatusVehiculo(EstatusVehiculo.builder().idEstatusVehiculo(ESTATUS_VEHICULO_REGISTRADO).build());
         vehiculo.setEstatusRegistro(EstatusRegistro.ACTIVO);
 
-        return vehiculoRepository.save(vehiculo);
+        Vehiculo vehiculoSaved = vehiculoRepository.save(vehiculo);
+
+        BitacoraVehiculo bitacoraVehiculo = bitacoraVehiculoService.getBitacoraVehiculo("Registrar nuevos vehículos", null, vehiculoSaved, vehiculo.getCreadoPor());
+        bitacoraVehiculoService.save(bitacoraVehiculo);
+
+        return vehiculoSaved;
     }
 
     @Override
     public void editar(Vehiculo vehiculo) {
 
         Vehiculo vehiculoToUpdate = this.findById(vehiculo.getIdVehiculo());
+        Vehiculo vehiculoAnterior = vehiculoToUpdate.clone();
 
         // Validar si ya existe un vehiculo con ese no. de serie
         if(vehiculoRepository.existsByEstatusRegistroActivoAndNoSerieAndIdVehiculoNot(vehiculo.getNoSerie(),
@@ -234,6 +240,9 @@ public class VehiculoServiceImpl implements IVehiculoService {
         vehiculoToUpdate.setFechaModificacion(new Date());
 
         vehiculoRepository.save(vehiculoToUpdate);
+
+        BitacoraVehiculo bitacoraVehiculo = bitacoraVehiculoService.getBitacoraVehiculo("Editar", vehiculoAnterior, vehiculoToUpdate, vehiculo.getModificadoPor());
+        bitacoraVehiculoService.save(bitacoraVehiculo);
     }
 
     @Override
@@ -249,7 +258,14 @@ public class VehiculoServiceImpl implements IVehiculoService {
         }
 
         try {
+            List<BitacoraVehiculo> bitacoraVehiculoList = new ArrayList<>();
+            for(Vehiculo vehiculo : vehiculos) {
+                // Se genera la copia de vehículo
+                Vehiculo vehiculoAnterior = vehiculo.clone();
+                bitacoraVehiculoList.add(bitacoraVehiculoService.getBitacoraVehiculo("Registrar nuevos vehículos por layout", vehiculoAnterior, vehiculo, username));
+            }
             vehiculoRepository.saveAll(vehiculos);
+            bitacoraVehiculoService.saveAll(bitacoraVehiculoList);
         } catch (Exception e) {
             acuseImportacionList.add(AcuseImportacion.builder()
                     .titulo("Error al guardar la información")
@@ -447,27 +463,32 @@ public class VehiculoServiceImpl implements IVehiculoService {
             Integer estatusActual = distinctEstatusVehiculos.getFirst();
 
             boolean cancelado = false;
+            String accionStr = "";
 
             // Si la accion es solicitar autorizacion
             if(Objects.equals(accion, ACCION_SOLICITAR_AUTORIZACION)) {
+                accionStr = "Solicitar autorización";
                 // El estatus actual debe ser REGISTADO, si no entonces marca error
                 if(!Objects.equals(estatusActual, ESTATUS_VEHICULO_REGISTRADO)) {
                     throw new BadRequestException("Para solicitar la autorización asegúrate de seleccionar vehículos con estatus REGISTRADO.");
                 }
             } // Si la accion es autorizar solicitud
             else if(Objects.equals(accion, ACCION_AUTORIZAR_SOLICITUD)) {
+                accionStr = "Autorizar solicitud";
                 // El estatus actual debe ser POR AUTORIZAR, si no entonces marca error
                 if(!Objects.equals(estatusActual, ESTATUS_VEHICULO_POR_AUTORIZAR)) {
                     throw new BadRequestException("Para autorizar las solicitudes asegúrate de seleccionar vehículos con estatus POR AUTORIZAR.");
                 }
             }  // Si la accion es rechazar solicitud
             else if (Objects.equals(accion, ACCION_RECHAZAR_SOLICITUD)) {
+                accionStr = "Rechazar solicitud";
                 // El estatus actual debe ser POR AUTORIZAR, si no entonces marca error
                 if(!Objects.equals(estatusActual, ESTATUS_VEHICULO_POR_AUTORIZAR)) {
                     throw new BadRequestException("Para rechazar la solicitud asegúrate de seleccionar vehículos con estatus POR AUTORIZAR.");
                 }
             } // Si la accion es cancelar solicitud
             else if(Objects.equals(accion, ACCION_CANCELAR_SOLICITUD)) {
+                accionStr = "Cancelar solicitud";
                 // TODO: Validar si es la primera por autorizar
                 // El estatus actual debe ser POR AUTORIZAR, si no entonces marca error
                 if(!Objects.equals(estatusActual, ESTATUS_VEHICULO_POR_AUTORIZAR)) {
@@ -476,19 +497,26 @@ public class VehiculoServiceImpl implements IVehiculoService {
                 cancelado = true;
             } // Si la accion es solicitar baja
             else if (Objects.equals(accion, ACCION_SOLICITAR_BAJA)) {
+                accionStr = "Solicitar baja";
                 // El estatus actual debe ser ACTIVO, si no entonces marca error
                 if(!Objects.equals(estatusActual, ESTATUS_VEHICULO_ACTIVO)) {
                     throw new BadRequestException("Para solicitar la baja asegúrate de seleccionar vehículos con estatus ACTIVO.");
                 }
             } // Si la accion es solicitar modificación
             else if (Objects.equals(accion, ACCION_SOLICITAR_MODIFICACION)) {
+                accionStr = "Solicitar modificación";
                 // El estatus actual debe ser ACTIVO o BAJA, si no entonces marca error
                 if(!Objects.equals(estatusActual, ESTATUS_VEHICULO_ACTIVO) || !Objects.equals(estatusActual, ESTATUS_VEHICULO_BAJA)) {
                     throw new BadRequestException("Para solicitar la modificación asegúrate de seleccionar únicamente vehículos con estatus ACTIVO o BAJA.");
                 }
             }
 
+            List<BitacoraVehiculo> bitacoraVehiculoList = new ArrayList<>();
             for (Vehiculo vehiculo : vehiculoToUpdateList) {
+
+                // Se genera la copia de vehículo
+                Vehiculo vehiculoAnterior = vehiculo.clone();
+
                 vehiculo.setEstatusVehiculo(estatusVehiculo);
                 vehiculo.setObservaciones(motivo);
                 vehiculo.setModificadoPor(username);
@@ -499,9 +527,12 @@ public class VehiculoServiceImpl implements IVehiculoService {
                     vehiculo.setFechaBorrado(new Date());
                     vehiculo.setBorradoPor(username);
                 }
+
+                bitacoraVehiculoList.add(bitacoraVehiculoService.getBitacoraVehiculo(accionStr, vehiculoAnterior, vehiculo, username));
             }
 
             vehiculoRepository.saveAll(vehiculoToUpdateList);
+            bitacoraVehiculoService.saveAll(bitacoraVehiculoList);
         } else {
             throw new BadRequestException("No se han recibido los vehículos por actualizar.");
         }

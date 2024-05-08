@@ -27,45 +27,70 @@
             </h:form>
 
             <h:form id="form_toolbar" styleClass="mb-5">
-                <sec:authorize access="hasAnyAuthority('ROLE_OWNER')">
+                <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'VEHICULOS_WRITE_REGISTRO_INDIVIDUAL', 'VEHICULOS_WRITE_SOLICITAR_AUTORIZACION', 'VEHICULOS_WRITE_AUTORIZAR_SOLICITUD', 'VEHICULOS_WRITE_RECHAZAR_SOLICITUD', 'VEHICULOS_WRITE_CANCELAR_SOLICITUD', 'VEHICULOS_WRITE_SOLICITAR_BAJA', 'VEHICULOS_WRITE_SOLICITAR_MODIFICACION')">
                     <p:toolbar>
                         <p:toolbarGroup>
-                            <sec:authorize access="hasAnyAuthority('ROLE_OWNER')">
+                            <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'VEHICULOS_WRITE_REGISTRO_INDIVIDUAL', 'VEHICULOS_WRITE_SOLICITAR_AUTORIZACION', 'VEHICULOS_WRITE_AUTORIZAR_SOLICITUD', 'VEHICULOS_WRITE_RECHAZAR_SOLICITUD', 'VEHICULOS_WRITE_CANCELAR_SOLICITUD', 'VEHICULOS_WRITE_SOLICITAR_BAJA', 'VEHICULOS_WRITE_SOLICITAR_MODIFICACION')">
                                 <p:commandButton id="btn_acciones_vehiculos" type="button" value="Acciones"
                                                  iconPos="right" icon="fi fi-rr-angle-small-down"/>
                                 <p:menu overlay="true" trigger="btn_acciones_vehiculos" my="left top" at="left bottom" maxHeight="250">
-                                    <p:menuitem value="Registrar nuevos vehículos" ajax="true" action="#{vehiculoView.abrirModalRegistroVehiculo()}"/>
-                                    <p:menuitem value="Solicitar autorización" ajax="true" action="#{vehiculoView.solicitarAutorizacion()}">
-                                        <p:confirm header="Confirmación" message="¿Está seguro que desea solicitar la autorización?" icon="pi pi-exclamation-triangle"/>
-                                    </p:menuitem>
-                                    <p:menuitem value="Autorizar solicitud" ajax="true" action="#{vehiculoView.autorizarSolicitud()}">
-                                        <p:confirm header="Confirmación" message="¿Está seguro que desea autorizar las solicitudes?" icon="pi pi-exclamation-triangle"/>
-                                    </p:menuitem>
-                                    <p:menuitem value="Rechazar solicitud" ajax="true"
-                                                action="#{vehiculoView.abrirConfirmEstatusDialog(vehiculoView.ACCION_RECHAZAR_SOLICITUD)}">
-                                        <p:resetInput target="confirm-estatus-dialog"/>
-                                    </p:menuitem>
-                                    <p:menuitem value="Cancelar solicitud" ajax="true"
-                                                action="#{vehiculoView.abrirConfirmEstatusDialog(vehiculoView.ACCION_CANCELAR_SOLICITUD)}">
-                                        <p:resetInput target="confirm-estatus-dialog"/>
-                                    </p:menuitem>
-                                    <p:menuitem value="Solicitar baja" ajax="true"
-                                                action="#{vehiculoView.abrirConfirmEstatusDialog(vehiculoView.ACCION_SOLICITAR_BAJA)}">
-                                        <p:resetInput target="confirm-estatus-dialog"/>
-                                    </p:menuitem>
-                                    <p:menuitem value="Solicitar modificación" ajax="true"
-                                                action="#{vehiculoView.abrirConfirmEstatusDialog(vehiculoView.ACCION_SOLICITAR_MODIFICACION)}">
-                                        <p:resetInput target="confirm-estatus-dialog"/>
-                                    </p:menuitem>
+                                    <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'VEHICULOS_WRITE_REGISTRO_INDIVIDUAL', 'VEHICULOS_WRITE_REGISTRO_LAYOUT')">
+                                        <p:menuitem value="Registrar nuevos vehículos" ajax="true" action="#{vehiculoView.abrirModalRegistroVehiculo()}"/>
+                                    </sec:authorize>
+                                    <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'VEHICULOS_WRITE_SOLICITAR_AUTORIZACION')">
+                                        <p:menuitem value="Solicitar autorización" ajax="true" action="#{vehiculoView.solicitarAutorizacion()}">
+                                            <p:confirm header="Confirmación" message="¿Está seguro que desea solicitar la autorización?" icon="pi pi-exclamation-triangle"/>
+                                        </p:menuitem>
+                                    </sec:authorize>
+                                    <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'VEHICULOS_WRITE_AUTORIZAR_SOLICITUD')">
+                                        <p:menuitem value="Autorizar solicitud" ajax="true" action="#{vehiculoView.autorizarSolicitud()}">
+                                            <p:confirm header="Confirmación" message="¿Está seguro que desea autorizar las solicitudes?" icon="pi pi-exclamation-triangle"/>
+                                        </p:menuitem>
+                                    </sec:authorize>
+                                    <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'VEHICULOS_WRITE_RECHAZAR_SOLICITUD')">
+                                        <p:menuitem value="Rechazar solicitud" ajax="true"
+                                                    action="#{vehiculoView.abrirConfirmEstatusDialog(vehiculoView.ACCION_RECHAZAR_SOLICITUD)}">
+                                            <p:resetInput target="confirm-estatus-dialog"/>
+                                        </p:menuitem>
+                                    </sec:authorize>
+                                    <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'VEHICULOS_WRITE_CANCELAR_SOLICITUD')">
+                                        <p:menuitem value="Cancelar solicitud" ajax="true"
+                                                    action="#{vehiculoView.abrirConfirmEstatusDialog(vehiculoView.ACCION_CANCELAR_SOLICITUD)}">
+                                            <p:resetInput target="confirm-estatus-dialog"/>
+                                        </p:menuitem>
+                                    </sec:authorize>
+                                    <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'VEHICULOS_WRITE_SOLICITAR_BAJA')">
+                                        <p:menuitem value="Solicitar baja" ajax="true"
+                                                    action="#{vehiculoView.abrirConfirmEstatusDialog(vehiculoView.ACCION_SOLICITAR_BAJA)}">
+                                            <p:resetInput target="confirm-estatus-dialog"/>
+                                        </p:menuitem>
+                                    </sec:authorize>
+                                    <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'VEHICULOS_WRITE_SOLICITAR_MODIFICACION')">
+                                        <p:menuitem value="Solicitar modificación" ajax="true"
+                                                    action="#{vehiculoView.abrirConfirmEstatusDialog(vehiculoView.ACCION_SOLICITAR_MODIFICACION)}">
+                                            <p:resetInput target="confirm-estatus-dialog"/>
+                                        </p:menuitem>
+                                    </sec:authorize>
                                 </p:menu>
                             </sec:authorize>
                         </p:toolbarGroup>
                         <p:toolbarGroup align="right">
-                            <p:commandButton value="Descargar Layout de Vehículos"
-                                             ajax="false" onclick="PrimeFaces.monitorDownload(start, stop);"
-                                             icon="fi fi-rr-download" styleClass="ui-button-flat">
-                                <p:fileDownload value="#{fileDownloadBean.downloadFileByPath(vehiculoView.LAYOUT_VEHICULOS)}"/>
-                            </p:commandButton>
+                            <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'VEHICULOS_READ_EXPORTAR_VEHICULOS', 'VEHICULOS_READ_OBTENER_LAYOUT')">
+                                <p:commandButton id="btn_descarga_vehiculos" type="button" value="Descargar"
+                                                 iconPos="right" icon="fi fi-rr-angle-small-down" styleClass="ui-button-outlined"/>
+                                <p:menu overlay="true" trigger="btn_descarga_vehiculos" my="left top" at="left bottom" maxHeight="250">
+                                    <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'VEHICULOS_READ_EXPORTAR_VEHICULOS')">
+                                        <p:menuitem value="Exportar vehículos" ajax="false" onclick="PrimeFaces.monitorDownload(start, stop);">
+                                            <p:fileDownload value="#{fileDownloadBean.downloadFile(vehiculoView.exportarVehiculos())}"/>
+                                        </p:menuitem>
+                                    </sec:authorize>
+                                    <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'VEHICULOS_READ_OBTENER_LAYOUT')">
+                                        <p:menuitem value="Layout de importación" ajax="false" onclick="PrimeFaces.monitorDownload(start, stop);">
+                                            <p:fileDownload value="#{fileDownloadBean.downloadFileByPath(vehiculoView.LAYOUT_VEHICULOS)}"/>
+                                        </p:menuitem>
+                                    </sec:authorize>
+                                </p:menu>
+                            </sec:authorize>
                         </p:toolbarGroup>
                     </p:toolbar>
                 </sec:authorize>
@@ -82,6 +107,7 @@
                                 <f:selectItem itemLabel="Todos" itemValue="#{null}"/>
                                 <f:selectItems value="#{vehiculoView.dependenciaList}" var="dependencia"
                                                itemValue="#{dependencia.idDependencia}" itemLabel="#{dependencia.abreviatura} - #{dependencia.nombre}"/>
+                                <p:ajax event="blur"/>
                             </p:selectOneMenu>
                             <span class="text-sm hidden"> </span>
                         </p:outputPanel>
@@ -91,6 +117,7 @@
                                 <f:selectItem itemLabel="Todos" itemValue="#{null}"/>
                                 <f:selectItems value="#{vehiculoView.condicionVehiculoList}" var="condicionVehiculo"
                                                itemValue="#{condicionVehiculo.idCondicionVehiculo}" itemLabel="#{condicionVehiculo.nombre}"/>
+                                <p:ajax event="blur"/>
                             </p:selectOneMenu>
                             <span class="text-sm hidden"> </span>
                         </p:outputPanel>
@@ -100,6 +127,7 @@
                                 <f:selectItem itemLabel="Todos" itemValue="#{null}"/>
                                 <f:selectItems value="#{vehiculoView.estatusVehiculoList}" var="estatusVehiculo"
                                                itemValue="#{estatusVehiculo.idEstatusVehiculo}" itemLabel="#{estatusVehiculo.nombre}"/>
+                                <p:ajax event="blur"/>
                             </p:selectOneMenu>
                             <span class="text-sm hidden"> </span>
                         </p:outputPanel>
@@ -109,16 +137,29 @@
                                 <f:selectItem itemLabel="Todos" itemValue="#{null}"/>
                                 <f:selectItems value="#{vehiculoView.licitacionList}" var="licitacion"
                                                itemValue="#{licitacion.idLicitacion}" itemLabel="#{licitacion.numeroLicitacion}"/>
-                                <p:ajax event="change" listener="#{vehiculoView.onChangeLicitacionFilter()}" update="form_filtros:filtros" />
+                                <p:ajax event="change" listener="#{vehiculoView.onChangeLicitacionFilter()}"
+                                        update="form_filtros:select_anexo" />
+                                <p:ajax event="blur"/>
                             </p:selectOneMenu>
                             <span class="text-sm hidden"> </span>
                         </p:outputPanel>
                         <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4 xl:col-3">
                             <p:outputLabel for="@next" value="Anexo" styleClass="block"/>
-                            <p:selectOneMenu value="#{vehiculoView.vehiculoFilter.anexo.idAnexo}" styleClass="w-full mw-auto">
+                            <p:selectOneMenu id="select_anexo" value="#{vehiculoView.vehiculoFilter.anexo.idAnexo}" styleClass="w-full mw-auto">
                                 <f:selectItem itemLabel="Todos" itemValue="#{null}"/>
                                 <f:selectItems value="#{vehiculoView.anexoList}" var="anexo"
                                                itemValue="#{anexo.idAnexo}" itemLabel="#{anexo.nombre}"/>
+                                <p:ajax event="blur"/>
+                            </p:selectOneMenu>
+                            <span class="text-sm hidden"> </span>
+                        </p:outputPanel>
+                        <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4 xl:col-3">
+                            <p:outputLabel for="@next" value="Año" styleClass="block"/>
+                            <p:selectOneMenu id="select_anio" value="#{vehiculoView.vehiculoFilter.anio}" styleClass="w-full mw-auto">
+                                <f:selectItem itemLabel="Todos" itemValue="#{null}"/>
+                                <f:selectItems value="#{vehiculoView.anioList}" var="anio"
+                                               itemValue="#{anio}" itemLabel="#{anio}"/>
+                                <p:ajax event="blur"/>
                             </p:selectOneMenu>
                             <span class="text-sm hidden"> </span>
                         </p:outputPanel>
@@ -128,28 +169,18 @@
                                 <f:selectItem itemLabel="Todos" itemValue="#{null}"/>
                                 <f:selectItems value="#{vehiculoView.marcaList}" var="marca"
                                                itemValue="#{marca}" itemLabel="#{marca}"/>
-                                <p:ajax event="change" listener="#{vehiculoView.onChangeMarcaFilter()}" update="form_filtros:filtros" />
+                                <p:ajax event="change" listener="#{vehiculoView.onChangeMarcaFilter()}"
+                                        update="form_filtros:select_modelo @this"/>
                             </p:selectOneMenu>
                             <span class="text-sm hidden"> </span>
                         </p:outputPanel>
 
                         <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4 xl:col-3">
                             <p:outputLabel for="@next" value="Modelo" styleClass="block"/>
-                            <p:selectOneMenu value="#{vehiculoView.vehiculoFilter.marca}" styleClass="w-full mw-auto">
+                            <p:selectOneMenu id="select_modelo" value="#{vehiculoView.vehiculoFilter.modelo}" styleClass="w-full mw-auto">
                                 <f:selectItem itemLabel="Todos" itemValue="#{null}"/>
                                 <f:selectItems value="#{vehiculoView.modeloList}" var="modelo"
                                                itemValue="#{modelo}" itemLabel="#{modelo}"/>
-                                <p:ajax event="change" listener="#{vehiculoView.onChangeModeloFilter()}" update="form_filtros:filtros" />
-                            </p:selectOneMenu>
-                            <span class="text-sm hidden"> </span>
-                        </p:outputPanel>
-
-                        <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4 xl:col-3">
-                            <p:outputLabel for="@next" value="Tipo" styleClass="block"/>
-                            <p:selectOneMenu value="#{vehiculoView.vehiculoFilter.anio}" styleClass="w-full mw-auto">
-                                <f:selectItem itemLabel="Todos" itemValue="#{null}"/>
-                                <f:selectItems value="#{vehiculoView.anioList}" var="anio"
-                                               itemValue="#{anio}" itemLabel="#{anio}"/>
                             </p:selectOneMenu>
                             <span class="text-sm hidden"> </span>
                         </p:outputPanel>
@@ -208,16 +239,20 @@
                         <h:outputText value="#{vehiculo.noSerie}"/>
                     </p:column>
 
+                    <p:column headerText="Placa" width="150">
+                        <h:outputText value="#{vehiculo.placa}"/>
+                    </p:column>
+
+                    <p:column headerText="Año" width="100">
+                        <h:outputText value="#{vehiculo.anio}"/>
+                    </p:column>
+
                     <p:column headerText="Marca" width="150">
                         <h:outputText value="#{vehiculo.marca}"/>
                     </p:column>
 
                     <p:column headerText="Modelo" width="150">
                         <h:outputText value="#{vehiculo.modelo}"/>
-                    </p:column>
-
-                    <p:column headerText="Tipo" width="150">
-                        <h:outputText value="#{vehiculo.anio}"/>
                     </p:column>
 
                     <p:column headerText="Color" width="100">
@@ -248,10 +283,46 @@
                         <h:outputText value="#{vehiculo.anexo != null ? vehiculo.anexo.nombre : ''}"/>
                     </p:column>
 
-                    <p:column headerText="Renta Mensual" width="150">
+                    <p:column headerText="No. Motor" width="150">
+                        <h:outputText value="#{vehiculo.noMotor}"/>
+                    </p:column>
+
+                    <p:column headerText="Renta mensual" width="150">
                         <h:outputText value="#{vehiculo.rentaMensual}">
                             <f:convertNumber maxFractionDigits="2"/>
                         </h:outputText>
+                    </p:column>
+
+                    <p:column headerText="No. Factura" width="150">
+                        <h:outputText value="#{vehiculo.noFactura}"/>
+                    </p:column>
+
+                    <p:column headerText="Valor factura" width="150">
+                        <h:outputText value="#{vehiculo.montoFactura}"/>
+                    </p:column>
+
+                    <p:column headerText="Descripción" width="350">
+                        <h:outputText value="#{vehiculo.descripcionVehiculo}"/>
+                    </p:column>
+
+                    <p:column headerText="Resguardante" width="180">
+                        <h:outputText value="#{vehiculo.resguardante}"/>
+                    </p:column>
+
+                    <p:column headerText="Área reguardante" width="180">
+                        <h:outputText value="#{vehiculo.areaResguardante}"/>
+                    </p:column>
+
+                    <p:column headerText="Director administrativo" width="180">
+                        <h:outputText value="#{vehiculo.autorizaDirectorAdmin}"/>
+                    </p:column>
+
+                    <p:column headerText="Director general" width="180">
+                        <h:outputText value="#{vehiculo.autorizaDirectorGeneral}"/>
+                    </p:column>
+
+                    <p:column headerText="Proveedor" width="150">
+                        <h:outputText value="#{vehiculo.proveedor}"/>
                     </p:column>
 
                     <sec:authorize access="hasAuthority('ROLE_OWNER')">
@@ -293,7 +364,7 @@
 
                     </sec:authorize>
 
-                    <sec:authorize access="hasAnyAuthority('ROLE_OWNER','SEGURIDAD_ROLES_READ_CONFIGURAR_PERMISOS', 'SEGURIDAD_ROLES_WRITE_EDITAR', 'SEGURIDAD_ROLES_WRITE_ELIMINAR')">
+                    <sec:authorize access="hasAnyAuthority('ROLE_OWNER','VEHICULOS_WRITE_VER_DETALLE', 'VEHICULOS_WRITE_REGISTRAR_MANTENIMIENTO', 'VEHICULOS_WRITE_ADJUNTAR_FOTOS')">
                         <p:column headerText="Acciones" width="120">
 
                             <p:commandButton id="buttonOptions" type="button"
@@ -302,13 +373,13 @@
                                              rendered="#{vehiculo.estatusRegistro.label != 'Borrado'}"/>
                             <p:menu overlay="true" trigger="buttonOptions" my="left top" at="left bottom" styleClass="w-16rem">
 
-                                <sec:authorize access="hasAnyAuthority('ROLE_OWNER')">
+                                <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'VEHICULOS_WRITE_VER_DETALLE')">
                                     <p:menuitem value="Ver detalle del vehículo"
                                                 action="#{vehiculoView.verDetalle(vehiculo)}"
                                                 ajax="true" update="container"/>
                                 </sec:authorize>
 
-                                <sec:authorize access="hasAnyAuthority('ROLE_OWNER')">
+                                <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'VEHICULOS_WRITE_REGISTRAR_MANTENIMIENTO')">
                                     <p:menuitem value="Registrar mantenimiento"
                                                 ajax="true" action="#{vehiculoView.abrirModalRegistroMantenimiento(vehiculo.idVehiculo)}"
                                                 update="growl form_datatable">
@@ -316,7 +387,7 @@
                                     </p:menuitem>
                                 </sec:authorize>
 
-                                <sec:authorize access="hasAnyAuthority('ROLE_OWNER')">
+                                <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'VEHICULOS_WRITE_ADJUNTAR_FOTOS')">
                                     <p:menuitem value="Adjuntar fotos"
                                                 ajax="true" action="#{vehiculoView.abrirModalAdjuntarFotos(vehiculo.idVehiculo)}"
                                                 oncomplete="Main.changeChooseLabel();"

@@ -22,8 +22,8 @@ public interface IVehiculoRepository extends JpaRepository<Vehiculo, Long>, JpaS
     @Query("select distinct v.modelo from Vehiculo v where v.estatusRegistro = 1 and (v.marca = ?1 or ?1 is null)")
     List<String> findDistinctModeloByEstatusActivo(String marca);
 
-    @Query("select distinct v.anio from Vehiculo v where v.estatusRegistro = 1 and (v.marca = ?1 or ?1 is null) and (v.modelo = ?2 or ?2 is null)")
-    List<Integer> findDistinctAnioByEstatusActivo(String marca, String modelo);
+    @Query("select distinct v.anio from Vehiculo v where v.estatusRegistro = 1")
+    List<Integer> findDistinctAnioByEstatusActivo();
 
     @Query("select v from Vehiculo v where v.idVehiculo in ?1")
     List<Vehiculo> findAllByIdVehiculo(List<Long> idVehiculoList);
