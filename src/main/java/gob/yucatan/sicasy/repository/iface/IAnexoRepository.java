@@ -2,6 +2,7 @@ package gob.yucatan.sicasy.repository.iface;
 
 import gob.yucatan.sicasy.business.entities.Anexo;
 import gob.yucatan.sicasy.business.entities.Licitacion;
+import gob.yucatan.sicasy.business.entities.Vehiculo;
 import gob.yucatan.sicasy.business.enums.EstatusRegistro;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
@@ -20,5 +21,8 @@ public interface IAnexoRepository extends JpaRepository<Anexo, Long>, JpaSpecifi
 
     @Query("select a from Anexo a where a.estatusRegistro = 1 and a.nombre = ?1 and a.licitacion = ?2 ")
     Optional<Anexo> findAnexoActivoByNombreAndLicitacion(String nombre, Licitacion licitacion);
+
+    @Query("select a from Anexo a where a.estatusRegistro = 1 and a.nombre in ?1")
+    List<Anexo> findAnexosActivosByNombre(List<String> nombres);
 
 }

@@ -70,6 +70,9 @@ public class Anexo implements Cloneable {
     @Column(name = "borrado_por")
     private String borradoPor;
 
+    @Transient
+    private String numLicitacionString;
+
 
     public String fechaInicioString(){
         return DateFormatUtil.convertToFormat(fechaInicio,"dd-MM-yyyy");
@@ -81,10 +84,6 @@ public class Anexo implements Cloneable {
 
     public String fechaFirmaString(){
         return DateFormatUtil.convertToFormat(fechaFirma, "dd-MM-yyyy");
-    }
-
-    public String numLicitacionString(){
-        return licitacion.getNumeroLicitacion();
     }
 
     public Boolean getIsExpirationDateFechaFinal(){

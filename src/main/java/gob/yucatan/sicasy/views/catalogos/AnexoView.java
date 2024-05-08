@@ -1,8 +1,10 @@
 package gob.yucatan.sicasy.views.catalogos;
 
 import gob.yucatan.sicasy.business.annotations.ConfigPermiso;
+import gob.yucatan.sicasy.business.dtos.AcuseImportacion;
 import gob.yucatan.sicasy.business.entities.Anexo;
 import gob.yucatan.sicasy.business.entities.Licitacion;
+import gob.yucatan.sicasy.business.entities.Vehiculo;
 import gob.yucatan.sicasy.business.enums.EstatusRegistro;
 import gob.yucatan.sicasy.business.enums.TipoPermiso;
 import gob.yucatan.sicasy.business.exceptions.BadRequestException;
@@ -12,7 +14,10 @@ import gob.yucatan.sicasy.services.iface.ILicitacionService;
 import gob.yucatan.sicasy.utils.export.ExportFile;
 import gob.yucatan.sicasy.utils.export.excel.models.*;
 import gob.yucatan.sicasy.utils.export.excel.services.iface.IGeneratorExcelFile;
+import gob.yucatan.sicasy.utils.imports.excel.ConfigHeaderExcelModel;
+import gob.yucatan.sicasy.utils.imports.excel.ImportExcelFile;
 import gob.yucatan.sicasy.utils.imports.excel.SaveFile;
+import gob.yucatan.sicasy.views.beans.Messages;
 import gob.yucatan.sicasy.views.beans.UserSessionBean;
 import jakarta.annotation.PostConstruct;
 import jakarta.faces.application.FacesMessage;
@@ -26,6 +31,7 @@ import org.apache.poi.ss.usermodel.VerticalAlignment;
 import org.apache.poi.xssf.usermodel.XSSFCellStyle;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.primefaces.PrimeFaces;
+import org.primefaces.event.FileUploadEvent;
 import org.primefaces.event.SelectEvent;
 import org.primefaces.model.file.UploadedFile;
 import org.springframework.beans.factory.annotation.Value;
@@ -52,9 +58,13 @@ public class AnexoView implements Serializable {
     private @Getter Anexo anexoFilter;
     private @Getter Anexo anexoSelected;
     private @Getter List<Anexo> anexoList;
+    private @Getter @Setter List<Anexo> anexoImportList;
     private @Getter EstatusRegistro[] estatusRegistros;
     private @Getter List<Licitacion> licitacionesActivasList;
     private @Getter @Setter UploadedFile anexoFile;
+    private @Getter boolean showErrorImportacion;
+    private @Getter String layoutFileUpload;
+    private @Getter @Setter List<AcuseImportacion> acuseImportacionList;
 
     private final IAnexoService anexoService;
     private final ILicitacionService licitacionService;
@@ -309,6 +319,84 @@ public class AnexoView implements Serializable {
         }
 
         return true;
+    }
+
+    public void abrirModalImport(){
+        this.layoutFileUpload = null;
+        this.showErrorImportacion = false;
+        this.acuseImportacionList = null;
+        //PrimeFaces.current().ajax().update("import-dialog-content");
+        PrimeFaces.current().executeScript("PF('formDialogImport').show()");
+    }
+
+    public void cerrarModalImport() {
+        this.anexoSelected = null;
+        //PrimeFaces.current().ajax().update("import-dialog-content");
+        PrimeFaces.current().executeScript("PF('formDialogImport').hide()");
+    }
+
+    public void importarLayout(FileUploadEvent event) throws IOException {
+        UploadedFile file = event.getFile();
+        String fileName = file.getFileName();
+        byte[] fileContent = file.getContent();
+
+        if (fileName.endsWith(".xls") || fileName.endsWith(".xlsx")) {
+            //procesarlo utilizando Apache POI
+            Class<Anexo> anexoClass = Anexo.class;
+            List<ConfigHeaderExcelModel> list = new ArrayList<>();
+            list.add(ConfigHeaderExcelModel.builder().header("NUM_LICITACION").fieldName("numLicitacionString").columnIndex(0).build());
+            list.add(ConfigHeaderExcelModel.builder().header("NOMBRE").fieldName("nombre").columnIndex(1).build());
+            list.add(ConfigHeaderExcelModel.builder().header("DESCRIPCION").fieldName("descripcion").columnIndex(2).build());
+            list.add(ConfigHeaderExcelModel.builder().header("FECHA_INICIO").fieldName("fechaInicio").columnIndex(3).build());
+            list.add(ConfigHeaderExcelModel.builder().header("FECHA_FIN").fieldName("fechaFinal").columnIndex(4).build());
+            list.add(ConfigHeaderExcelModel.builder().header("FECHA_FIRMA").fieldName("fechaFirma").columnIndex(5).build());
+
+
+            ImportExcelFile<Anexo> importExcelFile = new ImportExcelFile<>();
+            this.anexoImportList = importExcelFile.processExcelFile(fileContent, anexoClass, list);
+
+            this.anexoImportList.forEach(Anexo -> Anexo.setLicitacion(new Licitacion()));
+
+            this.layoutFileUpload = fileName;
+            PrimeFaces.current().ajax().update(":form_import:dropZoneLayout");
+            log.info("Se ha cargado la información del layout correctamente. Vehículos a importar: {}", this.anexoImportList.size());
+        } else {
+            Messages.addError("Error", "Tipo de archivo no válido");
+        }
+    }
+
+    public void guardarImportacionAnexos(){
+        log.info("guardar importacion");
+        try {
+            if(this.anexoImportList != null) {
+
+                this.acuseImportacionList = anexoService.importar(this.anexoImportList, userSessionBean.getUserName());
+
+//                // Si alguno marco error entonces no se guardó nada y se muestra el acuse
+                if(acuseImportacionList.stream().anyMatch(a -> a.getError() == 1)) {
+                    this.showErrorImportacion = true;
+                    log.info("showErrorImportacion true");
+                }
+                else {
+                    // Si no, entonces se guardó correctamente
+                    Messages.addInfo("Todos los anexos se han registrado correctamente");
+                    this.limpiarFiltros();
+                    this.buscar();
+                    this.cerrarModalImport();
+                }
+
+            }
+        } catch (Exception e) {
+            log.error("Error al guardar nuevo anexo", e);
+            String message;
+            if(e instanceof BadRequestException)
+                message = e.getMessage();
+            else if(e instanceof NotFoundException)
+                message = e.getMessage();
+            else
+                message = "Ocurrió un error inesperado. Intenta de nuevo más tarde.";
+            Messages.addError(message);
+        }
     }
 
 

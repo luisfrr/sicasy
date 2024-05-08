@@ -10,6 +10,7 @@ import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -107,7 +108,12 @@ public class ImportExcelFile<T> {
     private Object getCellValue(Cell cell, Class<?> fieldType) {
         // Convertir el valor de la celda al tipo de dato apropiado
         if (fieldType == String.class) {
-            return cell.getStringCellValue().trim();
+            try {
+                return cell.getStringCellValue().trim();
+            }catch (Exception e) {
+                DecimalFormat df = new DecimalFormat("#.##"); // No muestra decimales si son ceros
+                return df.format(cell.getNumericCellValue());
+            }
         } else if (fieldType == Integer.class) {
             return DoubleUtil.parse(String.valueOf(cell.getNumericCellValue())).intValue();
         } else if (fieldType == Double.class) {

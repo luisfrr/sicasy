@@ -1,20 +1,25 @@
 package gob.yucatan.sicasy.services.impl;
 
+import gob.yucatan.sicasy.business.dtos.AcuseImportacion;
 import gob.yucatan.sicasy.business.entities.*;
 import gob.yucatan.sicasy.business.enums.EstatusRegistro;
+import gob.yucatan.sicasy.business.exceptions.BadRequestException;
 import gob.yucatan.sicasy.business.exceptions.NotFoundException;
 import gob.yucatan.sicasy.repository.criteria.SearchCriteria;
 import gob.yucatan.sicasy.repository.criteria.SearchOperation;
 import gob.yucatan.sicasy.repository.criteria.SearchSpecification;
 import gob.yucatan.sicasy.repository.iface.IAnexoRepository;
+import gob.yucatan.sicasy.repository.iface.ILicitacionRepository;
 import gob.yucatan.sicasy.services.iface.IAnexoService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -22,6 +27,23 @@ import java.util.Optional;
 public class AnexoServiceImpl implements IAnexoService {
 
     private final IAnexoRepository anexoRepository;
+    private final ILicitacionRepository licitacionRepository;
+
+    @SafeVarargs
+    private static <T> Predicate<T>
+    distinctByKeys(final Function<? super T, ?>... keyExtractors)
+    {
+        final Map<List<?>, Boolean> seen = new ConcurrentHashMap<>();
+
+        return t ->
+        {
+            final List<?> keys = Arrays.stream(keyExtractors)
+                    .map(ke -> ke.apply(t))
+                    .collect(Collectors.toList());
+
+            return seen.putIfAbsent(keys, Boolean.TRUE) == null;
+        };
+    }
 
     @Override
     public List<Anexo> findAllDynamic(Anexo anexo) {
@@ -119,4 +141,139 @@ public class AnexoServiceImpl implements IAnexoService {
 
 
     }
+
+    @Override
+    public List<AcuseImportacion> importar(List<Anexo> anexos, String username) {
+        List<AcuseImportacion> acuseImportacionList = new ArrayList<>();
+
+        this.validarImportacion(acuseImportacionList, anexos, username);
+
+        if(acuseImportacionList.stream().anyMatch(acuseImportacion -> acuseImportacion.getError() == 1)) {
+            return acuseImportacionList;
+        }
+
+        try {
+            anexoRepository.saveAll(anexos);
+        } catch (Exception e) {
+            acuseImportacionList.add(AcuseImportacion.builder()
+                    .titulo("Error al guardar la información")
+                    .mensaje(e.getMessage())
+                    .error(1)
+                    .build());
+        }
+
+        return acuseImportacionList;
+    }
+
+    private void validarImportacion( List<AcuseImportacion> acuseImportacionList ,List<Anexo> anexos, String username) {
+
+        for (Anexo anexo : anexos) {
+            try {
+                // validar campos obligatorios
+                if(anexo.getNumLicitacionString() == null || anexo.getNumLicitacionString().isEmpty())
+                    throw new BadRequestException("El campo Num. Licitación es obligatorio");
+
+                if(anexo.getNombre() == null || anexo.getNombre().isEmpty())
+                    throw new BadRequestException("El campo Nombre es obligatorio");
+
+                if (anexo.getFechaInicio() != null && anexo.getFechaFinal() != null){
+                    if (anexo.getFechaInicio().after(anexo.getFechaFinal())){
+                        throw new BadRequestException("La fecha de inicio no puede ser una fecha posterior a la fecha final");
+                    }
+                }
+
+                if (anexo.getNumLicitacionString() != null){
+                    Licitacion licitacion = licitacionRepository
+                            .findByNumeroLicitacionAndEstatusRegistro(anexo.getNumLicitacionString(),
+                                    EstatusRegistro.ACTIVO)
+                            .orElseThrow(() -> new NotFoundException("No se encontro la licitacion con el número de licitacion: "
+                                    + anexo.getNumLicitacionString()));
+                    anexo.setLicitacion(licitacion);
+                }
+
+                anexo.setEstatusRegistro(EstatusRegistro.ACTIVO);
+                anexo.setFechaCreacion(new Date());
+                anexo.setCreadoPor(username);
+
+
+            }catch (Exception e) {
+                acuseImportacionList.add(AcuseImportacion.builder()
+                        .titulo(anexo.getNombre())
+                        .mensaje(e.getMessage())
+                        .error(1)
+                        .build());
+            }
+        }
+
+        // validar que no existan los anexos de la lista
+        List<String> nombresAnexosLista = anexos.stream()
+                .map(Anexo :: getNombre )
+                .distinct()
+                .toList();
+
+        List<Anexo> anexosActivosLista = anexoRepository.findAnexosActivosByNombre(nombresAnexosLista);
+
+        if (!anexosActivosLista.isEmpty()){
+            anexosActivosLista.forEach(v -> acuseImportacionList.add(AcuseImportacion.builder()
+                    .titulo(v.getNombre())
+                    .mensaje("Ya existe un anexo registrado con ese nombre")
+                    .error(1)
+                    .build()));
+        }
+
+        // validar que si esten registrados las licitaciones
+        List<String> numLicitaciones = anexos.stream()
+                .map(Anexo::getNumLicitacionString)
+                .distinct()
+                .toList();
+
+        List<Licitacion> licitacionList = licitacionRepository.findLicitacionesActivasByNumeroLicitacion(numLicitaciones);
+
+        // si esta vacio es que ninguna licitacion existe en la base
+        if (licitacionList.isEmpty()){
+            acuseImportacionList.add(AcuseImportacion.builder()
+                    .titulo("Error")
+                    .mensaje("Estas licitaciones no se encuentran registradas.")
+                    .error(1)
+                    .build());
+        }
+
+        // alguna licitacion no esta registrada
+        if (!licitacionList.isEmpty() && licitacionList.size() != numLicitaciones.size()){
+            acuseImportacionList.add(AcuseImportacion.builder()
+                    .titulo("Error")
+                    .mensaje("Una o mas licitaciones no se encuentran registradas.")
+                    .error(1)
+                    .build());
+        }
+
+        // que no se repitan los pares licitacion-anexo
+        List<Anexo> anexoFilterList = anexos.stream()
+                .filter(distinctByKeys(Anexo::getNombre, Anexo ::getNumLicitacionString))
+                .toList();
+
+        if (!anexoFilterList.isEmpty()){
+            for (Anexo anexo : anexoFilterList){
+                List<Anexo> anexos1 = anexos.stream()
+                        .filter(a -> a.getNumLicitacionString().equals(anexo.getNumLicitacionString())
+                        && a.getNombre().equals(anexo.getNombre()))
+                        .toList();
+
+                // aqui se valida si existen mas de un par distinto de clave numlicitacion y nombre_anexo
+                if (!anexos1.isEmpty() && anexos1.size() > 1){
+                    acuseImportacionList.add(AcuseImportacion.builder()
+                            .titulo(anexo.getNombre())
+                            .mensaje("Este registro se encuentra duplicado en el archivo")
+                            .error(1)
+                            .build());
+                }
+            }
+        }
+
+    }
+
+
+
+
 }
+

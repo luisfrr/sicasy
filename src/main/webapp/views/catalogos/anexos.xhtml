@@ -37,10 +37,15 @@
                     </p:toolbarGroup>
 
                     <p:toolbarGroup align="right">
+                        <p:commandButton value="Importar" ajax="false" action="#{anexoView.abrirModalImport()}"
+                                         styleClass="ui-button-outlined mr-4">
+                        </p:commandButton>
+
                         <p:commandButton value="Exportar" ajax="false" onclick="PrimeFaces.monitorDownload(start, stop);"
                                          styleClass="ui-button-outlined">
                             <p:fileDownload value="#{fileDownloadBean.downloadFile(anexoView.exportFileExcel())}"/>
                         </p:commandButton>
+
                     </p:toolbarGroup>
                 </p:toolbar>
             </h:form>
@@ -345,6 +350,69 @@
                                      update="growl form_datatable"
                                      validateClient="true"/>
                 </f:facet>
+            </p:dialog>
+        </h:form>
+
+        <h:form id="form_import">
+            <p:dialog widgetVar="formDialogImport" showEffect="fade" modal="true"
+                      height="350" width="850" header="Importación de datos"
+                      closable="true" closeOnEscape="true"
+                      cache="false" responsive="true">
+                <p:outputPanel id="import-dialog-content" styleClass="formgrid grid">
+
+                    <p:outputPanel styleClass="field col-12 mb-5" rendered="#{not anexoView.showErrorImportacion}">
+                        <p:outputLabel for="@next" value="Importar layout" styleClass="block"/>
+                        <p:inputTextarea id="dropZoneLayout" widgetVar="dropZoneLayout"
+                                         styleClass="w-full dropzone mb-3" rows="5" required="true"
+                                         placeholder="Arrastra y suelta aquí el archivo de importación de anexos"
+                                         value="#{anexoView.layoutFileUpload}" readonly="true"/>
+                        <span class="text-sm">
+                                    <p:link value="O haz clic aquí para elegir" onclick="PF('uploadLayout').show();return false"/>
+                                </span>
+                        <p:fileUpload widgetVar="uploadLayout" listener="#{anexoView.importarLayout}"
+                                      fileLimit="1" fileLimitMessage="Solo se permite subir un archivo"
+                                      sizeLimit="50000000" allowTypes="/(\.|\/)(xlsx|)$/" dropZone="dropZoneLayout"
+                                      update="growl" style="display: none"/>
+                    </p:outputPanel>
+
+                    <p:outputPanel id="panel_acuseImport" styleClass="field col-12 mb-5" rendered="#{anexoView.showErrorImportacion}">
+                        <p:dataTable id="dt_acuses" var="acuse" value="#{anexoView.acuseImportacionList}"
+                                     rows="25" rowHover="true"
+                                     rowIndexVar="index"
+                                     styleClass="dt-scrollable-x"
+                                     scrollable="true" scrollHeight="230" size="small"
+                                     paginator="true" paginatorPosition="bottom"
+                                     paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                     currentPageReportTemplate="{startRecord}-{endRecord} de {totalRecords} registros"
+                                     rowsPerPageTemplate="25,100,200,{ShowAll|'Todos'}">
+                            <f:facet name="header">
+                                Se encontraron error al importar el layout
+                            </f:facet>
+
+                            <p:column headerText="Anexo" width="180">
+                                <h:outputText value="#{acuse.titulo}"/>
+                            </p:column>
+
+                            <p:column headerText="Error" style="min-width: 200px">
+                                <h:outputText value="#{acuse.mensaje}"/>
+                            </p:column>
+
+                        </p:dataTable>
+                    </p:outputPanel>
+
+                    <p:outputPanel styleClass="field col-12 mt-5 mb-0" rendered="#{not anexoView.showErrorImportacion}">
+                        <p:outputPanel styleClass="flex justify-content-end">
+                            <p:commandButton value="Cancelar" ajax="true" process="@this"
+                                             action="#{anexoView.cerrarModalImport()}"
+                                             styleClass="ui-button-outlined mr-4"/>
+                            <p:commandButton value="Guardar" ajax="true" process="@form"
+                                             action="#{anexoView.guardarImportacionAnexos()}"
+                                             update="growl :form_import:import-dialog-content"
+                                             validateClient="true"/>
+                        </p:outputPanel>
+                    </p:outputPanel>
+
+                </p:outputPanel>
             </p:dialog>
         </h:form>
 
