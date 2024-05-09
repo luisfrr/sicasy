@@ -182,14 +182,12 @@ public class AnexoServiceImpl implements IAnexoService {
                     }
                 }
 
-                if (anexo.getNumLicitacionString() != null){
-                    Licitacion licitacion = licitacionRepository
-                            .findByNumeroLicitacionAndEstatusRegistro(anexo.getNumLicitacionString(),
-                                    EstatusRegistro.ACTIVO)
-                            .orElseThrow(() -> new NotFoundException("No se encontro la licitacion con el número de licitacion: "
-                                    + anexo.getNumLicitacionString()));
-                    anexo.setLicitacion(licitacion);
-                }
+                Licitacion licitacion = licitacionRepository
+                        .findByNumeroLicitacionAndEstatusRegistro(anexo.getNumLicitacionString(),
+                                EstatusRegistro.ACTIVO)
+                        .orElseThrow(() -> new NotFoundException("No se encontro la licitacion con el número de licitacion: "
+                                + anexo.getNumLicitacionString()));
+                anexo.setLicitacion(licitacion);
 
                 anexo.setEstatusRegistro(EstatusRegistro.ACTIVO);
                 anexo.setFechaCreacion(new Date());

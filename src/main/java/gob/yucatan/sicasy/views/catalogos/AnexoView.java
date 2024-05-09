@@ -4,7 +4,6 @@ import gob.yucatan.sicasy.business.annotations.ConfigPermiso;
 import gob.yucatan.sicasy.business.dtos.AcuseImportacion;
 import gob.yucatan.sicasy.business.entities.Anexo;
 import gob.yucatan.sicasy.business.entities.Licitacion;
-import gob.yucatan.sicasy.business.entities.Vehiculo;
 import gob.yucatan.sicasy.business.enums.EstatusRegistro;
 import gob.yucatan.sicasy.business.enums.TipoPermiso;
 import gob.yucatan.sicasy.business.exceptions.BadRequestException;
@@ -288,7 +287,7 @@ public class AnexoView implements Serializable {
 
         if (this.anexoSelected != null && this.anexoSelected.getIdAnexo() == null &&
                 this.anexoSelected.getNombre() != null) {
-            List<Anexo> anexosResult = new ArrayList<>();
+            List<Anexo> anexosResult;
 
             // buscar si ya existe un anexo con el mismo nombre y si tiene una licitacion activa
             Anexo anexoSearch = new Anexo();
@@ -308,12 +307,10 @@ public class AnexoView implements Serializable {
 
             if(anexo.isPresent() && anexo.get().getEstatusRegistro().equals(EstatusRegistro.ACTIVO)) {
                 // si existe el anexo y esta activo, revisar si tiene alguna licitacion activa vinculada
-                if (anexo.get().getLicitacion() != null && licitacionSearch != null
-                        && anexo.get().getLicitacion().getNumeroLicitacion()
-                            .equals(licitacionSearch.getNumeroLicitacion())
-                        && anexo.get().getLicitacion().getEstatusRegistro().equals(EstatusRegistro.ACTIVO)) {
-                    return false;
-                }
+                return anexo.get().getLicitacion() == null || licitacionSearch == null
+                        || !anexo.get().getLicitacion().getNumeroLicitacion()
+                        .equals(licitacionSearch.getNumeroLicitacion())
+                        || !anexo.get().getLicitacion().getEstatusRegistro().equals(EstatusRegistro.ACTIVO);
             }
 
         }
@@ -375,7 +372,6 @@ public class AnexoView implements Serializable {
 //                // Si alguno marco error entonces no se guardó nada y se muestra el acuse
                 if(acuseImportacionList.stream().anyMatch(a -> a.getError() == 1)) {
                     this.showErrorImportacion = true;
-                    log.info("showErrorImportacion true");
                 }
                 else {
                     // Si no, entonces se guardó correctamente

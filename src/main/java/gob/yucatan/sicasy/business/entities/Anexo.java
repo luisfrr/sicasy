@@ -91,8 +91,6 @@ public class Anexo implements Cloneable {
         if (fechaFinal != null){
             Instant instant = fechaFinal.toInstant();
 
-            // Replace JVM's timezone, ZoneId.systemDefault() with the applicable timezone
-            // e.g. ZoneId.of("Etc/UTC")
             LocalDate date = instant.atZone(ZoneId.systemDefault()).toLocalDate();
             LocalDate today = LocalDate.now(ZoneId.systemDefault());
 
