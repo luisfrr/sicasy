@@ -23,10 +23,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Component
 @Scope("view")
@@ -193,7 +190,9 @@ public class RolView {
         this.rolSelected = rol;
 
         // recupera la bitacora de cambios del rol para la tabla
-        this.bitacoraRolList = bitacoraRolService.findByRolId(rol.getIdRol());
+        this.bitacoraRolList = bitacoraRolService.findByRolId(rol.getIdRol())
+                .stream().sorted(Comparator.comparing(BitacoraRol::getFechaModificacion))
+                .toList();
         log.info("bitacoraRolList: {}", bitacoraRolList.size());
 
         this.showPanelBitacoraRol = true;

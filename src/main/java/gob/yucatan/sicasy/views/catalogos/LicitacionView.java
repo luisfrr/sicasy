@@ -1,6 +1,7 @@
 package gob.yucatan.sicasy.views.catalogos;
 
 import gob.yucatan.sicasy.business.annotations.ConfigPermiso;
+import gob.yucatan.sicasy.business.dtos.AcuseImportacion;
 import gob.yucatan.sicasy.business.entities.Anexo;
 import gob.yucatan.sicasy.business.entities.Licitacion;
 import gob.yucatan.sicasy.business.enums.EstatusRegistro;
@@ -12,7 +13,10 @@ import gob.yucatan.sicasy.services.iface.ILicitacionService;
 import gob.yucatan.sicasy.utils.export.ExportFile;
 import gob.yucatan.sicasy.utils.export.excel.models.*;
 import gob.yucatan.sicasy.utils.export.excel.services.iface.IGeneratorExcelFile;
+import gob.yucatan.sicasy.utils.imports.excel.ConfigHeaderExcelModel;
+import gob.yucatan.sicasy.utils.imports.excel.ImportExcelFile;
 import gob.yucatan.sicasy.utils.imports.excel.SaveFile;
+import gob.yucatan.sicasy.views.beans.Messages;
 import gob.yucatan.sicasy.views.beans.UserSessionBean;
 import jakarta.annotation.PostConstruct;
 import jakarta.faces.application.FacesMessage;
@@ -26,8 +30,10 @@ import org.apache.poi.ss.usermodel.VerticalAlignment;
 import org.apache.poi.xssf.usermodel.XSSFCellStyle;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.primefaces.PrimeFaces;
+import org.primefaces.event.FileUploadEvent;
 import org.primefaces.event.SelectEvent;
 import org.primefaces.model.file.UploadedFile;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
@@ -41,14 +47,21 @@ import java.util.*;
 @ConfigPermiso(tipo = TipoPermiso.VIEW, codigo = "CATALOGO_LICITACION_VIEW", nombre = "Catálogo de Licitaciones")
 public class LicitacionView {
 
+    @Value("${app.files.folder.licitaciones}")
+    private @Getter String FOLDER_LICITACION;
+
     private @Getter String title;
     private @Getter String titleDialog;
     private @Getter Boolean fechaFinalValida;
     private @Getter Licitacion licitacionSelected;
     private @Getter Licitacion licitacionFilter;
     private @Getter List<Licitacion> licitacionList;
+    private @Getter @Setter List<Licitacion> licitacionImportList;
     private @Getter EstatusRegistro[] estatusRegistros;
     private @Getter @Setter UploadedFile file;
+    private @Getter boolean showErrorImportacion;
+    private @Getter String layoutFileUpload;
+    private @Getter @Setter List<AcuseImportacion> acuseImportacionList;
 
     private final ILicitacionService licitacionService;
     private final IAnexoService anexoService;
@@ -100,7 +113,7 @@ public class LicitacionView {
                     this.licitacionSelected.setFechaModificacion(new Date());
 
                     if (file != null){
-                        String pathfile = SaveFile.saveFileToPath(file.getContent(), file.getFileName(), "\\Downloads\\");
+                        String pathfile = SaveFile.importFileToPath(file.getContent(), file.getFileName(), FOLDER_LICITACION);
                         licitacionSelected.setRutaArchivo(pathfile);
                     }
 
@@ -121,7 +134,7 @@ public class LicitacionView {
                         this.licitacionSelected.setFechaCreacion(new Date());
 
                         if (file != null){
-                            String pathfile = SaveFile.saveFileToPath(file.getContent(), file.getFileName(), "\\Downloads\\");
+                            String pathfile = SaveFile.importFileToPath(file.getContent(), file.getFileName(), FOLDER_LICITACION);
                             licitacionSelected.setRutaArchivo(pathfile);
                         }
 
@@ -282,6 +295,77 @@ public class LicitacionView {
 
         return generatorExcelFile.createExcelFile(workbook, excelDataSheet);
 
+    }
+
+    public void abrirModalImport(){
+        this.layoutFileUpload = null;
+        this.showErrorImportacion = false;
+        this.acuseImportacionList = null;
+        PrimeFaces.current().executeScript("PF('formDialogImport').show()");
+    }
+
+    public void cerrarModalImport() {
+        this.licitacionSelected = null;
+        PrimeFaces.current().executeScript("PF('formDialogImport').hide()");
+    }
+
+    public void importarLayout(FileUploadEvent event) throws IOException {
+        UploadedFile file = event.getFile();
+        String fileName = file.getFileName();
+        byte[] fileContent = file.getContent();
+
+        if (fileName.endsWith(".xls") || fileName.endsWith(".xlsx")) {
+            //procesarlo utilizando Apache POI
+            Class<Licitacion> licitacionClass = Licitacion.class;
+            List<ConfigHeaderExcelModel> list = new ArrayList<>();
+            list.add(ConfigHeaderExcelModel.builder().header("NUM_LICITACION").fieldName("numeroLicitacion").columnIndex(0).build());
+            list.add(ConfigHeaderExcelModel.builder().header("NOMBRE").fieldName("nombre").columnIndex(1).build());
+            list.add(ConfigHeaderExcelModel.builder().header("DESCRIPCION").fieldName("descripcion").columnIndex(2).build());
+            list.add(ConfigHeaderExcelModel.builder().header("FECHA_INICIO").fieldName("fechaInicio").columnIndex(3).build());
+            list.add(ConfigHeaderExcelModel.builder().header("FECHA_FIN").fieldName("fechaFinal").columnIndex(4).build());
+
+            ImportExcelFile<Licitacion> importExcelFile = new ImportExcelFile<>();
+            this.licitacionImportList = importExcelFile.processExcelFile(fileContent, licitacionClass, list);
+
+            this.layoutFileUpload = fileName;
+            PrimeFaces.current().ajax().update(":form_import:dropZoneLayout");
+            log.info("Se ha cargado la información del layout correctamente. Vehículos a importar: {}", this.licitacionImportList.size());
+        } else {
+            Messages.addError("Error", "Tipo de archivo no válido");
+        }
+    }
+
+    public void guardarImportacion(){
+        log.info("guardar importacion");
+        try {
+            if(this.licitacionImportList != null) {
+
+                this.acuseImportacionList = licitacionService.importar(this.licitacionImportList, userSessionBean.getUserName());
+
+//                // Si alguno marco error entonces no se guardó nada y se muestra el acuse
+                if(acuseImportacionList.stream().anyMatch(a -> a.getError() == 1)) {
+                    this.showErrorImportacion = true;
+                }
+                else {
+                    // Si no, entonces se guardó correctamente
+                    Messages.addInfo("Todos los anexos se han registrado correctamente");
+                    this.limpiarFiltros();
+                    this.buscar();
+                    this.cerrarModalImport();
+                }
+
+            }
+        } catch (Exception e) {
+            log.error("Error al guardar nuevo anexo", e);
+            String message;
+            if(e instanceof BadRequestException)
+                message = e.getMessage();
+            else if(e instanceof NotFoundException)
+                message = e.getMessage();
+            else
+                message = "Ocurrió un error inesperado. Intenta de nuevo más tarde.";
+            Messages.addError(message);
+        }
     }
 
 }

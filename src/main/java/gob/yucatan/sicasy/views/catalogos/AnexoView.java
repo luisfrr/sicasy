@@ -1,6 +1,7 @@
 package gob.yucatan.sicasy.views.catalogos;
 
 import gob.yucatan.sicasy.business.annotations.ConfigPermiso;
+import gob.yucatan.sicasy.business.dtos.AcuseImportacion;
 import gob.yucatan.sicasy.business.entities.Anexo;
 import gob.yucatan.sicasy.business.entities.Licitacion;
 import gob.yucatan.sicasy.business.enums.EstatusRegistro;
@@ -12,7 +13,10 @@ import gob.yucatan.sicasy.services.iface.ILicitacionService;
 import gob.yucatan.sicasy.utils.export.ExportFile;
 import gob.yucatan.sicasy.utils.export.excel.models.*;
 import gob.yucatan.sicasy.utils.export.excel.services.iface.IGeneratorExcelFile;
+import gob.yucatan.sicasy.utils.imports.excel.ConfigHeaderExcelModel;
+import gob.yucatan.sicasy.utils.imports.excel.ImportExcelFile;
 import gob.yucatan.sicasy.utils.imports.excel.SaveFile;
+import gob.yucatan.sicasy.views.beans.Messages;
 import gob.yucatan.sicasy.views.beans.UserSessionBean;
 import jakarta.annotation.PostConstruct;
 import jakarta.faces.application.FacesMessage;
@@ -26,8 +30,10 @@ import org.apache.poi.ss.usermodel.VerticalAlignment;
 import org.apache.poi.xssf.usermodel.XSSFCellStyle;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.primefaces.PrimeFaces;
+import org.primefaces.event.FileUploadEvent;
 import org.primefaces.event.SelectEvent;
 import org.primefaces.model.file.UploadedFile;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
@@ -41,6 +47,9 @@ import java.util.*;
 @ConfigPermiso(tipo = TipoPermiso.VIEW, codigo = "CATALOGO_ANEXO_VIEW", nombre = "Catálogo de Anexos")
 public class AnexoView implements Serializable {
 
+    @Value("${app.files.folder.anexos}")
+    private @Getter String FOLDER_ANEXO;
+
     private @Getter String title;
     private @Getter String titleDialog;
     private @Getter Boolean fechasValidadasCorrectas;
@@ -48,9 +57,13 @@ public class AnexoView implements Serializable {
     private @Getter Anexo anexoFilter;
     private @Getter Anexo anexoSelected;
     private @Getter List<Anexo> anexoList;
+    private @Getter @Setter List<Anexo> anexoImportList;
     private @Getter EstatusRegistro[] estatusRegistros;
     private @Getter List<Licitacion> licitacionesActivasList;
     private @Getter @Setter UploadedFile anexoFile;
+    private @Getter boolean showErrorImportacion;
+    private @Getter String layoutFileUpload;
+    private @Getter @Setter List<AcuseImportacion> acuseImportacionList;
 
     private final IAnexoService anexoService;
     private final ILicitacionService licitacionService;
@@ -103,7 +116,7 @@ public class AnexoView implements Serializable {
                     this.anexoSelected.setFechaModificacion(new Date());
 
                     if (anexoFile != null){
-                        String pathfile = SaveFile.saveFileToPath(anexoFile.getContent(), anexoFile.getFileName(), "\\Downloads\\");
+                        String pathfile = SaveFile.importFileToPath(anexoFile.getContent(), anexoFile.getFileName(), FOLDER_ANEXO);
                         anexoSelected.setRutaArchivo(pathfile);
                     }
 
@@ -122,7 +135,7 @@ public class AnexoView implements Serializable {
                         this.anexoSelected.setCreadoPor(userSessionBean.getUserName());
                         this.anexoSelected.setFechaCreacion(new Date());
                         if (anexoFile != null){
-                            String pathfile = SaveFile.saveFileToPath(anexoFile.getContent(), anexoFile.getFileName(), "\\Downloads\\");
+                            String pathfile = SaveFile.importFileToPath(anexoFile.getContent(), anexoFile.getFileName(), FOLDER_ANEXO);
                             anexoSelected.setRutaArchivo(pathfile);
                         }
                         anexoService.save(anexoSelected);
@@ -274,7 +287,7 @@ public class AnexoView implements Serializable {
 
         if (this.anexoSelected != null && this.anexoSelected.getIdAnexo() == null &&
                 this.anexoSelected.getNombre() != null) {
-            List<Anexo> anexosResult = new ArrayList<>();
+            List<Anexo> anexosResult;
 
             // buscar si ya existe un anexo con el mismo nombre y si tiene una licitacion activa
             Anexo anexoSearch = new Anexo();
@@ -294,17 +307,92 @@ public class AnexoView implements Serializable {
 
             if(anexo.isPresent() && anexo.get().getEstatusRegistro().equals(EstatusRegistro.ACTIVO)) {
                 // si existe el anexo y esta activo, revisar si tiene alguna licitacion activa vinculada
-                if (anexo.get().getLicitacion() != null && licitacionSearch != null
-                        && anexo.get().getLicitacion().getNumeroLicitacion()
-                            .equals(licitacionSearch.getNumeroLicitacion())
-                        && anexo.get().getLicitacion().getEstatusRegistro().equals(EstatusRegistro.ACTIVO)) {
-                    return false;
-                }
+                return anexo.get().getLicitacion() == null || licitacionSearch == null
+                        || !anexo.get().getLicitacion().getNumeroLicitacion()
+                        .equals(licitacionSearch.getNumeroLicitacion())
+                        || !anexo.get().getLicitacion().getEstatusRegistro().equals(EstatusRegistro.ACTIVO);
             }
 
         }
 
         return true;
+    }
+
+    public void abrirModalImport(){
+        this.layoutFileUpload = null;
+        this.showErrorImportacion = false;
+        this.acuseImportacionList = null;
+        //PrimeFaces.current().ajax().update("import-dialog-content");
+        PrimeFaces.current().executeScript("PF('formDialogImport').show()");
+    }
+
+    public void cerrarModalImport() {
+        this.anexoSelected = null;
+        //PrimeFaces.current().ajax().update("import-dialog-content");
+        PrimeFaces.current().executeScript("PF('formDialogImport').hide()");
+    }
+
+    public void importarLayout(FileUploadEvent event) throws IOException {
+        UploadedFile file = event.getFile();
+        String fileName = file.getFileName();
+        byte[] fileContent = file.getContent();
+
+        if (fileName.endsWith(".xls") || fileName.endsWith(".xlsx")) {
+            //procesarlo utilizando Apache POI
+            Class<Anexo> anexoClass = Anexo.class;
+            List<ConfigHeaderExcelModel> list = new ArrayList<>();
+            list.add(ConfigHeaderExcelModel.builder().header("NUM_LICITACION").fieldName("numLicitacionString").columnIndex(0).build());
+            list.add(ConfigHeaderExcelModel.builder().header("NOMBRE").fieldName("nombre").columnIndex(1).build());
+            list.add(ConfigHeaderExcelModel.builder().header("DESCRIPCION").fieldName("descripcion").columnIndex(2).build());
+            list.add(ConfigHeaderExcelModel.builder().header("FECHA_INICIO").fieldName("fechaInicio").columnIndex(3).build());
+            list.add(ConfigHeaderExcelModel.builder().header("FECHA_FIN").fieldName("fechaFinal").columnIndex(4).build());
+            list.add(ConfigHeaderExcelModel.builder().header("FECHA_FIRMA").fieldName("fechaFirma").columnIndex(5).build());
+
+
+            ImportExcelFile<Anexo> importExcelFile = new ImportExcelFile<>();
+            this.anexoImportList = importExcelFile.processExcelFile(fileContent, anexoClass, list);
+
+            this.anexoImportList.forEach(Anexo -> Anexo.setLicitacion(new Licitacion()));
+
+            this.layoutFileUpload = fileName;
+            PrimeFaces.current().ajax().update(":form_import:dropZoneLayout");
+            log.info("Se ha cargado la información del layout correctamente. Vehículos a importar: {}", this.anexoImportList.size());
+        } else {
+            Messages.addError("Error", "Tipo de archivo no válido");
+        }
+    }
+
+    public void guardarImportacionAnexos(){
+        log.info("guardar importacion");
+        try {
+            if(this.anexoImportList != null) {
+
+                this.acuseImportacionList = anexoService.importar(this.anexoImportList, userSessionBean.getUserName());
+
+//                // Si alguno marco error entonces no se guardó nada y se muestra el acuse
+                if(acuseImportacionList.stream().anyMatch(a -> a.getError() == 1)) {
+                    this.showErrorImportacion = true;
+                }
+                else {
+                    // Si no, entonces se guardó correctamente
+                    Messages.addInfo("Todos los anexos se han registrado correctamente");
+                    this.limpiarFiltros();
+                    this.buscar();
+                    this.cerrarModalImport();
+                }
+
+            }
+        } catch (Exception e) {
+            log.error("Error al guardar nuevo anexo", e);
+            String message;
+            if(e instanceof BadRequestException)
+                message = e.getMessage();
+            else if(e instanceof NotFoundException)
+                message = e.getMessage();
+            else
+                message = "Ocurrió un error inesperado. Intenta de nuevo más tarde.";
+            Messages.addError(message);
+        }
     }
 
 

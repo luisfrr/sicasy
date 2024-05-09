@@ -287,7 +287,9 @@ public class UsuarioView implements Serializable {
         this.usuarioSelected = usuario;
 
         // buscar bitacora de usuario
-        this.bitacoraUsuarioList = bitacoraUsuarioService.findByUsuarioId(usuario.getIdUsuario());
+        this.bitacoraUsuarioList = bitacoraUsuarioService.findByUsuarioId(usuario.getIdUsuario())
+                .stream().sorted(Comparator.comparing(BitacoraUsuario::getFechaModificacion))
+                .toList();
 
         this.showPanelPrincipal = false;
         this.showPanelBitacoraUsuario = true;

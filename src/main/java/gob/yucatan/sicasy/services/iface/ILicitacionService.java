@@ -1,5 +1,6 @@
 package gob.yucatan.sicasy.services.iface;
 
+import gob.yucatan.sicasy.business.dtos.AcuseImportacion;
 import gob.yucatan.sicasy.business.entities.Licitacion;
 
 import java.util.List;
@@ -22,4 +23,7 @@ public interface ILicitacionService {
     void delete(Licitacion licitacion);
 
     void update(Licitacion licitacion);
+
+    List<AcuseImportacion> importar(List<Licitacion> licitacions, String username);
+
 }

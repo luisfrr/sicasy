@@ -70,6 +70,9 @@ public class Anexo implements Cloneable {
     @Column(name = "borrado_por")
     private String borradoPor;
 
+    @Transient
+    private String numLicitacionString;
+
 
     public String fechaInicioString(){
         return DateFormatUtil.convertToFormat(fechaInicio,"dd-MM-yyyy");
@@ -83,17 +86,11 @@ public class Anexo implements Cloneable {
         return DateFormatUtil.convertToFormat(fechaFirma, "dd-MM-yyyy");
     }
 
-    public String numLicitacionString(){
-        return licitacion.getNumeroLicitacion();
-    }
-
     public Boolean getIsExpirationDateFechaFinal(){
 
         if (fechaFinal != null){
             Instant instant = fechaFinal.toInstant();
 
-            // Replace JVM's timezone, ZoneId.systemDefault() with the applicable timezone
-            // e.g. ZoneId.of("Etc/UTC")
             LocalDate date = instant.atZone(ZoneId.systemDefault()).toLocalDate();
             LocalDate today = LocalDate.now(ZoneId.systemDefault());
 
