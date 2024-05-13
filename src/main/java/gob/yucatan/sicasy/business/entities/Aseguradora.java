@@ -5,6 +5,7 @@ import gob.yucatan.sicasy.business.enums.EstatusRegistro;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.io.Serializable;
 import java.util.Date;
 
 @Entity
@@ -14,7 +15,7 @@ import java.util.Date;
 @Getter
 @Setter
 @Builder
-public class Aseguradora {
+public class Aseguradora implements Cloneable, Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -56,6 +57,14 @@ public class Aseguradora {
     private String borradoPor;
 
 
+    @Override
+    public Aseguradora clone() {
+        try {
+            return (Aseguradora) super.clone();
+        } catch (CloneNotSupportedException e) {
+            throw new AssertionError();
+        }
+    }
 
 
 }
