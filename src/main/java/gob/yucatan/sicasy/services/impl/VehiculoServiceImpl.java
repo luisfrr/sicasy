@@ -163,7 +163,7 @@ public class VehiculoServiceImpl implements IVehiculoService {
     @Override
     public Vehiculo findByNoSerie(String noSerie) {
         return vehiculoRepository.findVehiculoActivoByNoSerie(noSerie)
-                .orElseThrow(() -> new NotFoundException("No se ha encontrado el vehículo con el número de serie " + noSerie));
+                .orElseThrow(() -> new NotFoundException("No se ha encontrado el vehículo con el número de serie: " + noSerie));
     }
 
     @Override

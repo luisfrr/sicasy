@@ -7,6 +7,7 @@ import lombok.*;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 @Entity
 @Table(name = "vehiculo")
@@ -150,5 +151,18 @@ public class Vehiculo implements Cloneable, Serializable {
         } catch (CloneNotSupportedException e) {
             throw new AssertionError();
         }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Vehiculo vehiculo = (Vehiculo) o;
+        return Objects.equals(idVehiculo, vehiculo.idVehiculo) && Objects.equals(noSerie, vehiculo.noSerie);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(idVehiculo, noSerie);
     }
 }

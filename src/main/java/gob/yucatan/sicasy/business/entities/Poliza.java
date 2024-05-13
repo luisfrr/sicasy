@@ -6,6 +6,7 @@ import lombok.*;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.Objects;
 
 @Entity
 @Table(name = "poliza")
@@ -97,6 +98,28 @@ public class Poliza implements Cloneable, Serializable {
     @Column(name = "borrado_por")
     private String borradoPor;
 
+    @Transient
+    private boolean incisoNotNull;
+
+    @Transient
+    private Integer idAseguradora;
+
+    @Transient
+    private String vehiculoNoSerie;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Poliza poliza = (Poliza) o;
+        return Objects.equals(aseguradora, poliza.aseguradora) && Objects.equals(numeroPoliza, poliza.numeroPoliza) && Objects.equals(inciso, poliza.inciso) && Objects.equals(vehiculo, poliza.vehiculo);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(aseguradora, numeroPoliza, inciso, vehiculo);
+    }
+
     @Override
     public Poliza clone() {
         try {
@@ -109,4 +132,6 @@ public class Poliza implements Cloneable, Serializable {
             throw new AssertionError();
         }
     }
+
+
 }
