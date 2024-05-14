@@ -565,4 +565,7 @@ body .ui-menu.ui-menu-dynamic {
     width: 280px !important;
 }
 
+.status-dialog .ui-dialog-content {
+    padding: 1rem !important;
+}
 

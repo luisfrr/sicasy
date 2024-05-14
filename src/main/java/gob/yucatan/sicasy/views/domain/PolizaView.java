@@ -6,6 +6,7 @@ import gob.yucatan.sicasy.services.iface.IPolizaService;
 import jakarta.annotation.PostConstruct;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.primefaces.PrimeFaces;
 import org.springframework.beans.factory.annotation.Value;
@@ -31,7 +32,7 @@ public class PolizaView implements Serializable {
     // Generales
     private @Getter String title;
     private @Getter Poliza polizaFilter;
-    private @Getter GrupoPoliza grupoPolizaSelected;
+    private @Getter @Setter GrupoPoliza grupoPolizaSelected;
     private @Getter List<GrupoPoliza> grupoPolizaList;
     private @Getter List<Poliza> polizaList;
 
@@ -65,6 +66,20 @@ public class PolizaView implements Serializable {
         log.info("buscar grupos polizas");
         this.grupoPolizaList = polizaService.findGrupoPoliza(this.polizaFilter);
         PrimeFaces.current().ajax().update("form_datatable");
+    }
+
+    public void verIncisos() {
+        log.info("ver incisos polizas");
+        if(this.grupoPolizaSelected != null) {
+            this.polizaList = polizaService.findByGrupoPoliza(this.grupoPolizaSelected);
+            PrimeFaces.current().ajax().update("form_datatable_incisos");
+        }
+    }
+
+    public void limpiarIncisos() {
+        log.info("limpiar incisos polizas");
+        this.polizaList = new ArrayList<>();
+        PrimeFaces.current().ajax().update("form_datatable_incisos");
     }
 
 
