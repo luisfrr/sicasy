@@ -11,7 +11,6 @@ import gob.yucatan.sicasy.repository.criteria.SearchOperation;
 import gob.yucatan.sicasy.repository.criteria.SearchSpecification;
 import gob.yucatan.sicasy.repository.iface.IAseguradoraRepository;
 import gob.yucatan.sicasy.repository.iface.IPolizaRepository;
-import gob.yucatan.sicasy.services.iface.IAseguradoraService;
 import gob.yucatan.sicasy.services.iface.IPolizaService;
 import gob.yucatan.sicasy.services.iface.IVehiculoService;
 import lombok.RequiredArgsConstructor;
@@ -147,8 +146,21 @@ public class PolizaServiceImpl implements IPolizaService {
             return acuseImportacionList;
         }
 
+        try {
 
-        return List.of();
+            
+
+
+            polizaRepository.saveAll(polizas);
+        } catch (Exception e) {
+            acuseImportacionList.add(AcuseImportacion.builder()
+                    .titulo("Error al guardar la información")
+                    .mensaje(e.getMessage())
+                    .error(1)
+                    .build());
+        }
+
+        return acuseImportacionList;
     }
 
     private GrupoPoliza convertToGrupoPoliza(Poliza poliza) {
@@ -204,6 +216,9 @@ public class PolizaServiceImpl implements IPolizaService {
                         throw new BadRequestException("La fecha inicio de vigencia no puede ser posterior a la fecha fin de vigencia.");
                 }
 
+                poliza.setCreadoPor(username);
+                poliza.setModificadoPor(username);
+
             } catch (Exception e) {
                 acuseImportacionList.add(AcuseImportacion.builder()
                         .titulo(poliza.getNumeroPoliza())
@@ -211,6 +226,22 @@ public class PolizaServiceImpl implements IPolizaService {
                         .error(1)
                         .build());
             }
+        }
+
+        List<Poliza> polizaList = polizas.stream()
+                .distinct()
+                .toList();
+
+        // Si es diferente quiere decir que un número de serie se está duplicando en el layout
+        if(polizaList.size() != polizas.size()) {
+            List<Poliza> polizaDuplicadosLayout = polizas.stream()
+                    .filter(poliza -> !polizaList.contains(poliza))
+                    .toList();
+            polizaDuplicadosLayout.forEach(poliza -> acuseImportacionList.add(AcuseImportacion.builder()
+                    .titulo(poliza.getNumeroPoliza() + " - Incisos:" + poliza.getInciso())
+                    .mensaje("La póliza esta duplicada en este layout.")
+                    .error(1)
+                    .build()));
         }
     }
 
