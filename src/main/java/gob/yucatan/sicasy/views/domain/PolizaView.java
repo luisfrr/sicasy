@@ -2,6 +2,7 @@ package gob.yucatan.sicasy.views.domain;
 
 import gob.yucatan.sicasy.business.dtos.GrupoPoliza;
 import gob.yucatan.sicasy.business.entities.*;
+import gob.yucatan.sicasy.services.iface.IAseguradoraService;
 import gob.yucatan.sicasy.services.iface.IPolizaService;
 import jakarta.annotation.PostConstruct;
 import lombok.Getter;
@@ -35,10 +36,15 @@ public class PolizaView implements Serializable {
     private @Getter @Setter GrupoPoliza grupoPolizaSelected;
     private @Getter List<GrupoPoliza> grupoPolizaList;
     private @Getter List<Poliza> polizaList;
+    private @Getter @Setter List<Poliza> polizaSelectedList;
 
     private @Getter boolean showPanelPolizas;
 
+    private @Getter List<Aseguradora> aseguradoraList;
+
+
     private final IPolizaService polizaService;
+    private final IAseguradoraService aseguradoraService;
 
 
     @PostConstruct
@@ -49,7 +55,6 @@ public class PolizaView implements Serializable {
 
     public void limpiarFiltros() {
         log.info("limpiar filtros de vehiculos");
-        this.grupoPolizaSelected = null;
         this.polizaFilter = new Poliza();
         this.polizaFilter.setAseguradora(new Aseguradora());
         this.polizaFilter.setEstatusPoliza(new EstatusPoliza());
@@ -57,8 +62,12 @@ public class PolizaView implements Serializable {
 
         this.showPanelPolizas = true;
 
+        this.loadAseguradorasList();
+
         this.grupoPolizaList = new ArrayList<>();
         this.polizaList = new ArrayList<>();
+        this.grupoPolizaSelected = null;
+        this.polizaSelectedList = new ArrayList<>();
         PrimeFaces.current().ajax().update("form_filtros", "form_datatable");
     }
 
@@ -82,5 +91,10 @@ public class PolizaView implements Serializable {
         PrimeFaces.current().ajax().update("form_datatable_incisos");
     }
 
+
+    /* private methods */
+    private void loadAseguradorasList() {
+        this.aseguradoraList = aseguradoraService.findAll();
+    }
 
 }

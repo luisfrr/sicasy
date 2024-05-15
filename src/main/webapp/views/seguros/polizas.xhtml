@@ -12,9 +12,9 @@
 
     <ui:define name="content">
 
-        <p:ajaxStatus onstart="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()"/>
+        <p:ajaxStatus onstart="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()" rendered="false"/>
 
-        <p:dialog widgetVar="statusDialog" modal="true" draggable="false"
+        <p:dialog widgetVar="statusDialog" modal="true" draggable="false" rendered="false"
                   closable="false" resizable="false" showHeader="false" styleClass="status-dialog">
             <div class="flex align-items-center justify-content-center">
                 <div>
@@ -41,10 +41,22 @@
                 <h:form id="form_toolbar" styleClass="mb-5">
                     <p:toolbar>
                         <p:toolbarGroup>
-
+                            <p:commandButton id="accionesPolizas" type="button" value="Acciones"
+                                             iconPos="right" icon="fi fi-rr-angle-small-down"/>
+                            <p:menu overlay="true" trigger="accionesPolizas" my="left top" at="left bottom">
+                                <p:menuitem value="Registrar pólizas"/>
+                                <p:menuitem value="Registrar endoso de alta"/>
+                            </p:menu>
                         </p:toolbarGroup>
                         <p:toolbarGroup align="right">
-
+                            <p:commandButton id="exportarPolizas" type="button" value="Exportar"
+                                             iconPos="right" icon="fi fi-rr-angle-small-down"
+                                             styleClass="ui-button-outlined"/>
+                            <p:menu overlay="true" trigger="exportarPolizas" my="left top" at="left bottom">
+                                <p:menuitem value="Exportar pólizas"/>
+                                <p:menuitem value="Layout Registro de Pólizas"/>
+                                <p:menuitem value="Layout Endoso de Alta"/>
+                            </p:menu>
                         </p:toolbarGroup>
                     </p:toolbar>
                 </h:form>
@@ -53,7 +65,16 @@
                     <p:panel header="Filtros" widgetVar="panelFiltros"
                              toggleable="true" toggleSpeed="500">
                         <p:outputPanel id="filtros" styleClass="formgrid grid mb-2">
-
+                            <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4 xl:col-3">
+                                <p:outputLabel for="@next" value="Aseguradora" styleClass="block"/>
+                                <p:selectOneMenu value="#{polizaView.polizaFilter.aseguradora.idAseguradora}" styleClass="w-full mw-auto">
+                                    <f:selectItem itemLabel="Todos" itemValue="#{null}"/>
+                                    <f:selectItems value="#{polizaView.aseguradoraList}" var="aseguradora"
+                                                   itemValue="#{aseguradora.idAseguradora}" itemLabel="#{aseguradora.nombre}"/>
+                                    <p:ajax event="blur"/>
+                                </p:selectOneMenu>
+                                <span class="text-sm hidden"> </span>
+                            </p:outputPanel>
                         </p:outputPanel>
                         <f:facet name="footer">
                             <p:outputPanel styleClass="flex flex-row gap-4 justify-content-end">
@@ -112,6 +133,15 @@
                                 <f:convertNumber maxFractionDigits="2"/>
                             </h:outputText>
                         </p:column>
+                        <p:column headerText="Acciones" width="150">
+                            <p:commandButton id="dtAccionesPolizas" type="button"
+                                             icon="fi fi-rr-menu-dots-vertical" styleClass="rounded-button ui-button-outlined" />
+                            <p:menu overlay="true" trigger="dtAccionesPolizas" my="left top" at="left bottom">
+                                <p:menuitem value="Exportar incisos"/>
+                                <p:menuitem value="Adjuntar póliza"/>
+                                <p:menuitem value="Descargar póliza"/>
+                            </p:menu>
+                        </p:column>
                     </p:dataTable>
                 </h:form>
 
@@ -120,6 +150,8 @@
                                  var="polizaInciso" value="#{polizaView.polizaList}"
                                  rows="50" rowHover="true"
                                  rowKey="#{polizaInciso.idPoliza}" rowIndexVar="index"
+                                 rowSelectMode="add"
+                                 selection="#{vehiculoView.vehiculoSelectedList}"
                                  styleClass="dt-scrollable-x"
                                  scrollable="true" scrollHeight="450"
                                  paginator="true" paginatorPosition="bottom"
@@ -127,11 +159,28 @@
                                  currentPageReportTemplate="{startRecord}-{endRecord} de {totalRecords} registros"
                                  rowsPerPageTemplate="50,100,200,{ShowAll|'Todos'}">
                         <f:facet name="header">
-                            Incisos
+                            <div class="flex justify-content-between align-items-center">
+                                <div class="flex justify-content-start">
+                                    Incisos
+                                </div>
+                                <div class="flex justify-content-end">
+                                    <p:commandButton id="accionesIncisos" type="button" value="Acciones"
+                                                     iconPos="right" icon="fi fi-rr-angle-small-down"
+                                                     styleClass="ui-button-outlined"/>
+                                    <p:menu overlay="true" trigger="accionesIncisos" my="left top" at="left bottom">
+                                        <p:menuitem value="Solicitar pago"/>
+                                        <p:menuitem value="Registrar pago"/>
+                                        <p:menuitem value="Rechazar solicitud"/>
+                                    </p:menu>
+                                </div>
+                            </div>
                         </f:facet>
                         <p:ajax event="rowSelect" update="form_toolbar"/>
                         <p:ajax event="rowUnselect" update="form_toolbar"/>
+                        <p:ajax event="rowSelectCheckbox" update="form_toolbar"/>
+                        <p:ajax event="rowUnselectCheckbox" update="form_toolbar"/>
                         <p:ajax event="toggleSelect" update="form_toolbar"/>
+                        <p:column selectionMode="multiple" style="width:16px;text-align:center"/>
                         <p:column headerText="No." width="40">
                             <h:outputText value="#{index + 1}" />
                         </p:column>
@@ -171,6 +220,14 @@
                         </p:column>
                         <p:column headerText="Baja pendiente" width="150">
                             <h:outputText value="#{polizaInciso.bajaPendiente == 1 ?  'Sí' : ''}"/>
+                        </p:column>
+                        <p:column headerText="Acciones" width="150">
+                            <p:commandButton id="dtAccionesIncisos" type="button"
+                                             icon="fi fi-rr-menu-dots-vertical" styleClass="rounded-button ui-button-outlined" />
+                            <p:menu overlay="true" trigger="dtAccionesIncisos" my="left top" at="left bottom">
+                                <p:menuitem value="Endoso de modificación"/>
+                                <p:menuitem value="Endoso de baja"/>
+                            </p:menu>
                         </p:column>
                     </p:dataTable>
                 </h:form>

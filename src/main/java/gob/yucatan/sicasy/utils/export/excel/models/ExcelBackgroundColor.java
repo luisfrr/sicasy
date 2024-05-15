@@ -7,5 +7,6 @@ public enum ExcelBackgroundColor {
     DARK_BLUE,
     BLUE_GREY,
     RED,
-    DARK_RED
+    DARK_RED,
+    LIGHT_BLUE
 }

@@ -8,6 +8,7 @@ import java.util.Optional;
 public interface IAseguradoraService {
 
     List<Aseguradora> findAllDynamic(Aseguradora aseguradora);
+    List<Aseguradora> findAll();
 
     Optional<Aseguradora> findById(Integer id);
 
