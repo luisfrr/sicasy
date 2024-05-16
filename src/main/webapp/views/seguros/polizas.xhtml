@@ -44,7 +44,7 @@
                             <p:commandButton id="accionesPolizas" type="button" value="Acciones"
                                              iconPos="right" icon="fi fi-rr-angle-small-down"/>
                             <p:menu overlay="true" trigger="accionesPolizas" my="left top" at="left bottom">
-                                <p:menuitem value="Registrar pólizas"/>
+                                <p:menuitem value="Registrar pólizas" ajax="true" action="#{polizaView.abrirRegistroPolizasDialog()}"/>
                                 <p:menuitem value="Registrar endoso de alta"/>
                             </p:menu>
                         </p:toolbarGroup>
@@ -231,7 +231,11 @@
                         </p:column>
                     </p:dataTable>
                 </h:form>
+
             </p:outputPanel>
+
+            <ui:include src="/views/seguros/_registrar_polizas.xhtml"/>
+
             
         </p:outputPanel>
 

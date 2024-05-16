@@ -6,6 +6,7 @@ import lombok.*;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 import java.util.Objects;
 
 @Entity
@@ -45,7 +46,7 @@ public class Poliza implements Cloneable, Serializable {
     @Column(name = "beneficiario_preferente")
     private String beneficiarioPreferente;
 
-    @Column(name = "tipo_cobertura", nullable = false)
+    @Column(name = "tipo_cobertura")
     private String tipoCobertura;
 
     @Column(name = "costo_poliza")
@@ -84,18 +85,18 @@ public class Poliza implements Cloneable, Serializable {
     @Column(name = "creado_por", nullable = false, updatable = false)
     private String creadoPor;
 
-    @Column(name = "fecha_modificacion")
+    @Column(name = "fecha_modificacion", insertable = false)
     @Temporal(TemporalType.TIMESTAMP)
     private Date fechaModificacion;
 
-    @Column(name = "modificado_por")
+    @Column(name = "modificado_por", insertable = false)
     private String modificadoPor;
 
-    @Column(name = "fecha_borrado")
+    @Column(name = "fecha_borrado", insertable = false)
     @Temporal(TemporalType.TIMESTAMP)
     private Date fechaBorrado;
 
-    @Column(name = "borrado_por")
+    @Column(name = "borrado_por", insertable = false)
     private String borradoPor;
 
     @Transient
@@ -107,17 +108,23 @@ public class Poliza implements Cloneable, Serializable {
     @Transient
     private String vehiculoNoSerie;
 
+    @Transient
+    private List<Integer> idAseguradoraList;
+
+    @Transient
+    private List<String> numeroPolizaList;
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Poliza poliza = (Poliza) o;
-        return Objects.equals(aseguradora, poliza.aseguradora) && Objects.equals(numeroPoliza, poliza.numeroPoliza) && Objects.equals(inciso, poliza.inciso) && Objects.equals(vehiculo, poliza.vehiculo);
+        return Objects.equals(aseguradora, poliza.aseguradora) && Objects.equals(numeroPoliza, poliza.numeroPoliza) && Objects.equals(inciso, poliza.inciso) && Objects.equals(vehiculo, poliza.vehiculo) && Objects.equals(estatusRegistro, poliza.estatusRegistro);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(aseguradora, numeroPoliza, inciso, vehiculo);
+        return Objects.hash(aseguradora, numeroPoliza, inciso, vehiculo, estatusRegistro);
     }
 
     @Override

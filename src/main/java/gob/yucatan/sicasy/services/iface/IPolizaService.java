@@ -13,6 +13,9 @@ public interface IPolizaService {
     List<Poliza> findByGrupoPoliza(GrupoPoliza grupoPoliza);
     Poliza findById(Long id);
 
+    void guardarRegistroPoliza(Poliza poliza);
+    List<AcuseImportacion> importarLayoutRegistroPoliza(List<Poliza> polizas, String username);
     List<AcuseImportacion> importar(List<Poliza> polizas, String username);
+
 
 }

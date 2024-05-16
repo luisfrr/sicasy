@@ -13,6 +13,7 @@ import gob.yucatan.sicasy.repository.iface.IAseguradoraRepository;
 import gob.yucatan.sicasy.repository.iface.IPolizaRepository;
 import gob.yucatan.sicasy.services.iface.IPolizaService;
 import gob.yucatan.sicasy.services.iface.IVehiculoService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -23,6 +24,8 @@ import java.util.*;
 @RequiredArgsConstructor
 @Slf4j
 public class PolizaServiceImpl implements IPolizaService {
+
+    private final Integer ESTATUS_REGISTRADA = 1;
 
     private final IPolizaRepository polizaRepository;
     private final IVehiculoService vehiculoService;
@@ -55,6 +58,18 @@ public class PolizaServiceImpl implements IPolizaService {
             specification.add(new SearchCriteria(SearchOperation.IS_NOT_NULL,
                     "",
                     Poliza_.INCISO));
+        }
+
+        if(poliza.getIdAseguradoraList() != null && !poliza.getIdAseguradoraList().isEmpty()) {
+            specification.add(new SearchCriteria(SearchOperation.IN,
+                    poliza.getIdAseguradoraList(),
+                    Poliza_.ASEGURADORA, Aseguradora_.ID_ASEGURADORA));
+        }
+
+        if(poliza.getNumeroPolizaList() != null && !poliza.getNumeroPolizaList().isEmpty()) {
+            specification.add(new SearchCriteria(SearchOperation.IN,
+                    poliza.getNumeroPolizaList(),
+                    Poliza_.NUMERO_POLIZA));
         }
 
         return polizaRepository.findAll(specification);
@@ -137,6 +152,44 @@ public class PolizaServiceImpl implements IPolizaService {
     }
 
     @Override
+    @Transactional
+    public void guardarRegistroPoliza(Poliza poliza) {
+
+        boolean alreadyExists = polizaRepository.existsByIdAseguradoraAndNumeroPolizaAndActiva(poliza.getAseguradora().getIdAseguradora(), poliza.getNumeroPoliza());
+
+        if(alreadyExists)
+            throw new BadRequestException("La póliza ya se encuentra registrada");
+
+        poliza.setFechaCreacion(new Date());
+        poliza.setEstatusRegistro(EstatusRegistro.ACTIVO);
+        poliza.setEstatusPoliza(EstatusPoliza.builder().idEstatusPoliza(ESTATUS_REGISTRADA).build());
+
+        polizaRepository.save(poliza);
+    }
+
+    @Override
+    @Transactional
+    public List<AcuseImportacion> importarLayoutRegistroPoliza(List<Poliza> polizas, String username) {
+        List<AcuseImportacion> acuseImportacionList = new ArrayList<>();
+        this.validarLayoutRegistroPoliza(acuseImportacionList, polizas, username);
+
+        if(acuseImportacionList.stream().anyMatch(acuseImportacion -> acuseImportacion.getError() == 1)) {
+            return acuseImportacionList;
+        }
+
+        try {
+            polizaRepository.saveAll(polizas);
+        } catch (Exception e) {
+            acuseImportacionList.add(AcuseImportacion.builder()
+                    .titulo("Error al guardar la información")
+                    .mensaje(e.getMessage())
+                    .error(1)
+                    .build());
+        }
+        return acuseImportacionList;
+    }
+
+    @Override
     public List<AcuseImportacion> importar(List<Poliza> polizas, String username) {
         List<AcuseImportacion> acuseImportacionList = new ArrayList<>();
 
@@ -169,6 +222,88 @@ public class PolizaServiceImpl implements IPolizaService {
                 .idAseguradora(poliza.getAseguradora().getIdAseguradora())
                 .aseguradora(poliza.getAseguradora().getNombre())
                 .build();
+    }
+
+    private void validarLayoutRegistroPoliza(List<AcuseImportacion> acuseImportacionList, List<Poliza> polizas, String username) {
+        List<Aseguradora> aseguradoras = aseguradoraRepository.findByEstatus(EstatusRegistro.ACTIVO);
+
+        Poliza polizaFilter = Poliza.builder()
+                .idAseguradoraList(polizas.stream().map(Poliza::getIdAseguradora).distinct().toList())
+                .numeroPolizaList(polizas.stream().map(Poliza::getNumeroPoliza).distinct().toList())
+                .estatusRegistro(EstatusRegistro.ACTIVO)
+                .build();
+        List<Poliza> polizaDbList = this.findAllDynamic(polizaFilter);
+
+        for(Poliza poliza : polizas) {
+
+            try {
+                // Validación de campos obligatorios
+                if(poliza.getIdAseguradora() == null)
+                    throw new BadRequestException("El campo Aseguradora es obligatorio");
+                else {
+                    Aseguradora aseguradora = aseguradoras.stream()
+                            .filter(a -> Objects.equals(a.getIdAseguradora(), poliza.getIdAseguradora()))
+                            .findFirst().orElseThrow(() -> new NotFoundException("No se ha logrado obtener la aseguradora: " + poliza.getIdAseguradora()));
+                    poliza.setAseguradora(aseguradora);
+                }
+
+                if(poliza.getNumeroPoliza() == null || poliza.getNumeroPoliza().trim().isEmpty())
+                    throw new BadRequestException("El campo No. Póliza es obligatorio");
+
+                if(polizaDbList.stream()
+                        .anyMatch(p -> Objects.equals(p.getAseguradora().getIdAseguradora(), poliza.getIdAseguradora())
+                                && Objects.equals(p.getNumeroPoliza(), poliza.getNumeroPoliza()))) {
+                    throw new BadRequestException("La póliza ya se encuentra registrada");
+                }
+
+                poliza.setEstatusRegistro(EstatusRegistro.ACTIVO);
+                poliza.setCreadoPor(username);
+                poliza.setFechaCreacion(new Date());
+                poliza.setEstatusPoliza(EstatusPoliza.builder().idEstatusPoliza(ESTATUS_REGISTRADA).build());
+
+            } catch (Exception e) {
+                acuseImportacionList.add(AcuseImportacion.builder()
+                        .titulo(poliza.getNumeroPoliza())
+                        .mensaje(e.getMessage())
+                        .error(1)
+                        .build());
+            }
+        }
+
+        // TODO: Validar los duplicados en el layout
+
+        List<Poliza> polizasDistinctList = polizas.stream()
+                .distinct()
+                .toList();
+
+        List<Poliza> polizasDuplicadas = new ArrayList<>(polizasDistinctList);
+        polizasDuplicadas.removeIf(poliza -> polizas.stream()
+                .anyMatch(p -> Objects.equals(p.getIdAseguradora(), poliza.getIdAseguradora())
+                        && Objects.equals(p.getNumeroPoliza(), poliza.getNumeroPoliza())));
+
+        if(!polizasDuplicadas.isEmpty()) {
+            polizasDuplicadas.forEach(poliza -> acuseImportacionList.add(AcuseImportacion.builder()
+                    .titulo(poliza.getNumeroPoliza())
+                    .mensaje("La póliza esta duplicada en este layout.")
+                    .error(1)
+                    .build()));
+        }
+
+
+//        // Se obtiene una lista única de pólizas
+//        List<Poliza> polizasDistinctList = polizas.stream()
+//                .distinct()
+//                .toList();
+//        // Si es diferente quiere decir que un número de serie se está duplicando en el layout
+//        if(polizasDistinctList.size() != polizas.size()) {
+//            List<Poliza> polizaDuplicadosLayout = new ArrayList<>(polizas);
+//            polizaDuplicadosLayout.removeAll(polizasDistinctList);
+//            polizaDuplicadosLayout.forEach(poliza -> acuseImportacionList.add(AcuseImportacion.builder()
+//                    .titulo(poliza.getNumeroPoliza())
+//                    .mensaje("La póliza esta duplicada en este layout.")
+//                    .error(1)
+//                    .build()));
+//        }
     }
 
     private void validarImportacion(List<AcuseImportacion> acuseImportacionList, List<Poliza> polizas, String username) {
