@@ -270,17 +270,7 @@ public class PolizaServiceImpl implements IPolizaService {
             }
         }
 
-        // TODO: Validar los duplicados en el layout
-
-        List<Poliza> polizasDistinctList = polizas.stream()
-                .distinct()
-                .toList();
-
-        List<Poliza> polizasDuplicadas = new ArrayList<>(polizasDistinctList);
-        polizasDuplicadas.removeIf(poliza -> polizas.stream()
-                .anyMatch(p -> Objects.equals(p.getIdAseguradora(), poliza.getIdAseguradora())
-                        && Objects.equals(p.getNumeroPoliza(), poliza.getNumeroPoliza())));
-
+        List<Poliza> polizasDuplicadas = encontrarDuplicados(polizas);
         if(!polizasDuplicadas.isEmpty()) {
             polizasDuplicadas.forEach(poliza -> acuseImportacionList.add(AcuseImportacion.builder()
                     .titulo(poliza.getNumeroPoliza())
@@ -288,22 +278,6 @@ public class PolizaServiceImpl implements IPolizaService {
                     .error(1)
                     .build()));
         }
-
-
-//        // Se obtiene una lista única de pólizas
-//        List<Poliza> polizasDistinctList = polizas.stream()
-//                .distinct()
-//                .toList();
-//        // Si es diferente quiere decir que un número de serie se está duplicando en el layout
-//        if(polizasDistinctList.size() != polizas.size()) {
-//            List<Poliza> polizaDuplicadosLayout = new ArrayList<>(polizas);
-//            polizaDuplicadosLayout.removeAll(polizasDistinctList);
-//            polizaDuplicadosLayout.forEach(poliza -> acuseImportacionList.add(AcuseImportacion.builder()
-//                    .titulo(poliza.getNumeroPoliza())
-//                    .mensaje("La póliza esta duplicada en este layout.")
-//                    .error(1)
-//                    .build()));
-//        }
     }
 
     private void validarImportacion(List<AcuseImportacion> acuseImportacionList, List<Poliza> polizas, String username) {
@@ -381,4 +355,16 @@ public class PolizaServiceImpl implements IPolizaService {
     }
 
 
+    public static List<Poliza> encontrarDuplicados(List<Poliza> polizas) {
+        Set<Poliza> unicos = new HashSet<>();
+        List<Poliza> duplicados = new ArrayList<>();
+
+        for (Poliza poliza : polizas) {
+            if (!unicos.add(poliza)) { // Si no se puede agregar a 'unicos', es un duplicado
+                duplicados.add(poliza);
+            }
+        }
+
+        return duplicados;
+    }
 }
