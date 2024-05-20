@@ -22,7 +22,7 @@
             <h:form id="form_breadcrumb" styleClass="mb-3">
                 <p:breadCrumb homeDisplay="text">
                     <p:menuitem value="Inicio" ajax="false" action="#{menuSessionBean.goToHome()}"/>
-                    <p:menuitem value="Vehículos"/>
+                    <p:menuitem value="Vehículos" ajax="false" action="#{menuSessionBean.goToVehiculos()}"/>
                 </p:breadCrumb>
             </h:form>
 
@@ -383,7 +383,6 @@
                                     <p:menuitem value="Registrar mantenimiento"
                                                 ajax="true" action="#{vehiculoView.abrirModalRegistroMantenimiento(vehiculo.idVehiculo)}"
                                                 update="growl form_datatable">
-                                        <p:confirm header="Confirmación" message="¿Está seguro que desea restablecer la contraseña del vehiculo?" icon="pi pi-exclamation-triangle"/>
                                     </p:menuitem>
                                 </sec:authorize>
 
@@ -413,6 +412,8 @@
         <ui:include src="/views/arrendamientos/_confirmacion_cambio_estatus.xhtml"/>
 
         <ui:include src="/views/arrendamientos/_adjuntar_fotos_dialog.xhtml"/>
+
+        <ui:include src="_registrar_mantenimiento_vehiculo.xhtml"/>
 
     </p:outputPanel>
 
