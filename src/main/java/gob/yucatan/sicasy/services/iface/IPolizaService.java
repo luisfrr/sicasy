@@ -1,7 +1,6 @@
 package gob.yucatan.sicasy.services.iface;
 
 import gob.yucatan.sicasy.business.dtos.AcuseImportacion;
-import gob.yucatan.sicasy.business.dtos.GrupoPoliza;
 import gob.yucatan.sicasy.business.entities.Poliza;
 
 import java.util.List;
@@ -9,13 +8,12 @@ import java.util.List;
 public interface IPolizaService {
 
     List<Poliza> findAllDynamic(Poliza poliza);
-    List<GrupoPoliza> findGrupoPoliza(Poliza poliza);
-    List<Poliza> findByGrupoPoliza(GrupoPoliza grupoPoliza);
+    List<Poliza> findAll(Poliza poliza);
+    Poliza findFullById(Long id);
     Poliza findById(Long id);
 
-    void guardarRegistroPoliza(Poliza poliza);
-    List<AcuseImportacion> importarLayoutRegistroPoliza(List<Poliza> polizas, String username);
-    List<AcuseImportacion> importar(List<Poliza> polizas, String username);
+    void registrarPoliza(Poliza poliza, String userName);
+    List<AcuseImportacion> importarLayoutRegistro(List<Poliza> polizas, String username);
 
 
 }

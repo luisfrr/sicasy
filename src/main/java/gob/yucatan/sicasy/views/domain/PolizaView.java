@@ -1,7 +1,6 @@
 package gob.yucatan.sicasy.views.domain;
 
 import gob.yucatan.sicasy.business.dtos.AcuseImportacion;
-import gob.yucatan.sicasy.business.dtos.GrupoPoliza;
 import gob.yucatan.sicasy.business.entities.*;
 import gob.yucatan.sicasy.business.exceptions.BadRequestException;
 import gob.yucatan.sicasy.business.exceptions.NotFoundException;
@@ -23,7 +22,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -42,12 +40,12 @@ public class PolizaView implements Serializable {
 
     // Generales
     private @Getter String title;
-    private @Getter Poliza polizaFilter;
-    private @Getter @Setter GrupoPoliza grupoPolizaSelected;
-    private @Getter List<GrupoPoliza> grupoPolizaList;
-    private @Getter List<Poliza> polizaList;
-    private @Getter @Setter List<Poliza> polizaSelectedList;
+    private @Getter @Setter Poliza polizaFilter;
+    private @Getter @Setter Poliza polizaForm;
     private @Getter @Setter Poliza polizaSelected;
+    private @Getter List<Poliza> polizaList;
+    private @Getter List<Inciso> incisoList;
+    private @Getter @Setter List<Inciso> incisoSelectedList;
 
     private @Getter boolean showPanelPolizas;
     private @Getter boolean showRegistrarPolizasDialog;
@@ -74,46 +72,51 @@ public class PolizaView implements Serializable {
         log.info("limpiar filtros de vehiculos");
         this.polizaFilter = new Poliza();
         this.polizaFilter.setAseguradora(new Aseguradora());
-        this.polizaFilter.setEstatusPoliza(new EstatusPoliza());
-        this.polizaFilter.setVehiculo(new Vehiculo());
 
         this.showPanelPolizas = true;
         this.showRegistrarPolizasDialog = false;
 
         this.loadAseguradorasList();
 
-        this.grupoPolizaList = new ArrayList<>();
         this.polizaList = new ArrayList<>();
-        this.grupoPolizaSelected = null;
-        this.polizaSelectedList = new ArrayList<>();
+        this.incisoList = new ArrayList<>();
+        this.polizaSelected = null;
+        this.incisoSelectedList = new ArrayList<>();
         PrimeFaces.current().ajax().update("form_filtros", "form_datatable");
     }
 
     public void buscar() {
         log.info("buscar grupos polizas");
-        this.grupoPolizaList = polizaService.findGrupoPoliza(this.polizaFilter);
+        this.polizaList = polizaService.findAll(this.polizaFilter);
         PrimeFaces.current().ajax().update("form_datatable");
     }
 
     public void verIncisos() {
         log.info("ver incisos polizas");
-        if(this.grupoPolizaSelected != null) {
-            this.polizaList = polizaService.findByGrupoPoliza(this.grupoPolizaSelected);
+        if(this.polizaSelected != null) {
+            this.polizaSelected = polizaService.findFullById(this.polizaSelected.getIdPoliza());
+
+            if(this.polizaSelected.getIncisoSet() != null &&
+                    !this.polizaSelected.getIncisoSet().isEmpty()) {
+                this.incisoList =  new ArrayList<>(polizaSelected.getIncisoSet());
+            } else  {
+                this.incisoList = new ArrayList<>();
+            }
             PrimeFaces.current().ajax().update("form_datatable_incisos");
         }
     }
 
     public void limpiarIncisos() {
         log.info("limpiar incisos polizas");
-        this.polizaList = new ArrayList<>();
+        this.incisoList = new ArrayList<>();
         PrimeFaces.current().ajax().update("form_datatable_incisos");
     }
 
     public void abrirRegistroPolizasDialog() {
         log.info("abrir registro polizas dialog");
         this.showRegistrarPolizasDialog = true;
-        this.polizaSelected = new Poliza();
-        this.polizaSelected.setAseguradora(new Aseguradora());
+        this.polizaForm = new Poliza();
+        this.polizaForm.setAseguradora(new Aseguradora());
         this.acuseImportacionList = new ArrayList<>();
         this.showErrorImportacion = false;
         this.layoutFileUpload = null;
@@ -125,7 +128,7 @@ public class PolizaView implements Serializable {
     public void cerrarRegistroPolizasDialog() {
         log.info("cerrar registro polizas dialog");
         this.showRegistrarPolizasDialog = false;
-        this.polizaSelected = null;
+        this.polizaForm = null;
         this.acuseImportacionList = new ArrayList<>();
         this.showErrorImportacion = false;
         this.layoutFileUpload = null;
@@ -137,9 +140,9 @@ public class PolizaView implements Serializable {
     public void guardarRegistroPoliza() {
         log.info("guardar registro poliza");
         try {
-            if(this.polizaSelected != null) {
-                this.polizaSelected.setCreadoPor(userSessionBean.getUserName());
-                polizaService.guardarRegistroPoliza(this.polizaSelected);
+            if(this.polizaForm != null) {
+                this.polizaForm.setCreadoPor(userSessionBean.getUserName());
+                polizaService.registrarPoliza(this.polizaForm, userSessionBean.getUserName());
                 Messages.addInfo("Se ha guardado correctamente la póliza");
                 this.limpiarFiltros();
                 this.buscar();
@@ -159,7 +162,7 @@ public class PolizaView implements Serializable {
         }
     }
 
-    public void importarLayoutRegistroPolizas(FileUploadEvent event) throws IOException {
+    public void importarLayoutRegistroPolizas(FileUploadEvent event) {
         log.info("importar layout registro polizas");
         UploadedFile file = event.getFile();
         String fileName = file.getFileName();
@@ -195,7 +198,7 @@ public class PolizaView implements Serializable {
         log.info("guardar layout registro polizas");
         try {
             if(this.importPolizaList != null) {
-                this.acuseImportacionList = polizaService.importarLayoutRegistroPoliza(this.importPolizaList,
+                this.acuseImportacionList = polizaService.importarLayoutRegistro(this.importPolizaList,
                         userSessionBean.getUserName());
 
                 // Si alguno marco error entonces no se guardó nada y se muestra el acuse

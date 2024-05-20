@@ -5,9 +5,8 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.io.Serializable;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
+import java.time.LocalDate;
+import java.util.*;
 
 @Entity
 @Table(name = "poliza")
@@ -30,18 +29,13 @@ public class Poliza implements Cloneable, Serializable {
     @Column(name = "numero_poliza", nullable = false)
     private String numeroPoliza;
 
-    @Column(name = "inciso")
-    private String inciso;
+    @Column(name = "fecha_inicio")
+    @Temporal(TemporalType.DATE)
+    private LocalDate fechaInicioVigencia;
 
-    @ManyToOne
-    @JoinColumn(name = "vehiculo_id")
-    private Vehiculo vehiculo;
-
-    @Column(name = "fecha_inicio_vigencia")
-    private Date fechaInicioVigencia;
-
-    @Column(name = "fecha_fin_vigencia")
-    private Date fechaFinVigencia;
+    @Column(name = "fecha_fin")
+    @Temporal(TemporalType.DATE)
+    private LocalDate fechaFinVigencia;
 
     @Column(name = "beneficiario_preferente")
     private String beneficiarioPreferente;
@@ -49,30 +43,14 @@ public class Poliza implements Cloneable, Serializable {
     @Column(name = "tipo_cobertura")
     private String tipoCobertura;
 
-    @Column(name = "costo_poliza")
-    private Double costoPoliza;
-
-    @Column(name = "saldo_poliza")
-    private Double saldoPoliza;
-
-    @Column(name = "tipo_pago")
-    private String tipoPago;
-
-    @Column(name = "observaciones")
-    private String observaciones;
-
-    @Column(name = "baja_pendiente")
-    private Integer bajaPendiente;
-
     @Column(name = "nombre_archivo")
     private String nombreArchivo;
 
     @Column(name = "ruta_archivo")
     private String rutaArchivo;
 
-    @ManyToOne
-    @JoinColumn(name = "estatus_poliza_id")
-    private EstatusPoliza estatusPoliza;
+    @OneToMany(mappedBy = "poliza")
+    private Set<Inciso> incisoSet;
 
     @Column(name = "estatus_registro", nullable = false)
     @Enumerated(EnumType.ORDINAL)
@@ -99,14 +77,18 @@ public class Poliza implements Cloneable, Serializable {
     @Column(name = "borrado_por", insertable = false)
     private String borradoPor;
 
+
     @Transient
-    private boolean incisoNotNull;
+    private Double costoTotal;
+
+    @Transient
+    private Double saldoTotal;
+
+    @Transient
+    private Integer totalIncisos;
 
     @Transient
     private Integer idAseguradora;
-
-    @Transient
-    private String vehiculoNoSerie;
 
     @Transient
     private List<Integer> idAseguradoraList;
@@ -114,17 +96,19 @@ public class Poliza implements Cloneable, Serializable {
     @Transient
     private List<String> numeroPolizaList;
 
+    @Transient boolean fethIncisoSet;
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Poliza poliza = (Poliza) o;
-        return Objects.equals(aseguradora, poliza.aseguradora) && Objects.equals(numeroPoliza, poliza.numeroPoliza) && Objects.equals(inciso, poliza.inciso) && Objects.equals(vehiculo, poliza.vehiculo) && Objects.equals(estatusRegistro, poliza.estatusRegistro);
+        return Objects.equals(aseguradora, poliza.aseguradora) && Objects.equals(numeroPoliza, poliza.numeroPoliza) && Objects.equals(estatusRegistro, poliza.estatusRegistro);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(aseguradora, numeroPoliza, inciso, vehiculo, estatusRegistro);
+        return Objects.hash(aseguradora, numeroPoliza, estatusRegistro);
     }
 
     @Override
@@ -132,8 +116,7 @@ public class Poliza implements Cloneable, Serializable {
         try {
             Poliza clone = (Poliza) super.clone();
             clone.aseguradora = this.aseguradora != null ? this.aseguradora.clone() : null;
-            clone.vehiculo = this.vehiculo != null ? this.vehiculo.clone() : null;
-            clone.estatusPoliza = this.estatusPoliza != null ? this.estatusPoliza.clone() : null;
+            clone.incisoSet = new HashSet<>(this.incisoSet);
             return clone;
         } catch (CloneNotSupportedException e) {
             throw new AssertionError();

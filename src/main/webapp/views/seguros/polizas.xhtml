@@ -91,11 +91,11 @@
                 <h:form id="form_datatable" styleClass="mb-5">
 
                     <p:dataTable id="dt_grupo_poliza"
-                                 var="grupoPoliza" value="#{polizaView.grupoPolizaList}"
+                                 var="poliza" value="#{polizaView.polizaList}"
                                  rows="50" rowHover="true"
-                                 rowKey="#{grupoPoliza.numeroPoliza}" rowIndexVar="index"
+                                 rowKey="#{poliza.idPoliza}" rowIndexVar="index"
                                  selectionMode="single"
-                                 selection="#{polizaView.grupoPolizaSelected}"
+                                 selection="#{polizaView.polizaSelected}"
                                  styleClass="dt-scrollable-x"
                                  scrollable="true" scrollHeight="450"
                                  paginator="true" paginatorPosition="bottom"
@@ -111,27 +111,40 @@
                         <p:column headerText="No." width="40">
                             <h:outputText value="#{index + 1}" />
                         </p:column>
-                        <p:column headerText="No. Póliza" width="180">
-                            <h:outputText value="#{grupoPoliza.numeroPoliza}"/>
+                        <p:column headerText="No. Póliza" width="120">
+                            <h:outputText value="#{poliza.numeroPoliza}"/>
                         </p:column>
                         <p:column headerText="Aseguradora" width="180">
-                            <h:outputText value="#{grupoPoliza.aseguradora}"/>
+                            <h:outputText value="#{poliza.aseguradora.nombre}"/>
                         </p:column>
-                        <p:column headerText="Inicio Vigencia" width="100">
-                            <h:outputText value="#{grupoPoliza.fechaInicio}"/>
+                        <p:column headerText="Fecha Inicio" width="100" styleClass="text-center">
+                            <h:outputText value="#{poliza.fechaInicioVigencia}">
+                                <f:convertDateTime pattern="dd/MM/yyyy"/>
+                            </h:outputText>
                         </p:column>
-                        <p:column headerText="Fin Vigencia" width="150">
-                            <h:outputText value="#{grupoPoliza.fechaFin}"/>
+                        <p:column headerText="Fecha Fin" width="150" styleClass="text-center">
+                            <h:outputText value="#{poliza.fechaFinVigencia}">
+                                <f:convertDateTime pattern="dd/MM/yyyy"/>
+                            </h:outputText>
                         </p:column>
-                        <p:column headerText="Total costo" width="150">
-                            <h:outputText value="#{grupoPoliza.totalCostoPoliza}">
+                        <p:column headerText="Costo total" width="150" styleClass="text-center">
+                            <h:outputText value="#{poliza.costoTotal}">
                                 <f:convertNumber maxFractionDigits="2"/>
                             </h:outputText>
                         </p:column>
-                        <p:column headerText="Total saldo" width="150">
-                            <h:outputText value="#{grupoPoliza.totalSaldoPoliza}">
+                        <p:column headerText="Saldo total" width="150" styleClass="text-center">
+                            <h:outputText value="#{poliza.saldoTotal}">
                                 <f:convertNumber maxFractionDigits="2"/>
                             </h:outputText>
+                        </p:column>
+                        <p:column headerText="Cobertura" width="120">
+                            <h:outputText value="#{poliza.tipoCobertura}"/>
+                        </p:column>
+                        <p:column headerText="Beneficiario" width="200">
+                            <h:outputText value="#{poliza.beneficiarioPreferente}"/>
+                        </p:column>
+                        <p:column headerText="Total incisos" width="120" styleClass="text-center">
+                            <h:outputText value="#{poliza.totalIncisos}"/>
                         </p:column>
                         <p:column headerText="Acciones" width="150">
                             <p:commandButton id="dtAccionesPolizas" type="button"
@@ -147,11 +160,11 @@
 
                 <h:form id="form_datatable_incisos" styleClass="mb-5">
                     <p:dataTable id="dt_incisos"
-                                 var="polizaInciso" value="#{polizaView.polizaList}"
+                                 var="inciso" value="#{polizaView.incisoList}"
                                  rows="50" rowHover="true"
-                                 rowKey="#{polizaInciso.idPoliza}" rowIndexVar="index"
+                                 rowKey="#{inciso.idInciso}" rowIndexVar="index"
                                  rowSelectMode="add"
-                                 selection="#{vehiculoView.vehiculoSelectedList}"
+                                 selection="#{polizaView.incisoSelectedList}"
                                  styleClass="dt-scrollable-x"
                                  scrollable="true" scrollHeight="450"
                                  paginator="true" paginatorPosition="bottom"
@@ -185,42 +198,43 @@
                             <h:outputText value="#{index + 1}" />
                         </p:column>
                         <p:column headerText="Inciso" width="180">
-                            <h:outputText value="#{polizaInciso.inciso}"/>
+                            <h:outputText value="#{inciso.inciso}"/>
                         </p:column>
                         <p:column headerText="Vehículo" width="180">
-                            <h:outputText value="#{polizaInciso.vehiculo != null ? polizaInciso.vehiculo.noSerie : ''}"/>
+                            <h:outputText value="#{inciso.vehiculo != null ? inciso.vehiculo.noSerie : ''}"/>
                         </p:column>
                         <p:column headerText="Fecha inicio" width="150">
-                            <h:outputText value="#{polizaInciso.fechaInicioVigencia}"/>
+                            <h:outputText value="#{inciso.fechaInicioVigencia}"/>
                         </p:column>
                         <p:column headerText="Fecha fin" width="150">
-                            <h:outputText value="#{polizaInciso.fechaFinVigencia}"/>
+                            <h:outputText value="#{inciso.fechaFinVigencia}"/>
                         </p:column>
                         <p:column headerText="Costo" width="150">
-                            <h:outputText value="#{polizaInciso.costoPoliza}">
+                            <h:outputText value="#{inciso.costo}">
                                 <f:convertNumber maxFractionDigits="2"/>
                             </h:outputText>
                         </p:column>
                         <p:column headerText="Saldo" width="150">
-                            <h:outputText value="#{polizaInciso.saldoPoliza}">
+                            <h:outputText value="#{inciso.saldo}">
                                 <f:convertNumber maxFractionDigits="2"/>
                             </h:outputText>
                         </p:column>
-                        <p:column headerText="Beneficiario" width="180">
-                            <h:outputText value="#{polizaInciso.beneficiarioPreferente}"/>
-                        </p:column>
-                        <p:column headerText="Cobertura" width="180">
-                            <h:outputText value="#{polizaInciso.tipoCobertura}"/>
-                        </p:column>
-                        <p:column headerText="Tipo pago" width="180">
-                            <h:outputText value="#{polizaInciso.tipoPago}"/>
-                        </p:column>
-                        <p:column headerText="Observaciones" width="200">
-                            <h:outputText value="#{polizaInciso.observaciones}"/>
+                        <p:column headerText="Frecuencia Pago" width="180">
+                            <h:outputText value="#{inciso.frecuenciaPago}"/>
                         </p:column>
                         <p:column headerText="Baja pendiente" width="150">
-                            <h:outputText value="#{polizaInciso.bajaPendiente == 1 ?  'Sí' : ''}"/>
+                            <h:outputText value="#{inciso.bajaPendienteSiniestro == 1 ?  'Sí' : ''}"/>
                         </p:column>
+                        <p:column headerText="Nota crédito" width="150">
+                            <h:outputText value="#{inciso.tieneNotaCredito == 1 ?  'Sí' : ''}"/>
+                        </p:column>
+                        <p:column headerText="Pagado" width="150">
+                            <h:outputText value="#{inciso.tieneNotaCredito == 1 ?  'Sí' : 'No'}"/>
+                        </p:column>
+                        <p:column headerText="Observaciones" width="200">
+                            <h:outputText value="#{inciso.observaciones}"/>
+                        </p:column>
+
                         <p:column headerText="Acciones" width="150">
                             <p:commandButton id="dtAccionesIncisos" type="button"
                                              icon="fi fi-rr-menu-dots-vertical" styleClass="rounded-button ui-button-outlined" />

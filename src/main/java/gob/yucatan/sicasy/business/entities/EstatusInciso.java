@@ -12,7 +12,7 @@ import java.io.Serializable;
 @Getter
 @Setter
 @Builder
-public class EstatusPoliza implements Cloneable, Serializable {
+public class EstatusInciso implements Cloneable, Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -26,9 +26,9 @@ public class EstatusPoliza implements Cloneable, Serializable {
     private String descripcion;
 
     @Override
-    public EstatusPoliza clone() {
+    public EstatusInciso clone() {
         try {
-            return (EstatusPoliza) super.clone();
+            return (EstatusInciso) super.clone();
         } catch (CloneNotSupportedException e) {
             throw new AssertionError();
         }
