@@ -12,12 +12,14 @@ import gob.yucatan.sicasy.repository.criteria.SearchSpecification;
 import gob.yucatan.sicasy.repository.iface.IAseguradoraRepository;
 import gob.yucatan.sicasy.repository.iface.IPolizaRepository;
 import gob.yucatan.sicasy.services.iface.IPolizaService;
+import gob.yucatan.sicasy.utils.date.DateFormatUtil;
 import jakarta.persistence.criteria.JoinType;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.*;
 
 @Service
@@ -140,6 +142,24 @@ public class PolizaServiceImpl implements IPolizaService {
         if(alreadyExists)
             throw new BadRequestException("La póliza ya se encuentra registrada");
 
+        if(poliza.getFechaInicioStr() == null || poliza.getFechaInicioStr().isEmpty()) {
+            throw new BadRequestException("El campo Fecha Inicio es obligatorio.");
+        }
+
+        if(poliza.getFechaFinStr() == null || poliza.getFechaFinStr().isEmpty()) {
+            throw new BadRequestException("El campo Fecha Inicio es obligatorio.");
+        }
+
+        LocalDate fechaInicio = DateFormatUtil.convertToLocalDate(poliza.getFechaInicioStr(), "yyyy-MM-dd");
+        LocalDate fechaFin = DateFormatUtil.convertToLocalDate(poliza.getFechaFinStr(), "yyyy-MM-dd");
+
+        if(fechaInicio.isAfter(fechaFin)) {
+            throw new BadRequestException("No se puede registrar la póliza con fecha inicio posterior a la fecha fin.");
+        }
+
+        poliza.setFechaInicioVigencia(fechaInicio);
+        poliza.setFechaFinVigencia(fechaFin);
+
         poliza.setEstatusRegistro(EstatusRegistro.ACTIVO);
         poliza.setFechaCreacion(new Date());
         poliza.setCreadoPor(username);
@@ -200,6 +220,24 @@ public class PolizaServiceImpl implements IPolizaService {
                                 && Objects.equals(p.getNumeroPoliza(), poliza.getNumeroPoliza()))) {
                     throw new BadRequestException("La póliza ya se encuentra registrada");
                 }
+
+                if(poliza.getFechaInicioStr() == null || poliza.getFechaInicioStr().isEmpty()) {
+                    throw new BadRequestException("El campo Fecha Inicio es obligatorio.");
+                }
+
+                if(poliza.getFechaFinStr() == null || poliza.getFechaFinStr().isEmpty()) {
+                    throw new BadRequestException("El campo Fecha Inicio es obligatorio.");
+                }
+
+                LocalDate fechaInicio = DateFormatUtil.convertToLocalDate(poliza.getFechaInicioStr(), "yyyy-MM-dd");
+                LocalDate fechaFin = DateFormatUtil.convertToLocalDate(poliza.getFechaFinStr(), "yyyy-MM-dd");
+
+                if(fechaInicio.isAfter(fechaFin)) {
+                    throw new BadRequestException("No se puede registrar la póliza con fecha inicio posterior a la fecha fin.");
+                }
+
+                poliza.setFechaInicioVigencia(fechaInicio);
+                poliza.setFechaFinVigencia(fechaFin);
 
                 poliza.setEstatusRegistro(EstatusRegistro.ACTIVO);
                 poliza.setCreadoPor(username);

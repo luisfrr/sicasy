@@ -96,7 +96,14 @@ public class Poliza implements Cloneable, Serializable {
     @Transient
     private List<String> numeroPolizaList;
 
-    @Transient boolean fethIncisoSet;
+    @Transient
+    private boolean fethIncisoSet;
+
+    @Transient
+    private String fechaInicioStr;
+
+    @Transient
+    private String fechaFinStr;
 
     @Override
     public boolean equals(Object o) {

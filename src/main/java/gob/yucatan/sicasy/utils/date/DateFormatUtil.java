@@ -4,6 +4,8 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 
 @Slf4j
@@ -32,6 +34,22 @@ public class DateFormatUtil {
         DateFormat dateFormat = new SimpleDateFormat(pattern);
         try {
             return dateFormat.parse(date);
+        } catch (Exception e) {
+            log.warn("Could not convert date {} to {}", date, pattern);
+            return null;
+        }
+    }
+
+    public static LocalDate convertToLocalDate(String date, String pattern) {
+        if(date == null || date.isEmpty())
+            return null;
+
+        if(pattern == null || pattern.isEmpty())
+            pattern = "yyyy-MM-dd";
+
+        try {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern(pattern);
+            return LocalDate.parse(date, formatter);
         } catch (Exception e) {
             log.warn("Could not convert date {} to {}", date, pattern);
             return null;

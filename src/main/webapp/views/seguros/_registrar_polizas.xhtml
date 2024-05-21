@@ -39,7 +39,7 @@
 
                   <p:outputPanel styleClass="field col-12 md:col-6">
                      <p:outputLabel for="@next" styleClass="block" value="Fecha inicio"/>
-                     <p:datePicker value="#{polizaView.polizaForm.fechaInicioVigencia}"
+                     <p:datePicker value="#{polizaView.polizaForm.fechaInicioStr}"
                                    placeholder="dd/MM/yyyy" pattern="dd/MM/yyyy"
                                    monthNavigator="true" yearNavigator="true"
                                    showWeek="true" locale="es" required="true"
@@ -48,7 +48,7 @@
 
                   <p:outputPanel styleClass="field col-12 md:col-6">
                      <p:outputLabel for="@next" styleClass="block" value="Fecha fin"/>
-                     <p:datePicker value="#{polizaView.polizaForm.fechaFinVigencia}"
+                     <p:datePicker value="#{polizaView.polizaForm.fechaFinStr}"
                                    placeholder="dd/MM/yyyy" pattern="dd/MM/yyyy"
                                    monthNavigator="true" yearNavigator="true"
                                    showWeek="true" locale="es" required="true"
