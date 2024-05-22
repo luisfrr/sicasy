@@ -153,7 +153,10 @@
                                 <p:menuitem value="Exportar incisos"/>
                                 <p:menuitem value="Adjuntar póliza" ajax="true" action="#{polizaView.abrirAdjuntarPolizaDialog(poliza.idPoliza)}"
                                             oncomplete="Main.changeChooseLabel();" update="growl form_datatable"/>
-                                <p:menuitem value="Descargar póliza"/>
+                                <p:menuitem value="Descargar póliza" ajax="false" onclick="PrimeFaces.monitorDownload(start, stop);"
+                                            disabled="#{poliza.rutaArchivo == null}">
+                                    <p:fileDownload value="#{fileDownloadBean.downloadFileByPath(poliza.rutaArchivo)}" />
+                                </p:menuitem>
                                 <p:menuitem value="Eliminar" ajax="true" action="#{polizaView.eliminarPoliza(poliza.idPoliza)}" disabled="#{poliza.totalIncisos > 0}">
                                     <p:confirm header="Confirmación" message="¿Está seguro que desea eliminar la póliza?" icon="pi pi-exclamation-triangle"/>
                                 </p:menuitem>

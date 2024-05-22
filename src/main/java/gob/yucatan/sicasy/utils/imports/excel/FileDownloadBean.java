@@ -38,14 +38,15 @@ public class FileDownloadBean implements Serializable {
                         "Error", "No se encontró el archivo.");
                 FacesContext.getCurrentInstance().addMessage(null, msg);
             }
-            InputStream input = new FileInputStream(fi);
-            ExternalContext externalContext = FacesContext.getCurrentInstance().getExternalContext();
+            try (InputStream input = new FileInputStream(fi)) {
+                ExternalContext externalContext = FacesContext.getCurrentInstance().getExternalContext();
 
-            return DefaultStreamedContent.builder()
-                    .name(fi.getName())
-                    .contentType(externalContext.getMimeType(fi.getName()))
-                    .stream( () -> input )
-                    .build();
+                return DefaultStreamedContent.builder()
+                        .name(fi.getName())
+                        .contentType(externalContext.getMimeType(fi.getName()))
+                        .stream(() -> input)
+                        .build();
+            }
         }catch (Exception e) {
             log.error(e.getMessage());
             return null;
