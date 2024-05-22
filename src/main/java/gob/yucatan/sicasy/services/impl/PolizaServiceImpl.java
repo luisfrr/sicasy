@@ -12,14 +12,12 @@ import gob.yucatan.sicasy.repository.criteria.SearchSpecification;
 import gob.yucatan.sicasy.repository.iface.IAseguradoraRepository;
 import gob.yucatan.sicasy.repository.iface.IPolizaRepository;
 import gob.yucatan.sicasy.services.iface.IPolizaService;
-import gob.yucatan.sicasy.utils.date.DateFormatUtil;
 import jakarta.persistence.criteria.JoinType;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.util.*;
 
 @Service
@@ -181,6 +179,22 @@ public class PolizaServiceImpl implements IPolizaService {
                     .build());
         }
         return acuseImportacionList;
+    }
+
+    @Override
+    @Transactional
+    public void borrar(Long polizaId, String userName) {
+
+        Poliza poliza = this.findFullById(polizaId);
+
+        if(!poliza.getIncisoSet().isEmpty())
+            throw new BadRequestException("No se puede borrar una poliza que tiene incisos.");
+
+        poliza.setEstatusRegistro(EstatusRegistro.BORRADO);
+        poliza.setFechaBorrado(new Date());
+        poliza.setBorradoPor(userName);
+
+        polizaRepository.save(poliza);
     }
 
     private void validarLayoutRegistroPoliza(List<AcuseImportacion> acuseImportacionList, List<Poliza> polizas, String username) {

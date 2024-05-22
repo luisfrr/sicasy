@@ -231,6 +231,28 @@ public class PolizaView implements Serializable {
         }
     }
 
+    public void eliminarPoliza(Long polizaId) {
+        log.info("eliminar poliza");
+        try {
+            polizaService.borrar(polizaId, userSessionBean.getUserName());
+
+            Messages.addInfo("Se eliminado la póliza correctamente.");
+            this.limpiarFiltros();
+            this.buscar();
+            this.verIncisos();
+
+        } catch (Exception e) {
+            log.error("Error al eliminar una póliza", e);
+            String message;
+            if(e instanceof BadRequestException)
+                message = e.getMessage();
+            else if(e instanceof NotFoundException)
+                message = e.getMessage();
+            else
+                message = "Ocurrió un error inesperado. Intenta de nuevo más tarde.";
+            Messages.addError(message);
+        }
+    }
 
     //region private methods
 

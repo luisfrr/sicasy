@@ -14,6 +14,6 @@ public interface IPolizaService {
 
     void registrarPoliza(Poliza poliza, String userName);
     List<AcuseImportacion> importarLayoutRegistro(List<Poliza> polizas, String username);
-
+    void borrar(Long polizaId, String userName);
 
 }
