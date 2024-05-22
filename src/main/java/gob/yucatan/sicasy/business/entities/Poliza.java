@@ -31,11 +31,11 @@ public class Poliza implements Cloneable, Serializable {
 
     @Column(name = "fecha_inicio")
     @Temporal(TemporalType.DATE)
-    private LocalDate fechaInicioVigencia;
+    private Date fechaInicioVigencia;
 
     @Column(name = "fecha_fin")
     @Temporal(TemporalType.DATE)
-    private LocalDate fechaFinVigencia;
+    private Date fechaFinVigencia;
 
     @Column(name = "beneficiario_preferente")
     private String beneficiarioPreferente;

@@ -142,23 +142,17 @@ public class PolizaServiceImpl implements IPolizaService {
         if(alreadyExists)
             throw new BadRequestException("La póliza ya se encuentra registrada");
 
-        if(poliza.getFechaInicioStr() == null || poliza.getFechaInicioStr().isEmpty()) {
+        if(poliza.getFechaInicioVigencia() == null) {
             throw new BadRequestException("El campo Fecha Inicio es obligatorio.");
         }
 
-        if(poliza.getFechaFinStr() == null || poliza.getFechaFinStr().isEmpty()) {
+        if(poliza.getFechaFinVigencia() == null) {
             throw new BadRequestException("El campo Fecha Inicio es obligatorio.");
         }
 
-        LocalDate fechaInicio = DateFormatUtil.convertToLocalDate(poliza.getFechaInicioStr(), "yyyy-MM-dd");
-        LocalDate fechaFin = DateFormatUtil.convertToLocalDate(poliza.getFechaFinStr(), "yyyy-MM-dd");
-
-        if(fechaInicio.isAfter(fechaFin)) {
+        if(poliza.getFechaInicioVigencia().after(poliza.getFechaFinVigencia())) {
             throw new BadRequestException("No se puede registrar la póliza con fecha inicio posterior a la fecha fin.");
         }
-
-        poliza.setFechaInicioVigencia(fechaInicio);
-        poliza.setFechaFinVigencia(fechaFin);
 
         poliza.setEstatusRegistro(EstatusRegistro.ACTIVO);
         poliza.setFechaCreacion(new Date());
@@ -229,10 +223,10 @@ public class PolizaServiceImpl implements IPolizaService {
                     throw new BadRequestException("El campo Fecha Inicio es obligatorio.");
                 }
 
-                LocalDate fechaInicio = DateFormatUtil.convertToLocalDate(poliza.getFechaInicioStr(), "yyyy-MM-dd");
-                LocalDate fechaFin = DateFormatUtil.convertToLocalDate(poliza.getFechaFinStr(), "yyyy-MM-dd");
+                Date fechaInicio = DateFormatUtil.convertToDate(poliza.getFechaInicioStr(), "yyyy-MM-dd");
+                Date fechaFin = DateFormatUtil.convertToDate(poliza.getFechaFinStr(), "yyyy-MM-dd");
 
-                if(fechaInicio.isAfter(fechaFin)) {
+                if(fechaInicio.after(fechaFin)) {
                     throw new BadRequestException("No se puede registrar la póliza con fecha inicio posterior a la fecha fin.");
                 }
 

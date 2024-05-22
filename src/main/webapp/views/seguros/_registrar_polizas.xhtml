@@ -39,7 +39,7 @@
 
                   <p:outputPanel styleClass="field col-12 md:col-6">
                      <p:outputLabel for="@next" styleClass="block" value="Fecha inicio"/>
-                     <p:datePicker value="#{polizaView.polizaForm.fechaInicioStr}"
+                     <p:datePicker value="#{polizaView.polizaForm.fechaInicioVigencia}"
                                    placeholder="dd/MM/yyyy" pattern="dd/MM/yyyy"
                                    monthNavigator="true" yearNavigator="true"
                                    showWeek="true" locale="es" required="true"
@@ -48,7 +48,7 @@
 
                   <p:outputPanel styleClass="field col-12 md:col-6">
                      <p:outputLabel for="@next" styleClass="block" value="Fecha fin"/>
-                     <p:datePicker value="#{polizaView.polizaForm.fechaFinStr}"
+                     <p:datePicker value="#{polizaView.polizaForm.fechaFinVigencia}"
                                    placeholder="dd/MM/yyyy" pattern="dd/MM/yyyy"
                                    monthNavigator="true" yearNavigator="true"
                                    showWeek="true" locale="es" required="true"
@@ -57,7 +57,8 @@
 
                   <p:outputPanel styleClass="field col-12 md:col-6">
                      <p:outputLabel for="@next" value="Cobertura" styleClass="block"/>
-                     <p:selectOneMenu id="select_anexo" value="#{polizaView.polizaForm.tipoCobertura}" styleClass="w-full mw-auto">
+                     <p:selectOneMenu id="select_anexo" value="#{polizaView.polizaForm.tipoCobertura}"
+                                      styleClass="w-full mw-auto" required="true">
                         <f:selectItem itemLabel="Selecciona uno..."
                                       itemValue="#{null}"/>
                         <f:selectItem itemLabel="RESPONSABILIDAD CIVIL"
