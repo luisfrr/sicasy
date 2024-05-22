@@ -241,7 +241,6 @@ public class PolizaView implements Serializable {
             polizaService.borrar(polizaId, userSessionBean.getUserName());
 
             Messages.addInfo("Se eliminado la póliza correctamente.");
-            this.limpiarFiltros();
             this.buscar();
             this.verIncisos();
 
@@ -287,10 +286,13 @@ public class PolizaView implements Serializable {
                 this.polizaForm.setModificadoPor(userSessionBean.getUserName());
 
                 polizaService.save(this.polizaForm);
-                Messages.addInfo("Se ha guardado correctamente la foto: " + fileName);
+                this.buscar();
+                this.verIncisos();
+                PrimeFaces.current().ajax().update("form_datatable", "form_datatable_incisos", "growl");
+                Messages.addInfo("Se ha guardado correctamente la póliza " + fileName);
 
             } else {
-                Messages.addWarn("No se ha seleccionado el vehículo");
+                Messages.addWarn("No se ha seleccionado la póliza");
             }
         } catch (Exception e) {
             log.error(e.getMessage(), e);
