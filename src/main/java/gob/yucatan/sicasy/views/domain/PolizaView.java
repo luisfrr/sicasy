@@ -175,7 +175,11 @@ public class PolizaView implements Serializable {
                 Class<Poliza> polizaClass = Poliza.class;
                 List<ConfigHeaderExcelModel> list = new ArrayList<>();
                 list.add(ConfigHeaderExcelModel.builder().header("ASEGURADORA").fieldName("idAseguradora").columnIndex(0).build());
-                list.add(ConfigHeaderExcelModel.builder().header("NO_POLIZA").fieldName("numeroPoliza").columnIndex(1).build());
+                list.add(ConfigHeaderExcelModel.builder().header("NO. POLIZA").fieldName("numeroPoliza").columnIndex(1).build());
+                list.add(ConfigHeaderExcelModel.builder().header("FECHA INICIO").fieldName("fechaInicioVigencia").columnIndex(2).dateFormat("dd/MM/yyyy").build());
+                list.add(ConfigHeaderExcelModel.builder().header("FECHA FIN").fieldName("fechaFinVigencia").columnIndex(3).dateFormat("dd/MM/yyyy").build());
+                list.add(ConfigHeaderExcelModel.builder().header("COBERTURA").fieldName("tipoCobertura").columnIndex(4).build());
+                list.add(ConfigHeaderExcelModel.builder().header("BENEFICIARIO").fieldName("beneficiarioPreferente").columnIndex(5).build());
 
                 ImportExcelFile<Poliza> importExcelFile = new ImportExcelFile<>();
                 this.importPolizaList = importExcelFile.processExcelFile(fileContent, polizaClass, list);

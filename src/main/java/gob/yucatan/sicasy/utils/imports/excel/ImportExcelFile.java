@@ -1,5 +1,6 @@
 package gob.yucatan.sicasy.utils.imports.excel;
 
+import gob.yucatan.sicasy.utils.date.DateFormatUtil;
 import gob.yucatan.sicasy.utils.numbers.DoubleUtil;
 import org.apache.poi.ss.usermodel.*;
 import org.springframework.util.StringUtils;
@@ -88,7 +89,7 @@ public class ImportExcelFile<T> {
                 Class<?> fieldType = getFieldClass(entity, fieldName);
 
                 // Convertir el valor de la celda al tipo de dato apropiado
-                Object cellValue = getCellValue(cell, fieldType);
+                Object cellValue = getCellValue(cell, fieldType, header.getDateFormat());
 
                 // Obtener el método setter del campo correspondiente
                 Method setterMethod = entity.getClass().getMethod("set" + StringUtils.capitalize(fieldName), fieldType);
@@ -105,7 +106,7 @@ public class ImportExcelFile<T> {
         return field.getType();
     }
 
-    private Object getCellValue(Cell cell, Class<?> fieldType) {
+    private Object getCellValue(Cell cell, Class<?> fieldType, String dateFormat) {
         // Convertir el valor de la celda al tipo de dato apropiado
         if (fieldType == String.class) {
             try {
@@ -119,7 +120,11 @@ public class ImportExcelFile<T> {
         } else if (fieldType == Double.class) {
             return DoubleUtil.parse(String.valueOf(cell.getNumericCellValue()));
         } else if (fieldType == Date.class) {
-            return cell.getDateCellValue();
+            try {
+                return cell.getDateCellValue();
+            } catch (Exception e) {
+                return DateFormatUtil.convertToDate(cell.getStringCellValue(), dateFormat);
+            }
         } else if (fieldType == Boolean.class) {
             return cell.getBooleanCellValue();
         } else {

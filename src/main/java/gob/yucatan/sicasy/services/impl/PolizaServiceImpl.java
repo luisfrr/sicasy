@@ -199,15 +199,21 @@ public class PolizaServiceImpl implements IPolizaService {
                 // Validación de campos obligatorios
                 if(poliza.getIdAseguradora() == null)
                     throw new BadRequestException("El campo Aseguradora es obligatorio");
-                else {
-                    Aseguradora aseguradora = aseguradoras.stream()
-                            .filter(a -> Objects.equals(a.getIdAseguradora(), poliza.getIdAseguradora()))
-                            .findFirst().orElseThrow(() -> new NotFoundException("No se ha logrado obtener la aseguradora: " + poliza.getIdAseguradora()));
-                    poliza.setAseguradora(aseguradora);
-                }
 
                 if(poliza.getNumeroPoliza() == null || poliza.getNumeroPoliza().trim().isEmpty())
                     throw new BadRequestException("El campo No. Póliza es obligatorio");
+
+                if(poliza.getFechaInicioVigencia() == null) {
+                    throw new BadRequestException("El campo Fecha Inicio es obligatorio. Revise el formato de fecha.");
+                }
+
+                if(poliza.getFechaFinVigencia() == null) {
+                    throw new BadRequestException("El campo Fecha Inicio es obligatorio. Revise el formato de fecha.");
+                }
+
+                if(poliza.getTipoCobertura() == null || poliza.getTipoCobertura().isEmpty()) {
+                    throw new BadRequestException("El campo Cobertura es obligatorio.");
+                }
 
                 if(polizaDbList.stream()
                         .anyMatch(p -> Objects.equals(p.getAseguradora().getIdAseguradora(), poliza.getIdAseguradora())
@@ -215,23 +221,18 @@ public class PolizaServiceImpl implements IPolizaService {
                     throw new BadRequestException("La póliza ya se encuentra registrada");
                 }
 
-                if(poliza.getFechaInicioStr() == null || poliza.getFechaInicioStr().isEmpty()) {
-                    throw new BadRequestException("El campo Fecha Inicio es obligatorio.");
-                }
+                Aseguradora aseguradora = aseguradoras.stream()
+                        .filter(a -> Objects.equals(a.getIdAseguradora(), poliza.getIdAseguradora()))
+                        .findFirst().orElseThrow(() -> new NotFoundException("No se ha logrado obtener la aseguradora: " + poliza.getIdAseguradora()));
+                poliza.setAseguradora(aseguradora);
 
-                if(poliza.getFechaFinStr() == null || poliza.getFechaFinStr().isEmpty()) {
-                    throw new BadRequestException("El campo Fecha Inicio es obligatorio.");
-                }
 
-                Date fechaInicio = DateFormatUtil.convertToDate(poliza.getFechaInicioStr(), "yyyy-MM-dd");
-                Date fechaFin = DateFormatUtil.convertToDate(poliza.getFechaFinStr(), "yyyy-MM-dd");
-
-                if(fechaInicio.after(fechaFin)) {
+                if(poliza.getFechaInicioVigencia().after(poliza.getFechaFinVigencia())) {
                     throw new BadRequestException("No se puede registrar la póliza con fecha inicio posterior a la fecha fin.");
                 }
 
-                poliza.setFechaInicioVigencia(fechaInicio);
-                poliza.setFechaFinVigencia(fechaFin);
+                if(poliza.getBeneficiarioPreferente() == null)
+                    poliza.setBeneficiarioPreferente("");
 
                 poliza.setEstatusRegistro(EstatusRegistro.ACTIVO);
                 poliza.setCreadoPor(username);
