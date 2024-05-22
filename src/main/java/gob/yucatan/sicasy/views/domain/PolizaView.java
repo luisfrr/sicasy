@@ -8,6 +8,7 @@ import gob.yucatan.sicasy.services.iface.IAseguradoraService;
 import gob.yucatan.sicasy.services.iface.IPolizaService;
 import gob.yucatan.sicasy.utils.imports.excel.ConfigHeaderExcelModel;
 import gob.yucatan.sicasy.utils.imports.excel.ImportExcelFile;
+import gob.yucatan.sicasy.utils.imports.excel.SaveFile;
 import gob.yucatan.sicasy.views.beans.Messages;
 import gob.yucatan.sicasy.views.beans.UserSessionBean;
 import jakarta.annotation.PostConstruct;
@@ -24,6 +25,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Component
@@ -49,6 +51,7 @@ public class PolizaView implements Serializable {
 
     private @Getter boolean showPanelPolizas;
     private @Getter boolean showRegistrarPolizasDialog;
+    private @Getter boolean showAdjuntarPolizaDialog;
 
     private @Getter List<Aseguradora> aseguradoraList;
 
@@ -64,17 +67,18 @@ public class PolizaView implements Serializable {
 
     @PostConstruct
     public void init() {
-        this.title = "Polizas";
+        this.title = "Pólizas";
         this.limpiarFiltros();
     }
 
     public void limpiarFiltros() {
-        log.info("limpiar filtros de vehiculos");
+        log.info("limpiar filtros de polizas");
         this.polizaFilter = new Poliza();
         this.polizaFilter.setAseguradora(new Aseguradora());
 
         this.showPanelPolizas = true;
         this.showRegistrarPolizasDialog = false;
+        this.showAdjuntarPolizaDialog = false;
 
         this.loadAseguradorasList();
 
@@ -251,6 +255,46 @@ public class PolizaView implements Serializable {
             else
                 message = "Ocurrió un error inesperado. Intenta de nuevo más tarde.";
             Messages.addError(message);
+        }
+    }
+
+    public void abrirAdjuntarPolizaDialog(Long idPoliza) {
+        log.info("abrir modal adjuntar poliza");
+        this.showAdjuntarPolizaDialog = true;
+        this.polizaForm = polizaService.findById(idPoliza);
+        PrimeFaces.current().ajax().update("adjuntar-poliza-dialog", "form_datatable", "growl");
+        PrimeFaces.current().executeScript("PF('adjuntarPolizaDialog').show();");
+    }
+
+    public void cerrarAdjuntarPolizaDialog() {
+        log.info("cerrar modal adjuntar poliza");
+        this.showAdjuntarPolizaDialog = false;
+        this.polizaForm = null;
+        PrimeFaces.current().ajax().update("adjuntar-poliza-dialog", "form_datatable");
+        PrimeFaces.current().executeScript("PF('adjuntarPolizaDialog').hide();");
+    }
+
+    public void adjuntarPoliza(FileUploadEvent event) {
+        log.info("adjuntar poliza");
+        String fileName = event.getFile().getFileName();
+        try {
+            if(this.polizaForm != null) {
+                String filePath = SaveFile.importFileToPath(event.getFile().getContent(), fileName, FOLDER_POLIZAS);
+
+                this.polizaForm.setRutaArchivo(filePath);
+                this.polizaForm.setNombreArchivo(fileName);
+                this.polizaForm.setFechaModificacion(new Date());
+                this.polizaForm.setModificadoPor(userSessionBean.getUserName());
+
+                polizaService.save(this.polizaForm);
+                Messages.addInfo("Se ha guardado correctamente la foto: " + fileName);
+
+            } else {
+                Messages.addWarn("No se ha seleccionado el vehículo");
+            }
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            Messages.addError("No se ha logrado guardar la foto: " + fileName);
         }
     }
 

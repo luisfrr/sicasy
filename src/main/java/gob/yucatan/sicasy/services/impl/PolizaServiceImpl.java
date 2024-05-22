@@ -133,6 +133,12 @@ public class PolizaServiceImpl implements IPolizaService {
 
     @Override
     @Transactional
+    public void save(Poliza poliza) {
+        polizaRepository.save(poliza);
+    }
+
+    @Override
+    @Transactional
     public void registrarPoliza(Poliza poliza, String username) {
 
         boolean alreadyExists = polizaRepository.existsByIdAseguradoraAndNumeroPolizaAndActiva(poliza.getAseguradora().getIdAseguradora(), poliza.getNumeroPoliza());

@@ -151,7 +151,8 @@
                                              icon="fi fi-rr-menu-dots-vertical" styleClass="rounded-button ui-button-outlined" />
                             <p:menu overlay="true" trigger="dtAccionesPolizas" my="left top" at="left bottom">
                                 <p:menuitem value="Exportar incisos"/>
-                                <p:menuitem value="Adjuntar póliza"/>
+                                <p:menuitem value="Adjuntar póliza" ajax="true" action="#{polizaView.abrirAdjuntarPolizaDialog(poliza.idPoliza)}"
+                                            oncomplete="Main.changeChooseLabel();" update="growl form_datatable"/>
                                 <p:menuitem value="Descargar póliza"/>
                                 <p:menuitem value="Eliminar" ajax="true" action="#{polizaView.eliminarPoliza(poliza.idPoliza)}" disabled="#{poliza.totalIncisos > 0}">
                                     <p:confirm header="Confirmación" message="¿Está seguro que desea eliminar la póliza?" icon="pi pi-exclamation-triangle"/>
@@ -252,6 +253,8 @@
             </p:outputPanel>
 
             <ui:include src="/views/seguros/_registrar_polizas.xhtml"/>
+
+            <ui:include src="/views/seguros/_adjuntar_poliza_dialog.xhtml"/>
 
             
         </p:outputPanel>

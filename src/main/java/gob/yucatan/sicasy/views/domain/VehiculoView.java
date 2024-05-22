@@ -520,7 +520,7 @@ public class VehiculoView implements Serializable {
                         .build();
 
                 vehiculoFotoService.guardarFoto(vehiculoFoto);
-                Messages.addInfo("Se ha gurdado correctamente la foto: " + fileName);
+                Messages.addInfo("Se ha guardado correctamente la foto: " + fileName);
 
                 if(this.showDetailsPanel) {
                     this.vehiculoFotoList = vehiculoFotoService.getVehiculoFotos(this.vehiculoFotoSelected.getIdVehiculo());
