@@ -1,5 +1,6 @@
 package gob.yucatan.sicasy.services.impl;
 
+import gob.yucatan.sicasy.business.dtos.AcuseImportacion;
 import gob.yucatan.sicasy.business.entities.*;
 import gob.yucatan.sicasy.business.enums.EstatusRegistro;
 import gob.yucatan.sicasy.business.exceptions.BadRequestException;
@@ -10,12 +11,14 @@ import gob.yucatan.sicasy.repository.criteria.SearchSpecification;
 import gob.yucatan.sicasy.repository.iface.IIncisoRepository;
 import gob.yucatan.sicasy.repository.iface.IPolizaRepository;
 import gob.yucatan.sicasy.services.iface.IIncisoService;
+import gob.yucatan.sicasy.services.iface.IPolizaService;
 import gob.yucatan.sicasy.utils.date.DateValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -27,7 +30,7 @@ public class IncisoServiceImpl implements IIncisoService {
     private final Integer ESTATUS_REGISTRADO = 1;
 
     private final IIncisoRepository incisoRepository;
-    private final IPolizaRepository polizaRepository;
+    private final IPolizaService polizaService;
 
     @Override
     public List<Inciso> findAllDynamic(Inciso inciso) {
@@ -85,21 +88,20 @@ public class IncisoServiceImpl implements IIncisoService {
     @Transactional
     public void generarEndosoAlta(Inciso inciso, String username) {
 
-        Long idPoliza = inciso.getPoliza().getIdPoliza();
-        Poliza poliza = polizaRepository.findById(idPoliza)
-                .orElseThrow(() -> new NotFoundException("No se ha logrado obtener la póliza."));
-        inciso.setPoliza(poliza);
-
         // Validación de campos
         if(inciso.getPoliza() == null || inciso.getPoliza().getIdPoliza() == null)
             throw new BadRequestException("El campo Póliza es obligatorio");
 
+        Long idPoliza = inciso.getPoliza().getIdPoliza();
+        Poliza poliza = polizaService.findById(idPoliza);
+
+        if(poliza.getEstatusRegistro() == EstatusRegistro.BORRADO)
+            throw new NotFoundException("No se ha logrado obtener la póliza.");
+
         if(inciso.getInciso() == null || inciso.getInciso().isEmpty())
             throw new BadRequestException("El campo Inciso es obligatorio");
 
-        if(inciso.getVehiculo() == null
-                || inciso.getVehiculo().getNoSerie() == null
-                || inciso.getVehiculo().getNoSerie().isEmpty())
+        if(inciso.getVehiculo() == null || inciso.getVehiculo().getIdVehiculo() == null)
             throw new BadRequestException("El campo No. Serie es obligatorio");
 
         if(inciso.getFolioFactura() == null || inciso.getFolioFactura().isEmpty())
@@ -123,7 +125,8 @@ public class IncisoServiceImpl implements IIncisoService {
         if(inciso.getFechaInicioVigencia().after(inciso.getFechaFinVigencia()))
             throw new BadRequestException("La fecha inicio de vigencia no puede ser posterior a la fecha fin de vigencia");
 
-        // TODO: Validar si ya existe el inciso
+        if(incisoRepository.existsByIdPolizaAndIncisoAndIdVehiculo(poliza.getIdPoliza(), inciso.getInciso(), inciso.getVehiculo().getIdVehiculo()))
+            throw new BadRequestException("La póliza ya existe.");
 
         // Se agrega el saldo
         if(inciso.getCosto() > 0)
@@ -131,8 +134,8 @@ public class IncisoServiceImpl implements IIncisoService {
         else
             inciso.setSaldo(0d);
 
+        inciso.setPoliza(poliza);
         inciso.setEstatusInciso(EstatusInciso.builder().idEstatusPoliza(ESTATUS_REGISTRADO).build());
-
         inciso.setEstatusRegistro(EstatusRegistro.ACTIVO);
         inciso.setFechaCreacion(new Date());
         inciso.setCreadoPor(username);
@@ -141,7 +144,37 @@ public class IncisoServiceImpl implements IIncisoService {
     }
 
     @Override
-    public void importarEndosoAlta(List<Inciso> incisos, String username) {
+    @Transactional
+    public List<AcuseImportacion> importarEndosoAlta(List<Inciso> incisos, String username) {
+        List<AcuseImportacion> acuseImportacionList = new ArrayList<>();
+        this.validarLayoutRegistroEndosoAlta(acuseImportacionList, incisos, username);
+
+        if(acuseImportacionList.stream().anyMatch(acuseImportacion -> acuseImportacion.getError() == 1)) {
+            return acuseImportacionList;
+        }
+
+        try {
+            incisoRepository.saveAll(incisos);
+        } catch (Exception e) {
+            acuseImportacionList.add(AcuseImportacion.builder()
+                    .titulo("Error al guardar la información")
+                    .mensaje(e.getMessage())
+                    .error(1)
+                    .build());
+        }
+        return acuseImportacionList;
+    }
+
+
+    private void validarLayoutRegistroEndosoAlta(List<AcuseImportacion> acuseImportacionList, List<Inciso> incisos, String username) {
+
+        Poliza polizaFilter = Poliza.builder()
+                .idAseguradoraList(incisos.stream().map(Inciso::getPolizaIdAseguradora).distinct().toList())
+                .numeroPolizaList(incisos.stream().map(Inciso::getPolizaNoPoliza).distinct().toList())
+                .estatusRegistro(EstatusRegistro.ACTIVO)
+                .build();
+        List<Poliza> polizaDbList = polizaService.findAllDynamic(polizaFilter);
+
 
     }
 }

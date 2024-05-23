@@ -48,10 +48,13 @@ public class PolizaView implements Serializable {
     private @Getter List<Poliza> polizaList;
     private @Getter List<Inciso> incisoList;
     private @Getter @Setter List<Inciso> incisoSelectedList;
+    private @Getter @Setter Inciso incisoSelected;
+    private @Getter @Setter Inciso incisoForm;
 
     private @Getter boolean showPanelPolizas;
     private @Getter boolean showRegistrarPolizasDialog;
     private @Getter boolean showAdjuntarPolizaDialog;
+    private @Getter boolean showRegistrarEndosoAltaDialog;
 
     private @Getter List<Aseguradora> aseguradoraList;
 
@@ -59,6 +62,7 @@ public class PolizaView implements Serializable {
     private @Getter @Setter List<AcuseImportacion> acuseImportacionList;
     private @Getter @Setter String layoutFileUpload;
     private @Getter @Setter List<Poliza> importPolizaList;
+    private @Getter @Setter List<Inciso> importIncisoList;
 
     private final UserSessionBean userSessionBean;
     private final IPolizaService polizaService;
@@ -298,6 +302,33 @@ public class PolizaView implements Serializable {
             log.error(e.getMessage(), e);
             Messages.addError("No se ha logrado guardar la foto: " + fileName);
         }
+    }
+
+    public void abrirRegistroEndosoAltaDialog() {
+        log.info("abrir modal registrar endoso de alta");
+        this.showRegistrarEndosoAltaDialog = true;
+        this.incisoForm = new Inciso();
+        this.incisoForm.setPoliza(new Poliza());
+        this.incisoForm.getPoliza().setAseguradora(new Aseguradora());
+        this.incisoForm.setVehiculo(new Vehiculo());
+        this.acuseImportacionList = new ArrayList<>();
+        this.showErrorImportacion = false;
+        this.layoutFileUpload = null;
+        this.importIncisoList = null;
+        PrimeFaces.current().ajax().update("registrar-endoso-alta-dialog-content", "growl");
+        PrimeFaces.current().executeScript("PF('registrarEndosoAltaDialog').show();");
+    }
+
+    public void cerrarRegistroEndosoAltaDialog() {
+        log.info("cerrar modal registrar endoso de alta");
+        this.showRegistrarEndosoAltaDialog = false;
+        this.incisoForm = null;
+        this.acuseImportacionList = new ArrayList<>();
+        this.showErrorImportacion = false;
+        this.layoutFileUpload = null;
+        this.importIncisoList = null;
+        PrimeFaces.current().ajax().update("registrar-endoso-alta-dialog-content");
+        PrimeFaces.current().executeScript("PF('registrarEndosoAltaDialog').hide();");
     }
 
     //region private methods

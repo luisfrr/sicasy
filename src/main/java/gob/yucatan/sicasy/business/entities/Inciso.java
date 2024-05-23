@@ -100,6 +100,9 @@ public class Inciso implements Cloneable, Serializable {
     private String vehiculoNoSerie;
 
     @Transient
+    private Integer polizaIdAseguradora;
+
+    @Transient
     private String polizaNoPoliza;
 
 

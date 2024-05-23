@@ -1,5 +1,6 @@
 package gob.yucatan.sicasy.services.iface;
 
+import gob.yucatan.sicasy.business.dtos.AcuseImportacion;
 import gob.yucatan.sicasy.business.entities.Inciso;
 
 import java.util.List;
@@ -11,6 +12,6 @@ public interface IIncisoService {
     Inciso findById(Long id);
 
     void generarEndosoAlta(Inciso inciso, String username);
-    void importarEndosoAlta(List<Inciso> incisos, String username);
+    List<AcuseImportacion> importarEndosoAlta(List<Inciso> incisos, String username);
 
 }

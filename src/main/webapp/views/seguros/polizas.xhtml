@@ -45,7 +45,7 @@
                                              iconPos="right" icon="fi fi-rr-angle-small-down"/>
                             <p:menu overlay="true" trigger="accionesPolizas" my="left top" at="left bottom">
                                 <p:menuitem value="Registrar pólizas" ajax="true" action="#{polizaView.abrirRegistroPolizasDialog()}"/>
-                                <p:menuitem value="Registrar endoso de alta"/>
+                                <p:menuitem value="Registrar endoso de alta" ajax="true" action="#{polizaView.abrirRegistroEndosoAltaDialog()}"/>
                             </p:menu>
                         </p:toolbarGroup>
                         <p:toolbarGroup align="right">
@@ -258,6 +258,8 @@
             <ui:include src="/views/seguros/_registrar_polizas.xhtml"/>
 
             <ui:include src="/views/seguros/_adjuntar_poliza_dialog.xhtml"/>
+
+            <ui:include src="/views/seguros/_registrar_endoso_alta.xhtml"/>
 
             
         </p:outputPanel>
