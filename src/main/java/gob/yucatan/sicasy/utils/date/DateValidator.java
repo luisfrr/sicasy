@@ -1,6 +1,5 @@
 package gob.yucatan.sicasy.utils.date;
 
-import java.time.format.DateTimeParseException;
 import java.util.Date;
 
 public class DateValidator {
