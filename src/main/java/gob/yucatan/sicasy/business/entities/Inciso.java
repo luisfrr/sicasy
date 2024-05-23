@@ -26,7 +26,7 @@ public class Inciso implements Cloneable, Serializable {
     @JoinColumn(name = "poliza_id", nullable = false)
     private Poliza poliza;
 
-    @Column(name = "inciso")
+    @Column(name = "inciso", nullable = false)
     private String inciso;
 
     @ManyToOne
@@ -36,10 +36,10 @@ public class Inciso implements Cloneable, Serializable {
     @Column(name = "folio_factura", nullable = false)
     private String folioFactura;
 
-    @Column(name = "fecha_inicio_vigencia")
+    @Column(name = "fecha_inicio_vigencia", nullable = false)
     private Date fechaInicioVigencia;
 
-    @Column(name = "fecha_fin_vigencia")
+    @Column(name = "fecha_fin_vigencia", nullable = false)
     private Date fechaFinVigencia;
 
     @Column(name = "tipo_cobertura")
