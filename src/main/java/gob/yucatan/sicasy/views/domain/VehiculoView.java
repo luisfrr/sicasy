@@ -74,6 +74,7 @@ public class VehiculoView implements Serializable {
     private @Getter @Setter Vehiculo vehiculoFilter;
     private @Getter boolean showVehiculosPanel; // Seccion completa de filtrado
     private @Getter @Setter List<VehiculoFoto> vehiculoFotoList;
+    private @Getter @Setter List<MantenimientoFoto> mantenimientoFotoList;
     private @Getter List<ResponsiveOption> responsiveOptions;
     private @Getter List<Integer> idEstatusVehiculoList;
 
@@ -125,6 +126,7 @@ public class VehiculoView implements Serializable {
     private final IGeneratorExcelFile generatorExcelFile;
     private final ITipoMantenimientoService tipoMantenimientoService;
     private final IMantenimientoService mantenimientoService;
+    private final IMantenimientoFotoService mantenimientoFotoService;
 
 
     @PostConstruct
@@ -173,6 +175,7 @@ public class VehiculoView implements Serializable {
         this.vehiculoList = new ArrayList<>();
         this.vehiculoSelectedList = new ArrayList<>();
         this.vehiculoFotoList = new ArrayList<>();
+        this.mantenimientoFotoList = new ArrayList<>();
         PrimeFaces.current().ajax().update("form_filtros");
     }
 
@@ -514,19 +517,28 @@ public class VehiculoView implements Serializable {
     public void guardarMantenimientoVehiculo(){
 
         try{
-            this.mantenimientoVehiculo.setCreadoPor(userSessionBean.getUserName());
-            this.mantenimientoVehiculo.setFechaCreacion(new Date());
-            this.mantenimientoVehiculo.setEstatus(EstatusRegistro.ACTIVO);
+            if(this.mantenimientoVehiculo.getTipoMantenimiento().getIdTipoMantenimiento() != null &&
+                this.mantenimientoVehiculo.getDescripcion() != null && !this.mantenimientoVehiculo.getDescripcion()
+                .isEmpty() && this.mantenimientoVehiculo.getFechaInicio() != null) {
+                this.mantenimientoVehiculo.setCreadoPor(userSessionBean.getUserName());
+                this.mantenimientoVehiculo.setFechaCreacion(new Date());
+                this.mantenimientoVehiculo.setEstatus(EstatusRegistro.ACTIVO);
 
-            mantenimientoService.save(mantenimientoVehiculo);
+                mantenimientoService.save(mantenimientoVehiculo);
 
-            FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_INFO,
-                    "Operación exitosa", "Se ha guardado correctamente la información");
-            FacesContext.getCurrentInstance().addMessage(null, msg);
-            PrimeFaces.current().executeScript("PF('registroMantenimientoDialog').hide();");
-            this.buscar();
-            this.mantenimientoVehiculo  = new Mantenimiento();
-            this.mantenimientoVehiculo.setTipoMantenimiento(new TipoMantenimiento());
+                FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_INFO,
+                        "Operación exitosa", "Se ha guardado correctamente la información");
+                FacesContext.getCurrentInstance().addMessage(null, msg);
+                PrimeFaces.current().executeScript("PF('registroMantenimientoDialog').hide();");
+                this.buscar();
+                this.mantenimientoVehiculo  = new Mantenimiento();
+                this.mantenimientoVehiculo.setTipoMantenimiento(new TipoMantenimiento());
+            }else {
+                FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_INFO,
+                        "Atención", "Se necesita mas información para guardar el registro.");
+                FacesContext.getCurrentInstance().addMessage(null, msg);
+            }
+
 
         }catch (Exception ex){
             String message;
@@ -581,6 +593,40 @@ public class VehiculoView implements Serializable {
         PrimeFaces.current().executeScript("PF('adjuntarFotosDialog').hide();");
     }
 
+    public void subirFotoMantenimiento(FileUploadEvent event){
+        log.info("subirFotoMantenimiento");
+        String fileName = event.getFile().getFileName();
+        try {
+            if(this.mantenimientoVehiculo != null) {
+                String filePath = SaveFile.importFileToPath(event.getFile().getContent(), fileName, FOLDER_VEHICULOS);
+
+                MantenimientoFoto mantenimientoFoto = MantenimientoFoto.builder()
+                        .mantenimiento(mantenimientoVehiculo)
+                        .rutaArchivo(filePath)
+                        .nombreArchivo(fileName)
+                        .fechaCreacion(new Date())
+                        .creadoPor(userSessionBean.getUserName())
+                        .borrado(0)
+                        .build();
+
+
+                mantenimientoFotoService.guardarFoto(mantenimientoFoto);
+                Messages.addInfo("Se ha guardado correctamente la foto: " + fileName);
+
+                if(this.showDetailsPanel) {
+                    this.mantenimientoFotoList = mantenimientoFotoService.getFotosMantenimientos(mantenimientoVehiculo.getIdMantenimiento());
+                    PrimeFaces.current().ajax().update("tab_view_detalles:form_galeria_");
+                }
+            } else {
+                Messages.addWarn("No se ha seleccionado el mantenimiento del vehiculo");
+            }
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            Messages.addError("No se ha logrado guardar la foto: " + fileName);
+        }
+
+    }
+
     public void subirFotoVehiculo(FileUploadEvent event) {
         log.info("subir foto vehiculo");
         String fileName = event.getFile().getFileName();
@@ -598,7 +644,7 @@ public class VehiculoView implements Serializable {
                         .build();
 
                 vehiculoFotoService.guardarFoto(vehiculoFoto);
-                Messages.addInfo("Se ha gurdado correctamente la foto: " + fileName);
+                Messages.addInfo("Se ha guardado correctamente la foto: " + fileName);
 
                 if(this.showDetailsPanel) {
                     this.vehiculoFotoList = vehiculoFotoService.getVehiculoFotos(this.vehiculoFotoSelected.getIdVehiculo());

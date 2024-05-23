@@ -67,8 +67,8 @@
                        for="id_calendar2" />
             </p:outputPanel>
 
-            <p:outputPanel styleClass="field col-12 mb-5">
-               <p:fileUpload listener="#{vehiculoView.subirFotoVehiculo}" mode="advanced" dragDropSupport="true"
+            <p:outputPanel styleClass="field col-12 mb-5" rendered="false">
+               <p:fileUpload listener="#{vehiculoView.subirFotoMantenimiento}" mode="advanced" dragDropSupport="true"
                              chooseButtonTitle="Elegir" chooseLabel="Elegir"
                              cancelButtonTitle="Cancelar" cancelLabel="Cancelar"
                              uploadButtonTitle="Subir" uploadLabel="Subir"
