@@ -136,6 +136,9 @@ public class Vehiculo implements Cloneable, Serializable {
     @Transient
     private List<Integer> idEstatusVehiculoList;
 
+    @Transient
+    private List<String> noSerieList;
+
 
     @Override
     public Vehiculo clone() {

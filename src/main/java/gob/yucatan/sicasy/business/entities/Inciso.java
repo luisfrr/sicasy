@@ -6,6 +6,7 @@ import lombok.*;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 import java.util.Objects;
 
 @Entity
@@ -105,6 +106,14 @@ public class Inciso implements Cloneable, Serializable {
     @Transient
     private String polizaNoPoliza;
 
+    @Transient
+    private List<Long> idPolizaList;
+
+    @Transient
+    private List<String> incisoList;
+
+    @Transient
+    private List<String> vehiculoNoSerieList;
 
 
     @Override

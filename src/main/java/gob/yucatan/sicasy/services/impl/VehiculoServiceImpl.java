@@ -108,6 +108,11 @@ public class VehiculoServiceImpl implements IVehiculoService {
                     vehiculo.getEstatusRegistro(),
                     Vehiculo_.ESTATUS_REGISTRO));
 
+        if(vehiculo.getNoSerieList() != null && !vehiculo.getNoSerieList().isEmpty())
+            specification.add(new SearchCriteria(SearchOperation.IN,
+                    vehiculo.getNoSerieList(),
+                    Vehiculo_.NO_SERIE));
+
         return vehiculoRepository.findAll(specification);
     }
 

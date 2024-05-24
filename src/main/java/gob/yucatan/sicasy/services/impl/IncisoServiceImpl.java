@@ -12,15 +12,14 @@ import gob.yucatan.sicasy.repository.iface.IIncisoRepository;
 import gob.yucatan.sicasy.repository.iface.IPolizaRepository;
 import gob.yucatan.sicasy.services.iface.IIncisoService;
 import gob.yucatan.sicasy.services.iface.IPolizaService;
+import gob.yucatan.sicasy.services.iface.IVehiculoService;
 import gob.yucatan.sicasy.utils.date.DateValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -31,6 +30,7 @@ public class IncisoServiceImpl implements IIncisoService {
 
     private final IIncisoRepository incisoRepository;
     private final IPolizaService polizaService;
+    private final IVehiculoService vehiculoService;
 
     @Override
     public List<Inciso> findAllDynamic(Inciso inciso) {
@@ -64,6 +64,24 @@ public class IncisoServiceImpl implements IIncisoService {
             specification.add(new SearchCriteria(SearchOperation.EQUAL,
                     inciso.getTipoCobertura(),
                     Inciso_.TIPO_COBERTURA));
+        }
+
+        if(inciso.getIdPolizaList() != null && !inciso.getIdPolizaList().isEmpty()){
+            specification.add(new SearchCriteria(SearchOperation.IN,
+                    inciso.getIdPolizaList(),
+                    Inciso_.POLIZA, Poliza_.ID_POLIZA));
+        }
+
+        if(inciso.getIncisoList() != null && !inciso.getIncisoList().isEmpty()){
+            specification.add(new SearchCriteria(SearchOperation.IN,
+                    inciso.getIncisoList(),
+                    Inciso_.INCISO));
+        }
+
+        if(inciso.getVehiculoNoSerieList() != null && !inciso.getVehiculoNoSerieList().isEmpty()){
+            specification.add(new SearchCriteria(SearchOperation.IN,
+                    inciso.getVehiculoNoSerieList(),
+                    Inciso_.VEHICULO, Vehiculo_.NO_SERIE));
         }
 
         return incisoRepository.findAll(specification);
@@ -175,6 +193,113 @@ public class IncisoServiceImpl implements IIncisoService {
                 .build();
         List<Poliza> polizaDbList = polizaService.findAllDynamic(polizaFilter);
 
+        Vehiculo vehiculoFilter = Vehiculo.builder()
+                .noSerieList(incisos.stream().map(Inciso::getVehiculoNoSerie).toList())
+                .estatusRegistro(EstatusRegistro.ACTIVO)
+                .build();
+        List<Vehiculo> vehiculoDbList = vehiculoService.findAllDynamic(vehiculoFilter);
 
+        Inciso incisoFilter = Inciso.builder()
+                .idPolizaList(polizaDbList.stream().map(Poliza::getIdPoliza).distinct().toList())
+                .incisoList(incisos.stream().map(Inciso::getInciso).toList())
+                .vehiculoNoSerieList(incisos.stream().map(Inciso::getVehiculoNoSerie).distinct().toList())
+                .estatusRegistro(EstatusRegistro.ACTIVO)
+                .build();
+        List<Inciso> incisoDbList = this.findAllDynamic(incisoFilter);
+
+        for (Inciso inciso : incisos) {
+
+            try {
+                // Validación de campos
+                if(inciso.getPolizaIdAseguradora() == null)
+                    throw new BadRequestException("El campo Aseguradora es obligatorio");
+
+                if(inciso.getPolizaNoPoliza() == null)
+                    throw new BadRequestException("El campo No. Póliza es obligatorio");
+
+                Poliza poliza = polizaDbList.stream()
+                        .filter(p -> Objects.equals(p.getAseguradora().getIdAseguradora(), inciso.getPolizaIdAseguradora())
+                                && Objects.equals(p.getNumeroPoliza(), inciso.getPolizaNoPoliza()))
+                        .findFirst().orElseThrow(() -> new BadRequestException("No se ha encontrado la información de la póliza"));
+
+                if(inciso.getInciso() == null || inciso.getInciso().isEmpty())
+                    throw new BadRequestException("El campo Inciso es obligatorio");
+
+                if(inciso.getVehiculoNoSerie() == null || inciso.getVehiculoNoSerie().isEmpty())
+                    throw new BadRequestException("El campo No. Serie es obligatorio");
+
+                if(vehiculoDbList.stream().noneMatch(v -> Objects.equals(v.getNoSerie(), inciso.getVehiculoNoSerie()))) {
+                    throw new BadRequestException("No se ha encontrado la información del vehículo");
+                }
+
+                if(inciso.getFolioFactura() == null || inciso.getFolioFactura().isEmpty())
+                    throw new BadRequestException("El campo Folio factura es obligatorio");
+
+                if(inciso.getFechaInicioVigencia() == null)
+                    throw new BadRequestException("El campo Fecha inicio de vigencia es obligatorio");
+
+                if(inciso.getFechaFinVigencia() == null)
+                    throw new BadRequestException("El campo Fecha fin de vigencia es obligatorio");
+
+                if(inciso.getCosto() < 0)
+                    throw new BadRequestException("El campo Costo no puede ser menor a 0.");
+
+                if(DateValidator.isDateBetween(poliza.getFechaInicioVigencia(), poliza.getFechaFinVigencia(), inciso.getFechaInicioVigencia()))
+                    throw new BadRequestException("La fecha inicio de vigencia debe estar entre la fecha inicio y fecha fin de la póliza");
+
+                if(DateValidator.isDateBetween(poliza.getFechaInicioVigencia(), poliza.getFechaFinVigencia(), inciso.getFechaFinVigencia()))
+                    throw new BadRequestException("La fecha fin de vigencia debe estar entre la fecha inicio y fecha fin de la póliza");
+
+                if(inciso.getFechaInicioVigencia().after(inciso.getFechaFinVigencia()))
+                    throw new BadRequestException("La fecha inicio de vigencia no puede ser posterior a la fecha fin de vigencia");
+
+                if(incisoDbList.stream().anyMatch(i -> Objects.equals(i.getPoliza().getIdPoliza(), poliza.getIdPoliza())
+                        && Objects.equals(i.getInciso(), inciso.getInciso())
+                        && Objects.equals(i.getVehiculo().getNoSerie(), inciso.getVehiculoNoSerie()))) {
+                    throw new BadRequestException("La póliza ya existe.");
+                }
+
+                // Se agrega el saldo
+                if(inciso.getCosto() > 0)
+                    inciso.setSaldo(-inciso.getCosto());
+                else
+                    inciso.setSaldo(0d);
+
+                inciso.setPoliza(poliza);
+                inciso.setEstatusInciso(EstatusInciso.builder().idEstatusPoliza(ESTATUS_REGISTRADO).build());
+                inciso.setEstatusRegistro(EstatusRegistro.ACTIVO);
+                inciso.setFechaCreacion(new Date());
+                inciso.setCreadoPor(username);
+            } catch (Exception e) {
+                acuseImportacionList.add(AcuseImportacion.builder()
+                        .titulo(inciso.getInciso())
+                        .mensaje(e.getMessage())
+                        .error(1)
+                        .build());
+            }
+
+        }
+
+        List<Inciso> incisosDuplicados = encontrarDuplicados(incisos);
+        if(!incisosDuplicados.isEmpty()) {
+            incisosDuplicados.forEach(poliza -> acuseImportacionList.add(AcuseImportacion.builder()
+                    .titulo(poliza.getInciso())
+                    .mensaje("El inciso está duplicada en este layout.")
+                    .error(1)
+                    .build()));
+        }
+    }
+
+    public static List<Inciso> encontrarDuplicados(List<Inciso> incisos) {
+        Set<Inciso> unicos = new HashSet<>();
+        List<Inciso> duplicados = new ArrayList<>();
+
+        for (Inciso inciso : incisos) {
+            if (!unicos.add(inciso)) { // Si no se puede agregar a 'unicos', es un duplicado
+                duplicados.add(inciso);
+            }
+        }
+
+        return duplicados;
     }
 }
