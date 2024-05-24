@@ -89,6 +89,8 @@ public class VehiculoView implements Serializable {
 
     // mantenimiento vehiculos
     private @Getter boolean fechaFinalValida;
+    private @Getter List<Mantenimiento> mantenimientoVehiculoList;
+    private @Getter List<BitacoraVehiculo> bitacoraVehiculoList;
 
     // Se usa para los filtros
     private @Getter List<Dependencia> dependenciaList;
@@ -127,6 +129,7 @@ public class VehiculoView implements Serializable {
     private final ITipoMantenimientoService tipoMantenimientoService;
     private final IMantenimientoService mantenimientoService;
     private final IMantenimientoFotoService mantenimientoFotoService;
+    private final IBitacoraVehiculoService bitacoraVehiculoService;
 
 
     @PostConstruct
@@ -176,6 +179,8 @@ public class VehiculoView implements Serializable {
         this.vehiculoSelectedList = new ArrayList<>();
         this.vehiculoFotoList = new ArrayList<>();
         this.mantenimientoFotoList = new ArrayList<>();
+        this.mantenimientoVehiculoList = new ArrayList<>();
+        this.bitacoraVehiculoList = new ArrayList<>();
         PrimeFaces.current().ajax().update("form_filtros");
     }
 
@@ -451,6 +456,8 @@ public class VehiculoView implements Serializable {
         this.loadAnexosForm();
 
         this.vehiculoFotoList = vehiculoFotoService.getVehiculoFotos(this.vehiculoSelected.getIdVehiculo());
+        this.mantenimientoVehiculoList = mantenimientoService.findByVehiculoId(vehiculo.getIdVehiculo());
+        this.bitacoraVehiculoList = bitacoraVehiculoService.findByVehiculoId(vehiculo.getIdVehiculo());
 
         PrimeFaces.current().ajax().update("container");
     }
@@ -519,7 +526,8 @@ public class VehiculoView implements Serializable {
         try{
             if(this.mantenimientoVehiculo.getTipoMantenimiento().getIdTipoMantenimiento() != null &&
                 this.mantenimientoVehiculo.getDescripcion() != null && !this.mantenimientoVehiculo.getDescripcion()
-                .isEmpty() && this.mantenimientoVehiculo.getFechaInicio() != null) {
+                .isEmpty()) {
+
                 this.mantenimientoVehiculo.setCreadoPor(userSessionBean.getUserName());
                 this.mantenimientoVehiculo.setFechaCreacion(new Date());
                 this.mantenimientoVehiculo.setEstatus(EstatusRegistro.ACTIVO);
@@ -534,8 +542,8 @@ public class VehiculoView implements Serializable {
                 this.mantenimientoVehiculo  = new Mantenimiento();
                 this.mantenimientoVehiculo.setTipoMantenimiento(new TipoMantenimiento());
             }else {
-                FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_INFO,
-                        "Atención", "Se necesita mas información para guardar el registro.");
+                FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_WARN,
+                        "Atención", "Seleccione un tipo de mantenimiento y escriba una descripción para guardar el registro.");
                 FacesContext.getCurrentInstance().addMessage(null, msg);
             }
 
@@ -568,7 +576,8 @@ public class VehiculoView implements Serializable {
             }else
                 fechaFinalValida = true;
 
-        }
+        }else
+            fechaFinalValida = true;
 
         PrimeFaces.current().ajax().update("form_registrar_mantenimiento:bnt_saveRegistro");
 
