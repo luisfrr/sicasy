@@ -521,6 +521,37 @@ public class VehiculoView implements Serializable {
 
     }
 
+    public void abrirModalEditarMantenimiento(Mantenimiento mantenimiento) {
+        this.mantenimientoVehiculo = mantenimiento;
+        PrimeFaces.current().ajax().update("form_registrar_mantenimiento", "growl");
+        PrimeFaces.current().executeScript("PF('registroMantenimientoDialog').show();");
+    }
+
+    public void doEliminarMatenimiento(Mantenimiento mantenimiento) {
+        log.info("prepare to eliminar");
+        this.mantenimientoVehiculo = mantenimiento;
+    }
+
+    public void eliminarMantenimiento(){
+
+        this.mantenimientoVehiculo.setBorradoPor(userSessionBean.getUserName());
+        this.mantenimientoVehiculo.setFechaBorrado(new Date());
+        this.mantenimientoVehiculo.setEstatus(EstatusRegistro.BORRADO);
+
+        try{
+            mantenimientoService.save(mantenimientoVehiculo);
+            this.mantenimientoVehiculoList = mantenimientoService.findByVehiculoId(mantenimientoVehiculo.getVehiculo().getIdVehiculo());
+
+            Messages.addInfo("Atención","Se ha eliminado la información");
+            PrimeFaces.current().ajax().update("tab_view_detalles:form_bitacoras:dt_mantenimiento", "growl");
+            PrimeFaces.current().executeScript("PF('confirmDialog').hide();");
+
+        }catch (Exception e){
+            Messages.addError(e.getMessage());
+        }
+
+    }
+
     public void guardarMantenimientoVehiculo(){
 
         try{
@@ -528,15 +559,25 @@ public class VehiculoView implements Serializable {
                 this.mantenimientoVehiculo.getDescripcion() != null && !this.mantenimientoVehiculo.getDescripcion()
                 .isEmpty()) {
 
-                this.mantenimientoVehiculo.setCreadoPor(userSessionBean.getUserName());
-                this.mantenimientoVehiculo.setFechaCreacion(new Date());
-                this.mantenimientoVehiculo.setEstatus(EstatusRegistro.ACTIVO);
+                if (this.mantenimientoVehiculo.getIdMantenimiento() != null){
+                    // update data
+                    this.mantenimientoVehiculo.setModificadoPor(userSessionBean.getUserName());
+                    this.mantenimientoVehiculo.setFechaModificacion(new Date());
+
+                }else {
+                    // registro nuevo
+                    this.mantenimientoVehiculo.setCreadoPor(userSessionBean.getUserName());
+                    this.mantenimientoVehiculo.setFechaCreacion(new Date());
+                    this.mantenimientoVehiculo.setEstatus(EstatusRegistro.ACTIVO);
+
+                }
 
                 mantenimientoService.save(mantenimientoVehiculo);
 
                 FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_INFO,
                         "Operación exitosa", "Se ha guardado correctamente la información");
                 FacesContext.getCurrentInstance().addMessage(null, msg);
+                PrimeFaces.current().ajax().update("tab_view_detalles:form_bitacoras:dt_mantenimiento", "growl");
                 PrimeFaces.current().executeScript("PF('registroMantenimientoDialog').hide();");
                 this.buscar();
                 this.mantenimientoVehiculo  = new Mantenimiento();

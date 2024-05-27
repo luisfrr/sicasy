@@ -343,7 +343,7 @@
                   <!--panel de registros de mantenimiento -->
 
                   <p:dataTable var="mantenimiento" value="#{vehiculoView.mantenimientoVehiculoList}"
-                               rows="50" rowHover="true"
+                               rows="50" rowHover="true" id="dt_mantenimiento"
                                rowKey="#{mantenimiento.idMantenimiento}" rowIndexVar="index"
                                styleClass="dt-scrollable-x"
                                scrollable="true"
@@ -388,15 +388,18 @@
                                          />
                         <p:menu overlay="true" trigger="buttonOptions" my="left top" at="left bottom" styleClass="w-16rem">
 
-                              <p:menuitem value="Ver detalle del vehículo"
-                                          ajax="true" update="container"/>
+                              <p:menuitem value="Eliminar mantenimiento" icon="fi fi-rr-trash"
+                                          update="form_confirm_dialog" action="#{vehiculoView.doEliminarMatenimiento(mantenimiento)}"
+                                          oncomplete="PF('confirmDialog').show()"
+                                          ajax="true"/>
 
-                              <p:menuitem value="Registrar mantenimiento"
-                                          update="growl form_datatable">
+                              <p:menuitem value="Editar mantenimiento" icon="fi fi-rr-pencil"
+                                          update="growl tab_view_detalles:form_bitacoras:dt_mantenimiento"
+                                          action="#{vehiculoView.abrirModalEditarMantenimiento(mantenimiento)}">
                               </p:menuitem>
 
-                              <p:menuitem value="Adjuntar fotos"
-                                          update="growl form_datatable">
+                              <p:menuitem value="Adjuntar fotos" icon="fi fi-rr-add-image"
+                                          update="growl dt_mantenimiento">
                               </p:menuitem>
 
                         </p:menu>
@@ -406,11 +409,96 @@
                   </p:dataTable>
 
                   <!--bitacora de actividades -->
+                  <p:dataTable id="dt_bitacora_vehiculo"
+                               var="bitacora" value="#{vehiculoView.bitacoraVehiculoList}"
+                               rows="50" rowHover="true"
+                               rowKey="#{bitacora.idBitacoraVehiculo}" rowIndexVar="index"
+                               styleClass="dt-scrollable-x"
+                               scrollable="true"
+                               paginator="true" paginatorPosition="bottom"
+                               paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                               currentPageReportTemplate="{startRecord}-{endRecord} de {totalRecords} registros"
+                               rowsPerPageTemplate="50,100,200,{ShowAll|'Todos'}">
+
+                     <f:facet name="header">
+                        Bitácora de actividades
+                     </f:facet>
+
+                     <p:column headerText="No." width="50" >
+                        <p:rowToggler />
+                        <h:outputText value="#{index + 1}" styleClass="ml-2"/>
+                     </p:column>
+
+                     <p:column headerText="Actividad" width="250">
+                        <h:outputText value="#{bitacora.accion}"/>
+                     </p:column>
+
+                     <p:column headerText="Fecha" width="80">
+                        <h:outputText value="#{bitacora.fechaModificacion}"/>
+                     </p:column>
+
+                     <p:column headerText="Realizado por" width="100">
+                        <h:outputText value="#{bitacora.modificadoPor}"/>
+                     </p:column>
+
+                     <!--<p:rowExpansion>
+                        <p:dataTable id="dtcambios"
+                                     var="cambios" value="#{bitacora.cambioSet}"
+                                     rowKey="#{cambios.campo}"
+                                     rowHover="true" rowIndexVar="num"
+                                     styleClass="dt-scrollable"
+                                     scrollable="true">
+
+                           <p:column headerText="No." width="30">
+                              <h:outputText value="#{num + 1}" />
+                           </p:column>
+
+                           <p:column headerText="Campo" width="80">
+                              <h:outputText value="#{cambios.campo}"/>
+                           </p:column>
+
+                           <p:column headerText="Anterior" width="120">
+                              <h:outputText value="#{cambios.valorAnterior}"/>
+                           </p:column>
+
+                           <p:column headerText="Nuevo" width="120">
+                              <h:outputText value="#{cambios.valorNuevo}"/>
+                           </p:column>
+
+                        </p:dataTable>
+
+                     </p:rowExpansion>-->
+
+                  </p:dataTable>
+
 
                </p:panel>
             </h:form>
+
          </p:tab>
       </p:tabView>
+
+      <h:form id="form_confirm_dialog">
+         <p:dialog header="Aviso" widgetVar="confirmDialog"
+                   showEffect="fade" modal="true"
+                   closable="true" closeOnEscape="true"
+                   cache="false" responsive="true">
+            <p:outputPanel>
+               <p:outputLabel styleClass="block mb-2" value="¿Está seguro que desea eliminar el registro?"/>
+
+            </p:outputPanel>
+
+            <f:facet name="footer">
+               <p:commandButton value="No" onclick="PF('confirmDialog').hide()"
+                                class="ui-button-outlined"/>
+               <p:commandButton value="Si"
+                                action="#{vehiculoView.eliminarMantenimiento()}"
+                                ajax="true"
+                                update="growl :tab_view_detalles:form_bitacoras:dt_mantenimiento"
+                                validateClient="true"/>
+            </f:facet>
+         </p:dialog>
+      </h:form>
 
    </p:outputPanel>
 
