@@ -9,7 +9,6 @@ import gob.yucatan.sicasy.repository.criteria.SearchCriteria;
 import gob.yucatan.sicasy.repository.criteria.SearchOperation;
 import gob.yucatan.sicasy.repository.criteria.SearchSpecification;
 import gob.yucatan.sicasy.repository.iface.IIncisoRepository;
-import gob.yucatan.sicasy.repository.iface.IPolizaRepository;
 import gob.yucatan.sicasy.services.iface.IIncisoService;
 import gob.yucatan.sicasy.services.iface.IPolizaService;
 import gob.yucatan.sicasy.services.iface.IVehiculoService;
@@ -122,41 +121,13 @@ public class IncisoServiceImpl implements IIncisoService {
         if(inciso.getVehiculo() == null || inciso.getVehiculo().getIdVehiculo() == null)
             throw new BadRequestException("El campo No. Serie es obligatorio");
 
-        if(inciso.getFolioFactura() == null || inciso.getFolioFactura().isEmpty())
-            throw new BadRequestException("El campo Folio factura es obligatorio");
-
-        if(inciso.getFechaInicioVigencia() == null)
-            throw new BadRequestException("El campo Fecha inicio de vigencia es obligatorio");
-
-        if(inciso.getFechaFinVigencia() == null)
-            throw new BadRequestException("El campo Fecha fin de vigencia es obligatorio");
-
-        if(inciso.getCosto() < 0)
-            throw new BadRequestException("El campo Costo no puede ser menor a 0.");
-
-        if(DateValidator.isDateBetween(poliza.getFechaInicioVigencia(), poliza.getFechaFinVigencia(), inciso.getFechaInicioVigencia()))
-            throw new BadRequestException("La fecha inicio de vigencia debe estar entre la fecha inicio y fecha fin de la póliza");
-
-        if(DateValidator.isDateBetween(poliza.getFechaInicioVigencia(), poliza.getFechaFinVigencia(), inciso.getFechaFinVigencia()))
-            throw new BadRequestException("La fecha fin de vigencia debe estar entre la fecha inicio y fecha fin de la póliza");
-
-        if(inciso.getFechaInicioVigencia().after(inciso.getFechaFinVigencia()))
-            throw new BadRequestException("La fecha inicio de vigencia no puede ser posterior a la fecha fin de vigencia");
+        validateIncisoPoliza(inciso, poliza);
 
         if(incisoRepository.existsByIdPolizaAndIncisoAndIdVehiculo(poliza.getIdPoliza(), inciso.getInciso(), inciso.getVehiculo().getIdVehiculo()))
             throw new BadRequestException("La póliza ya existe.");
 
         // Se agrega el saldo
-        if(inciso.getCosto() > 0)
-            inciso.setSaldo(-inciso.getCosto());
-        else
-            inciso.setSaldo(0d);
-
-        inciso.setPoliza(poliza);
-        inciso.setEstatusInciso(EstatusInciso.builder().idEstatusPoliza(ESTATUS_REGISTRADO).build());
-        inciso.setEstatusRegistro(EstatusRegistro.ACTIVO);
-        inciso.setFechaCreacion(new Date());
-        inciso.setCreadoPor(username);
+        setValuesEndosoAlta(username, inciso, poliza);
 
         incisoRepository.save(inciso);
     }
@@ -232,26 +203,7 @@ public class IncisoServiceImpl implements IIncisoService {
                     throw new BadRequestException("No se ha encontrado la información del vehículo");
                 }
 
-                if(inciso.getFolioFactura() == null || inciso.getFolioFactura().isEmpty())
-                    throw new BadRequestException("El campo Folio factura es obligatorio");
-
-                if(inciso.getFechaInicioVigencia() == null)
-                    throw new BadRequestException("El campo Fecha inicio de vigencia es obligatorio");
-
-                if(inciso.getFechaFinVigencia() == null)
-                    throw new BadRequestException("El campo Fecha fin de vigencia es obligatorio");
-
-                if(inciso.getCosto() < 0)
-                    throw new BadRequestException("El campo Costo no puede ser menor a 0.");
-
-                if(DateValidator.isDateBetween(poliza.getFechaInicioVigencia(), poliza.getFechaFinVigencia(), inciso.getFechaInicioVigencia()))
-                    throw new BadRequestException("La fecha inicio de vigencia debe estar entre la fecha inicio y fecha fin de la póliza");
-
-                if(DateValidator.isDateBetween(poliza.getFechaInicioVigencia(), poliza.getFechaFinVigencia(), inciso.getFechaFinVigencia()))
-                    throw new BadRequestException("La fecha fin de vigencia debe estar entre la fecha inicio y fecha fin de la póliza");
-
-                if(inciso.getFechaInicioVigencia().after(inciso.getFechaFinVigencia()))
-                    throw new BadRequestException("La fecha inicio de vigencia no puede ser posterior a la fecha fin de vigencia");
+                validateIncisoPoliza(inciso, poliza);
 
                 if(incisoDbList.stream().anyMatch(i -> Objects.equals(i.getPoliza().getIdPoliza(), poliza.getIdPoliza())
                         && Objects.equals(i.getInciso(), inciso.getInciso())
@@ -260,16 +212,8 @@ public class IncisoServiceImpl implements IIncisoService {
                 }
 
                 // Se agrega el saldo
-                if(inciso.getCosto() > 0)
-                    inciso.setSaldo(-inciso.getCosto());
-                else
-                    inciso.setSaldo(0d);
+                setValuesEndosoAlta(username, inciso, poliza);
 
-                inciso.setPoliza(poliza);
-                inciso.setEstatusInciso(EstatusInciso.builder().idEstatusPoliza(ESTATUS_REGISTRADO).build());
-                inciso.setEstatusRegistro(EstatusRegistro.ACTIVO);
-                inciso.setFechaCreacion(new Date());
-                inciso.setCreadoPor(username);
             } catch (Exception e) {
                 acuseImportacionList.add(AcuseImportacion.builder()
                         .titulo(inciso.getInciso())
@@ -290,7 +234,43 @@ public class IncisoServiceImpl implements IIncisoService {
         }
     }
 
-    public static List<Inciso> encontrarDuplicados(List<Inciso> incisos) {
+    private void validateIncisoPoliza(Inciso inciso, Poliza poliza) {
+        if(inciso.getFolioFactura() == null || inciso.getFolioFactura().isEmpty())
+            throw new BadRequestException("El campo Folio factura es obligatorio");
+
+        if(inciso.getFechaInicioVigencia() == null)
+            throw new BadRequestException("El campo Fecha inicio de vigencia es obligatorio");
+
+        if(inciso.getFechaFinVigencia() == null)
+            throw new BadRequestException("El campo Fecha fin de vigencia es obligatorio");
+
+        if(inciso.getCosto() < 0)
+            throw new BadRequestException("El campo Costo no puede ser menor a 0.");
+
+        if(DateValidator.isDateBetween(poliza.getFechaInicioVigencia(), poliza.getFechaFinVigencia(), inciso.getFechaInicioVigencia()))
+            throw new BadRequestException("La fecha inicio de vigencia debe estar entre la fecha inicio y fecha fin de la póliza");
+
+        if(DateValidator.isDateBetween(poliza.getFechaInicioVigencia(), poliza.getFechaFinVigencia(), inciso.getFechaFinVigencia()))
+            throw new BadRequestException("La fecha fin de vigencia debe estar entre la fecha inicio y fecha fin de la póliza");
+
+        if(inciso.getFechaInicioVigencia().after(inciso.getFechaFinVigencia()))
+            throw new BadRequestException("La fecha inicio de vigencia no puede ser posterior a la fecha fin de vigencia");
+    }
+
+    private void setValuesEndosoAlta(String username, Inciso inciso, Poliza poliza) {
+        if(inciso.getCosto() > 0)
+            inciso.setSaldo(-inciso.getCosto());
+        else
+            inciso.setSaldo(0d);
+
+        inciso.setPoliza(poliza);
+        inciso.setEstatusInciso(EstatusInciso.builder().idEstatusPoliza(ESTATUS_REGISTRADO).build());
+        inciso.setEstatusRegistro(EstatusRegistro.ACTIVO);
+        inciso.setFechaCreacion(new Date());
+        inciso.setCreadoPor(username);
+    }
+
+    private static List<Inciso> encontrarDuplicados(List<Inciso> incisos) {
         Set<Inciso> unicos = new HashSet<>();
         List<Inciso> duplicados = new ArrayList<>();
 
