@@ -5,7 +5,9 @@ import gob.yucatan.sicasy.business.entities.*;
 import gob.yucatan.sicasy.business.exceptions.BadRequestException;
 import gob.yucatan.sicasy.business.exceptions.NotFoundException;
 import gob.yucatan.sicasy.services.iface.IAseguradoraService;
+import gob.yucatan.sicasy.services.iface.IIncisoService;
 import gob.yucatan.sicasy.services.iface.IPolizaService;
+import gob.yucatan.sicasy.services.iface.IVehiculoService;
 import gob.yucatan.sicasy.utils.imports.excel.ConfigHeaderExcelModel;
 import gob.yucatan.sicasy.utils.imports.excel.ImportExcelFile;
 import gob.yucatan.sicasy.utils.imports.excel.SaveFile;
@@ -57,6 +59,8 @@ public class PolizaView implements Serializable {
     private @Getter boolean showRegistrarEndosoAltaDialog;
 
     private @Getter List<Aseguradora> aseguradoraList;
+    private @Getter List<Poliza> polizaFormList;
+    private @Getter String informacionVehiculo;
 
     private @Getter boolean showErrorImportacion;
     private @Getter @Setter List<AcuseImportacion> acuseImportacionList;
@@ -67,6 +71,8 @@ public class PolizaView implements Serializable {
     private final UserSessionBean userSessionBean;
     private final IPolizaService polizaService;
     private final IAseguradoraService aseguradoraService;
+    private final IIncisoService incisoService;
+    private final IVehiculoService vehiculoService;
 
 
     @PostConstruct
@@ -315,6 +321,7 @@ public class PolizaView implements Serializable {
         this.showErrorImportacion = false;
         this.layoutFileUpload = null;
         this.importIncisoList = null;
+        this.informacionVehiculo = "";
         PrimeFaces.current().ajax().update("registrar-endoso-alta-dialog-content", "growl");
         PrimeFaces.current().executeScript("PF('registrarEndosoAltaDialog').show();");
     }
@@ -327,14 +334,95 @@ public class PolizaView implements Serializable {
         this.showErrorImportacion = false;
         this.layoutFileUpload = null;
         this.importIncisoList = null;
+        this.informacionVehiculo = null;
         PrimeFaces.current().ajax().update("registrar-endoso-alta-dialog-content");
         PrimeFaces.current().executeScript("PF('registrarEndosoAltaDialog').hide();");
     }
+
+    public void guardarEndosoAlta() {
+        log.info("guardar endoso de alta");
+        try {
+            if(this.incisoForm != null) {
+                incisoService.generarEndosoAlta(this.incisoForm, userSessionBean.getUserName());
+                Messages.addInfo("Se ha guardado correctamente el endoso de alta");
+
+                this.buscar();
+                this.verIncisos();
+                this.cerrarRegistroEndosoAltaDialog();
+            }
+        } catch (Exception e) {
+            log.error("Error al guardar el endoso de alta", e);
+            String message;
+            if(e instanceof BadRequestException)
+                message = e.getMessage();
+            else if(e instanceof NotFoundException)
+                message = e.getMessage();
+            else
+                message = "Ocurrió un error inesperado. Intenta de nuevo más tarde.";
+            Messages.addError(message);
+        }
+    }
+
+    public void buscarVehiculo() {
+        log.info("buscar vehiculos");
+        try {
+            if(this.incisoForm != null && this.incisoForm.getVehiculo() != null) {
+
+                if(this.incisoForm.getVehiculo().getNoSerie() != null) {
+
+                    Vehiculo vehiculo = vehiculoService.findByNoSerie(this.incisoForm.getVehiculo().getNoSerie());
+
+                    this.informacionVehiculo = String.join(" | ",
+                            vehiculo.getNoSerie(),
+                            vehiculo.getMarca(),
+                            vehiculo.getAnio().toString(),
+                            vehiculo.getModelo(),
+                            vehiculo.getColor(),
+                            vehiculo.getDescripcionVehiculo());
+                } else {
+                    this.informacionVehiculo = "";
+                }
+            }
+        } catch (Exception e) {
+            log.error("Error al buscar un vehículo", e);
+            String message;
+            if(e instanceof BadRequestException)
+                message = e.getMessage();
+            else if(e instanceof NotFoundException)
+                message = e.getMessage();
+            else
+                message = "Ocurrió un error inesperado. Intenta de nuevo más tarde.";
+            Messages.addError(message);
+        }
+    }
+
+    //region events
+
+    public void onChangeAseguradoraForm() {
+        if(this.incisoForm != null && this.incisoForm.getPoliza() != null && this.incisoForm.getPoliza().getAseguradora() != null) {
+            this.loadPolizaFormList(this.incisoForm.getPoliza().getAseguradora().getIdAseguradora());
+        }
+        else {
+            this.loadPolizaFormList(null);
+        }
+
+    }
+
+    //endregion
 
     //region private methods
 
     private void loadAseguradorasList() {
         this.aseguradoraList = aseguradoraService.findAll();
+    }
+
+    private void loadPolizaFormList(Integer idAseguradora) {
+        if(idAseguradora != null) {
+            this.polizaFormList = polizaService.findDropdown(idAseguradora);
+        }
+        else {
+            this.polizaFormList = new ArrayList<>();
+        }
     }
 
     //endregion private methods

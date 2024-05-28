@@ -8,7 +8,7 @@
 
    <p:dialog header="Registrar endoso de alta"
              id="registrar-endoso-alta-dialog" widgetVar="registrarEndosoAltaDialog"
-             height="450" width="800"
+             height="450" width="1000"
              showEffect="fade" modal="true"
              closable="true" closeOnEscape="true"
              cache="false" responsive="true">
@@ -17,6 +17,101 @@
             <p:tab id="registro-individual" title="Registro individual">
                <h:form id="endoso-alta-indiv-form" styleClass="formgrid grid">
 
+                  <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4">
+                     <p:outputLabel for="@next" value="Aseguradora" styleClass="block"/>
+                     <p:selectOneMenu value="#{polizaView.incisoForm.poliza.aseguradora.idAseguradora}"
+                                      styleClass="w-full mw-auto" required="true">
+                        <f:selectItem itemLabel="Seleccione uno..." itemValue="#{null}"/>
+                        <f:selectItems value="#{polizaView.aseguradoraList}" var="aseguradora"
+                                       itemValue="#{aseguradora.idAseguradora}" itemLabel="#{aseguradora.nombre}"/>
+                        <p:ajax event="change" listener="#{polizaView.onChangeAseguradoraForm()}" process="@this" update="endoso-alta-indiv-form"/>
+                     </p:selectOneMenu>
+                     <span class="text-sm hidden"> </span>
+                  </p:outputPanel>
+
+                  <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4">
+                     <p:outputLabel for="@next" value="Póliza" styleClass="block"/>
+                     <p:selectOneMenu value="#{polizaView.incisoForm.poliza.idPoliza}"
+                                      styleClass="w-full mw-auto" required="true"
+                                      filter="true" filterMatchMode="contains" filterNormalize="true">
+                        <f:selectItem itemLabel="Seleccione uno..." itemValue="#{null}"/>
+                        <f:selectItems value="#{polizaView.polizaFormList}" var="poliza"
+                                       itemValue="#{poliza.idPoliza}" itemLabel="#{poliza.numeroPoliza}"/>
+                     </p:selectOneMenu>
+                     <span class="text-sm hidden"> </span>
+                  </p:outputPanel>
+
+                  <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4">
+                     <div class="flex justify-content-start align-items-end h-full">
+                        <div class="flex flex-column align-items-start w-full mr-3">
+                           <p:outputLabel for="no_serie_vehiculo" value="No. Serie Vehículo" styleClass="block"/>
+                           <p:inputText id="no_serie_vehiculo" styleClass="block w-full" required="true"
+                                        value="#{polizaView.incisoForm.vehiculo.noSerie}"/>
+                           <span class="text-sm hidden"> </span>
+                        </div>
+                        <div class="flex">
+                           <p:commandButton icon="fi fi-rr-search" title="Buscar"
+                                            styleClass="ui-button-outlined"
+                                            action="#{polizaView.buscarVehiculo()}"
+                                            process="@this,no_serie_vehiculo"
+                                            update="endoso-alta-indiv-form:info_vehiculo"/>
+                        </div>
+                     </div>
+                  </p:outputPanel>
+
+                  <p:outputPanel styleClass="field col-12">
+                     <p:outputLabel for="info_vehiculo" value="Información del vehículo" styleClass="block"/>
+                     <p:inputText id="info_vehiculo" styleClass="block w-full" required="true" readonly="true"
+                                  value="#{polizaView.informacionVehiculo}"/>
+                     <span class="text-sm hidden"> </span>
+                  </p:outputPanel>
+
+                  <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4">
+                     <p:outputLabel for="@next" value="Folio factura" styleClass="block"/>
+                     <p:inputText styleClass="block w-full" required="true"
+                                  value="#{polizaView.incisoForm.folioFactura}"/>
+                     <span class="text-sm hidden"> </span>
+                  </p:outputPanel>
+
+                  <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4">
+                     <p:outputLabel for="@next" styleClass="block" value="Fecha inicio"/>
+                     <p:datePicker value="#{polizaView.incisoForm.fechaInicioVigencia}"
+                                   placeholder="dd/MM/yyyy" pattern="dd/MM/yyyy"
+                                   monthNavigator="true" yearNavigator="true"
+                                   showWeek="true" locale="es" required="true"
+                                   styleClass="w-full"/>
+                  </p:outputPanel>
+
+                  <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4">
+                     <p:outputLabel for="@next" styleClass="block" value="Fecha fin"/>
+                     <p:datePicker value="#{polizaView.incisoForm.fechaFinVigencia}"
+                                   placeholder="dd/MM/yyyy" pattern="dd/MM/yyyy"
+                                   monthNavigator="true" yearNavigator="true"
+                                   showWeek="true" locale="es" required="true"
+                                   styleClass="w-full"/>
+                  </p:outputPanel>
+
+                  <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4">
+                     <p:outputLabel for="@next" styleClass="block" value="Costo"/>
+                     <p:inputNumber styleClass="block w-full" required="true"
+                                  value="#{polizaView.incisoForm.costo}"/>
+                  </p:outputPanel>
+
+                  <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4">
+                     <p:outputLabel for="@next" value="Frecuencia de pago" styleClass="block"/>
+                     <p:selectOneMenu id="select_anexo" value="#{polizaView.incisoForm.frecuenciaPago}"
+                                      styleClass="w-full mw-auto">
+                        <f:selectItem itemLabel="Selecciona uno..."
+                                      itemValue="#{null}"/>
+                        <f:selectItem itemLabel="MENSUAL"
+                                      itemValue="MENSUAL"/>
+                        <f:selectItem itemLabel="SEMESTRAL"
+                                      itemValue="SEMESTRAL"/>
+                        <f:selectItem itemLabel="ANUAL"
+                                      itemValue="ANUAL"/>
+                     </p:selectOneMenu>
+                     <span class="text-sm hidden"> </span>
+                  </p:outputPanel>
 
                   <p:outputPanel styleClass="field col-12 mt-5 mb-0">
 
@@ -25,7 +120,7 @@
                                          action="#{polizaView.cerrarRegistroEndosoAltaDialog()}"
                                          styleClass="ui-button-outlined mr-4"/>
                         <p:commandButton value="Guardar" ajax="true" process="@form"
-                                         action="#{polizaView.guardarRegistroPoliza()}"
+                                         action="#{polizaView.guardarEndosoAlta()}"
                                          update="growl @form form_datatable"
                                          validateClient="true"/>
                      </p:outputPanel>

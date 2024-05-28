@@ -112,6 +112,12 @@ public class PolizaServiceImpl implements IPolizaService {
     }
 
     @Override
+    public List<Poliza> findDropdown(Integer idAseguradora) {
+        Date hoy = new Date();
+        return polizaRepository.findByAseguradoraAndVigentes(idAseguradora, hoy, EstatusRegistro.ACTIVO);
+    }
+
+    @Override
     public Poliza findFullById(Long id) {
 
         Poliza poliza = Poliza.builder()

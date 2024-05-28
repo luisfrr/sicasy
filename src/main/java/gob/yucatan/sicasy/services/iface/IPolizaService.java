@@ -9,6 +9,7 @@ public interface IPolizaService {
 
     List<Poliza> findAllDynamic(Poliza poliza);
     List<Poliza> findAll(Poliza poliza);
+    List<Poliza> findDropdown(Integer idAseguradora);
     Poliza findFullById(Long id);
     Poliza findById(Long id);
     void save(Poliza poliza);

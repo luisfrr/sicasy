@@ -7,6 +7,8 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 
+import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 
 public interface IPolizaRepository extends JpaRepository<Poliza, Long>, JpaSpecificationExecutor<Poliza> {
@@ -15,5 +17,11 @@ public interface IPolizaRepository extends JpaRepository<Poliza, Long>, JpaSpeci
             select (count(p) > 0) from Poliza p
             where p.aseguradora.idAseguradora = ?1 and p.numeroPoliza = ?2 and p.estatusRegistro = 1""")
     boolean existsByIdAseguradoraAndNumeroPolizaAndActiva(Integer idAseguradora, String numeroPoliza);
+
+    @Query("""
+            select p from Poliza p
+            where p.aseguradora.idAseguradora = ?1 and ?2 between p.fechaInicioVigencia and p.fechaFinVigencia and p.estatusRegistro = ?3
+            order by p.numeroPoliza""")
+    List<Poliza> findByAseguradoraAndVigentes(Integer idAseguradora, Date fecha, EstatusRegistro estatusRegistro);
 
 }
