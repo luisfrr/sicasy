@@ -42,6 +42,13 @@
                   </p:outputPanel>
 
                   <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4">
+                     <p:outputLabel for="@next" value="Inciso" styleClass="block"/>
+                     <p:inputText styleClass="block w-full" required="true"
+                                  value="#{polizaView.incisoForm.inciso}"/>
+                     <span class="text-sm hidden"> </span>
+                  </p:outputPanel>
+
+                  <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4">
                      <div class="flex justify-content-start align-items-end h-full">
                         <div class="flex flex-column align-items-start w-full mr-3">
                            <p:outputLabel for="no_serie_vehiculo" value="No. Serie Vehículo" styleClass="block"/>
@@ -61,8 +68,9 @@
 
                   <p:outputPanel styleClass="field col-12">
                      <p:outputLabel for="info_vehiculo" value="Información del vehículo" styleClass="block"/>
-                     <p:inputText id="info_vehiculo" styleClass="block w-full" required="true" readonly="true"
-                                  value="#{polizaView.informacionVehiculo}"/>
+                     <p:inputTextarea id="info_vehiculo" styleClass="block w-full" required="true"
+                                      readonly="true" rows="2" cols="50"
+                                      value="#{polizaView.informacionVehiculo}"/>
                      <span class="text-sm hidden"> </span>
                   </p:outputPanel>
 
@@ -136,7 +144,7 @@
                      <p:outputLabel for="@next" value="Importar layout" styleClass="block"/>
                      <p:inputTextarea id="dropZoneLayout" widgetVar="dropZoneLayout"
                                       styleClass="w-full dropzone mb-3" rows="6" required="true"
-                                      placeholder="Arrastra y suelta aquí el archivo de importación de vehículos"
+                                      placeholder="Arrastra y suelta aquí el archivo de importación de incisos"
                                       value="#{polizaView.layoutFileUpload}" readonly="true"/>
                      <span class="text-sm">
                                     <p:link value="O haz clic aquí para elegir" onclick="PF('uploadLayout').show();return false"/>

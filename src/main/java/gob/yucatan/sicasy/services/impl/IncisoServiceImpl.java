@@ -118,8 +118,11 @@ public class IncisoServiceImpl implements IIncisoService {
         if(inciso.getInciso() == null || inciso.getInciso().isEmpty())
             throw new BadRequestException("El campo Inciso es obligatorio");
 
-        if(inciso.getVehiculo() == null || inciso.getVehiculo().getIdVehiculo() == null)
+        if(inciso.getVehiculo() == null || inciso.getVehiculo().getNoSerie() == null)
             throw new BadRequestException("El campo No. Serie es obligatorio");
+
+        Vehiculo vehiculo = vehiculoService.findByNoSerie(inciso.getVehiculo().getNoSerie());
+        inciso.setVehiculo(vehiculo);
 
         validateIncisoPoliza(inciso, poliza);
 

@@ -271,7 +271,7 @@ public class PolizaView implements Serializable {
         log.info("abrir modal adjuntar poliza");
         this.showAdjuntarPolizaDialog = true;
         this.polizaForm = polizaService.findById(idPoliza);
-        PrimeFaces.current().ajax().update("adjuntar-poliza-dialog", "form_datatable", "growl");
+        PrimeFaces.current().ajax().update("form_adjuntar_poliza", "form_datatable", "growl");
         PrimeFaces.current().executeScript("PF('adjuntarPolizaDialog').show();");
     }
 
@@ -279,7 +279,7 @@ public class PolizaView implements Serializable {
         log.info("cerrar modal adjuntar poliza");
         this.showAdjuntarPolizaDialog = false;
         this.polizaForm = null;
-        PrimeFaces.current().ajax().update("adjuntar-poliza-dialog", "form_datatable");
+        PrimeFaces.current().ajax().update("form_adjuntar_poliza", "form_datatable");
         PrimeFaces.current().executeScript("PF('adjuntarPolizaDialog').hide();");
     }
 
@@ -306,7 +306,7 @@ public class PolizaView implements Serializable {
             }
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            Messages.addError("No se ha logrado guardar la foto: " + fileName);
+            Messages.addError("No se ha logrado guardar la póliza: " + fileName);
         }
     }
 
@@ -384,15 +384,8 @@ public class PolizaView implements Serializable {
                 }
             }
         } catch (Exception e) {
-            log.error("Error al buscar un vehículo", e);
-            String message;
-            if(e instanceof BadRequestException)
-                message = e.getMessage();
-            else if(e instanceof NotFoundException)
-                message = e.getMessage();
-            else
-                message = "Ocurrió un error inesperado. Intenta de nuevo más tarde.";
-            Messages.addError(message);
+            log.warn("Error al buscar un vehículo", e);
+            Messages.addWarn("No se ha encontrado el vehículo");
         }
     }
 
