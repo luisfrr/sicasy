@@ -204,39 +204,46 @@
                         <p:column headerText="No." width="40">
                             <h:outputText value="#{index + 1}" />
                         </p:column>
-                        <p:column headerText="Inciso" width="180">
+                        <p:column headerText="Inciso" width="120" styleClass="text-center">
                             <h:outputText value="#{inciso.inciso}"/>
                         </p:column>
                         <p:column headerText="Vehículo" width="180">
                             <h:outputText value="#{inciso.vehiculo != null ? inciso.vehiculo.noSerie : ''}"/>
                         </p:column>
-                        <p:column headerText="Fecha inicio" width="150">
-                            <h:outputText value="#{inciso.fechaInicioVigencia}"/>
+                        <p:column headerText="Fecha inicio" width="150" styleClass="text-center">
+                            <h:outputText value="#{inciso.fechaInicioVigencia}">
+                                <f:convertDateTime pattern="dd/MM/yyyy"/>
+                            </h:outputText>
                         </p:column>
-                        <p:column headerText="Fecha fin" width="150">
-                            <h:outputText value="#{inciso.fechaFinVigencia}"/>
+                        <p:column headerText="Fecha fin" width="150" styleClass="text-center">
+                            <h:outputText value="#{inciso.fechaFinVigencia}">
+                                <f:convertDateTime pattern="dd/MM/yyyy"/>
+                            </h:outputText>
                         </p:column>
-                        <p:column headerText="Costo" width="150">
+                        <p:column headerText="Costo" width="150" styleClass="text-center">
                             <h:outputText value="#{inciso.costo}">
                                 <f:convertNumber maxFractionDigits="2"/>
                             </h:outputText>
                         </p:column>
-                        <p:column headerText="Saldo" width="150">
+                        <p:column headerText="Saldo" width="150" styleClass="text-center">
                             <h:outputText value="#{inciso.saldo}">
                                 <f:convertNumber maxFractionDigits="2"/>
                             </h:outputText>
                         </p:column>
-                        <p:column headerText="Frecuencia Pago" width="180">
+                        <p:column headerText="Frecuencia Pago" width="180" styleClass="text-center">
                             <h:outputText value="#{inciso.frecuenciaPago}"/>
                         </p:column>
-                        <p:column headerText="Baja pendiente" width="150">
+                        <p:column headerText="Baja pendiente" width="150"  styleClass="text-center">
                             <h:outputText value="#{inciso.bajaPendienteSiniestro == 1 ?  'Sí' : ''}"/>
                         </p:column>
-                        <p:column headerText="Nota crédito" width="150">
+                        <p:column headerText="Nota crédito" width="150"  styleClass="text-center">
                             <h:outputText value="#{inciso.tieneNotaCredito == 1 ?  'Sí' : ''}"/>
                         </p:column>
-                        <p:column headerText="Pagado" width="150">
+                        <p:column headerText="Pagado" width="80"  styleClass="text-center">
                             <h:outputText value="#{inciso.tieneNotaCredito == 1 ?  'Sí' : 'No'}"/>
+                        </p:column>
+                        <p:column headerText="Estatus" width="150" styleClass="text-center">
+                            <h:outputText value="#{inciso.estatusInciso.nombre}"/>
                         </p:column>
                         <p:column headerText="Observaciones" width="200">
                             <h:outputText value="#{inciso.observaciones}"/>

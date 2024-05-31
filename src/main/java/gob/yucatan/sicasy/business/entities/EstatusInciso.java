@@ -6,7 +6,7 @@ import lombok.*;
 import java.io.Serializable;
 
 @Entity
-@Table(name = "estatus_poliza")
+@Table(name = "estatus_inciso")
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
@@ -16,7 +16,7 @@ public class EstatusInciso implements Cloneable, Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "estatus_poliza_id")
+    @Column(name = "estatus_inciso_id")
     private Integer idEstatusPoliza;
 
     @Column(name = "nombre", nullable = false)

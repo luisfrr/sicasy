@@ -250,10 +250,10 @@ public class IncisoServiceImpl implements IIncisoService {
         if(inciso.getCosto() < 0)
             throw new BadRequestException("El campo Costo no puede ser menor a 0.");
 
-        if(DateValidator.isDateBetween(poliza.getFechaInicioVigencia(), poliza.getFechaFinVigencia(), inciso.getFechaInicioVigencia()))
+        if(!DateValidator.isDateBetween(poliza.getFechaInicioVigencia(), poliza.getFechaFinVigencia(), inciso.getFechaInicioVigencia()))
             throw new BadRequestException("La fecha inicio de vigencia debe estar entre la fecha inicio y fecha fin de la póliza");
 
-        if(DateValidator.isDateBetween(poliza.getFechaInicioVigencia(), poliza.getFechaFinVigencia(), inciso.getFechaFinVigencia()))
+        if(!DateValidator.isDateBetween(poliza.getFechaInicioVigencia(), poliza.getFechaFinVigencia(), inciso.getFechaFinVigencia()))
             throw new BadRequestException("La fecha fin de vigencia debe estar entre la fecha inicio y fecha fin de la póliza");
 
         if(inciso.getFechaInicioVigencia().after(inciso.getFechaFinVigencia()))

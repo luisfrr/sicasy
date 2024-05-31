@@ -90,7 +90,9 @@ public class PolizaServiceImpl implements IPolizaService {
                 int totalIncisos = 0;
 
                 if(currentPoliza.getIncisoSet() != null && !currentPoliza.getIncisoSet().isEmpty()) {
-                    List<Inciso> incisos = new ArrayList<>(currentPoliza.getIncisoSet());
+                    List<Inciso> incisos = new ArrayList<>(currentPoliza.getIncisoSet()).stream()
+                            .filter(i -> i.getEstatusRegistro() == EstatusRegistro.ACTIVO)
+                            .toList();
 
                     costoTotal = incisos.stream()
                             .mapToDouble(Inciso::getCosto)

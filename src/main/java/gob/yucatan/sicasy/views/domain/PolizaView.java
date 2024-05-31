@@ -108,12 +108,10 @@ public class PolizaView implements Serializable {
     public void verIncisos() {
         log.info("ver incisos polizas");
         if(this.polizaSelected != null) {
-            this.polizaSelected = polizaService.findFullById(this.polizaSelected.getIdPoliza());
-
-            if(this.polizaSelected.getIncisoSet() != null &&
-                    !this.polizaSelected.getIncisoSet().isEmpty()) {
-                this.incisoList =  new ArrayList<>(polizaSelected.getIncisoSet());
-            } else  {
+            this.polizaSelected = polizaService.findById(this.polizaSelected.getIdPoliza());
+            if(this.polizaSelected.getIdPoliza() != null) {
+                this.incisoList = incisoService.findByIdPoliza(this.polizaSelected.getIdPoliza());
+            } else {
                 this.incisoList = new ArrayList<>();
             }
             PrimeFaces.current().ajax().update("form_datatable_incisos");
