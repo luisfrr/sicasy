@@ -91,6 +91,7 @@ public class VehiculoView implements Serializable {
     private @Getter boolean fechaFinalValida;
     private @Getter List<Mantenimiento> mantenimientoVehiculoList;
     private @Getter List<BitacoraVehiculo> bitacoraVehiculoList;
+    private @Getter @Setter UploadedFile fotoMantenimiento;
 
     // Se usa para los filtros
     private @Getter List<Dependencia> dependenciaList;
@@ -572,7 +573,11 @@ public class VehiculoView implements Serializable {
 
                 }
 
-                mantenimientoService.save(mantenimientoVehiculo);
+                this.mantenimientoVehiculo = mantenimientoService.save(mantenimientoVehiculo);
+
+                if (fotoMantenimiento != null){
+                    subirFotoMantenimiento();
+                }
 
                 FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_INFO,
                         "Operación exitosa", "Se ha guardado correctamente la información");
@@ -643,12 +648,13 @@ public class VehiculoView implements Serializable {
         PrimeFaces.current().executeScript("PF('adjuntarFotosDialog').hide();");
     }
 
-    public void subirFotoMantenimiento(FileUploadEvent event){
+    public void subirFotoMantenimiento(){
         log.info("subirFotoMantenimiento");
-        String fileName = event.getFile().getFileName();
+        String fileName = ""; // event.getFile().getFileName();
+        fileName = fotoMantenimiento.getFileName();
         try {
             if(this.mantenimientoVehiculo != null) {
-                String filePath = SaveFile.importFileToPath(event.getFile().getContent(), fileName, FOLDER_VEHICULOS);
+                String filePath = SaveFile.importFileToPath(fotoMantenimiento.getContent(), fileName, FOLDER_VEHICULOS);
 
                 MantenimientoFoto mantenimientoFoto = MantenimientoFoto.builder()
                         .mantenimiento(mantenimientoVehiculo)

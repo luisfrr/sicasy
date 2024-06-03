@@ -63,7 +63,7 @@ public class MantenimientoServiceImpl implements IMantenimientoService {
     }
 
     @Override
-    public void save(Mantenimiento mantenimiento) {
+    public Mantenimiento save(Mantenimiento mantenimiento) {
         if(mantenimiento.getIdMantenimiento() != null) {
             Mantenimiento mantenimientoToUpdate = this.findById(mantenimiento.getIdMantenimiento());
             //mantenimientoToUpdate.setVehiculo(mantenimiento.getVehiculo()); // Vehiculo no se puede actualizar
@@ -74,11 +74,11 @@ public class MantenimientoServiceImpl implements IMantenimientoService {
             mantenimientoToUpdate.setTipoMantenimiento(mantenimiento.getTipoMantenimiento());
             mantenimientoToUpdate.setTipoMantenimiento(mantenimiento.getTipoMantenimiento());
 
-            mantenimientoRepository.save(mantenimiento);
+            return mantenimientoRepository.save(mantenimiento);
         } else {
             mantenimiento.setFechaCreacion(new Date());
             mantenimiento.setEstatus(EstatusRegistro.ACTIVO);
-            mantenimientoRepository.save(mantenimiento);
+            return mantenimientoRepository.save(mantenimiento);
         }
     }
 

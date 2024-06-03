@@ -67,8 +67,8 @@
                        for="id_calendar2" />
             </p:outputPanel>
 
-            <p:outputPanel styleClass="field col-12 mb-5" rendered="false">
-               <p:fileUpload listener="#{vehiculoView.subirFotoMantenimiento}" mode="advanced" dragDropSupport="true"
+            <p:outputPanel styleClass="field col-12 mb-5" rendered="true">
+               <!--<p:fileUpload value="#{vehiculoView.fotoMantenimiento}" mode="simple" dragDropSupport="true"
                              chooseButtonTitle="Elegir" chooseLabel="Elegir"
                              cancelButtonTitle="Cancelar" cancelLabel="Cancelar"
                              uploadButtonTitle="Subir" uploadLabel="Subir"
@@ -76,7 +76,19 @@
                              fileLimitMessage="Has superado el número máximo de archivos"
                              invalidFileMessage="Archivo no válido"
                              invalidSizeMessage="Has superado el tamaño máximo por archivo"
-                             allowTypes="/(\.|\/)(jpe?g|png)$/"/>
+                             allowTypes="/(\.|\/)(jpe?g|png)$/"/>-->
+
+               <p:fileUpload value="#{vehiculoView.fotoMantenimiento}"
+                             sizeLimit="10000000"
+                             mode="simple" fileLimit="1"
+                             chooseButtonTitle="Elegir" chooseLabel="Elegir"
+                             cancelButtonTitle="Cancelar" cancelLabel="Cancelar"
+                             uploadButtonTitle="Subir" uploadLabel="Subir"
+                             fileLimitMessage="Has superado el número máximo de archivos"
+                             invalidFileMessage="Archivo no válido"
+                             invalidSizeMessage="Has superado el tamaño máximo por archivo"
+                             allowTypes="/(\.|\/)(jpe?g|png)$/"
+                             skinSimple="true"/>
                <span class="text-sm">Sólo se permiten archivos .jpg, .jpeg y .png. Máximo 5 archivos</span>
             </p:outputPanel>
 
