@@ -102,6 +102,7 @@ public class Vehiculo implements Cloneable, Serializable {
     private String observaciones;
 
     @OneToMany(mappedBy = "vehiculo", fetch = FetchType.LAZY)
+    @ToString.Exclude
     private Set<Inciso> incisoSet;
 
     @Column(name = "estatus_registro", nullable = false)
@@ -144,6 +145,9 @@ public class Vehiculo implements Cloneable, Serializable {
     @Transient
     private List<String> noSerieList;
 
+    @Transient
+    private boolean fetchIncisoSet;
+
 
     @Override
     public Vehiculo clone() {
@@ -178,7 +182,8 @@ public class Vehiculo implements Cloneable, Serializable {
         if(this.incisoSet != null && !this.incisoSet.isEmpty()) {
             Date today = new Date();
             return this.incisoSet.stream()
-                    .filter(i -> DateValidator.isDateBetween(i.getFechaInicioVigencia(), i.getFechaFinVigencia(), today))
+                    .filter(i -> DateValidator.isDateBetween(i.getFechaInicioVigencia(), i.getFechaFinVigencia(), today) &&
+                            i.getEstatusRegistro() == EstatusRegistro.ACTIVO)
                     .findFirst().orElse(null);
         }
         return null;

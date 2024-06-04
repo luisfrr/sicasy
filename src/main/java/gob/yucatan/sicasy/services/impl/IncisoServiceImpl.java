@@ -178,6 +178,7 @@ public class IncisoServiceImpl implements IIncisoService {
         Vehiculo vehiculoFilter = Vehiculo.builder()
                 .noSerieList(incisos.stream().map(Inciso::getVehiculoNoSerie).toList())
                 .estatusRegistro(EstatusRegistro.ACTIVO)
+                .fetchIncisoSet(true)
                 .build();
         List<Vehiculo> vehiculoDbList = vehiculoService.findAllDynamic(vehiculoFilter);
 

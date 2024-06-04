@@ -6,6 +6,7 @@ import gob.yucatan.sicasy.business.enums.EstatusRegistro;
 import gob.yucatan.sicasy.business.exceptions.BadRequestException;
 import gob.yucatan.sicasy.business.exceptions.NotFoundException;
 import gob.yucatan.sicasy.repository.criteria.SearchCriteria;
+import gob.yucatan.sicasy.repository.criteria.SearchFetch;
 import gob.yucatan.sicasy.repository.criteria.SearchOperation;
 import gob.yucatan.sicasy.repository.criteria.SearchSpecification;
 import gob.yucatan.sicasy.repository.iface.IAnexoRepository;
@@ -14,6 +15,7 @@ import gob.yucatan.sicasy.repository.iface.ILicitacionRepository;
 import gob.yucatan.sicasy.repository.iface.IVehiculoRepository;
 import gob.yucatan.sicasy.services.iface.IBitacoraVehiculoService;
 import gob.yucatan.sicasy.services.iface.IVehiculoService;
+import jakarta.persistence.criteria.JoinType;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -112,6 +114,10 @@ public class VehiculoServiceImpl implements IVehiculoService {
             specification.add(new SearchCriteria(SearchOperation.IN,
                     vehiculo.getNoSerieList(),
                     Vehiculo_.NO_SERIE));
+
+        if(vehiculo.isFetchIncisoSet())
+            specification.add(new SearchFetch(JoinType.LEFT,
+                    Vehiculo_.INCISO_SET));
 
         return vehiculoRepository.findAll(specification);
     }
