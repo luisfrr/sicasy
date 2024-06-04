@@ -124,6 +124,14 @@ public class IncisoServiceImpl implements IIncisoService {
         Vehiculo vehiculo = vehiculoService.findByNoSerie(inciso.getVehiculo().getNoSerie());
         inciso.setVehiculo(vehiculo);
 
+        if(vehiculo.getIncisoVigente() != null) {
+            throw new BadRequestException("El vehículo con número de serie " +
+                    inciso.getVehiculo().getNoSerie() +
+                    " ya tiene una póliza con un inciso vigente." +
+                    " No. póliza: " + vehiculo.getIncisoVigente().getPoliza().getNumeroPoliza() +
+                    ". Inciso: " + vehiculo.getIncisoVigente().getInciso());
+        }
+
         validateIncisoPoliza(inciso, poliza);
 
         if(incisoRepository.existsByIdPolizaAndIncisoAndIdVehiculo(poliza.getIdPoliza(), inciso.getInciso(), inciso.getVehiculo().getIdVehiculo()))
@@ -202,8 +210,17 @@ public class IncisoServiceImpl implements IIncisoService {
                 if(inciso.getVehiculoNoSerie() == null || inciso.getVehiculoNoSerie().isEmpty())
                     throw new BadRequestException("El campo No. Serie es obligatorio");
 
-                if(vehiculoDbList.stream().noneMatch(v -> Objects.equals(v.getNoSerie(), inciso.getVehiculoNoSerie()))) {
-                    throw new BadRequestException("No se ha encontrado la información del vehículo");
+                Vehiculo vehiculo = vehiculoDbList.stream()
+                        .filter(v -> Objects.equals(v.getNoSerie(), inciso.getVehiculoNoSerie()))
+                        .findFirst()
+                        .orElseThrow(() -> new NotFoundException("No se ha encontrado la información del vehículo"));
+
+                if(vehiculo.getIncisoVigente() != null) {
+                    throw new BadRequestException("El vehículo con número de serie " +
+                            inciso.getVehiculoNoSerie() +
+                            " ya tiene una póliza con un inciso vigente." +
+                            " No. póliza: " + vehiculo.getIncisoVigente().getPoliza().getNumeroPoliza() +
+                            ". Inciso: " + vehiculo.getIncisoVigente().getInciso());
                 }
 
                 validateIncisoPoliza(inciso, poliza);

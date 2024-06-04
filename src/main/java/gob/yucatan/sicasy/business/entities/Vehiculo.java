@@ -1,6 +1,7 @@
 package gob.yucatan.sicasy.business.entities;
 
 import gob.yucatan.sicasy.business.enums.EstatusRegistro;
+import gob.yucatan.sicasy.utils.date.DateValidator;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -8,6 +9,7 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 @Entity
 @Table(name = "vehiculo")
@@ -99,6 +101,9 @@ public class Vehiculo implements Cloneable, Serializable {
     @Column(name = "observaciones")
     private String observaciones;
 
+    @OneToMany(mappedBy = "vehiculo", fetch = FetchType.LAZY)
+    private Set<Inciso> incisoSet;
+
     @Column(name = "estatus_registro", nullable = false)
     @Enumerated(EnumType.ORDINAL)
     private EstatusRegistro estatusRegistro;
@@ -167,5 +172,15 @@ public class Vehiculo implements Cloneable, Serializable {
     @Override
     public int hashCode() {
         return Objects.hash(idVehiculo, noSerie);
+    }
+
+    public Inciso getIncisoVigente() {
+        if(this.incisoSet != null && !this.incisoSet.isEmpty()) {
+            Date today = new Date();
+            return this.incisoSet.stream()
+                    .filter(i -> DateValidator.isDateBetween(i.getFechaInicioVigencia(), i.getFechaFinVigencia(), today))
+                    .findFirst().orElse(null);
+        }
+        return null;
     }
 }
