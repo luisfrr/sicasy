@@ -5,6 +5,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 
+import java.util.Collection;
+import java.util.List;
+
 public interface IIncisoRepository extends JpaRepository<Inciso, Long>, JpaSpecificationExecutor<Inciso> {
 
     @Query("""
@@ -12,6 +15,9 @@ public interface IIncisoRepository extends JpaRepository<Inciso, Long>, JpaSpeci
             where i.poliza.idPoliza = ?1 and i.inciso = ?2 and i.vehiculo.idVehiculo = ?3
             and i.vehiculo.estatusRegistro = 1 and i.poliza.estatusRegistro = 1 and i.estatusRegistro = 1""")
     boolean existsByIdPolizaAndIncisoAndIdVehiculo(Long idPoliza, String inciso, Long idVehiculo);
+
+    @Query("select i from Inciso i where i.idInciso in ?1")
+    List<Inciso> findByIdIncisoIn(Collection<Long> idIncisos);
 
 
 }

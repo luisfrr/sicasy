@@ -8,6 +8,7 @@ import gob.yucatan.sicasy.business.exceptions.NotFoundException;
 import gob.yucatan.sicasy.repository.criteria.SearchCriteria;
 import gob.yucatan.sicasy.repository.criteria.SearchOperation;
 import gob.yucatan.sicasy.repository.criteria.SearchSpecification;
+import gob.yucatan.sicasy.repository.iface.IEstatusIncisoRepository;
 import gob.yucatan.sicasy.repository.iface.IIncisoRepository;
 import gob.yucatan.sicasy.services.iface.IIncisoService;
 import gob.yucatan.sicasy.services.iface.IPolizaService;
@@ -25,11 +26,19 @@ import java.util.*;
 @Slf4j
 public class IncisoServiceImpl implements IIncisoService {
 
-    private final Integer ESTATUS_REGISTRADO = 1;
+    private final Integer ESTATUS_INCISO_REGISTRADA = 1;
+    private final Integer ESTATUS_INCISO_EN_PROCESO_PAGO = 2;
+    private final Integer ESTATUS_INCISO_PAGADA = 3;
+    private final Integer ESTATUS_INCISO_BAJA = 4;
+
+    private final Integer ACCION_SOLICITAR_PAGO = 1;
+    private final Integer ACCION_AUTORIZAR_PAGO = 2;
+    private final Integer ACCION_RECHAZAR_PAGO = 3;
 
     private final IIncisoRepository incisoRepository;
     private final IPolizaService polizaService;
     private final IVehiculoService vehiculoService;
+    private final IEstatusIncisoRepository estatusIncisoRepository;
 
     @Override
     public List<Inciso> findAllDynamic(Inciso inciso) {
@@ -47,9 +56,9 @@ public class IncisoServiceImpl implements IIncisoService {
                     Inciso_.ESTATUS_REGISTRO));
         }
 
-        if(inciso.getEstatusInciso() != null && inciso.getEstatusInciso().getIdEstatusPoliza() != null) {
+        if(inciso.getEstatusInciso() != null && inciso.getEstatusInciso().getIdEstatusInciso() != null) {
             specification.add(new SearchCriteria(SearchOperation.EQUAL,
-                    inciso.getEstatusInciso().getIdEstatusPoliza(),
+                    inciso.getEstatusInciso().getIdEstatusInciso(),
                     Inciso_.ESTATUS_INCISO, EstatusInciso_.ID_ESTATUS_POLIZA));
         }
 
@@ -165,6 +174,35 @@ public class IncisoServiceImpl implements IIncisoService {
         return acuseImportacionList;
     }
 
+    @Override
+    public void solicitarPago(List<Inciso> incisos, String username) {
+        List<Long> idIncisoList = incisos.stream()
+                .map(Inciso::getIdInciso)
+                .toList();
+        // Al solicitar el pago cambia a estatus en proceso de pago
+        this.cambioEstatus(ACCION_SOLICITAR_PAGO, ESTATUS_INCISO_EN_PROCESO_PAGO,
+                idIncisoList, null, username);
+    }
+
+    @Override
+    public void autorizarPago(List<Inciso> incisos, String username) {
+        List<Long> idIncisoList = incisos.stream()
+                .map(Inciso::getIdInciso)
+                .toList();
+        // Al autorizar el pago cambia a estatus en pagada
+        this.cambioEstatus(ACCION_AUTORIZAR_PAGO, ESTATUS_INCISO_PAGADA,
+                idIncisoList, null, username);
+    }
+
+    @Override
+    public void rechazarPago(List<Inciso> incisos, String username) {
+        List<Long> idIncisoList = incisos.stream()
+                .map(Inciso::getIdInciso)
+                .toList();
+        // Al autorizar el pago cambia a estatus en pagada
+        this.cambioEstatus(ACCION_RECHAZAR_PAGO, ESTATUS_INCISO_REGISTRADA,
+                idIncisoList, null, username);
+    }
 
     private void validarLayoutRegistroEndosoAlta(List<AcuseImportacion> acuseImportacionList, List<Inciso> incisos, String username) {
 
@@ -279,13 +317,15 @@ public class IncisoServiceImpl implements IIncisoService {
     }
 
     private void setValuesEndosoAlta(String username, Inciso inciso, Poliza poliza) {
+        Integer ESTATUS_REGISTRADO = 1;
+
         if(inciso.getCosto() > 0)
             inciso.setSaldo(-inciso.getCosto());
         else
             inciso.setSaldo(0d);
 
         inciso.setPoliza(poliza);
-        inciso.setEstatusInciso(EstatusInciso.builder().idEstatusPoliza(ESTATUS_REGISTRADO).build());
+        inciso.setEstatusInciso(EstatusInciso.builder().idEstatusInciso(ESTATUS_REGISTRADO).build());
         inciso.setEstatusRegistro(EstatusRegistro.ACTIVO);
         inciso.setFechaCreacion(new Date());
         inciso.setCreadoPor(username);
@@ -303,4 +343,69 @@ public class IncisoServiceImpl implements IIncisoService {
 
         return duplicados;
     }
+
+    private void cambioEstatus(Integer accion, Integer estatusPorAsignar, List<Long> idIncisoList, String motivo, String username) {
+        List<Inciso> incisoToUpdateList = incisoRepository.findByIdIncisoIn(idIncisoList);
+
+        if(!incisoToUpdateList.isEmpty()) {
+
+            EstatusInciso estatusInciso = estatusIncisoRepository.findById(estatusPorAsignar)
+                    .orElseThrow(() -> new NotFoundException("No se ha encontrado el estatus solicitado."));
+
+            List<Integer> distinctEstatusIncisos = incisoToUpdateList.stream()
+                    .map(Inciso::getEstatusInciso)
+                    .map(EstatusInciso::getIdEstatusInciso)
+                    .distinct()
+                    .toList();
+
+            // Si los vehiculos seleccionados tienen diferentes estatus
+            // entonces no se puede actualizar. Todos deben tener el mismo estatus.
+            if(distinctEstatusIncisos.size() > 1) {
+                throw new BadRequestException("Asegurate de seleccionar incisos con el mismo estatus.");
+            }
+
+            // Se obtiene el estatus actual de todos los vehiculas a actualizar
+            Integer estatusActual = distinctEstatusIncisos.getFirst();
+
+            boolean cancelado = false;
+            String accionStr = "";
+
+            // Si la accion es solicitar pago
+            if(Objects.equals(accion, ACCION_SOLICITAR_PAGO)) {
+                accionStr = "Solicitar pago";
+                // El estatus actual debe ser REGISTADO, si no entonces marca error
+                if(!Objects.equals(estatusActual, ESTATUS_INCISO_REGISTRADA)) {
+                    throw new BadRequestException("Para solicitar la autorización asegúrate de seleccionar incisos con estatus REGISTRADA.");
+                }
+            } // Si la accion es autorizar pago
+            else if(Objects.equals(accion, ACCION_AUTORIZAR_PAGO)) {
+                accionStr = "Autorizar solicitud";
+                // El estatus actual debe ser POR AUTORIZAR, si no entonces marca error
+                if(!Objects.equals(estatusActual, ESTATUS_INCISO_EN_PROCESO_PAGO)) {
+                    throw new BadRequestException("Para autorizar el pago asegúrate de seleccionar incisos con estatus EN PROCESO DE PAGO.");
+                }
+            }  // Si la accion es rechazar solicitud
+            else if (Objects.equals(accion, ACCION_RECHAZAR_PAGO)) {
+                accionStr = "Rechazar solicitud";
+                // El estatus actual debe ser POR AUTORIZAR, si no entonces marca error
+                if(!Objects.equals(estatusActual, ESTATUS_INCISO_EN_PROCESO_PAGO)) {
+                    throw new BadRequestException("Para rechazar el asegúrate de seleccionar incisos con estatus EN PROCESO DE PAGO.");
+                }
+            }
+
+            for (Inciso inciso : incisoToUpdateList) {
+
+                inciso.setEstatusInciso(estatusInciso);
+                inciso.setObservaciones(motivo);
+                inciso.setModificadoPor(username);
+                inciso.setFechaModificacion(new Date());
+
+            }
+
+            incisoRepository.saveAll(incisoToUpdateList);
+        } else {
+            throw new BadRequestException("No se han recibido los incisos por actualizar.");
+        }
+    }
+
 }

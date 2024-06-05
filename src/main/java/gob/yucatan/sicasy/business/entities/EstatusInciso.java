@@ -17,7 +17,7 @@ public class EstatusInciso implements Cloneable, Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "estatus_inciso_id")
-    private Integer idEstatusPoliza;
+    private Integer idEstatusInciso;
 
     @Column(name = "nombre", nullable = false)
     private String nombre;

@@ -548,4 +548,5 @@ public class VehiculoServiceImpl implements IVehiculoService {
             throw new BadRequestException("No se han recibido los vehículos por actualizar.");
         }
     }
+
 }

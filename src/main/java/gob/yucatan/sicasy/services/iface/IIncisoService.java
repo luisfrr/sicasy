@@ -14,4 +14,7 @@ public interface IIncisoService {
     void generarEndosoAlta(Inciso inciso, String username);
     List<AcuseImportacion> importarEndosoAlta(List<Inciso> incisos, String username);
 
+    void solicitarPago(List<Inciso> incisos, String username);
+    void autorizarPago(List<Inciso> incisos, String username);
+    void rechazarPago(List<Inciso> incisos, String username);
 }
