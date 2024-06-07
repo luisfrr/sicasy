@@ -59,7 +59,7 @@ public class IncisoServiceImpl implements IIncisoService {
         if(inciso.getEstatusInciso() != null && inciso.getEstatusInciso().getIdEstatusInciso() != null) {
             specification.add(new SearchCriteria(SearchOperation.EQUAL,
                     inciso.getEstatusInciso().getIdEstatusInciso(),
-                    Inciso_.ESTATUS_INCISO, EstatusInciso_.ID_ESTATUS_POLIZA));
+                    Inciso_.ESTATUS_INCISO, EstatusInciso_.ID_ESTATUS_INCISO));
         }
 
         if(inciso.getVehiculo() != null && inciso.getVehiculo().getIdVehiculo() != null) {
@@ -262,6 +262,7 @@ public class IncisoServiceImpl implements IIncisoService {
                             ". Inciso: " + vehiculo.getIncisoVigente().getInciso());
                 }
 
+                inciso.setVehiculo(vehiculo);
                 validateIncisoPoliza(inciso, poliza);
 
                 if(incisoDbList.stream().anyMatch(i -> Objects.equals(i.getPoliza().getIdPoliza(), poliza.getIdPoliza())
@@ -302,6 +303,9 @@ public class IncisoServiceImpl implements IIncisoService {
 
         if(inciso.getFechaFinVigencia() == null)
             throw new BadRequestException("El campo Fecha fin de vigencia es obligatorio");
+
+        if(inciso.getCosto() == null)
+            throw new BadRequestException("El campo Costo es obligatorio.");
 
         if(inciso.getCosto() < 0)
             throw new BadRequestException("El campo Costo no puede ser menor a 0.");

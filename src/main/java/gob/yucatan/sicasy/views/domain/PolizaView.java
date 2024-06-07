@@ -318,7 +318,7 @@ public class PolizaView implements Serializable {
         this.acuseImportacionList = new ArrayList<>();
         this.showErrorImportacion = false;
         this.layoutFileUpload = null;
-        this.importIncisoList = null;
+        this.importIncisoList = new ArrayList<>();
         this.informacionVehiculo = "";
         PrimeFaces.current().ajax().update("registrar-endoso-alta-dialog-content", "growl");
         PrimeFaces.current().executeScript("PF('registrarEndosoAltaDialog').show();");
@@ -386,6 +386,79 @@ public class PolizaView implements Serializable {
             Messages.addWarn("No se ha encontrado el vehículo");
         }
     }
+
+    public void importarLayoutEndosoAlta(FileUploadEvent event) {
+        log.info("importar layout endoso alta");
+        UploadedFile file = event.getFile();
+        String fileName = file.getFileName();
+        byte[] fileContent = file.getContent();
+
+        try {
+            // Aquí puedes procesar el archivo según su tipo o contenido
+            if (fileName.endsWith(".xls") || fileName.endsWith(".xlsx")) {
+                // Si es un archivo Excel, procesarlo utilizando Apache POI
+                Class<Inciso> incisoClass = Inciso.class;
+                List<ConfigHeaderExcelModel> list = new ArrayList<>();
+                list.add(ConfigHeaderExcelModel.builder().header("ASEGURADORA").fieldName("polizaIdAseguradora").columnIndex(0).build());
+                list.add(ConfigHeaderExcelModel.builder().header("NO. PÓLIZA").fieldName("polizaNoPoliza").columnIndex(1).build());
+                list.add(ConfigHeaderExcelModel.builder().header("INCISO").fieldName("inciso").columnIndex(2).build());
+                list.add(ConfigHeaderExcelModel.builder().header("NO. SERIE VEHÍCULO").fieldName("vehiculoNoSerie").columnIndex(3).build());
+                list.add(ConfigHeaderExcelModel.builder().header("FECHA INICIO VIGENCIA").fieldName("fechaInicioVigencia").columnIndex(4).dateFormat("dd/MM/yyyy").build());
+                list.add(ConfigHeaderExcelModel.builder().header("FECHA FIN VIGENCIA").fieldName("fechaFinVigencia").columnIndex(5).dateFormat("dd/MM/yyyy").build());
+                list.add(ConfigHeaderExcelModel.builder().header("FOLIO FACTURA").fieldName("folioFactura").columnIndex(6).build());
+                list.add(ConfigHeaderExcelModel.builder().header("COSTO").fieldName("costo").columnIndex(7).build());
+                list.add(ConfigHeaderExcelModel.builder().header("FRECUENCIA PAGO").fieldName("frecuenciaPago").columnIndex(8).build());
+
+                ImportExcelFile<Inciso> importExcelFile = new ImportExcelFile<>();
+                this.importIncisoList = importExcelFile.processExcelFile(fileContent, incisoClass, list);
+
+                this.layoutFileUpload = fileName;
+                PrimeFaces.current().ajax().update("tab-view_endoso_alta:endoso-alta-layout-form:dropZoneLayout");
+                log.info("Se ha cargado la información del layout correctamente. Incisos a importar: {}", this.importIncisoList.size());
+            } else {
+                // Manejar otros tipos de archivos si es necesario
+                // Por ejemplo, mostrar un mensaje de error
+                Messages.addError("Error", "Tipo de archivo no válido");
+            }
+        } catch (Exception e) {
+            log.error("Ocurrió un error al importar el layout de endoso de alta", e);
+            Messages.addError("Ocurrió un error al importar el layout de endoso de alta");
+        }
+    }
+
+    public void guardarLayoutEndosoAlta() {
+        log.info("guardar layout endoso alta");
+        try {
+            if(this.importIncisoList != null) {
+                this.acuseImportacionList = incisoService.importarEndosoAlta(this.importIncisoList,
+                        userSessionBean.getUserName());
+
+                // Si alguno marco error entonces no se guardó nada y se muestra el acuse
+                if(acuseImportacionList.stream().anyMatch(a -> a.getError() == 1)) {
+                    this.showErrorImportacion = true;
+                }
+                else {
+                    // Si no, entonces se guardó correctamente
+                    Messages.addInfo("Se han importado correctamente el layout de endoso de alta.");
+                    this.limpiarFiltros();
+                    this.buscar();
+                    this.verIncisos();
+                    this.cerrarRegistroEndosoAltaDialog();
+                }
+            }
+        } catch (Exception e) {
+            log.error("Error al importar layout de endoso de alta", e);
+            String message;
+            if(e instanceof BadRequestException)
+                message = e.getMessage();
+            else if(e instanceof NotFoundException)
+                message = e.getMessage();
+            else
+                message = "Ocurrió un error inesperado. Intenta de nuevo más tarde.";
+            Messages.addError(message);
+        }
+    }
+
 
     //region events
 
