@@ -8,6 +8,7 @@ import gob.yucatan.sicasy.services.iface.IAseguradoraService;
 import gob.yucatan.sicasy.services.iface.IIncisoService;
 import gob.yucatan.sicasy.services.iface.IPolizaService;
 import gob.yucatan.sicasy.services.iface.IVehiculoService;
+import gob.yucatan.sicasy.services.impl.IncisoServiceImpl;
 import gob.yucatan.sicasy.utils.imports.excel.ConfigHeaderExcelModel;
 import gob.yucatan.sicasy.utils.imports.excel.ImportExcelFile;
 import gob.yucatan.sicasy.utils.imports.excel.SaveFile;
@@ -65,6 +66,7 @@ public class PolizaView implements Serializable {
     private @Getter boolean showAdjuntarPolizaDialog;
     private @Getter boolean showRegistrarEndosoAltaDialog;
     private @Getter boolean showRechazarSolicitudDialog;
+    private @Getter boolean showEditarIncisoDialog;
 
     private @Getter List<Aseguradora> aseguradoraList;
     private @Getter List<Poliza> polizaFormList;
@@ -98,6 +100,7 @@ public class PolizaView implements Serializable {
         this.showRegistrarPolizasDialog = false;
         this.showAdjuntarPolizaDialog = false;
         this.showRechazarSolicitudDialog = false;
+        this.showEditarIncisoDialog = false;
 
         this.loadAseguradorasList();
 
@@ -539,6 +542,57 @@ public class PolizaView implements Serializable {
             }
         } catch (Exception e) {
             log.error("Error al rechazar solicitud incisos", e);
+            String message;
+            if(e instanceof BadRequestException)
+                message = e.getMessage();
+            else if(e instanceof NotFoundException)
+                message = e.getMessage();
+            else
+                message = "Ocurrió un error inesperado. Intenta de nuevo más tarde.";
+            Messages.addError(message);
+        }
+    }
+
+    public void abrirEditarIncisoModal(Long idInciso) {
+        log.info("abrir editar inciso modal");
+        try {
+            this.showEditarIncisoDialog = true;
+            this.incisoForm = incisoService.findById(idInciso);
+            PrimeFaces.current().ajax().update("editar-inciso-dialog-content", "growl");
+            PrimeFaces.current().executeScript("PF('editarIncisoDialog').show();");
+        } catch (Exception e) {
+            log.warn("Error al abrir el formulario de edición de inciso", e);
+            String message;
+            if(e instanceof BadRequestException)
+                message = e.getMessage();
+            else if(e instanceof NotFoundException)
+                message = e.getMessage();
+            else
+                message = "Ocurrió un error inesperado. Intenta de nuevo más tarde.";
+            Messages.addError(message);
+        }
+    }
+
+    public void cerrarEditarIncisoModal() {
+        log.info("cerrar editar inciso modal");
+        this.showEditarIncisoDialog = false;
+        this.incisoForm = null;
+        PrimeFaces.current().ajax().update("editar-inciso-dialog-content", "growl");
+        PrimeFaces.current().executeScript("PF('editarIncisoDialog').hide();");
+    }
+
+    public void editarInciso() {
+        log.info("editar inciso");
+        try {
+            if(this.incisoForm != null) {
+                incisoService.editar(this.incisoForm, userSessionBean.getUserName());
+                Messages.addInfo("Se ha guardado correctamente");
+                this.verIncisos();
+                this.cerrarEditarIncisoModal();
+                PrimeFaces.current().ajax().update("form_datatable_incisos");
+            }
+        } catch (Exception e) {
+            log.error("Error editar el inciso", e);
             String message;
             if(e instanceof BadRequestException)
                 message = e.getMessage();

@@ -17,4 +17,6 @@ public interface IIncisoService {
     void solicitarPago(List<Inciso> incisos, String username);
     void autorizarPago(List<Inciso> incisos, String username);
     void rechazarSolicitud(List<Inciso> incisos, String motivo, String username);
+    void editar(Inciso inciso, String username);
 }
+

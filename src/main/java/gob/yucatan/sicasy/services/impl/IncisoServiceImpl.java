@@ -204,6 +204,33 @@ public class IncisoServiceImpl implements IIncisoService {
                 idIncisoList, motivo, username);
     }
 
+    @Override
+    public void editar(Inciso inciso, String username) {
+
+        Inciso incisoToUpdate = this.findById(inciso.getIdInciso());
+
+        validateIncisoPoliza(inciso, inciso.getPoliza());
+
+        incisoToUpdate.setFolioFactura(inciso.getFolioFactura());
+        incisoToUpdate.setFechaInicioVigencia(inciso.getFechaInicioVigencia());
+        incisoToUpdate.setFechaFinVigencia(inciso.getFechaFinVigencia());
+        incisoToUpdate.setCosto(inciso.getCosto());
+        if(incisoToUpdate.getCosto() > 0)
+            incisoToUpdate.setSaldo(-inciso.getCosto());
+        else
+            incisoToUpdate.setSaldo(0d);
+
+        Integer ESTATUS_REGISTRADO = 1;
+
+        incisoToUpdate.setObservaciones(null);
+        incisoToUpdate.setEstatusInciso(EstatusInciso.builder().idEstatusInciso(ESTATUS_REGISTRADO).build());
+        incisoToUpdate.setEstatusRegistro(EstatusRegistro.ACTIVO);
+        incisoToUpdate.setFechaModificacion(new Date());
+        incisoToUpdate.setModificadoPor(username);
+
+        incisoRepository.save(incisoToUpdate);
+    }
+
     private void validarLayoutRegistroEndosoAlta(List<AcuseImportacion> acuseImportacionList, List<Inciso> incisos, String username) {
 
         Poliza polizaFilter = Poliza.builder()
