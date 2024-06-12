@@ -398,7 +398,8 @@
                                           action="#{vehiculoView.abrirModalEditarMantenimiento(mantenimiento)}">
                               </p:menuitem>
 
-                              <p:menuitem value="Adjuntar fotos" icon="fi fi-rr-add-image"
+                              <p:menuitem value="Adjuntar/ver fotos" icon="fi fi-rr-add-image"
+                                          action="#{vehiculoView.abrirModalAdjuntaVerFotosMantenimiento(mantenimiento)}"
                                           update="growl dt_mantenimiento">
                               </p:menuitem>
 
@@ -501,5 +502,7 @@
       </h:form>
 
    </p:outputPanel>
+
+
 
 </ui:composition>

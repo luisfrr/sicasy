@@ -522,6 +522,22 @@ public class VehiculoView implements Serializable {
 
     }
 
+    public void abrirModalAdjuntaVerFotosMantenimiento(Mantenimiento mantenimiento){
+        this.mantenimientoVehiculo = mantenimiento;
+
+        this.mantenimientoFotoList = mantenimientoFotoService.getFotosMantenimientos(mantenimientoVehiculo.getIdMantenimiento());
+
+        log.info("abrir modal adjuntaVerFotosMantenimiento");
+        PrimeFaces.current().ajax().update("form_galeria_mantenimiento", "growl");
+        PrimeFaces.current().executeScript("PF('galeriaFotosMantenimientoDialog').show();");
+    }
+
+    public void cerrarGaleriaFotosMantenimiento(){
+        this.vehiculoSelected = null;
+        PrimeFaces.current().ajax().update("form_galeria_mantenimiento", "growl");
+        PrimeFaces.current().executeScript("PF('galeriaFotosMantenimientoDialog').hide();");
+    }
+
     public void abrirModalEditarMantenimiento(Mantenimiento mantenimiento) {
         this.mantenimientoVehiculo = mantenimiento;
         PrimeFaces.current().ajax().update("form_registrar_mantenimiento", "growl");
@@ -669,10 +685,6 @@ public class VehiculoView implements Serializable {
                 mantenimientoFotoService.guardarFoto(mantenimientoFoto);
                 Messages.addInfo("Se ha guardado correctamente la foto: " + fileName);
 
-                if(this.showDetailsPanel) {
-                    this.mantenimientoFotoList = mantenimientoFotoService.getFotosMantenimientos(mantenimientoVehiculo.getIdMantenimiento());
-                    PrimeFaces.current().ajax().update("tab_view_detalles:form_galeria_");
-                }
             } else {
                 Messages.addWarn("No se ha seleccionado el mantenimiento del vehiculo");
             }
