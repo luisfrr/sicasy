@@ -195,13 +195,13 @@ public class IncisoServiceImpl implements IIncisoService {
     }
 
     @Override
-    public void rechazarPago(List<Inciso> incisos, String username) {
+    public void rechazarSolicitud(List<Inciso> incisos, String motivo, String username) {
         List<Long> idIncisoList = incisos.stream()
                 .map(Inciso::getIdInciso)
                 .toList();
         // Al autorizar el pago cambia a estatus en pagada
         this.cambioEstatus(ACCION_RECHAZAR_PAGO, ESTATUS_INCISO_REGISTRADA,
-                idIncisoList, null, username);
+                idIncisoList, motivo, username);
     }
 
     private void validarLayoutRegistroEndosoAlta(List<AcuseImportacion> acuseImportacionList, List<Inciso> incisos, String username) {

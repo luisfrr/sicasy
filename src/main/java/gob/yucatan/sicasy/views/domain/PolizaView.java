@@ -29,6 +29,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 @Component
 @Scope("view")
@@ -42,6 +43,11 @@ public class PolizaView implements Serializable {
     @Value("${app.files.folder.polizas}")
     private @Getter String FOLDER_POLIZAS;
 
+    private @Getter final Integer ESTATUS_INCISO_REGISTRADA = 1;
+    private @Getter final Integer ESTATUS_INCISO_EN_PROCESO_PAGO = 2;
+    private @Getter final Integer ESTATUS_INCISO_PAGADA = 3;
+    private @Getter final Integer ESTATUS_INCISO_BAJA = 4;
+
     // Generales
     private @Getter String title;
     private @Getter @Setter Poliza polizaFilter;
@@ -52,11 +58,13 @@ public class PolizaView implements Serializable {
     private @Getter @Setter List<Inciso> incisoSelectedList;
     private @Getter @Setter Inciso incisoSelected;
     private @Getter @Setter Inciso incisoForm;
+    private @Getter @Setter String motivoRechazoSolicitud;
 
     private @Getter boolean showPanelPolizas;
     private @Getter boolean showRegistrarPolizasDialog;
     private @Getter boolean showAdjuntarPolizaDialog;
     private @Getter boolean showRegistrarEndosoAltaDialog;
+    private @Getter boolean showRechazarSolicitudDialog;
 
     private @Getter List<Aseguradora> aseguradoraList;
     private @Getter List<Poliza> polizaFormList;
@@ -89,6 +97,7 @@ public class PolizaView implements Serializable {
         this.showPanelPolizas = true;
         this.showRegistrarPolizasDialog = false;
         this.showAdjuntarPolizaDialog = false;
+        this.showRechazarSolicitudDialog = false;
 
         this.loadAseguradorasList();
 
@@ -459,6 +468,87 @@ public class PolizaView implements Serializable {
         }
     }
 
+    public void solicitarPagoIncisos() {
+        log.info("solicitar pago incisos");
+        try {
+            if(this.incisoSelectedList != null) {
+                incisoService.solicitarPago(this.incisoSelectedList, userSessionBean.getUserName());
+                this.verIncisos();
+                PrimeFaces.current().ajax().update("form_datatable_incisos");
+                Messages.addInfo("Se ha solicitado pago de los incisos seleccionados");
+            }
+            else {
+                Messages.addWarn("No se han seleccionado incisos");
+            }
+        } catch (Exception e) {
+            log.error("Error al solicitar pago incisos", e);
+            String message;
+            if(e instanceof BadRequestException)
+                message = e.getMessage();
+            else if(e instanceof NotFoundException)
+                message = e.getMessage();
+            else
+                message = "Ocurrió un error inesperado. Intenta de nuevo más tarde.";
+            Messages.addError(message);
+        }
+    }
+
+    public void abrirRechazarSolicitudModal() {
+        log.info("abrir rechazar solicitud modal");
+        this.showRechazarSolicitudDialog = true;
+        this.motivoRechazoSolicitud = "";
+
+        if(this.incisoSelectedList.isEmpty()) {
+            Messages.addWarn("No has seleccionado incisos");
+            return;
+        }
+
+        boolean notEnProcesoPago = this.incisoSelectedList.stream()
+                .anyMatch(i -> !Objects.equals(i.getEstatusInciso().getIdEstatusInciso(), ESTATUS_INCISO_EN_PROCESO_PAGO));
+        // Si tiene un estatus diferente a EN PROCESO DE PAGO
+        if(notEnProcesoPago) {
+            Messages.addWarn("Asegúrate de seleccionar incisos EN PROCESO DE PAGO");
+            return;
+        }
+
+        PrimeFaces.current().ajax().update("rechazar-solicitud-dialog-content", "growl");
+        PrimeFaces.current().executeScript("PF('rechazarSolicitudDialog').show();");
+    }
+
+    public void cerrarRechazarSolicitudModal() {
+        log.info("cerrar rechazar solicitud modal");
+        this.showRechazarSolicitudDialog = false;
+        this.motivoRechazoSolicitud = "";
+        PrimeFaces.current().ajax().update("rechazar-solicitud-dialog-content", "growl");
+        PrimeFaces.current().executeScript("PF('rechazarSolicitudDialog').hide();");
+    }
+
+    public void rechazarSolicitudIncisos() {
+        log.info("rechazar solicitud incisos");
+        try {
+            if(this.incisoSelectedList != null && !this.motivoRechazoSolicitud.isEmpty()) {
+                incisoService.rechazarSolicitud(this.incisoSelectedList, this.motivoRechazoSolicitud,
+                        userSessionBean.getUserName());
+                Messages.addInfo("Se ha rechazado la solicutd de pago de los incisos seleccionados");
+                this.verIncisos();
+                this.cerrarRechazarSolicitudModal();
+                PrimeFaces.current().ajax().update("form_datatable", "form_datatable_incisos");
+            }
+            else {
+                Messages.addWarn("Asegurate de seleccionar incisos y de ingresar un motivo de rechazo.");
+            }
+        } catch (Exception e) {
+            log.error("Error al rechazar solicitud incisos", e);
+            String message;
+            if(e instanceof BadRequestException)
+                message = e.getMessage();
+            else if(e instanceof NotFoundException)
+                message = e.getMessage();
+            else
+                message = "Ocurrió un error inesperado. Intenta de nuevo más tarde.";
+            Messages.addError(message);
+        }
+    }
 
     //region events
 

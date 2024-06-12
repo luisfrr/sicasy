@@ -185,12 +185,13 @@
                                 </div>
                                 <div class="flex justify-content-end">
                                     <p:commandButton id="accionesIncisos" type="button" value="Acciones"
-                                                     iconPos="right" icon="fi fi-rr-angle-small-down"
-                                                     styleClass="ui-button-outlined"/>
+                                                     iconPos="right" icon="fi fi-rr-angle-small-down"/>
                                     <p:menu overlay="true" trigger="accionesIncisos" my="left top" at="left bottom">
-                                        <p:menuitem value="Solicitar pago"/>
+                                        <p:menuitem value="Solicitar pago" ajax="true" action="#{polizaView.solicitarPagoIncisos()}">
+                                            <p:confirm header="Confirmación" message="¿Estás seguro que deseas solicitar el pago de los incisos seleccionados?" icon="pi pi-exclamation-triangle"/>
+                                        </p:menuitem>
                                         <p:menuitem value="Registrar pago"/>
-                                        <p:menuitem value="Rechazar solicitud"/>
+                                        <p:menuitem value="Rechazar solicitud" ajax="true" action="#{polizaView.abrirRechazarSolicitudModal()}"/>
                                     </p:menu>
                                 </div>
                             </div>
@@ -253,8 +254,9 @@
                             <p:commandButton id="dtAccionesIncisos" type="button"
                                              icon="fi fi-rr-menu-dots-vertical" styleClass="rounded-button ui-button-outlined" />
                             <p:menu overlay="true" trigger="dtAccionesIncisos" my="left top" at="left bottom">
-                                <p:menuitem value="Endoso de modificación"/>
-                                <p:menuitem value="Endoso de baja"/>
+                                <p:menuitem value="Editar" disabled="#{inciso.estatusInciso.idEstatusInciso != polizaView.ESTATUS_INCISO_REGISTRADA}"/>
+                                <p:menuitem value="Endoso de modificación" disabled="#{inciso.estatusInciso.idEstatusInciso != polizaView.ESTATUS_INCISO_PAGADA}"/>
+                                <p:menuitem value="Endoso de baja" disabled="#{inciso.estatusInciso.idEstatusInciso != polizaView.ESTATUS_INCISO_PAGADA}"/>
                             </p:menu>
                         </p:column>
                     </p:dataTable>
@@ -267,6 +269,8 @@
             <ui:include src="/views/seguros/_adjuntar_poliza_dialog.xhtml"/>
 
             <ui:include src="/views/seguros/_registrar_endoso_alta.xhtml"/>
+
+            <ui:include src="/views/seguros/_rechazar_solicitud_dialog.xhtml"/>
 
             
         </p:outputPanel>
