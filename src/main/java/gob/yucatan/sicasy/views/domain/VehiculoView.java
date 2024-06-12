@@ -4,6 +4,7 @@ import gob.yucatan.sicasy.business.annotations.ConfigPermiso;
 import gob.yucatan.sicasy.business.annotations.ConfigPermisoArray;
 import gob.yucatan.sicasy.business.dtos.AcuseImportacion;
 import gob.yucatan.sicasy.business.entities.*;
+import gob.yucatan.sicasy.business.enums.EstatusRegistro;
 import gob.yucatan.sicasy.business.enums.TipoPermiso;
 import gob.yucatan.sicasy.business.exceptions.BadRequestException;
 import gob.yucatan.sicasy.business.exceptions.NotFoundException;
@@ -17,6 +18,8 @@ import gob.yucatan.sicasy.utils.imports.excel.SaveFile;
 import gob.yucatan.sicasy.views.beans.Messages;
 import gob.yucatan.sicasy.views.beans.UserSessionBean;
 import jakarta.annotation.PostConstruct;
+import jakarta.faces.application.FacesMessage;
+import jakarta.faces.context.FacesContext;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -27,6 +30,7 @@ import org.apache.poi.xssf.usermodel.XSSFCellStyle;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.primefaces.PrimeFaces;
 import org.primefaces.event.FileUploadEvent;
+import org.primefaces.event.SelectEvent;
 import org.primefaces.model.ResponsiveOption;
 import org.primefaces.model.file.UploadedFile;
 import org.springframework.beans.factory.annotation.Value;
@@ -65,9 +69,12 @@ public class VehiculoView implements Serializable {
     private @Getter @Setter List<Vehiculo> vehiculoSelectedList;
     private @Getter @Setter List<Vehiculo> vehiculoImportList;
     private @Getter @Setter Vehiculo vehiculoSelected;
+    private @Getter @Setter Mantenimiento mantenimientoVehiculo;
+    private @Getter List<TipoMantenimiento> tipoMantenimientoList;
     private @Getter @Setter Vehiculo vehiculoFilter;
     private @Getter boolean showVehiculosPanel; // Seccion completa de filtrado
     private @Getter @Setter List<VehiculoFoto> vehiculoFotoList;
+    private @Getter @Setter List<MantenimientoFoto> mantenimientoFotoList;
     private @Getter List<ResponsiveOption> responsiveOptions;
     private @Getter List<Integer> idEstatusVehiculoList;
 
@@ -79,6 +86,12 @@ public class VehiculoView implements Serializable {
     // Seccion completa de detalles del vehículo
     private @Getter boolean showDetailsPanel;
     private @Getter boolean readOnlyEditForm;
+
+    // mantenimiento vehiculos
+    private @Getter boolean fechaFinalValida;
+    private @Getter List<Mantenimiento> mantenimientoVehiculoList;
+    private @Getter List<BitacoraVehiculo> bitacoraVehiculoList;
+    private @Getter @Setter UploadedFile fotoMantenimiento;
 
     // Se usa para los filtros
     private @Getter List<Dependencia> dependenciaList;
@@ -114,6 +127,10 @@ public class VehiculoView implements Serializable {
     private final IAnexoService anexoService;
     private final IVehiculoFotoService vehiculoFotoService;
     private final IGeneratorExcelFile generatorExcelFile;
+    private final ITipoMantenimientoService tipoMantenimientoService;
+    private final IMantenimientoService mantenimientoService;
+    private final IMantenimientoFotoService mantenimientoFotoService;
+    private final IBitacoraVehiculoService bitacoraVehiculoService;
 
 
     @PostConstruct
@@ -132,6 +149,8 @@ public class VehiculoView implements Serializable {
     public void limpiarFiltros() {
         log.info("limpiar filtros de vehiculos");
         this.vehiculoSelected = null;
+        this.mantenimientoVehiculo = new Mantenimiento();
+        this.mantenimientoVehiculo.setTipoMantenimiento(new TipoMantenimiento());
         this.vehiculoFilter = new Vehiculo();
         this.vehiculoFilter.setDependencia(new Dependencia());
         this.vehiculoFilter.setCondicionVehiculo(new CondicionVehiculo());
@@ -148,6 +167,7 @@ public class VehiculoView implements Serializable {
         this.loadMarcas();
         this.loadModelos();
         this.loadAnios();
+        this.loadTipoMantenimiento();
 
         this.showVehiculosPanel = true;
         this.showDetailsPanel = false;
@@ -159,6 +179,9 @@ public class VehiculoView implements Serializable {
         this.vehiculoList = new ArrayList<>();
         this.vehiculoSelectedList = new ArrayList<>();
         this.vehiculoFotoList = new ArrayList<>();
+        this.mantenimientoFotoList = new ArrayList<>();
+        this.mantenimientoVehiculoList = new ArrayList<>();
+        this.bitacoraVehiculoList = new ArrayList<>();
         PrimeFaces.current().ajax().update("form_filtros");
     }
 
@@ -434,6 +457,8 @@ public class VehiculoView implements Serializable {
         this.loadAnexosForm();
 
         this.vehiculoFotoList = vehiculoFotoService.getVehiculoFotos(this.vehiculoSelected.getIdVehiculo());
+        this.mantenimientoVehiculoList = mantenimientoService.findByVehiculoId(vehiculo.getIdVehiculo());
+        this.bitacoraVehiculoList = bitacoraVehiculoService.findByVehiculoId(vehiculo.getIdVehiculo());
 
         PrimeFaces.current().ajax().update("container");
     }
@@ -482,6 +507,142 @@ public class VehiculoView implements Serializable {
     public void abrirModalRegistroMantenimiento(Long idVehiculo) {
         log.info("abrir modal registro mantenimiento");
         this.vehiculoSelected = vehiculoService.findById(idVehiculo);
+        this.mantenimientoVehiculo = new Mantenimiento();
+        this.mantenimientoVehiculo.setVehiculo(vehiculoSelected);
+        this.mantenimientoVehiculo.setTipoMantenimiento(new TipoMantenimiento());
+        PrimeFaces.current().ajax().update("form_registrar_mantenimiento", "growl");
+        PrimeFaces.current().executeScript("PF('registroMantenimientoDialog').show();");
+    }
+
+    public void cerrarModalRegistroMantenimiento(){
+        log.info("cerrar modal registro mantenimiento");
+        this.vehiculoSelected = null;
+        PrimeFaces.current().ajax().update("form_registrar_mantenimiento", "growl");
+        PrimeFaces.current().executeScript("PF('registroMantenimientoDialog').hide();");
+
+    }
+
+    public void abrirModalAdjuntaVerFotosMantenimiento(Mantenimiento mantenimiento){
+        this.mantenimientoVehiculo = mantenimiento;
+
+        this.mantenimientoFotoList = mantenimientoFotoService.getFotosMantenimientos(mantenimientoVehiculo.getIdMantenimiento());
+
+        log.info("abrir modal adjuntaVerFotosMantenimiento");
+        PrimeFaces.current().ajax().update("form_galeria_mantenimiento", "growl");
+        PrimeFaces.current().executeScript("PF('galeriaFotosMantenimientoDialog').show();");
+    }
+
+    public void cerrarGaleriaFotosMantenimiento(){
+        this.vehiculoSelected = null;
+        PrimeFaces.current().ajax().update("form_galeria_mantenimiento", "growl");
+        PrimeFaces.current().executeScript("PF('galeriaFotosMantenimientoDialog').hide();");
+    }
+
+    public void abrirModalEditarMantenimiento(Mantenimiento mantenimiento) {
+        this.mantenimientoVehiculo = mantenimiento;
+        PrimeFaces.current().ajax().update("form_registrar_mantenimiento", "growl");
+        PrimeFaces.current().executeScript("PF('registroMantenimientoDialog').show();");
+    }
+
+    public void doEliminarMatenimiento(Mantenimiento mantenimiento) {
+        log.info("prepare to eliminar");
+        this.mantenimientoVehiculo = mantenimiento;
+    }
+
+    public void eliminarMantenimiento(){
+
+        this.mantenimientoVehiculo.setBorradoPor(userSessionBean.getUserName());
+        this.mantenimientoVehiculo.setFechaBorrado(new Date());
+        this.mantenimientoVehiculo.setEstatus(EstatusRegistro.BORRADO);
+
+        try{
+            mantenimientoService.save(mantenimientoVehiculo);
+            this.mantenimientoVehiculoList = mantenimientoService.findByVehiculoId(mantenimientoVehiculo.getVehiculo().getIdVehiculo());
+
+            Messages.addInfo("Atención","Se ha eliminado la información");
+            PrimeFaces.current().ajax().update("tab_view_detalles:form_bitacoras:dt_mantenimiento", "growl");
+            PrimeFaces.current().executeScript("PF('confirmDialog').hide();");
+
+        }catch (Exception e){
+            Messages.addError(e.getMessage());
+        }
+
+    }
+
+    public void guardarMantenimientoVehiculo(){
+
+        try{
+            if(this.mantenimientoVehiculo.getTipoMantenimiento().getIdTipoMantenimiento() != null &&
+                this.mantenimientoVehiculo.getDescripcion() != null && !this.mantenimientoVehiculo.getDescripcion()
+                .isEmpty()) {
+
+                if (this.mantenimientoVehiculo.getIdMantenimiento() != null){
+                    // update data
+                    this.mantenimientoVehiculo.setModificadoPor(userSessionBean.getUserName());
+                    this.mantenimientoVehiculo.setFechaModificacion(new Date());
+
+                }else {
+                    // registro nuevo
+                    this.mantenimientoVehiculo.setCreadoPor(userSessionBean.getUserName());
+                    this.mantenimientoVehiculo.setFechaCreacion(new Date());
+                    this.mantenimientoVehiculo.setEstatus(EstatusRegistro.ACTIVO);
+
+                }
+
+                this.mantenimientoVehiculo = mantenimientoService.save(mantenimientoVehiculo);
+
+                if (fotoMantenimiento != null){
+                    subirFotoMantenimiento();
+                }
+
+                FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_INFO,
+                        "Operación exitosa", "Se ha guardado correctamente la información");
+                FacesContext.getCurrentInstance().addMessage(null, msg);
+                PrimeFaces.current().ajax().update("tab_view_detalles:form_bitacoras:dt_mantenimiento", "growl");
+                PrimeFaces.current().executeScript("PF('registroMantenimientoDialog').hide();");
+                this.buscar();
+                this.mantenimientoVehiculo  = new Mantenimiento();
+                this.mantenimientoVehiculo.setTipoMantenimiento(new TipoMantenimiento());
+            }else {
+                FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_WARN,
+                        "Atención", "Seleccione un tipo de mantenimiento y escriba una descripción para guardar el registro.");
+                FacesContext.getCurrentInstance().addMessage(null, msg);
+            }
+
+
+        }catch (Exception ex){
+            String message;
+            if(ex instanceof BadRequestException)
+                message = ex.getMessage();
+            else if(ex instanceof NotFoundException)
+                message = ex.getMessage();
+            else
+                message = "Ocurrió un error inesperado.";
+            FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Error", message);
+            FacesContext.getCurrentInstance().addMessage(null, msg);
+        }
+
+    }
+
+    public void validateFechaInicioFinal(SelectEvent event){
+        log.info("validando fecha final" );
+
+        if (this.mantenimientoVehiculo.getFechaInicio() != null && this.mantenimientoVehiculo.getFechaFin() != null){
+
+            if (this.mantenimientoVehiculo.getFechaInicio().after(this.mantenimientoVehiculo.getFechaFin())){
+                // la fecha inicio no puede estar dspues de la fecha final
+                this.fechaFinalValida = false;
+                FacesContext.getCurrentInstance().addMessage(event.getComponent().getClientId(),
+                        new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Fecha selecionada inválida."));
+            }else
+                fechaFinalValida = true;
+
+        }else
+            fechaFinalValida = true;
+
+        PrimeFaces.current().ajax().update("form_registrar_mantenimiento:bnt_saveRegistro");
+
     }
 
     @ConfigPermiso(tipo = TipoPermiso.WRITE, codigo = "VEHICULOS_WRITE_ADJUNTAR_FOTOS", orden = 11,
@@ -503,6 +664,37 @@ public class VehiculoView implements Serializable {
         PrimeFaces.current().executeScript("PF('adjuntarFotosDialog').hide();");
     }
 
+    public void subirFotoMantenimiento(){
+        log.info("subirFotoMantenimiento");
+        String fileName = ""; // event.getFile().getFileName();
+        fileName = fotoMantenimiento.getFileName();
+        try {
+            if(this.mantenimientoVehiculo != null) {
+                String filePath = SaveFile.importFileToPath(fotoMantenimiento.getContent(), fileName, FOLDER_VEHICULOS);
+
+                MantenimientoFoto mantenimientoFoto = MantenimientoFoto.builder()
+                        .mantenimiento(mantenimientoVehiculo)
+                        .rutaArchivo(filePath)
+                        .nombreArchivo(fileName)
+                        .fechaCreacion(new Date())
+                        .creadoPor(userSessionBean.getUserName())
+                        .borrado(0)
+                        .build();
+
+
+                mantenimientoFotoService.guardarFoto(mantenimientoFoto);
+                Messages.addInfo("Se ha guardado correctamente la foto: " + fileName);
+
+            } else {
+                Messages.addWarn("No se ha seleccionado el mantenimiento del vehiculo");
+            }
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            Messages.addError("No se ha logrado guardar la foto: " + fileName);
+        }
+
+    }
+
     public void subirFotoVehiculo(FileUploadEvent event) {
         log.info("subir foto vehiculo");
         String fileName = event.getFile().getFileName();
@@ -520,7 +712,7 @@ public class VehiculoView implements Serializable {
                         .build();
 
                 vehiculoFotoService.guardarFoto(vehiculoFoto);
-                Messages.addInfo("Se ha gurdado correctamente la foto: " + fileName);
+                Messages.addInfo("Se ha guardado correctamente la foto: " + fileName);
 
                 if(this.showDetailsPanel) {
                     this.vehiculoFotoList = vehiculoFotoService.getVehiculoFotos(this.vehiculoFotoSelected.getIdVehiculo());
@@ -699,6 +891,10 @@ public class VehiculoView implements Serializable {
 
     private void loadAnios() {
         this.anioList = vehiculoService.findDistinctAnio();
+    }
+
+    private void loadTipoMantenimiento(){
+        this.tipoMantenimientoList = tipoMantenimientoService.findAll();
     }
 
     private void loadLicitacionesForm() {
