@@ -1,6 +1,7 @@
 package gob.yucatan.sicasy.services.impl;
 
 import gob.yucatan.sicasy.business.dtos.AcuseImportacion;
+import gob.yucatan.sicasy.business.dtos.PagoInciso;
 import gob.yucatan.sicasy.business.entities.*;
 import gob.yucatan.sicasy.business.enums.EstatusRegistro;
 import gob.yucatan.sicasy.business.exceptions.BadRequestException;
@@ -238,6 +239,44 @@ public class IncisoServiceImpl implements IIncisoService {
         incisoToUpdate.setModificadoPor(username);
 
         incisoRepository.save(incisoToUpdate);
+    }
+
+    @Override
+    public PagoInciso getDetallePagoIncisos(List<Inciso> incisosPorPagar) {
+
+        Poliza poliza = incisosPorPagar.stream().map(Inciso::getPoliza).findFirst().orElse(null);
+        List<Integer> idEstatusIncisoList = List.of(ESTATUS_INCISO_BAJA, ESTATUS_INCISO_PAGADA);
+
+        // Buscar saldos pendientes en incisos
+        Inciso inciso = Inciso.builder()
+                .poliza(poliza) // Se buscan por poliza
+                .idEstatusIncisoList(idEstatusIncisoList) // Se filtran los pagados por endoso de modificacion y los de baja
+                .saldoDiferenteCero(true) // Y solo los que tienen saldo diferente de cero
+                .build();
+
+        List<Inciso> incisosSaldosPendientes = this.findAllDynamic(inciso);
+
+        Double subtotal = incisosPorPagar.stream()
+                .mapToDouble(Inciso::getSaldo)
+                .sum();
+        Double saldoPendiente = incisosSaldosPendientes.stream()
+                .mapToDouble(Inciso::getSaldo)
+                .sum();
+
+        return PagoInciso.builder()
+                .poliza(poliza)
+                .subtotal(subtotal)
+                .saldoPendiente(saldoPendiente)
+                .usarSaldoPendiente(false)
+                .total(subtotal)
+                .incisosPorPagar(incisosPorPagar)
+                .incisosSaldosPendientes(incisosSaldosPendientes)
+                .build();
+    }
+
+    @Override
+    public void registarPagoIncisos(PagoInciso pagoInciso) {
+
     }
 
     private void validarLayoutRegistroEndosoAlta(List<AcuseImportacion> acuseImportacionList, List<Inciso> incisos, String username) {

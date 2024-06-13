@@ -19,17 +19,27 @@
 
             <p:outputPanel styleClass="field col-12 mb-5">
                <p:outputLabel for="@next" value="Incisos seleccionados" styleClass="block"/>
-               <p:inputNumber value="#{polizaView.pagoInciso.importe}" styleClass="w-full mb-3"
+               <p:inputNumber value="#{polizaView.pagoInciso.subtotal}" styleClass="w-full mb-3"
                               required="true" readonly="true"/>
             </p:outputPanel>
 
             <p:outputPanel styleClass="field col-12 mb-5">
                <p:outputLabel for="@next" value="Saldos pendientes" styleClass="block"/>
-               <p:inputNumber value="#{polizaView.pagoInciso.saldo}" styleClass="w-full mb-3"
+               <p:inputNumber value="#{polizaView.pagoInciso.saldoPendiente}" styleClass="w-full mb-3"
                               required="true" readonly="true"/>
             </p:outputPanel>
 
             <p:outputPanel styleClass="field col-12 mb-5">
+               <p:outputLabel for="@next" value="Saldos pendientes" styleClass="block"/>
+               <p:inputNumber value="#{polizaView.pagoInciso.saldoPendiente}" styleClass="w-full mb-3"
+                              required="true" readonly="true"/>
+
+               <p:selectBooleanCheckbox value="#{polizaView.pagoInciso.usarSaldoPendiente}" itemLabel="Usar saldo pendiente">
+                  <p:ajax update="growl registrar-pago-form:panel_total" listener="#{polizaView.usarSaldoPendiente}"/>
+               </p:selectBooleanCheckbox>
+            </p:outputPanel>
+
+            <p:outputPanel id="panel_total" styleClass="field col-12 mb-5">
                <p:outputLabel for="@next" value="Total a pagar" styleClass="block"/>
                <p:inputNumber value="#{polizaView.pagoInciso.total}" styleClass="w-full mb-3"
                               required="true" readonly="true"/>

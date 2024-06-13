@@ -1,7 +1,7 @@
 package gob.yucatan.sicasy.business.dtos;
 
 import gob.yucatan.sicasy.business.entities.Inciso;
-import jakarta.annotation.Nonnull;
+import gob.yucatan.sicasy.business.entities.Poliza;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -15,11 +15,11 @@ import java.util.List;
 @NoArgsConstructor
 @Builder
 public class PagoInciso implements Serializable {
-
+    private Poliza poliza;
     private List<Inciso> incisosPorPagar;
     private List<Inciso> incisosSaldosPendientes;
-    private Double importe;
-    private Double saldo;
+    private Double subtotal;
+    private Double saldoPendiente;
     private Double total;
-
+    private boolean usarSaldoPendiente;
 }

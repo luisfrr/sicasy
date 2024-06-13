@@ -1,6 +1,7 @@
 package gob.yucatan.sicasy.services.iface;
 
 import gob.yucatan.sicasy.business.dtos.AcuseImportacion;
+import gob.yucatan.sicasy.business.dtos.PagoInciso;
 import gob.yucatan.sicasy.business.entities.Inciso;
 
 import java.util.List;
@@ -18,5 +19,9 @@ public interface IIncisoService {
     void autorizarPago(List<Inciso> incisos, String username);
     void rechazarSolicitud(List<Inciso> incisos, String motivo, String username);
     void editar(Inciso inciso, String username);
+
+    PagoInciso getDetallePagoIncisos(List<Inciso> incisosPorPagar);
+    void registarPagoIncisos(PagoInciso pagoInciso);
+
 }
 

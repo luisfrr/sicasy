@@ -86,7 +86,6 @@ public class PolizaView implements Serializable {
     private final IAseguradoraService aseguradoraService;
     private final IIncisoService incisoService;
     private final IVehiculoService vehiculoService;
-    private Long idPoliza;
 
 
     @PostConstruct
@@ -627,34 +626,7 @@ public class PolizaView implements Serializable {
                 return;
             }
 
-
-            Poliza poliza = this.incisoSelectedList.stream().map(Inciso::getPoliza).findFirst().orElse(null);
-            List<Integer> idEstatusIncisoList = List.of(ESTATUS_INCISO_BAJA, ESTATUS_INCISO_PAGADA);
-
-            // Buscar saldos pendientes en incisos
-            Inciso inciso = Inciso.builder()
-                    .poliza(poliza) // Se buscan por poliza
-                    .idEstatusIncisoList(idEstatusIncisoList) // Se filtran los pagados por endoso de modificacion y los de baja
-                    .saldoDiferenteCero(true) // Y solo los que tienen saldo diferente de cero
-                    .build();
-
-            List<Inciso> incisosSaldosPendientes = incisoService.findAllDynamic(inciso);
-
-            Double totalImportePago = this.incisoSelectedList.stream()
-                    .mapToDouble(Inciso::getSaldo)
-                    .sum();
-            Double saldoPendiente = incisosSaldosPendientes.stream()
-                    .mapToDouble(Inciso::getSaldo)
-                    .sum();
-            Double totalPago = totalImportePago + saldoPendiente;
-
-            this.pagoInciso = PagoInciso.builder()
-                    .importe(totalImportePago)
-                    .saldo(saldoPendiente)
-                    .total(totalPago)
-                    .incisosPorPagar(this.incisoSelectedList)
-                    .incisosSaldosPendientes(incisosSaldosPendientes)
-                    .build();
+            this.pagoInciso = incisoService.getDetallePagoIncisos(this.incisoSelectedList);
 
             PrimeFaces.current().ajax().update("registrar-pago-dialog-content", "growl");
             PrimeFaces.current().executeScript("PF('registrarPagoDialog').show();");
@@ -679,8 +651,34 @@ public class PolizaView implements Serializable {
         PrimeFaces.current().executeScript("PF('registrarPagoDialog').hide();");
     }
 
+    public void usarSaldoPendiente() {
+        log.info("usar saldo pendiente");
+        if(this.pagoInciso != null) {
+            // Se recalcula el saldo
+            if(this.pagoInciso.isUsarSaldoPendiente()) {
+                Double total = this.pagoInciso.getSubtotal() + (this.pagoInciso.getSaldoPendiente());
+                this.pagoInciso.setTotal(total);
+            } else {
+                this.pagoInciso.setTotal(this.pagoInciso.getSubtotal());
+            }
+        }
+    }
+
     public void registrarPago() {
         log.info("registrar pago");
+        try {
+            this.incisoService.registarPagoIncisos(this.pagoInciso);
+        } catch (Exception e) {
+            log.warn("Error al registrar el pago de incisos", e);
+            String message;
+            if(e instanceof BadRequestException)
+                message = e.getMessage();
+            else if(e instanceof NotFoundException)
+                message = e.getMessage();
+            else
+                message = "Ocurrió un error inesperado. Intenta de nuevo más tarde.";
+            Messages.addError(message);
+        }
     }
 
     //region events
