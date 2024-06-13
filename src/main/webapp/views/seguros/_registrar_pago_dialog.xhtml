@@ -1,0 +1,52 @@
+<ui:composition
+        xmlns="http://www.w3.org/1999/xhtml"
+        xmlns:h="http://xmlns.jcp.org/jsf/html"
+        xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+        xmlns:p="http://primefaces.org/ui">
+
+   <p:dialog header="Registrar pago"
+             id="registrar-pago-dialog" widgetVar="registrarPagoDialog"
+             minHeight="400" width="600"
+             showEffect="fade" modal="true"
+             closable="true" closeOnEscape="true"
+             cache="false" responsive="true">
+      <p:outputPanel id="registrar-pago-dialog-content" styleClass="formgrid grid">
+         <h:form id="registrar-pago-form" styleClass="formgrid grid" rendered="#{polizaView.showRegistrarPagoDialog}">
+
+            <p:outputPanel styleClass="field col-12 mb-5">
+               <p class="text-lg">¿Estás seguro que deseas registrar el pago de los incisos seleccionados?</p>
+            </p:outputPanel>
+
+            <p:outputPanel styleClass="field col-12 mb-5">
+               <p:outputLabel for="@next" value="Incisos seleccionados" styleClass="block"/>
+               <p:inputNumber value="#{polizaView.pagoInciso.importe}" styleClass="w-full mb-3"
+                              required="true" readonly="true"/>
+            </p:outputPanel>
+
+            <p:outputPanel styleClass="field col-12 mb-5">
+               <p:outputLabel for="@next" value="Saldos pendientes" styleClass="block"/>
+               <p:inputNumber value="#{polizaView.pagoInciso.saldo}" styleClass="w-full mb-3"
+                              required="true" readonly="true"/>
+            </p:outputPanel>
+
+            <p:outputPanel styleClass="field col-12 mb-5">
+               <p:outputLabel for="@next" value="Total a pagar" styleClass="block"/>
+               <p:inputNumber value="#{polizaView.pagoInciso.total}" styleClass="w-full mb-3"
+                              required="true" readonly="true"/>
+            </p:outputPanel>
+
+            <p:outputPanel styleClass="field col-12 mt-5 mb-0">
+               <p:outputPanel styleClass="flex justify-content-end">
+                  <p:commandButton value="Cancelar" ajax="true" process="@this"
+                                   action="#{polizaView.cerrarRegistrarPagoModal()}"
+                                   styleClass="ui-button-outlined mr-4"/>
+                  <p:commandButton value="Pagar" ajax="true" process="@form"
+                                   action="#{polizaView.registrarPago()}"
+                                   update="growl" validateClient="true"/>
+               </p:outputPanel>
+            </p:outputPanel>
+         </h:form>
+      </p:outputPanel>
+   </p:dialog>
+
+</ui:composition>

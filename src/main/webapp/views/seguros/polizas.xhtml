@@ -190,7 +190,7 @@
                                         <p:menuitem value="Solicitar pago" ajax="true" action="#{polizaView.solicitarPagoIncisos()}">
                                             <p:confirm header="Confirmación" message="¿Estás seguro que deseas solicitar el pago de los incisos seleccionados?" icon="pi pi-exclamation-triangle"/>
                                         </p:menuitem>
-                                        <p:menuitem value="Registrar pago"/>
+                                        <p:menuitem value="Registrar pago" ajax="true" action="#{polizaView.abrirRegistrarPagoModal()}"/>
                                         <p:menuitem value="Rechazar solicitud" ajax="true" action="#{polizaView.abrirRechazarSolicitudModal()}"/>
                                     </p:menu>
                                 </div>
@@ -269,11 +269,13 @@
 
             <ui:include src="/views/seguros/_adjuntar_poliza_dialog.xhtml"/>
 
-            <ui:include src="/views/seguros/_registrar_endoso_alta.xhtml"/>
+            <ui:include src="/views/seguros/_registrar_endoso_alta_dialog.xhtml"/>
 
             <ui:include src="/views/seguros/_rechazar_solicitud_dialog.xhtml"/>
 
-            <ui:include src="/views/seguros/_editar_incisos.xhtml"/>
+            <ui:include src="/views/seguros/_editar_incisos_dialog.xhtml"/>
+
+            <ui:include src="/views/seguros/_registrar_pago_dialog.xhtml"/>
 
             
         </p:outputPanel>

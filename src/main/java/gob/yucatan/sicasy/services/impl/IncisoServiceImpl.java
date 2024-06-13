@@ -92,6 +92,15 @@ public class IncisoServiceImpl implements IIncisoService {
                     Inciso_.VEHICULO, Vehiculo_.NO_SERIE));
         }
 
+        if(inciso.getIdEstatusIncisoList() != null && !inciso.getIdEstatusIncisoList().isEmpty()) {
+            specification.add(new SearchCriteria(SearchOperation.IN,
+                    inciso.getIdEstatusIncisoList(),
+                    Inciso_.ESTATUS_INCISO, EstatusInciso_.ID_ESTATUS_INCISO));
+        }
+
+        if(inciso.isSaldoDiferenteCero())
+            specification.add(new SearchCriteria(SearchOperation.NOT_EQUAL, 0, Inciso_.SALDO));
+
         return incisoRepository.findAll(specification);
     }
 
@@ -351,7 +360,7 @@ public class IncisoServiceImpl implements IIncisoService {
         Integer ESTATUS_REGISTRADO = 1;
 
         if(inciso.getCosto() > 0)
-            inciso.setSaldo(-inciso.getCosto());
+            inciso.setSaldo(inciso.getCosto());
         else
             inciso.setSaldo(0d);
 

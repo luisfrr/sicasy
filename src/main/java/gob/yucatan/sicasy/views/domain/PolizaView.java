@@ -1,6 +1,7 @@
 package gob.yucatan.sicasy.views.domain;
 
 import gob.yucatan.sicasy.business.dtos.AcuseImportacion;
+import gob.yucatan.sicasy.business.dtos.PagoInciso;
 import gob.yucatan.sicasy.business.entities.*;
 import gob.yucatan.sicasy.business.exceptions.BadRequestException;
 import gob.yucatan.sicasy.business.exceptions.NotFoundException;
@@ -8,13 +9,13 @@ import gob.yucatan.sicasy.services.iface.IAseguradoraService;
 import gob.yucatan.sicasy.services.iface.IIncisoService;
 import gob.yucatan.sicasy.services.iface.IPolizaService;
 import gob.yucatan.sicasy.services.iface.IVehiculoService;
-import gob.yucatan.sicasy.services.impl.IncisoServiceImpl;
 import gob.yucatan.sicasy.utils.imports.excel.ConfigHeaderExcelModel;
 import gob.yucatan.sicasy.utils.imports.excel.ImportExcelFile;
 import gob.yucatan.sicasy.utils.imports.excel.SaveFile;
 import gob.yucatan.sicasy.views.beans.Messages;
 import gob.yucatan.sicasy.views.beans.UserSessionBean;
 import jakarta.annotation.PostConstruct;
+import jakarta.persistence.criteria.CriteriaBuilder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -60,6 +61,7 @@ public class PolizaView implements Serializable {
     private @Getter @Setter Inciso incisoSelected;
     private @Getter @Setter Inciso incisoForm;
     private @Getter @Setter String motivoRechazoSolicitud;
+    private @Getter @Setter PagoInciso pagoInciso;
 
     private @Getter boolean showPanelPolizas;
     private @Getter boolean showRegistrarPolizasDialog;
@@ -67,6 +69,7 @@ public class PolizaView implements Serializable {
     private @Getter boolean showRegistrarEndosoAltaDialog;
     private @Getter boolean showRechazarSolicitudDialog;
     private @Getter boolean showEditarIncisoDialog;
+    private @Getter boolean showRegistrarPagoDialog;
 
     private @Getter List<Aseguradora> aseguradoraList;
     private @Getter List<Poliza> polizaFormList;
@@ -83,6 +86,7 @@ public class PolizaView implements Serializable {
     private final IAseguradoraService aseguradoraService;
     private final IIncisoService incisoService;
     private final IVehiculoService vehiculoService;
+    private Long idPoliza;
 
 
     @PostConstruct
@@ -101,6 +105,7 @@ public class PolizaView implements Serializable {
         this.showAdjuntarPolizaDialog = false;
         this.showRechazarSolicitudDialog = false;
         this.showEditarIncisoDialog = false;
+        this.showRegistrarPagoDialog = false;
 
         this.loadAseguradorasList();
 
@@ -602,6 +607,80 @@ public class PolizaView implements Serializable {
                 message = "Ocurrió un error inesperado. Intenta de nuevo más tarde.";
             Messages.addError(message);
         }
+    }
+
+    public void abrirRegistrarPagoModal() {
+        log.info("abrir registrar pago modal");
+        try {
+            this.showRegistrarPagoDialog = true;
+
+            if(this.incisoSelectedList.isEmpty()) {
+                Messages.addWarn("No has seleccionado incisos");
+                return;
+            }
+
+            boolean notEnProcesoPago = this.incisoSelectedList.stream()
+                    .anyMatch(i -> !Objects.equals(i.getEstatusInciso().getIdEstatusInciso(), ESTATUS_INCISO_EN_PROCESO_PAGO));
+            // Si tiene un estatus diferente a EN PROCESO DE PAGO
+            if(notEnProcesoPago) {
+                Messages.addWarn("Asegúrate de seleccionar incisos EN PROCESO DE PAGO");
+                return;
+            }
+
+
+            Poliza poliza = this.incisoSelectedList.stream().map(Inciso::getPoliza).findFirst().orElse(null);
+            List<Integer> idEstatusIncisoList = List.of(ESTATUS_INCISO_BAJA, ESTATUS_INCISO_PAGADA);
+
+            // Buscar saldos pendientes en incisos
+            Inciso inciso = Inciso.builder()
+                    .poliza(poliza) // Se buscan por poliza
+                    .idEstatusIncisoList(idEstatusIncisoList) // Se filtran los pagados por endoso de modificacion y los de baja
+                    .saldoDiferenteCero(true) // Y solo los que tienen saldo diferente de cero
+                    .build();
+
+            List<Inciso> incisosSaldosPendientes = incisoService.findAllDynamic(inciso);
+
+            Double totalImportePago = this.incisoSelectedList.stream()
+                    .mapToDouble(Inciso::getSaldo)
+                    .sum();
+            Double saldoPendiente = incisosSaldosPendientes.stream()
+                    .mapToDouble(Inciso::getSaldo)
+                    .sum();
+            Double totalPago = totalImportePago + saldoPendiente;
+
+            this.pagoInciso = PagoInciso.builder()
+                    .importe(totalImportePago)
+                    .saldo(saldoPendiente)
+                    .total(totalPago)
+                    .incisosPorPagar(this.incisoSelectedList)
+                    .incisosSaldosPendientes(incisosSaldosPendientes)
+                    .build();
+
+            PrimeFaces.current().ajax().update("registrar-pago-dialog-content", "growl");
+            PrimeFaces.current().executeScript("PF('registrarPagoDialog').show();");
+        } catch (Exception e) {
+            log.warn("Error al abrir el formulario de registro de pago", e);
+            String message;
+            if(e instanceof BadRequestException)
+                message = e.getMessage();
+            else if(e instanceof NotFoundException)
+                message = e.getMessage();
+            else
+                message = "Ocurrió un error inesperado. Intenta de nuevo más tarde.";
+            Messages.addError(message);
+        }
+    }
+
+    public void cerrarRegistrarPagoModal() {
+        log.info("cerrar registrar pago modal");
+        this.showRegistrarPagoDialog = false;
+        this.pagoInciso = null;
+        PrimeFaces.current().ajax().update("registrar-pago-dialog-content", "growl");
+        PrimeFaces.current().executeScript("PF('registrarPagoDialog').hide();");
+    }
+
+    public void registrarPago() {
+        log.info("registrar pago");
     }
 
     //region events

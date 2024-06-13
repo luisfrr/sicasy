@@ -115,6 +115,11 @@ public class Inciso implements Cloneable, Serializable {
     @Transient
     private List<String> vehiculoNoSerieList;
 
+    @Transient
+    private List<Integer> idEstatusIncisoList;
+
+    @Transient
+    private boolean saldoDiferenteCero;
 
     @Override
     public boolean equals(Object o) {
