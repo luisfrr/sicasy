@@ -276,7 +276,17 @@ public class IncisoServiceImpl implements IIncisoService {
 
     @Override
     public void registarPagoIncisos(PagoInciso pagoInciso) {
+        // Sí usa el saldo pendiente
+        if(pagoInciso.isUsarSaldoPendiente()) {
 
+        } else { // Si no usa el saldo pendiente
+
+            pagoInciso.getIncisosPorPagar().forEach(inciso -> {
+
+            });
+
+
+        }
     }
 
     private void validarLayoutRegistroEndosoAlta(List<AcuseImportacion> acuseImportacionList, List<Inciso> incisos, String username) {
