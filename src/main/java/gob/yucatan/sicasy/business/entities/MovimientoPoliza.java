@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.io.Serializable;
+import java.util.Date;
 
 @Entity
 @Table(name = "movimiento_poliza")
@@ -55,7 +56,7 @@ public class MovimientoPoliza implements Serializable {
 
     @Column(name = "created_at", updatable = false)
     @Temporal(TemporalType.DATE)
-    private String createdAt;
+    private Date createdAt;
 
     @Column(name = "created_by")
     private String createdBy;
