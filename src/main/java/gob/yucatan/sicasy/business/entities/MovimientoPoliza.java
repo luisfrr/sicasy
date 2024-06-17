@@ -1,7 +1,6 @@
 package gob.yucatan.sicasy.business.entities;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import gob.yucatan.sicasy.business.dtos.BitacoraCambios;
 import gob.yucatan.sicasy.business.enums.EstatusRegistro;
 import gob.yucatan.sicasy.utils.strings.JsonStringConverter;
 import jakarta.persistence.*;
