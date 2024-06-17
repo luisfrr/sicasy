@@ -21,7 +21,7 @@ public interface IIncisoService {
     void editar(Inciso inciso, String username);
 
     PagoInciso getDetallePagoIncisos(List<Inciso> incisosPorPagar);
-    void registarPagoIncisos(PagoInciso pagoInciso);
+    void registarPagoIncisos(PagoInciso pagoInciso, String username);
 
 }
 

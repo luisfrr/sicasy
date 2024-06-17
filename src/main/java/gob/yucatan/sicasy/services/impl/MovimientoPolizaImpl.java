@@ -18,8 +18,8 @@ public class MovimientoPolizaImpl implements IMovimientoPolizaService {
 
     @Override
     public void save(MovimientoPoliza movimientoPoliza, String username) {
-        movimientoPoliza.setCreatedAt(new Date());
-        movimientoPoliza.setCreatedBy(username);
+        movimientoPoliza.setFechaCreacion(new Date());
+        movimientoPoliza.setCreadoPor(username);
         movimientoPolizaRepository.save(movimientoPoliza);
     }
 

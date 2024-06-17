@@ -1,10 +1,16 @@
 package gob.yucatan.sicasy.business.entities;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import gob.yucatan.sicasy.business.dtos.BitacoraCambios;
+import gob.yucatan.sicasy.business.enums.EstatusRegistro;
+import gob.yucatan.sicasy.utils.strings.JsonStringConverter;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Table(name = "movimiento_poliza")
@@ -17,27 +23,36 @@ public class MovimientoPoliza implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_movimiento_poliza")
+    @Column(name = "movimiento_poliza_id")
     private Long idMovimientoPoliza;
 
     @ManyToOne
     @JoinColumn(name = "poliza_id")
     private Poliza poliza;
 
+    @Column(name = "movimiento")
+    private String movimiento;
+
     @Column(name = "folio_factura")
     private String folioFactura;
-
-    @Column(name = "ruta_archivo_factura")
-    private String rutaArchivoFactura;
 
     @Column(name = "nombre_archivo_factura")
     private String nombreArchivoFactura;
 
-    @Column(name = "movimiento")
-    private String movimiento;
+    @Column(name = "ruta_archivo_factura")
+    private String rutaArchivoFactura;
 
     @Column(name = "usa_saldo_pendiente")
-    private Boolean usaSaldoPendiente;
+    private Integer usaSaldoPendiente;
+
+    @Column(name = "subtotal")
+    private Double subtotal;
+
+    @Column(name = "saldo_pendiente")
+    private Double saldoPendiente;
+
+    @Column(name = "total")
+    private Double total;
 
     @Column(name = "incisos_pagados")
     private String incisosPagados;
@@ -45,20 +60,34 @@ public class MovimientoPoliza implements Serializable {
     @Column(name = "incisos_pendientes")
     private String incisosPendientes;
 
-    @Column(name = "subtotal")
-    private Double subtotal;
+    @Column(name = "estatus_registro", nullable = false)
+    @Enumerated(EnumType.ORDINAL)
+    private EstatusRegistro estatusRegistro;
 
-    @Column(name = "saldoPendiente")
-    private Double saldoPendiente;
+    @Column(name = "fecha_creacion", updatable = false)
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date fechaCreacion;
 
-    @Column(name = "total_pagado")
-    private Double total;
+    @Column(name = "creado_por", updatable = false)
+    private String creadoPor;
 
-    @Column(name = "created_at", updatable = false)
-    @Temporal(TemporalType.DATE)
-    private Date createdAt;
 
-    @Column(name = "created_by")
-    private String createdBy;
+    public List<Inciso> getIncisosPagadosList() {
+        List<Inciso> incisos = new ArrayList<>();
+        if(this.incisosPagados != null && !this.incisosPagados.isEmpty()) {
+            TypeReference<List<Inciso>> typeRef = new TypeReference<>() {};
+            incisos = JsonStringConverter.convertToList(this.incisosPagados, typeRef);
+        }
+        return incisos;
+    }
+
+    public List<Inciso> getIncisosPendientesList() {
+        List<Inciso> incisos = new ArrayList<>();
+        if(this.incisosPendientes != null && !this.incisosPendientes.isEmpty()) {
+            TypeReference<List<Inciso>> typeRef = new TypeReference<>() {};
+            incisos = JsonStringConverter.convertToList(this.incisosPendientes, typeRef);
+        }
+        return incisos;
+    }
 
 }

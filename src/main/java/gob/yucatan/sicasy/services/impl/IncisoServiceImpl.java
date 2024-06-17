@@ -15,6 +15,7 @@ import gob.yucatan.sicasy.services.iface.IIncisoService;
 import gob.yucatan.sicasy.services.iface.IPolizaService;
 import gob.yucatan.sicasy.services.iface.IVehiculoService;
 import gob.yucatan.sicasy.utils.date.DateValidator;
+import gob.yucatan.sicasy.utils.strings.JsonStringConverter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -275,18 +276,63 @@ public class IncisoServiceImpl implements IIncisoService {
     }
 
     @Override
-    public void registarPagoIncisos(PagoInciso pagoInciso) {
-        // Sí usa el saldo pendiente
-        if(pagoInciso.isUsarSaldoPendiente()) {
+    public void registarPagoIncisos(PagoInciso pagoInciso, String username) {
 
-        } else { // Si no usa el saldo pendiente
+        String incisosSaldosPendiente;
+        if(pagoInciso.isUsarSaldoPendiente() && pagoInciso.getIncisosSaldosPendientes() != null
+                && !pagoInciso.getIncisosSaldosPendientes().isEmpty()) {
+            incisosSaldosPendiente = JsonStringConverter.convertToString(pagoInciso.getIncisosSaldosPendientes());
+
+            // Si el saldo pendiente (positivo) es mayor al subtotal entonces debe obtener
+            // la diferencia y ponerselo al último inciso pendiente
+
+            double saldoPendientePositivo = pagoInciso.getSaldoPendiente() * -1d;
+
+            if(saldoPendientePositivo > pagoInciso.getSubtotal()) {
+
+                int contador = 0;
+                int pendientes = pagoInciso.getIncisosSaldosPendientes().size() - 1;
+                pagoInciso.getIncisosSaldosPendientes().forEach(inciso -> {
+
+                    // Si es el ultimo
+                    if(contador == pendientes) {
+                        double diferencia = pagoInciso.getSaldoPendiente() - pagoInciso.getSubtotal();
+                        inciso.setSaldo(0d);
+                        inciso.setIncisoPagado(1);
+                        inciso.setFolioFactura(pagoInciso.getFolioFactura());
+                        inciso.setFechaModificacion(new Date());
+                        inciso.setModificadoPor(username);
+                    } else {
+                        inciso.setSaldo(0d);
+                        inciso.setIncisoPagado(1);
+                        inciso.setFolioFactura(pagoInciso.getFolioFactura());
+                        inciso.setFechaModificacion(new Date());
+                        inciso.setModificadoPor(username);
+                    }
+                });
+
+            }
+
+        } else {
+            incisosSaldosPendiente = "";
+        }
+
+        String incisosPorPagar;
+        if(pagoInciso.getIncisosPorPagar() != null && !pagoInciso.getIncisosPorPagar().isEmpty()) {
+            incisosPorPagar = JsonStringConverter.convertToString(pagoInciso.getIncisosPorPagar());
 
             pagoInciso.getIncisosPorPagar().forEach(inciso -> {
-
+                inciso.setSaldo(0d);
+                inciso.setIncisoPagado(1);
+                inciso.setFolioFactura(pagoInciso.getFolioFactura());
+                inciso.setFechaModificacion(new Date());
+                inciso.setModificadoPor(username);
             });
 
-
+        } else {
+            incisosPorPagar = "";
         }
+
     }
 
     private void validarLayoutRegistroEndosoAlta(List<AcuseImportacion> acuseImportacionList, List<Inciso> incisos, String username) {

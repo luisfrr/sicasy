@@ -16,6 +16,7 @@ import java.util.List;
 @Builder
 public class PagoInciso implements Serializable {
     private Poliza poliza;
+    private String folioFactura;
     private List<Inciso> incisosPorPagar;
     private List<Inciso> incisosSaldosPendientes;
     private Double subtotal;

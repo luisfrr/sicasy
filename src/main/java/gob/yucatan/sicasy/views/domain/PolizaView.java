@@ -667,7 +667,7 @@ public class PolizaView implements Serializable {
     public void registrarPago() {
         log.info("registrar pago");
         try {
-            this.incisoService.registarPagoIncisos(this.pagoInciso);
+            this.incisoService.registarPagoIncisos(this.pagoInciso, userSessionBean.getUserName());
         } catch (Exception e) {
             log.warn("Error al registrar el pago de incisos", e);
             String message;
