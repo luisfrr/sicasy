@@ -198,16 +198,6 @@ public class IncisoServiceImpl implements IIncisoService {
     }
 
     @Override
-    public void autorizarPago(List<Inciso> incisos, String username) {
-        List<Long> idIncisoList = incisos.stream()
-                .map(Inciso::getIdInciso)
-                .toList();
-        // Al autorizar el pago cambia a estatus en pagada
-        this.cambioEstatus(ACCION_AUTORIZAR_PAGO, ESTATUS_INCISO_PAGADA,
-                idIncisoList, null, username);
-    }
-
-    @Override
     public void rechazarSolicitud(List<Inciso> incisos, String motivo, String username) {
         List<Long> idIncisoList = incisos.stream()
                 .map(Inciso::getIdInciso)
