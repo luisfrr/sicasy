@@ -9,7 +9,7 @@ public interface IMantenimientoService {
     List<Mantenimiento> findAllDynamic(Mantenimiento mantenimiento);
     List<Mantenimiento> findByVehiculoId(Long idVehiculo);
     Mantenimiento findById(Long id);
-    void save(Mantenimiento mantenimiento);
+    Mantenimiento save(Mantenimiento mantenimiento);
     void delete(Long id, String username);
 
 }
