@@ -60,6 +60,9 @@ public class MovimientoPoliza implements Serializable {
     @Column(name = "incisos_pendientes")
     private String incisosPendientes;
 
+    @Column(name = "incisos_endoso")
+    private String incisosEndoso;
+
     @Column(name = "estatus_registro", nullable = false)
     @Enumerated(EnumType.ORDINAL)
     private EstatusRegistro estatusRegistro;
@@ -86,6 +89,15 @@ public class MovimientoPoliza implements Serializable {
         if(this.incisosPendientes != null && !this.incisosPendientes.isEmpty()) {
             TypeReference<List<Inciso>> typeRef = new TypeReference<>() {};
             incisos = JsonStringConverter.convertToList(this.incisosPendientes, typeRef);
+        }
+        return incisos;
+    }
+
+    public List<Inciso> getIncisosEndososList() {
+        List<Inciso> incisos = new ArrayList<>();
+        if(this.incisosEndoso != null && !this.incisosEndoso.isEmpty()) {
+            TypeReference<List<Inciso>> typeRef = new TypeReference<>() {};
+            incisos = JsonStringConverter.convertToList(this.incisosEndoso, typeRef);
         }
         return incisos;
     }

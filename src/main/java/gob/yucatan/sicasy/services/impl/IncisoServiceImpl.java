@@ -1,6 +1,8 @@
 package gob.yucatan.sicasy.services.impl;
 
 import gob.yucatan.sicasy.business.dtos.AcuseImportacion;
+import gob.yucatan.sicasy.business.dtos.EndosoBaja;
+import gob.yucatan.sicasy.business.dtos.EndosoModificacion;
 import gob.yucatan.sicasy.business.dtos.PagoInciso;
 import gob.yucatan.sicasy.business.entities.*;
 import gob.yucatan.sicasy.business.enums.EstatusRegistro;
@@ -188,6 +190,7 @@ public class IncisoServiceImpl implements IIncisoService {
     }
 
     @Override
+    @Transactional
     public void solicitarPago(List<Inciso> incisos, String username) {
         List<Long> idIncisoList = incisos.stream()
                 .map(Inciso::getIdInciso)
@@ -198,6 +201,7 @@ public class IncisoServiceImpl implements IIncisoService {
     }
 
     @Override
+    @Transactional
     public void rechazarSolicitud(List<Inciso> incisos, String motivo, String username) {
         List<Long> idIncisoList = incisos.stream()
                 .map(Inciso::getIdInciso)
@@ -208,6 +212,7 @@ public class IncisoServiceImpl implements IIncisoService {
     }
 
     @Override
+    @Transactional
     public void editar(Inciso inciso, String username) {
 
         Inciso incisoToUpdate = this.findById(inciso.getIdInciso());
@@ -268,6 +273,7 @@ public class IncisoServiceImpl implements IIncisoService {
     }
 
     @Override
+    @Transactional
     public void registarPagoIncisos(PagoInciso pagoInciso, String username) {
 
         if(pagoInciso.getIncisosPorPagar() == null) {
@@ -306,7 +312,11 @@ public class IncisoServiceImpl implements IIncisoService {
                         inciso.setSaldo(0d);
                         inciso.setTieneNotaCredito(0);
                     }
-                    inciso.setEstatusInciso(EstatusInciso.builder().idEstatusInciso(ESTATUS_INCISO_PAGADA).build());
+
+                    if(!Objects.equals(inciso.getEstatusInciso().getIdEstatusInciso(), ESTATUS_INCISO_BAJA)) {
+                        inciso.setEstatusInciso(EstatusInciso.builder().idEstatusInciso(ESTATUS_INCISO_PAGADA).build());
+                    }
+
                     inciso.setIncisoPagado(1);
                     inciso.setFolioFactura(pagoInciso.getFolioFactura());
                     inciso.setFechaModificacion(new Date());
@@ -316,9 +326,13 @@ public class IncisoServiceImpl implements IIncisoService {
             else {
                 // Se liquidan las notas de crédito
                 pagoInciso.getIncisosSaldosPendientes().forEach(inciso -> {
+
+                    if(!Objects.equals(inciso.getEstatusInciso().getIdEstatusInciso(), ESTATUS_INCISO_BAJA)) {
+                        inciso.setEstatusInciso(EstatusInciso.builder().idEstatusInciso(ESTATUS_INCISO_PAGADA).build());
+                    }
+
                     inciso.setSaldo(0d);
                     inciso.setTieneNotaCredito(0);
-                    inciso.setEstatusInciso(EstatusInciso.builder().idEstatusInciso(ESTATUS_INCISO_PAGADA).build());
                     inciso.setIncisoPagado(1);
                     inciso.setFolioFactura(pagoInciso.getFolioFactura());
                     inciso.setFechaModificacion(new Date());
@@ -353,6 +367,89 @@ public class IncisoServiceImpl implements IIncisoService {
                 .total(pagoInciso.getTotal())
                 .incisosPagados(incisosPorPagar)
                 .incisosPendientes(incisosSaldosPendiente)
+                .estatusRegistro(EstatusRegistro.ACTIVO)
+                .build();
+
+        movimientoPolizaService.save(movimientoPoliza, username);
+    }
+
+    @Override
+    @Transactional
+    public void generarEndosoModificacion(EndosoModificacion endosoModificacion, String username) {
+
+        int TIPO_MOVIMIENTO_SALDO_EN_CONTRA = 1;
+        int TIPO_MOVIMIENTO_SALDO_A_FAVOR = 2;
+        Inciso incisoModificacion = endosoModificacion.getInciso();
+
+        if(endosoModificacion.getTipoMovimiento() == TIPO_MOVIMIENTO_SALDO_EN_CONTRA) {
+            incisoModificacion.setSaldo(endosoModificacion.getCostoMovimiento());
+        } else if(endosoModificacion.getTipoMovimiento() == TIPO_MOVIMIENTO_SALDO_A_FAVOR) {
+            incisoModificacion.setSaldo(- endosoModificacion.getCostoMovimiento());
+        }
+
+        incisoModificacion.setEstatusInciso(EstatusInciso.builder().idEstatusInciso(ESTATUS_INCISO_REGISTRADA).build());
+        incisoModificacion.setObservaciones(endosoModificacion.getMotivo());
+
+        incisoModificacion.setModificadoPor(username);
+        incisoModificacion.setFechaModificacion(new Date());
+
+        Inciso incisoSaved = incisoRepository.save(incisoModificacion);
+
+        List<Inciso> incisoList = List.of(incisoSaved);
+        String incisosEndoso = JsonStringConverter.convertToString(incisoList);
+
+        MovimientoPoliza movimientoPoliza = MovimientoPoliza.builder()
+                .poliza(incisoModificacion.getPoliza())
+                .movimiento("Endoso de modificación: Inciso " + incisoModificacion.getInciso())
+                .folioFactura(endosoModificacion.getFolioFactura())
+                .nombreArchivoFactura(endosoModificacion.getNombreArchivoFactura())
+                .rutaArchivoFactura(endosoModificacion.getRutaArchivoFactura())
+                .usaSaldoPendiente(0)
+                .usaSaldoPendiente(0)
+                .subtotal(endosoModificacion.getCostoMovimiento())
+                .saldoPendiente(0d)
+                .total(endosoModificacion.getCostoMovimiento())
+                .incisosPagados("")
+                .incisosPendientes("")
+                .incisosEndoso(incisosEndoso)
+                .estatusRegistro(EstatusRegistro.ACTIVO)
+                .build();
+
+        movimientoPolizaService.save(movimientoPoliza, username);
+    }
+
+    @Override
+    @Transactional
+    public void generarEndosoBaja(EndosoBaja endosoBaja, String username) {
+
+        Inciso incisoBaja = endosoBaja.getInciso();
+
+        incisoBaja.setSaldo(- endosoBaja.getCostoMovimiento());
+        incisoBaja.setEstatusInciso(EstatusInciso.builder().idEstatusInciso(ESTATUS_INCISO_BAJA).build());
+        incisoBaja.setObservaciones(endosoBaja.getMotivo());
+
+        incisoBaja.setModificadoPor(username);
+        incisoBaja.setFechaModificacion(new Date());
+
+        Inciso incisoSaved = incisoRepository.save(incisoBaja);
+
+        List<Inciso> incisoList = List.of(incisoSaved);
+        String incisosEndoso = JsonStringConverter.convertToString(incisoList);
+
+        MovimientoPoliza movimientoPoliza = MovimientoPoliza.builder()
+                .poliza(incisoBaja.getPoliza())
+                .movimiento("Endoso de baja: Inciso " + incisoBaja.getInciso())
+                .folioFactura(endosoBaja.getFolioFactura())
+                .nombreArchivoFactura(endosoBaja.getNombreArchivoFactura())
+                .rutaArchivoFactura(endosoBaja.getRutaArchivoFactura())
+                .usaSaldoPendiente(0)
+                .usaSaldoPendiente(0)
+                .subtotal(endosoBaja.getCostoMovimiento())
+                .saldoPendiente(0d)
+                .total(endosoBaja.getCostoMovimiento())
+                .incisosPagados("")
+                .incisosPendientes("")
+                .incisosEndoso(incisosEndoso)
                 .estatusRegistro(EstatusRegistro.ACTIVO)
                 .build();
 
