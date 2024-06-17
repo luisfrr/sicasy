@@ -23,4 +23,8 @@ public class PagoInciso implements Serializable {
     private Double saldoPendiente;
     private Double total;
     private boolean usarSaldoPendiente;
+
+    private String nombreArchivo;
+    private String rutaArchivo;
+
 }

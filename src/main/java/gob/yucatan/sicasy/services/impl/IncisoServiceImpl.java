@@ -12,6 +12,7 @@ import gob.yucatan.sicasy.repository.criteria.SearchSpecification;
 import gob.yucatan.sicasy.repository.iface.IEstatusIncisoRepository;
 import gob.yucatan.sicasy.repository.iface.IIncisoRepository;
 import gob.yucatan.sicasy.services.iface.IIncisoService;
+import gob.yucatan.sicasy.services.iface.IMovimientoPolizaService;
 import gob.yucatan.sicasy.services.iface.IPolizaService;
 import gob.yucatan.sicasy.services.iface.IVehiculoService;
 import gob.yucatan.sicasy.utils.date.DateValidator;
@@ -41,6 +42,7 @@ public class IncisoServiceImpl implements IIncisoService {
     private final IPolizaService polizaService;
     private final IVehiculoService vehiculoService;
     private final IEstatusIncisoRepository estatusIncisoRepository;
+    private final IMovimientoPolizaService movimientoPolizaService;
 
     @Override
     public List<Inciso> findAllDynamic(Inciso inciso) {
@@ -278,61 +280,93 @@ public class IncisoServiceImpl implements IIncisoService {
     @Override
     public void registarPagoIncisos(PagoInciso pagoInciso, String username) {
 
-        String incisosSaldosPendiente;
-        if(pagoInciso.isUsarSaldoPendiente() && pagoInciso.getIncisosSaldosPendientes() != null
-                && !pagoInciso.getIncisosSaldosPendientes().isEmpty()) {
-            incisosSaldosPendiente = JsonStringConverter.convertToString(pagoInciso.getIncisosSaldosPendientes());
+        if(pagoInciso.getIncisosPorPagar() == null) {
+            throw new BadRequestException("No se ha logrado obtener los incisos por pagar");
+        }
 
-            // Si el saldo pendiente (positivo) es mayor al subtotal entonces debe obtener
-            // la diferencia y ponerselo al último inciso pendiente
+        if(pagoInciso.getIncisosSaldosPendientes() == null) {
+            throw new BadRequestException("No se ha logrado obtener los incisos con saldos pendientes");
+        }
 
-            double saldoPendientePositivo = pagoInciso.getSaldoPendiente() * -1d;
+        String incisosPorPagar = JsonStringConverter.convertToString(pagoInciso.getIncisosPorPagar());
+        String incisosSaldosPendiente= JsonStringConverter.convertToString(pagoInciso.getIncisosSaldosPendientes());
 
-            if(saldoPendientePositivo > pagoInciso.getSubtotal()) {
+        // Sí usa el saldo pendiente
+        if(pagoInciso.isUsarSaldoPendiente()) {
+            // Si el saldo es negativo es porque tiene saldo a favor
+            if(pagoInciso.getSaldoPendiente() < 0) {
+                double saldoPendientePositivo = pagoInciso.getSaldoPendiente() * -1d;
+
+                // Si el saldoPendientePosivio es mayor al subtotal se obtiene la diferencia
+                double diferenciaSaldoPendiente;
+                if(saldoPendientePositivo > pagoInciso.getSubtotal()) {
+                    diferenciaSaldoPendiente = saldoPendientePositivo - pagoInciso.getSubtotal();
+                } else {
+                    diferenciaSaldoPendiente = 0;
+                }
 
                 int contador = 0;
                 int pendientes = pagoInciso.getIncisosSaldosPendientes().size() - 1;
                 pagoInciso.getIncisosSaldosPendientes().forEach(inciso -> {
-
-                    // Si es el ultimo
+                    // Si es el último se le asigna la diferencia de saldo pendiente
                     if(contador == pendientes) {
-                        double diferencia = pagoInciso.getSaldoPendiente() - pagoInciso.getSubtotal();
-                        inciso.setSaldo(0d);
-                        inciso.setIncisoPagado(1);
-                        inciso.setFolioFactura(pagoInciso.getFolioFactura());
-                        inciso.setFechaModificacion(new Date());
-                        inciso.setModificadoPor(username);
+                        inciso.setSaldo(diferenciaSaldoPendiente);
+                        inciso.setTieneNotaCredito(1);
                     } else {
                         inciso.setSaldo(0d);
-                        inciso.setIncisoPagado(1);
-                        inciso.setFolioFactura(pagoInciso.getFolioFactura());
-                        inciso.setFechaModificacion(new Date());
-                        inciso.setModificadoPor(username);
+                        inciso.setTieneNotaCredito(0);
                     }
+                    inciso.setEstatusInciso(EstatusInciso.builder().idEstatusInciso(ESTATUS_INCISO_PAGADA).build());
+                    inciso.setIncisoPagado(1);
+                    inciso.setFolioFactura(pagoInciso.getFolioFactura());
+                    inciso.setFechaModificacion(new Date());
+                    inciso.setModificadoPor(username);
                 });
-
+            } // Si no, el saldo es positivo, entonces tiene saldo pendiente de pago
+            else {
+                // Se liquidan las notas de crédito
+                pagoInciso.getIncisosSaldosPendientes().forEach(inciso -> {
+                    inciso.setSaldo(0d);
+                    inciso.setTieneNotaCredito(0);
+                    inciso.setEstatusInciso(EstatusInciso.builder().idEstatusInciso(ESTATUS_INCISO_PAGADA).build());
+                    inciso.setIncisoPagado(1);
+                    inciso.setFolioFactura(pagoInciso.getFolioFactura());
+                    inciso.setFechaModificacion(new Date());
+                    inciso.setModificadoPor(username);
+                });
             }
-
-        } else {
-            incisosSaldosPendiente = "";
         }
 
-        String incisosPorPagar;
-        if(pagoInciso.getIncisosPorPagar() != null && !pagoInciso.getIncisosPorPagar().isEmpty()) {
-            incisosPorPagar = JsonStringConverter.convertToString(pagoInciso.getIncisosPorPagar());
 
-            pagoInciso.getIncisosPorPagar().forEach(inciso -> {
-                inciso.setSaldo(0d);
-                inciso.setIncisoPagado(1);
-                inciso.setFolioFactura(pagoInciso.getFolioFactura());
-                inciso.setFechaModificacion(new Date());
-                inciso.setModificadoPor(username);
-            });
+        pagoInciso.getIncisosPorPagar().forEach(inciso -> {
+            inciso.setSaldo(0d);
+            inciso.setTieneNotaCredito(0);
+            inciso.setEstatusInciso(EstatusInciso.builder().idEstatusInciso(ESTATUS_INCISO_PAGADA).build());
+            inciso.setIncisoPagado(1);
+            inciso.setFolioFactura(pagoInciso.getFolioFactura());
+            inciso.setFechaModificacion(new Date());
+            inciso.setModificadoPor(username);
+        });
 
-        } else {
-            incisosPorPagar = "";
-        }
+        incisoRepository.saveAll(pagoInciso.getIncisosPorPagar());
+        incisoRepository.saveAll(pagoInciso.getIncisosSaldosPendientes());
 
+        MovimientoPoliza movimientoPoliza = MovimientoPoliza.builder()
+                .movimiento("Registro de Pago")
+                .poliza(pagoInciso.getPoliza())
+                .folioFactura(pagoInciso.getFolioFactura())
+                .nombreArchivoFactura(pagoInciso.getNombreArchivo())
+                .rutaArchivoFactura(pagoInciso.getRutaArchivo())
+                .usaSaldoPendiente(pagoInciso.isUsarSaldoPendiente() ? 1 : 0)
+                .subtotal(pagoInciso.getSubtotal())
+                .saldoPendiente(pagoInciso.getSaldoPendiente())
+                .total(pagoInciso.getTotal())
+                .incisosPagados(incisosPorPagar)
+                .incisosPendientes(incisosSaldosPendiente)
+                .estatusRegistro(EstatusRegistro.ACTIVO)
+                .build();
+
+        movimientoPolizaService.save(movimientoPoliza, username);
     }
 
     private void validarLayoutRegistroEndosoAlta(List<AcuseImportacion> acuseImportacionList, List<Inciso> incisos, String username) {
@@ -529,7 +563,7 @@ public class IncisoServiceImpl implements IIncisoService {
             }
 
             for (Inciso inciso : incisoToUpdateList) {
-
+                log.info(accionStr);
                 inciso.setEstatusInciso(estatusInciso);
                 inciso.setObservaciones(motivo);
                 inciso.setModificadoPor(username);
