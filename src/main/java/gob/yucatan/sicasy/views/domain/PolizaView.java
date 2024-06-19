@@ -1,6 +1,8 @@
 package gob.yucatan.sicasy.views.domain;
 
 import gob.yucatan.sicasy.business.dtos.AcuseImportacion;
+import gob.yucatan.sicasy.business.dtos.EndosoBaja;
+import gob.yucatan.sicasy.business.dtos.EndosoModificacion;
 import gob.yucatan.sicasy.business.dtos.PagoInciso;
 import gob.yucatan.sicasy.business.entities.*;
 import gob.yucatan.sicasy.business.exceptions.BadRequestException;
@@ -65,6 +67,8 @@ public class PolizaView implements Serializable {
     private @Getter @Setter Inciso incisoForm;
     private @Getter @Setter String motivoRechazoSolicitud;
     private @Getter @Setter PagoInciso pagoInciso;
+    private @Getter @Setter EndosoModificacion endosoModificacion;
+    private @Getter @Setter EndosoBaja endosoBaja;
 
     private @Getter boolean showPanelPolizas;
     private @Getter boolean showRegistrarPolizasDialog;
@@ -73,6 +77,8 @@ public class PolizaView implements Serializable {
     private @Getter boolean showRechazarSolicitudDialog;
     private @Getter boolean showEditarIncisoDialog;
     private @Getter boolean showRegistrarPagoDialog;
+    private @Getter boolean showEndosoModificacionDialog;
+    private @Getter boolean showEndosoBajaDialog;
 
     private @Getter List<Aseguradora> aseguradoraList;
     private @Getter List<Poliza> polizaFormList;
@@ -110,6 +116,8 @@ public class PolizaView implements Serializable {
         this.showRechazarSolicitudDialog = false;
         this.showEditarIncisoDialog = false;
         this.showRegistrarPagoDialog = false;
+        this.showEndosoModificacionDialog = false;
+        this.showEndosoBajaDialog = false;
 
         this.loadAseguradorasList();
 
@@ -382,30 +390,29 @@ public class PolizaView implements Serializable {
         }
     }
 
-    public void buscarVehiculo() {
+    public void buscarVehiculo(String noSerie) {
         log.info("buscar vehiculos");
         try {
-            if(this.incisoForm != null && this.incisoForm.getVehiculo() != null) {
+            if(noSerie != null) {
 
-                if(this.incisoForm.getVehiculo().getNoSerie() != null) {
+                Vehiculo vehiculo = vehiculoService.findByNoSerie(noSerie);
 
-                    Vehiculo vehiculo = vehiculoService.findByNoSerie(this.incisoForm.getVehiculo().getNoSerie());
-
-                    if(vehiculo.getIncisoVigente() != null) {
-                        Messages.addWarn("El vehículo tiene una póliza vigente.");
-                        return;
-                    }
-
-                    this.informacionVehiculo = String.join(" | ",
-                            vehiculo.getNoSerie(),
-                            vehiculo.getMarca(),
-                            vehiculo.getAnio().toString(),
-                            vehiculo.getModelo(),
-                            vehiculo.getColor(),
-                            vehiculo.getDescripcionVehiculo());
-                } else {
+                // TODO: Validar si lo hace bien. poliza vigente
+                if(vehiculo.getIncisoVigente() != null) {
+                    Messages.addWarn("El vehículo tiene una póliza vigente.");
                     this.informacionVehiculo = "";
+                    return;
                 }
+
+                this.informacionVehiculo = String.join(" | ",
+                        vehiculo.getNoSerie(),
+                        vehiculo.getMarca(),
+                        vehiculo.getAnio().toString(),
+                        vehiculo.getModelo(),
+                        vehiculo.getColor(),
+                        vehiculo.getDescripcionVehiculo());
+            } else {
+                this.informacionVehiculo = "";
             }
         } catch (Exception e) {
             log.warn("Error al buscar un vehículo", e);
@@ -714,6 +721,51 @@ public class PolizaView implements Serializable {
                 message = "Ocurrió un error inesperado. Intenta de nuevo más tarde.";
             Messages.addError(message);
         }
+    }
+
+    public void abrirEndosoModificacionModal(Long idInciso) {
+        log.info("abrir endoso modificacion modal");
+        try {
+            this.showEndosoModificacionDialog = true;
+            this.file = null;
+            Inciso inciso = incisoService.findById(idInciso);
+            this.endosoModificacion = EndosoModificacion.builder()
+                    .inciso(inciso)
+                    .build();
+
+            Vehiculo vehiculo = inciso.getVehiculo();
+
+            this.informacionVehiculo = String.join(" | ",
+                    vehiculo.getNoSerie(),
+                    vehiculo.getMarca(),
+                    vehiculo.getAnio().toString(),
+                    vehiculo.getModelo(),
+                    vehiculo.getColor(),
+                    vehiculo.getDescripcionVehiculo());
+
+            PrimeFaces.current().ajax().update("endoso-modificacion-dialog-content", "growl");
+            PrimeFaces.current().executeScript("PF('endosoModificacionDialog').show();");
+        } catch (Exception e) {
+            log.warn("Error al abrir el formulario de endoso de modificacion", e);
+            String message;
+            if(e instanceof BadRequestException)
+                message = e.getMessage();
+            else if(e instanceof NotFoundException)
+                message = e.getMessage();
+            else
+                message = "Ocurrió un error inesperado. Intenta de nuevo más tarde.";
+            Messages.addError(message);
+        }
+    }
+
+    public void cerrarEndosoModificacionModal() {
+        log.info("cerrar endoso modificacion modal");
+        this.showEndosoModificacionDialog = false;
+        this.endosoModificacion = null;
+        this.file = null;
+        this.informacionVehiculo = "";
+        PrimeFaces.current().ajax().update("endoso-modificacion-dialog-content", "growl");
+        PrimeFaces.current().executeScript("PF('endosoModificacionDialog').hide();");
     }
 
     //region events

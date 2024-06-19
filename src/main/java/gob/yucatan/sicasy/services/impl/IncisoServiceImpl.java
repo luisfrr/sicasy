@@ -396,8 +396,10 @@ public class IncisoServiceImpl implements IIncisoService {
 
         if(endosoModificacion.getTipoMovimiento() == TIPO_MOVIMIENTO_SALDO_EN_CONTRA) {
             incisoModificacion.setSaldo(endosoModificacion.getCostoMovimiento());
+            incisoModificacion.setCosto(incisoModificacion.getCosto() + endosoModificacion.getCostoMovimiento());
         } else if(endosoModificacion.getTipoMovimiento() == TIPO_MOVIMIENTO_SALDO_A_FAVOR) {
             incisoModificacion.setSaldo(- endosoModificacion.getCostoMovimiento());
+            incisoModificacion.setCosto(incisoModificacion.getCosto() - endosoModificacion.getCostoMovimiento());
         }
 
         incisoModificacion.setEstatusInciso(EstatusInciso.builder().idEstatusInciso(ESTATUS_INCISO_REGISTRADA).build());

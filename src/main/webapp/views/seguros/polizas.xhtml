@@ -256,7 +256,8 @@
                             <p:menu overlay="true" trigger="dtAccionesIncisos" my="left top" at="left bottom">
                                 <p:menuitem value="Editar" ajax="true" action="#{polizaView.abrirEditarIncisoModal(inciso.idInciso)}"
                                             disabled="#{inciso.estatusInciso.idEstatusInciso != polizaView.ESTATUS_INCISO_REGISTRADA}"/>
-                                <p:menuitem value="Endoso de modificación" disabled="#{inciso.estatusInciso.idEstatusInciso != polizaView.ESTATUS_INCISO_PAGADA}"/>
+                                <p:menuitem value="Endoso de modificación" disabled="#{inciso.estatusInciso.idEstatusInciso != polizaView.ESTATUS_INCISO_PAGADA}"
+                                            ajax="true" action="#{polizaView.abrirEndosoModificacionModal(inciso.idInciso)}"/>
                                 <p:menuitem value="Endoso de baja" disabled="#{inciso.estatusInciso.idEstatusInciso != polizaView.ESTATUS_INCISO_PAGADA}"/>
                             </p:menu>
                         </p:column>
@@ -276,6 +277,8 @@
             <ui:include src="/views/seguros/_editar_incisos_dialog.xhtml"/>
 
             <ui:include src="/views/seguros/_registrar_pago_dialog.xhtml"/>
+
+            <ui:include src="/views/seguros/_endoso_modificacion_dialog.xhtml"/>
 
             
         </p:outputPanel>

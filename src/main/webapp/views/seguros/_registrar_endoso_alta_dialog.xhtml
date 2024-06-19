@@ -59,7 +59,7 @@
                         <div class="flex">
                            <p:commandButton icon="fi fi-rr-search" title="Buscar"
                                             styleClass="ui-button-outlined"
-                                            action="#{polizaView.buscarVehiculo()}"
+                                            action="#{polizaView.buscarVehiculo(polizaView.incisoForm.vehiculo.noSerie)}"
                                             process="@this,no_serie_vehiculo"
                                             update="endoso-alta-indiv-form:info_vehiculo growl"/>
                         </div>

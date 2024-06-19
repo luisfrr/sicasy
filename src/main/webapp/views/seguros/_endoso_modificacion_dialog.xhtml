@@ -1,0 +1,160 @@
+<ui:composition
+        xmlns="http://www.w3.org/1999/xhtml"
+        xmlns:h="http://xmlns.jcp.org/jsf/html"
+        xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+        xmlns:f="http://xmlns.jcp.org/jsf/core"
+        xmlns:p="http://primefaces.org/ui">
+
+   <p:dialog header="Endoso de modificación"
+             id="endoso-modificacion-dialog" widgetVar="endosoModificacionDialog"
+             height="400" width="1000"
+             showEffect="fade" modal="true"
+             closable="true" closeOnEscape="true"
+             cache="false" responsive="true">
+      <p:outputPanel id="endoso-modificacion-dialog-content" styleClass="formgrid grid">
+         <h:form id="endoso-modificacion-form" styleClass="formgrid grid"
+                 enctype="multipart/form-data"
+                 rendered="#{polizaView.showEndosoModificacionDialog}">
+
+            <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4">
+               <p:outputLabel for="@next" value="Aseguradora" styleClass="block"/>
+               <p:inputText styleClass="block w-full" required="true" disabled="true"
+                            value="#{polizaView.endosoModificacion.inciso.poliza.aseguradora.nombre}"/>
+               <span class="text-sm hidden"> </span>
+            </p:outputPanel>
+
+            <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4">
+               <p:outputLabel for="@next" value="No. Póliza" styleClass="block"/>
+               <p:inputText styleClass="block w-full" required="true" disabled="true"
+                            value="#{polizaView.endosoModificacion.inciso.poliza.numeroPoliza}"/>
+               <span class="text-sm hidden"> </span>
+            </p:outputPanel>
+
+            <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4">
+               <p:outputLabel for="@next" value="Inciso" styleClass="block"/>
+               <p:inputText styleClass="block w-full" required="true" disabled="true"
+                            value="#{polizaView.endosoModificacion.inciso.inciso}"/>
+               <span class="text-sm hidden"> </span>
+            </p:outputPanel>
+
+            <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4">
+               <div class="flex justify-content-start align-items-end h-full">
+                  <div class="flex flex-column align-items-start w-full mr-3">
+                     <p:outputLabel for="no_serie_vehiculo" value="No. Serie Vehículo" styleClass="block"/>
+                     <p:inputText id="no_serie_vehiculo" styleClass="block w-full" required="true"
+                                  value="#{polizaView.endosoModificacion.inciso.vehiculo.noSerie}"/>
+                     <span class="text-sm hidden"> </span>
+                  </div>
+                  <div class="flex">
+                     <p:commandButton icon="fi fi-rr-search" title="Buscar"
+                                      styleClass="ui-button-outlined"
+                                      action="#{polizaView.buscarVehiculo(polizaView.endosoModificacion.inciso.vehiculo.noSerie)}"
+                                      process="@this,no_serie_vehiculo"
+                                      update="endoso-modificacion-form:info_vehiculo growl"/>
+                  </div>
+               </div>
+            </p:outputPanel>
+
+            <p:outputPanel styleClass="field col-12">
+               <p:outputLabel for="info_vehiculo" value="Información del vehículo" styleClass="block"/>
+               <p:inputTextarea id="info_vehiculo" styleClass="block w-full" required="true"
+                                readonly="true" rows="2" cols="50"
+                                value="#{polizaView.informacionVehiculo}"/>
+               <span class="text-sm hidden"> </span>
+            </p:outputPanel>
+
+            <p:outputPanel styleClass="field col-12 md:col-6">
+               <p:outputLabel for="@next" styleClass="block" value="Fecha inicio"/>
+               <p:datePicker value="#{polizaView.endosoModificacion.inciso.fechaInicioVigencia}"
+                             placeholder="dd/MM/yyyy" pattern="dd/MM/yyyy"
+                             monthNavigator="true" yearNavigator="true"
+                             showWeek="true" locale="es" required="true"
+                             styleClass="w-full"/>
+            </p:outputPanel>
+
+            <p:outputPanel styleClass="field col-12 md:col-6">
+               <p:outputLabel for="@next" styleClass="block" value="Fecha fin"/>
+               <p:datePicker value="#{polizaView.endosoModificacion.inciso.fechaFinVigencia}"
+                             placeholder="dd/MM/yyyy" pattern="dd/MM/yyyy"
+                             monthNavigator="true" yearNavigator="true"
+                             showWeek="true" locale="es" required="true"
+                             styleClass="w-full"/>
+            </p:outputPanel>
+
+            <p:outputPanel styleClass="field col-12 md:col-6">
+               <p:outputLabel for="@next" styleClass="block" value="Costo"/>
+               <p:inputNumber styleClass="block w-full" required="true" disabled="true"
+                              value="#{polizaView.endosoModificacion.inciso.costo}"/>
+            </p:outputPanel>
+
+            <p:outputPanel styleClass="field col-12 md:col-6">
+               <p:outputLabel for="@next" value="Frecuencia de pago" styleClass="block"/>
+               <p:selectOneMenu value="#{polizaView.endosoModificacion.inciso.frecuenciaPago}"
+                                styleClass="w-full mw-auto">
+                  <f:selectItem itemLabel="Selecciona uno..."
+                                itemValue="#{null}"/>
+                  <f:selectItem itemLabel="MENSUAL"
+                                itemValue="MENSUAL"/>
+                  <f:selectItem itemLabel="SEMESTRAL"
+                                itemValue="SEMESTRAL"/>
+                  <f:selectItem itemLabel="ANUAL"
+                                itemValue="ANUAL"/>
+               </p:selectOneMenu>
+               <span class="text-sm hidden"> </span>
+            </p:outputPanel>
+
+            <p:outputPanel styleClass="field col-12">
+               <h6 class="mt-3 mb-0">Datos del movimiento</h6>
+            </p:outputPanel>
+
+            <p:outputPanel styleClass="field col-12 md:col-6">
+               <p:outputLabel for="@next" value="Costo del movimiento" styleClass="block"/>
+               <p:inputNumber value="#{polizaView.endosoModificacion.costoMovimiento}" styleClass="w-full mb-3"
+                              required="true"/>
+               <p class="text-sm mt-2">Este campo puede generar un saldo a favor o en contra y verse reflado en el costo del inciso.</p>
+            </p:outputPanel>
+
+            <p:outputPanel styleClass="field col-12 md:col-6">
+               <p:outputLabel for="@next" value="Saldo del movimiento" styleClass="block"/>
+               <p:selectOneMenu id="select_anexo" value="#{polizaView.endosoModificacion.tipoMovimiento}"
+                                styleClass="w-full mw-auto">
+                  <f:selectItem itemLabel="Selecciona uno..."
+                                itemValue="#{null}"/>
+                  <f:selectItem itemLabel="A FAVOR"
+                                itemValue="1"/>
+                  <f:selectItem itemLabel="EN CONTRA"
+                                itemValue="2"/>
+               </p:selectOneMenu>
+               <span class="text-sm hidden"> </span>
+            </p:outputPanel>
+
+            <p:outputPanel styleClass="field col-12 md:col-6">
+               <p:outputLabel for="@next" value="Folio factura" styleClass="block"/>
+               <p:inputText value="#{polizaView.endosoModificacion.folioFactura}" styleClass="w-full mb-3"
+                              required="true"/>
+            </p:outputPanel>
+
+            <p:outputPanel styleClass="field col-12 md:col-6">
+               <p:outputLabel for="@next" value="Factura" styleClass="block"/>
+               <p:fileUpload value="#{polizaView.file}" mode="simple"
+                             chooseButtonTitle="Elegir"
+                             accept=".pdf" sizeLimit="10000000"
+                             skinSimple="true" required="true"/>
+               <p class="text-sm mt-2">Solo se acepta un archivo en formato PDF.</p>
+            </p:outputPanel>
+
+            <p:outputPanel styleClass="field col-12 mt-5 mb-0">
+               <p:outputPanel styleClass="flex justify-content-end">
+                  <p:commandButton value="Cancelar" ajax="true" process="@this"
+                                   action="#{polizaView.cerrarEndosoModificacionModal()}"
+                                   styleClass="ui-button-outlined mr-4"/>
+                  <p:commandButton value="Pagar" ajax="true" process="@form"
+                                   action="#{polizaView.registrarPago}"
+                                   update="growl" validateClient="true"/>
+               </p:outputPanel>
+            </p:outputPanel>
+         </h:form>
+      </p:outputPanel>
+   </p:dialog>
+
+</ui:composition>
