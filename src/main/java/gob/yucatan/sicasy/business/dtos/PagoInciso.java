@@ -19,6 +19,7 @@ public class PagoInciso implements Serializable {
     private String folioFactura;
     private List<Inciso> incisosPorPagar;
     private List<Inciso> incisosSaldosPendientes;
+    private List<Inciso> incisosEndoso;
     private Double subtotal;
     private Double saldoPendiente;
     private Double total;

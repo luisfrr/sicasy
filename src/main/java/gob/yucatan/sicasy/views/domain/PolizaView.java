@@ -42,6 +42,9 @@ public class PolizaView implements Serializable {
     @Value("${app.files.folder.layouts.importar-vehiculo}")
     private @Getter String LAYOUT_POLIZAS;
 
+    @Value("${app.files.folder.polizas_facturas}")
+    private @Getter String LAYOUT_POLIZAS_FACTURAS;
+
     @Value("${app.files.folder.polizas}")
     private @Getter String FOLDER_POLIZAS;
 
@@ -80,6 +83,8 @@ public class PolizaView implements Serializable {
     private @Getter @Setter String layoutFileUpload;
     private @Getter @Setter List<Poliza> importPolizaList;
     private @Getter @Setter List<Inciso> importIncisoList;
+    private @Getter @Setter UploadedFile file;
+
 
     private final UserSessionBean userSessionBean;
     private final IPolizaService polizaService;
@@ -386,6 +391,11 @@ public class PolizaView implements Serializable {
 
                     Vehiculo vehiculo = vehiculoService.findByNoSerie(this.incisoForm.getVehiculo().getNoSerie());
 
+                    if(vehiculo.getIncisoVigente() != null) {
+                        Messages.addWarn("El vehículo tiene una póliza vigente.");
+                        return;
+                    }
+
                     this.informacionVehiculo = String.join(" | ",
                             vehiculo.getNoSerie(),
                             vehiculo.getMarca(),
@@ -460,6 +470,7 @@ public class PolizaView implements Serializable {
                     this.buscar();
                     this.verIncisos();
                     this.cerrarRegistroEndosoAltaDialog();
+                    PrimeFaces.current().ajax().update("form_datatable", "form_datatable_incisos");
                 }
             }
         } catch (Exception e) {
@@ -480,8 +491,9 @@ public class PolizaView implements Serializable {
         try {
             if(this.incisoSelectedList != null) {
                 incisoService.solicitarPago(this.incisoSelectedList, userSessionBean.getUserName());
+                this.buscar();
                 this.verIncisos();
-                PrimeFaces.current().ajax().update("form_datatable_incisos");
+                PrimeFaces.current().ajax().update("form_datatable", "form_datatable_incisos");
                 Messages.addInfo("Se ha solicitado pago de los incisos seleccionados");
             }
             else {
@@ -537,6 +549,7 @@ public class PolizaView implements Serializable {
                 incisoService.rechazarSolicitud(this.incisoSelectedList, this.motivoRechazoSolicitud,
                         userSessionBean.getUserName());
                 Messages.addInfo("Se ha rechazado la solicutd de pago de los incisos seleccionados");
+                this.buscar();
                 this.verIncisos();
                 this.cerrarRechazarSolicitudModal();
                 PrimeFaces.current().ajax().update("form_datatable", "form_datatable_incisos");
@@ -591,9 +604,10 @@ public class PolizaView implements Serializable {
             if(this.incisoForm != null) {
                 incisoService.editar(this.incisoForm, userSessionBean.getUserName());
                 Messages.addInfo("Se ha guardado correctamente");
+                this.buscar();
                 this.verIncisos();
                 this.cerrarEditarIncisoModal();
-                PrimeFaces.current().ajax().update("form_datatable_incisos");
+                PrimeFaces.current().ajax().update("form_datatable", "form_datatable_incisos");
             }
         } catch (Exception e) {
             log.error("Error editar el inciso", e);
@@ -612,6 +626,7 @@ public class PolizaView implements Serializable {
         log.info("abrir registrar pago modal");
         try {
             this.showRegistrarPagoDialog = true;
+            this.file = null;
 
             if(this.incisoSelectedList.isEmpty()) {
                 Messages.addWarn("No has seleccionado incisos");
@@ -647,6 +662,7 @@ public class PolizaView implements Serializable {
         log.info("cerrar registrar pago modal");
         this.showRegistrarPagoDialog = false;
         this.pagoInciso = null;
+        this.file = null;
         PrimeFaces.current().ajax().update("registrar-pago-dialog-content", "growl");
         PrimeFaces.current().executeScript("PF('registrarPagoDialog').hide();");
     }
@@ -666,8 +682,27 @@ public class PolizaView implements Serializable {
 
     public void registrarPago() {
         log.info("registrar pago");
+
+        try {
+            UploadedFile file = this.file;
+            String fileName = file.getFileName();
+            byte[] fileContent = file.getContent();
+            String filePath = SaveFile.importFileToPath(fileContent, fileName, LAYOUT_POLIZAS_FACTURAS);
+            this.pagoInciso.setNombreArchivo(fileName);
+            this.pagoInciso.setRutaArchivo(filePath);
+        } catch (Exception e) {
+            log.error("Ocurrio un error al subir la factura.", e);
+            Messages.addError("Ocurrió un error al subir la factura. Intente nuevamente, si el problema persiste contacte a soporte.");
+            return;
+        }
+
         try {
             this.incisoService.registarPagoIncisos(this.pagoInciso, userSessionBean.getUserName());
+            this.buscar();
+            this.verIncisos();
+            this.cerrarRegistrarPagoModal();
+            PrimeFaces.current().ajax().update("form_datatable", "form_datatable_incisos");
+            Messages.addInfo("Se ha registrado correctamente el pago.");
         } catch (Exception e) {
             log.warn("Error al registrar el pago de incisos", e);
             String message;

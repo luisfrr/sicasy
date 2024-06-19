@@ -224,7 +224,7 @@ public class IncisoServiceImpl implements IIncisoService {
         incisoToUpdate.setFechaFinVigencia(inciso.getFechaFinVigencia());
         incisoToUpdate.setCosto(inciso.getCosto());
         if(incisoToUpdate.getCosto() > 0)
-            incisoToUpdate.setSaldo(-inciso.getCosto());
+            incisoToUpdate.setSaldo(inciso.getCosto());
         else
             incisoToUpdate.setSaldo(0d);
 
@@ -284,8 +284,21 @@ public class IncisoServiceImpl implements IIncisoService {
             throw new BadRequestException("No se ha logrado obtener los incisos con saldos pendientes");
         }
 
+        try {
+            pagoInciso.getIncisosPorPagar().forEach(inciso -> {
+                inciso.getPoliza().setIncisoSet(null);
+                inciso.getVehiculo().setIncisoSet(null);
+            });
+            pagoInciso.getIncisosSaldosPendientes().forEach(inciso -> {
+                inciso.getPoliza().setIncisoSet(null);
+                inciso.getVehiculo().setIncisoSet(null);
+            });
+        } catch (Exception e) {
+            log.warn("No se ha logrado setear inciso.getPoliza().setIncisoSet(null)", e);
+        }
+
         String incisosPorPagar = JsonStringConverter.convertToString(pagoInciso.getIncisosPorPagar());
-        String incisosSaldosPendiente= JsonStringConverter.convertToString(pagoInciso.getIncisosSaldosPendientes());
+        String incisosSaldosPendiente = JsonStringConverter.convertToString(pagoInciso.getIncisosSaldosPendientes());
 
         // Sí usa el saldo pendiente
         if(pagoInciso.isUsarSaldoPendiente()) {
@@ -341,7 +354,6 @@ public class IncisoServiceImpl implements IIncisoService {
             }
         }
 
-
         pagoInciso.getIncisosPorPagar().forEach(inciso -> {
             inciso.setSaldo(0d);
             inciso.setTieneNotaCredito(0);
@@ -367,6 +379,7 @@ public class IncisoServiceImpl implements IIncisoService {
                 .total(pagoInciso.getTotal())
                 .incisosPagados(incisosPorPagar)
                 .incisosPendientes(incisosSaldosPendiente)
+                .incisosEndoso("")
                 .estatusRegistro(EstatusRegistro.ACTIVO)
                 .build();
 

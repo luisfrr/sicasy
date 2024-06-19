@@ -241,7 +241,7 @@
                             <h:outputText value="#{inciso.tieneNotaCredito == 1 ?  'Sí' : ''}"/>
                         </p:column>
                         <p:column headerText="Pagado" width="80"  styleClass="text-center">
-                            <h:outputText value="#{inciso.tieneNotaCredito == 1 ?  'Sí' : 'No'}"/>
+                            <h:outputText value="#{inciso.incisoPagado == 1 ?  'Sí' : 'No'}"/>
                         </p:column>
                         <p:column headerText="Estatus" width="150" styleClass="text-center">
                             <h:outputText value="#{inciso.estatusInciso.nombre}"/>
