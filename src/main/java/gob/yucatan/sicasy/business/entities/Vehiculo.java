@@ -182,7 +182,7 @@ public class Vehiculo implements Cloneable, Serializable {
         if(this.incisoSet != null && !this.incisoSet.isEmpty()) {
             Date today = new Date();
             return this.incisoSet.stream()
-                    .filter(i -> !DateValidator.isDateBetween(i.getFechaInicioVigencia(), i.getFechaFinVigencia(), today) &&
+                    .filter(i -> DateValidator.isDateBetween(i.getFechaInicioVigencia(), i.getFechaFinVigencia(), today) &&
                             i.getEstatusRegistro() == EstatusRegistro.ACTIVO)
                     .findFirst().orElse(null);
         }

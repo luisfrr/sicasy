@@ -12,7 +12,9 @@ public interface IIncisoService {
 
     List<Inciso> findAllDynamic(Inciso inciso);
     List<Inciso> findByIdPoliza(Long idPoliza);
+    List<Inciso> findByIdVehiculo(Long idVehiculo);
     Inciso findById(Long id);
+
 
     void generarEndosoAlta(Inciso inciso, String username);
     List<AcuseImportacion> importarEndosoAlta(List<Inciso> incisos, String username);

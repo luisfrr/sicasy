@@ -31,28 +31,37 @@ public class FileDownloadBean implements Serializable {
 
     public DefaultStreamedContent downloadFileByPath(String filePath) {
         log.info("downloadFile: {}", filePath);
-        File fi = new File(filePath);
-        try {
-            if (!fi.exists()) {
-                FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                        "Error", "No se encontró el archivo.");
-                FacesContext.getCurrentInstance().addMessage(null, msg);
-            }
-            try (InputStream input = new FileInputStream(fi)) {
-                ExternalContext externalContext = FacesContext.getCurrentInstance().getExternalContext();
+        File file = new File(filePath);
 
-                return DefaultStreamedContent.builder()
-                        .name(fi.getName())
-                        .contentType(externalContext.getMimeType(fi.getName()))
-                        .stream(() -> input)
-                        .build();
-            }
-        }catch (Exception e) {
-            log.error(e.getMessage());
+        if (!file.exists()) {
+            FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Error", "No se encontró el archivo.");
+            FacesContext.getCurrentInstance().addMessage(null, msg);
             return null;
         }
 
-
+        try {
+            ExternalContext externalContext = FacesContext.getCurrentInstance().getExternalContext();
+            String contentType = externalContext.getMimeType(file.getName());
+            return DefaultStreamedContent.builder()
+                    .name(file.getName())
+                    .contentType(contentType)
+                    .stream(() -> {
+                        try {
+                            return new FileInputStream(file);
+                        } catch (FileNotFoundException e) {
+                            log.error("File not found: {}", filePath, e);
+                            return null;
+                        }
+                    })
+                    .build();
+        } catch (Exception e) {
+            log.error("Error downloading file: {}", filePath, e);
+            FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Error", "Ocurrió un error al intentar descargar el archivo.");
+            FacesContext.getCurrentInstance().addMessage(null, msg);
+            return null;
+        }
     }
 
 }

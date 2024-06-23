@@ -120,6 +120,15 @@ public class IncisoServiceImpl implements IIncisoService {
     }
 
     @Override
+    public List<Inciso> findByIdVehiculo(Long idVehiculo) {
+        Inciso inciso = Inciso.builder()
+                .vehiculo(Vehiculo.builder().idVehiculo(idVehiculo).build())
+                .estatusRegistro(EstatusRegistro.ACTIVO)
+                .build();
+        return this.findAllDynamic(inciso);
+    }
+
+    @Override
     public Inciso findById(Long id) {
         return incisoRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("No se ha logrado obtener la información del inciso."));

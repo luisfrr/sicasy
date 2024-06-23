@@ -230,11 +230,65 @@
                                               style="height: 100px; width: auto; display: block" stream="false" />
                            </f:facet>
                         </p:galleria>
+                        <p:outputPanel styleClass="mb-4 grid" rendered="#{vehiculoView.vehiculoFotoList == null or vehiculoView.vehiculoFotoList.size() == 0}">
+                           <p:outputPanel styleClass="field col-12">
+                              No se han registrado fotos del vehículo
+                           </p:outputPanel>
+                        </p:outputPanel>
                      </p:panel>
                   </h:form>
                </p:outputPanel>
                <p:outputPanel styleClass="col-12 md:col-6 mb-5">
-                  Polizas
+                  <h:form id="form_polizas">
+                     <p:panel header="Póliza vigente" widgetVar="panelPolizaVigente" styleClass="mb-5">
+                        <p:outputPanel styleClass="mb-4 grid" rendered="#{vehiculoView.vehiculoSelected.incisoVigente != null}">
+                           <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4">
+                              <p:outputLabel for="@next" value="Aseguradora" styleClass="block"/>
+                              <p:inputText styleClass="block w-full" readonly="true"
+                                           value="#{vehiculoView.vehiculoSelected.incisoVigente.poliza.aseguradora.nombre}"/>
+                              <span class="text-sm hidden"> </span>
+                           </p:outputPanel>
+                           <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4">
+                              <p:outputLabel for="@next" value="Póliza" styleClass="block"/>
+                              <p:inputText styleClass="block w-full" readonly="true"
+                                           value="#{vehiculoView.vehiculoSelected.incisoVigente.poliza.numeroPoliza}"/>
+                              <span class="text-sm hidden"> </span>
+                           </p:outputPanel>
+                           <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4">
+                              <p:outputLabel for="@next" value="Inciso" styleClass="block"/>
+                              <p:inputText styleClass="block w-full" readonly="true"
+                                           value="#{vehiculoView.vehiculoSelected.incisoVigente.inciso}"/>
+                              <span class="text-sm hidden"> </span>
+                           </p:outputPanel>
+                           <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4">
+                              <p:outputLabel for="@next" value="Fecha inicio" styleClass="block"/>
+                              <p:inputText styleClass="block w-full" readonly="true"
+                                           value="#{vehiculoView.vehiculoSelected.incisoVigente.fechaInicioVigencia}">
+                                 <f:convertDateTime pattern="dd/MM/yyyy"/>
+                              </p:inputText>
+                              <span class="text-sm hidden"> </span>
+                           </p:outputPanel>
+                           <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4">
+                              <p:outputLabel for="@next" value="Fecha fin" styleClass="block"/>
+                              <p:inputText styleClass="block w-full" readonly="true"
+                                           value="#{vehiculoView.vehiculoSelected.incisoVigente.fechaFinVigencia}">
+                                 <f:convertDateTime pattern="dd/MM/yyyy"/>
+                              </p:inputText>
+                              <span class="text-sm hidden"> </span>
+                           </p:outputPanel>
+                           <p:outputPanel styleClass="field col-12">
+                              <p:commandLink value="Descargar póliza" ajax="false" onclick="PrimeFaces.monitorDownload(start, stop);" rendered="#{vehiculoView.vehiculoSelected.incisoVigente.poliza.rutaArchivo != null}">
+                                 <p:fileDownload value="#{fileDownloadBean.downloadFileByPath(vehiculoView.vehiculoSelected.incisoVigente.poliza.rutaArchivo)}"/>
+                              </p:commandLink>
+                           </p:outputPanel>
+                        </p:outputPanel>
+                        <p:outputPanel styleClass="mb-5 grid" rendered="#{vehiculoView.vehiculoSelected.incisoVigente == null}">
+                           <p:outputPanel styleClass="field col-12">
+                              No cuenta con una póliza vigente
+                           </p:outputPanel>
+                        </p:outputPanel>
+                     </p:panel>
+                  </h:form>
                </p:outputPanel>
             </p:outputPanel>
          </p:tab>
