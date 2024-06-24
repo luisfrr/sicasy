@@ -795,6 +795,70 @@ public class PolizaView implements Serializable {
         }
     }
 
+    public void abrirEndosoBajaModal(Long idInciso) {
+        log.info("abrir endoso baja modal");
+        try {
+            this.showEndosoBajaDialog = true;
+            this.file = null;
+            Inciso inciso = incisoService.findById(idInciso);
+            this.endosoBaja = EndosoBaja.builder()
+                    .inciso(inciso)
+                    .build();
+            Vehiculo vehiculo = inciso.getVehiculo();
+            this.informacionVehiculo = String.join(" | ",
+                    vehiculo.getNoSerie(),
+                    vehiculo.getMarca(),
+                    vehiculo.getAnio().toString(),
+                    vehiculo.getModelo(),
+                    vehiculo.getColor(),
+                    vehiculo.getDescripcionVehiculo());
+            PrimeFaces.current().ajax().update("endoso-baja-dialog-content", "growl");
+            PrimeFaces.current().executeScript("PF('endosoBajaDialog').show();");
+        } catch (Exception e) {
+            log.warn("Error al abrir el formulario de endoso de modificacion", e);
+            String message;
+            if(e instanceof BadRequestException)
+                message = e.getMessage();
+            else if(e instanceof NotFoundException)
+                message = e.getMessage();
+            else
+                message = "Ocurrió un error inesperado. Intenta de nuevo más tarde.";
+            Messages.addError(message);
+        }
+    }
+
+    public void cerrarEndosoBajaModal() {
+        log.info("cerrar endoso baja modal");
+        this.showEndosoBajaDialog = false;
+        this.endosoBaja = null;
+        this.file = null;
+        this.informacionVehiculo = "";
+        PrimeFaces.current().ajax().update("endoso-modificacion-dialog-content", "growl");
+        PrimeFaces.current().executeScript("PF('endosoBajaDialog').hide();");
+    }
+
+    public void guardarEndosoBaja() {
+        log.info("guardar endoso baja");
+        try {
+            incisoService.generarEndosoBaja(this.endosoBaja, userSessionBean.getUserName());
+            this.buscar();
+            this.verIncisos();
+            this.cerrarEndosoBajaModal();
+            PrimeFaces.current().ajax().update("form_datatable", "form_datatable_incisos");
+            Messages.addInfo("Se ha registrado el endoso de baja.");
+        } catch (Exception e) {
+            log.warn("Error al abrir el formulario de endoso de baja", e);
+            String message;
+            if(e instanceof BadRequestException)
+                message = e.getMessage();
+            else if(e instanceof NotFoundException)
+                message = e.getMessage();
+            else
+                message = "Ocurrió un error inesperado. Intenta de nuevo más tarde.";
+            Messages.addError(message);
+        }
+    }
+
     //region events
 
     public void onChangeAseguradoraForm() {

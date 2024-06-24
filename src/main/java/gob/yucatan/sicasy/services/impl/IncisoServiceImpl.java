@@ -450,7 +450,12 @@ public class IncisoServiceImpl implements IIncisoService {
 
         Inciso incisoBaja = endosoBaja.getInciso();
 
-        incisoBaja.setSaldo(- endosoBaja.getCostoMovimiento());
+        if(endosoBaja.getCostoMovimiento() <= 0) {
+            incisoBaja.setSaldo(0d);
+        } else {
+            incisoBaja.setSaldo(- endosoBaja.getCostoMovimiento());
+        }
+
         incisoBaja.setEstatusInciso(EstatusInciso.builder().idEstatusInciso(ESTATUS_INCISO_BAJA).build());
         incisoBaja.setObservaciones(endosoBaja.getMotivo());
 

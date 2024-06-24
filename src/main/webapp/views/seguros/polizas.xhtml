@@ -258,7 +258,8 @@
                                             disabled="#{inciso.estatusInciso.idEstatusInciso != polizaView.ESTATUS_INCISO_REGISTRADA or inciso.tieneNotaCredito == 1}"/>
                                 <p:menuitem value="Endoso de modificación" disabled="#{inciso.estatusInciso.idEstatusInciso != polizaView.ESTATUS_INCISO_PAGADA}"
                                             ajax="true" action="#{polizaView.abrirEndosoModificacionModal(inciso.idInciso)}"/>
-                                <p:menuitem value="Endoso de baja" disabled="#{inciso.estatusInciso.idEstatusInciso != polizaView.ESTATUS_INCISO_PAGADA}"/>
+                                <p:menuitem value="Endoso de baja" disabled="#{inciso.estatusInciso.idEstatusInciso != polizaView.ESTATUS_INCISO_PAGADA}"
+                                            ajax="true" action="#{polizaView.abrirEndosoBajaModal(inciso.idInciso)}"/>
                             </p:menu>
                         </p:column>
                     </p:dataTable>
@@ -279,6 +280,8 @@
             <ui:include src="/views/seguros/_registrar_pago_dialog.xhtml"/>
 
             <ui:include src="/views/seguros/_endoso_modificacion_dialog.xhtml"/>
+
+            <ui:include src="/views/seguros/_endoso_baja_dialog.xhtml"/>
 
             
         </p:outputPanel>
