@@ -679,8 +679,13 @@ public class PolizaView implements Serializable {
         if(this.pagoInciso != null) {
             // Se recalcula el saldo
             if(this.pagoInciso.isUsarSaldoPendiente()) {
-                Double total = this.pagoInciso.getSubtotal() + (this.pagoInciso.getSaldoPendiente());
-                this.pagoInciso.setTotal(total);
+                double total = this.pagoInciso.getSubtotal() + (this.pagoInciso.getSaldoPendiente());
+                if(total < 0) {
+                    this.pagoInciso.setTotal(0d);
+                }
+                else {
+                    this.pagoInciso.setTotal(total);
+                }
             } else {
                 this.pagoInciso.setTotal(this.pagoInciso.getSubtotal());
             }
@@ -766,6 +771,28 @@ public class PolizaView implements Serializable {
         this.informacionVehiculo = "";
         PrimeFaces.current().ajax().update("endoso-modificacion-dialog-content", "growl");
         PrimeFaces.current().executeScript("PF('endosoModificacionDialog').hide();");
+    }
+
+    public void guardarEndosoModificacion() {
+        log.info("guardar endoso modificacion");
+        try {
+            incisoService.generarEndosoModificacion(this.endosoModificacion, userSessionBean.getUserName());
+            this.buscar();
+            this.verIncisos();
+            this.cerrarEndosoModificacionModal();
+            PrimeFaces.current().ajax().update("form_datatable", "form_datatable_incisos");
+            Messages.addInfo("Se ha registrado el endoso de modificación.");
+        } catch (Exception e) {
+            log.warn("Error al abrir el formulario de endoso de modificacion", e);
+            String message;
+            if(e instanceof BadRequestException)
+                message = e.getMessage();
+            else if(e instanceof NotFoundException)
+                message = e.getMessage();
+            else
+                message = "Ocurrió un error inesperado. Intenta de nuevo más tarde.";
+            Messages.addError(message);
+        }
     }
 
     //region events

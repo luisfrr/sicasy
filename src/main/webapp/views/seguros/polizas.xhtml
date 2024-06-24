@@ -255,7 +255,7 @@
                                              icon="fi fi-rr-menu-dots-vertical" styleClass="rounded-button ui-button-outlined" />
                             <p:menu overlay="true" trigger="dtAccionesIncisos" my="left top" at="left bottom">
                                 <p:menuitem value="Editar" ajax="true" action="#{polizaView.abrirEditarIncisoModal(inciso.idInciso)}"
-                                            disabled="#{inciso.estatusInciso.idEstatusInciso != polizaView.ESTATUS_INCISO_REGISTRADA}"/>
+                                            disabled="#{inciso.estatusInciso.idEstatusInciso != polizaView.ESTATUS_INCISO_REGISTRADA or inciso.tieneNotaCredito == 1}"/>
                                 <p:menuitem value="Endoso de modificación" disabled="#{inciso.estatusInciso.idEstatusInciso != polizaView.ESTATUS_INCISO_PAGADA}"
                                             ajax="true" action="#{polizaView.abrirEndosoModificacionModal(inciso.idInciso)}"/>
                                 <p:menuitem value="Endoso de baja" disabled="#{inciso.estatusInciso.idEstatusInciso != polizaView.ESTATUS_INCISO_PAGADA}"/>
