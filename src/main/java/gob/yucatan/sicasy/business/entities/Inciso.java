@@ -50,10 +50,10 @@ public class Inciso implements Cloneable, Serializable {
     @JoinColumn(name = "estatus_inciso_id", nullable = false)
     private EstatusInciso estatusInciso;
 
-    @Column(name = "costo")
+    @Column(name = "costo_poliza")
     private Double costo;
 
-    @Column(name = "saldo")
+    @Column(name = "saldo_poliza")
     private Double saldo;
 
     @Column(name = "frecuencia_pago")
