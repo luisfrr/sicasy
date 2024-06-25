@@ -1,10 +1,12 @@
-package gob.yucatan.sicasy.views.domain;
+package gob.yucatan.sicasy.views.modulos;
 
+import gob.yucatan.sicasy.business.annotations.ConfigPermiso;
 import gob.yucatan.sicasy.business.dtos.AcuseImportacion;
 import gob.yucatan.sicasy.business.dtos.EndosoBaja;
 import gob.yucatan.sicasy.business.dtos.EndosoModificacion;
 import gob.yucatan.sicasy.business.dtos.PagoInciso;
 import gob.yucatan.sicasy.business.entities.*;
+import gob.yucatan.sicasy.business.enums.TipoPermiso;
 import gob.yucatan.sicasy.business.exceptions.BadRequestException;
 import gob.yucatan.sicasy.business.exceptions.NotFoundException;
 import gob.yucatan.sicasy.services.iface.IAseguradoraService;
@@ -17,7 +19,6 @@ import gob.yucatan.sicasy.utils.imports.excel.SaveFile;
 import gob.yucatan.sicasy.views.beans.Messages;
 import gob.yucatan.sicasy.views.beans.UserSessionBean;
 import jakarta.annotation.PostConstruct;
-import jakarta.persistence.criteria.CriteriaBuilder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -27,6 +28,7 @@ import org.primefaces.event.FileUploadEvent;
 import org.primefaces.model.file.UploadedFile;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
 import java.io.Serializable;
@@ -39,6 +41,10 @@ import java.util.Objects;
 @Scope("view")
 @RequiredArgsConstructor
 @Slf4j
+@ConfigPermiso(tipo = TipoPermiso.VIEW, codigo = "POLIZA_VIEW",
+        nombre = "Módulo de Pólizas e Incisos", descripcion = "Permite ver y filtrar la información de las pólizas e incisos.",
+        url = "/views/modulos/vehiculos.faces")
+@PreAuthorize("hasAnyAuthority('ROLE_OWNER', 'POLIZA_VIEW')")
 public class PolizaView implements Serializable {
 
     @Value("${app.files.folder.layouts.importar-vehiculo}")

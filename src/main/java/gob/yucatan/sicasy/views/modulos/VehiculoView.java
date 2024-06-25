@@ -1,4 +1,4 @@
-package gob.yucatan.sicasy.views.domain;
+package gob.yucatan.sicasy.views.modulos;
 
 import gob.yucatan.sicasy.business.annotations.ConfigPermiso;
 import gob.yucatan.sicasy.business.annotations.ConfigPermisoArray;
@@ -48,7 +48,7 @@ import java.util.*;
 @Slf4j
 @ConfigPermiso(tipo = TipoPermiso.VIEW, codigo = "VEHICULOS_VIEW",
         nombre = "Módulo de Vehículos", descripcion = "Permite ver y filtrar la información de los vehículos.",
-        url = "/views/arrendamientos/vehiculos.faces")
+        url = "/views/modulos/vehiculos.faces")
 @PreAuthorize("hasAnyAuthority('ROLE_OWNER', 'VEHICULOS_VIEW')")
 public class VehiculoView implements Serializable {
 

@@ -95,7 +95,7 @@ public class Siniestro implements Cloneable, Serializable {
     @Column(name = "corralon", nullable = false)
     private Integer corralon;
 
-    @Column(name = "corralon", nullable = false)
+    @Column(name = "multa_vehiculo", nullable = false)
     private Integer multaVehiculo;
 
     @Column(name = "costo_multa")

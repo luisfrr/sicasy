@@ -8,7 +8,11 @@
 
         <div class="topbar-left">
             <div class="brand">
-                <h6 class="app-name uppercase">#{appBean.appName}</h6>
+                <h:form>
+                    <p:commandLink ajax="false" action="#{menuSessionBean.goToHome()}">
+                        <h6 class="app-name uppercase">#{appBean.appName}</h6>
+                    </p:commandLink>
+                </h:form>
             </div>
             <span id="button-menu" class="header-link">
                 <i id="button-menu-icon" class="fi fi-rr-menu-burger"/>

@@ -71,11 +71,13 @@
                 allDayText : 'Todo el día'
             }
         </script>
-        <p:dialog modal="true" widgetVar="statusDialog" draggable="false" closable="false"
-                  resizable="false">
-            <div class="flex flex-column justify-content-center align-items-center">
-                <i class="pi pi-spinner pi-spin mb-3" style="font-size:3rem"/>
-                <p class="text-center">Descargando el archivo, espere un momento...</p>
+
+        <p:dialog widgetVar="statusDialog" modal="true" draggable="false" rendered="false"
+                  closable="false" resizable="false" showHeader="false" styleClass="status-dialog">
+            <div class="flex align-items-center justify-content-center">
+                <div>
+                    <i class="pi pi-spin pi-spinner loading-icon text-3xl" aria-hidden="true"> </i>
+                </div>
             </div>
         </p:dialog>
 

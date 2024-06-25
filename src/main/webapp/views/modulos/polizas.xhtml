@@ -14,15 +14,6 @@
 
         <p:ajaxStatus onstart="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()" rendered="false"/>
 
-        <p:dialog widgetVar="statusDialog" modal="true" draggable="false" rendered="false"
-                  closable="false" resizable="false" showHeader="false" styleClass="status-dialog">
-            <div class="flex align-items-center justify-content-center">
-                <div>
-                    <i class="pi pi-spin pi-spinner loading-icon text-3xl" aria-hidden="true"> </i>
-                </div>
-            </div>
-        </p:dialog>
-
         <p:outputPanel id="container" styleClass="container-fluid">
 
             <p:growl id="growl" showDetail="true" showSummary="true"
@@ -33,8 +24,7 @@
                 <h:form id="form_breadcrumb" styleClass="mb-3">
                     <p:breadCrumb homeDisplay="text">
                         <p:menuitem value="Inicio" ajax="false" action="#{menuSessionBean.goToHome()}"/>
-                        <p:menuitem value="Seguros"/>
-                        <p:menuitem value="Arrendamiento vehicular"/>
+                        <p:menuitem value="Pólizas"/>
                     </p:breadCrumb>
                 </h:form>
 
@@ -267,21 +257,21 @@
 
             </p:outputPanel>
 
-            <ui:include src="/views/seguros/_registrar_polizas.xhtml"/>
+            <ui:include src="/views/modulos/polizas/_registrar_polizas.xhtml"/>
 
-            <ui:include src="/views/seguros/_adjuntar_poliza_dialog.xhtml"/>
+            <ui:include src="/views/modulos/polizas/_adjuntar_poliza_dialog.xhtml"/>
 
-            <ui:include src="/views/seguros/_registrar_endoso_alta_dialog.xhtml"/>
+            <ui:include src="/views/modulos/polizas/_registrar_endoso_alta_dialog.xhtml"/>
 
-            <ui:include src="/views/seguros/_rechazar_solicitud_dialog.xhtml"/>
+            <ui:include src="/views/modulos/polizas/_rechazar_solicitud_dialog.xhtml"/>
 
-            <ui:include src="/views/seguros/_editar_incisos_dialog.xhtml"/>
+            <ui:include src="/views/modulos/polizas/_editar_incisos_dialog.xhtml"/>
 
-            <ui:include src="/views/seguros/_registrar_pago_dialog.xhtml"/>
+            <ui:include src="/views/modulos/polizas/_registrar_pago_dialog.xhtml"/>
 
-            <ui:include src="/views/seguros/_endoso_modificacion_dialog.xhtml"/>
+            <ui:include src="/views/modulos/polizas/_endoso_modificacion_dialog.xhtml"/>
 
-            <ui:include src="/views/seguros/_endoso_baja_dialog.xhtml"/>
+            <ui:include src="/views/modulos/polizas/_endoso_baja_dialog.xhtml"/>
 
             
         </p:outputPanel>

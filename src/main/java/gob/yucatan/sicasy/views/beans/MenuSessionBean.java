@@ -24,15 +24,19 @@ public class MenuSessionBean implements Serializable {
     }
 
     public String goToVehiculos() {
-        return "/views/arrendamientos/vehiculos?faces-redirect=true";
+        return "/views/modulos/vehiculos?faces-redirect=true";
+    }
+
+    public String goToPolizas() {
+        return "/views/modulos/polizas?faces-redirect=true";
+    }
+
+    public String goToSiniestros() {
+        return "/views/modulos/siniestros?faces-redirect=true";
     }
 
     public String goToAseguradoras() {
         return "/views/catalogos/aseguradoras?faces-redirect=true";
-    }
-
-    public String goToPolizas() {
-        return "/views/seguros/polizas?faces-redirect=true";
     }
 
     public String goToLicitaciones() {
