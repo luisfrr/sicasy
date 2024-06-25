@@ -10,7 +10,7 @@ import java.util.Optional;
 
 public interface IVehiculoRepository extends JpaRepository<Vehiculo, Long>, JpaSpecificationExecutor<Vehiculo> {
 
-    @Query("select v from Vehiculo v where v.estatusRegistro = 1 and v.noSerie = ?1")
+    @Query("select v from Vehiculo v left join fetch v.incisoSet where v.estatusRegistro = 1 and v.noSerie = ?1")
     Optional<Vehiculo> findVehiculoActivoByNoSerie(String noSerie);
 
     @Query("select v from Vehiculo v where v.estatusRegistro = 1 and v.noSerie in ?1")

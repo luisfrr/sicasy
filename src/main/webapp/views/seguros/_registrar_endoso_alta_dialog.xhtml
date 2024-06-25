@@ -1,0 +1,200 @@
+<ui:composition
+        xmlns="http://www.w3.org/1999/xhtml"
+        xmlns:h="http://xmlns.jcp.org/jsf/html"
+        xmlns:f="http://xmlns.jcp.org/jsf/core"
+        xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+        xmlns:p="http://primefaces.org/ui"
+        xmlns:sec="https://joinfaces.org/security">
+
+   <p:dialog header="Registrar endoso de alta"
+             id="registrar-endoso-alta-dialog" widgetVar="registrarEndosoAltaDialog"
+             minHeight="400" width="1000"
+             showEffect="fade" modal="true"
+             closable="true" closeOnEscape="true"
+             cache="false" responsive="true">
+      <p:outputPanel id="registrar-endoso-alta-dialog-content" styleClass="formgrid grid">
+         <p:tabView id="tab-view_endoso_alta" rendered="#{polizaView.showRegistrarEndosoAltaDialog}">
+            <p:tab id="registro-individual" title="Registro individual">
+               <h:form id="endoso-alta-indiv-form" styleClass="formgrid grid">
+
+                  <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4">
+                     <p:outputLabel for="@next" value="Aseguradora" styleClass="block"/>
+                     <p:selectOneMenu value="#{polizaView.incisoForm.poliza.aseguradora.idAseguradora}"
+                                      styleClass="w-full mw-auto" required="true">
+                        <f:selectItem itemLabel="Seleccione uno..." itemValue="#{null}"/>
+                        <f:selectItems value="#{polizaView.aseguradoraList}" var="aseguradora"
+                                       itemValue="#{aseguradora.idAseguradora}" itemLabel="#{aseguradora.nombre}"/>
+                        <p:ajax event="change" listener="#{polizaView.onChangeAseguradoraForm()}" process="@this" update="endoso-alta-indiv-form"/>
+                     </p:selectOneMenu>
+                     <span class="text-sm hidden"> </span>
+                  </p:outputPanel>
+
+                  <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4">
+                     <p:outputLabel for="@next" value="Póliza" styleClass="block"/>
+                     <p:selectOneMenu value="#{polizaView.incisoForm.poliza.idPoliza}"
+                                      styleClass="w-full mw-auto" required="true"
+                                      filter="true" filterMatchMode="contains" filterNormalize="true">
+                        <f:selectItem itemLabel="Seleccione uno..." itemValue="#{null}"/>
+                        <f:selectItems value="#{polizaView.polizaFormList}" var="poliza"
+                                       itemValue="#{poliza.idPoliza}" itemLabel="#{poliza.numeroPoliza}"/>
+                     </p:selectOneMenu>
+                     <span class="text-sm hidden"> </span>
+                  </p:outputPanel>
+
+                  <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4">
+                     <p:outputLabel for="@next" value="Inciso" styleClass="block"/>
+                     <p:inputText styleClass="block w-full" required="true"
+                                  value="#{polizaView.incisoForm.inciso}"/>
+                     <span class="text-sm hidden"> </span>
+                  </p:outputPanel>
+
+                  <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4">
+                     <div class="flex justify-content-start align-items-end h-full">
+                        <div class="flex flex-column align-items-start w-full mr-3">
+                           <p:outputLabel for="no_serie_vehiculo" value="No. Serie Vehículo" styleClass="block"/>
+                           <p:inputText id="no_serie_vehiculo" styleClass="block w-full" required="true"
+                                        value="#{polizaView.incisoForm.vehiculo.noSerie}"/>
+                           <span class="text-sm hidden"> </span>
+                        </div>
+                        <div class="flex">
+                           <p:commandButton icon="fi fi-rr-search" title="Buscar"
+                                            styleClass="ui-button-outlined"
+                                            action="#{polizaView.buscarVehiculo(polizaView.incisoForm.vehiculo.noSerie)}"
+                                            process="@this,no_serie_vehiculo"
+                                            update="endoso-alta-indiv-form:info_vehiculo growl"/>
+                        </div>
+                     </div>
+                  </p:outputPanel>
+
+                  <p:outputPanel styleClass="field col-12">
+                     <p:outputLabel for="info_vehiculo" value="Información del vehículo" styleClass="block"/>
+                     <p:inputTextarea id="info_vehiculo" styleClass="block w-full" required="true"
+                                      readonly="true" rows="2" cols="50"
+                                      value="#{polizaView.informacionVehiculo}"/>
+                     <span class="text-sm hidden"> </span>
+                  </p:outputPanel>
+
+                  <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4">
+                     <p:outputLabel for="@next" value="Folio factura" styleClass="block"/>
+                     <p:inputText styleClass="block w-full" required="true"
+                                  value="#{polizaView.incisoForm.folioFactura}"/>
+                     <span class="text-sm hidden"> </span>
+                  </p:outputPanel>
+
+                  <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4">
+                     <p:outputLabel for="@next" styleClass="block" value="Fecha inicio"/>
+                     <p:datePicker value="#{polizaView.incisoForm.fechaInicioVigencia}"
+                                   placeholder="dd/MM/yyyy" pattern="dd/MM/yyyy"
+                                   monthNavigator="true" yearNavigator="true"
+                                   showWeek="true" locale="es" required="true"
+                                   styleClass="w-full"/>
+                  </p:outputPanel>
+
+                  <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4">
+                     <p:outputLabel for="@next" styleClass="block" value="Fecha fin"/>
+                     <p:datePicker value="#{polizaView.incisoForm.fechaFinVigencia}"
+                                   placeholder="dd/MM/yyyy" pattern="dd/MM/yyyy"
+                                   monthNavigator="true" yearNavigator="true"
+                                   showWeek="true" locale="es" required="true"
+                                   styleClass="w-full"/>
+                  </p:outputPanel>
+
+                  <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4">
+                     <p:outputLabel for="@next" styleClass="block" value="Costo"/>
+                     <p:inputNumber styleClass="block w-full" required="true"
+                                  value="#{polizaView.incisoForm.costo}"/>
+                  </p:outputPanel>
+
+                  <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4">
+                     <p:outputLabel for="@next" value="Frecuencia de pago" styleClass="block"/>
+                     <p:selectOneMenu id="select_anexo" value="#{polizaView.incisoForm.frecuenciaPago}"
+                                      styleClass="w-full mw-auto">
+                        <f:selectItem itemLabel="Selecciona uno..."
+                                      itemValue="#{null}"/>
+                        <f:selectItem itemLabel="MENSUAL"
+                                      itemValue="MENSUAL"/>
+                        <f:selectItem itemLabel="SEMESTRAL"
+                                      itemValue="SEMESTRAL"/>
+                        <f:selectItem itemLabel="ANUAL"
+                                      itemValue="ANUAL"/>
+                     </p:selectOneMenu>
+                     <span class="text-sm hidden"> </span>
+                  </p:outputPanel>
+
+                  <p:outputPanel styleClass="field col-12 mt-5 mb-0">
+
+                     <p:outputPanel styleClass="flex justify-content-end">
+                        <p:commandButton value="Cancelar" ajax="true" process="@this"
+                                         action="#{polizaView.cerrarRegistroEndosoAltaDialog()}"
+                                         styleClass="ui-button-outlined mr-4"/>
+                        <p:commandButton value="Guardar" ajax="true" process="@form"
+                                         action="#{polizaView.guardarEndosoAlta()}"
+                                         update="growl @form form_datatable"
+                                         validateClient="true"/>
+                     </p:outputPanel>
+
+                  </p:outputPanel>
+
+               </h:form>
+            </p:tab>
+            <p:tab id="registro-layout" title="Importar layout">
+               <h:form id="endoso-alta-layout-form" styleClass="formgrid grid">
+
+                  <p:outputPanel styleClass="field col-12 mb-5" rendered="#{not polizaView.showErrorImportacion}">
+                     <p:outputLabel for="@next" value="Importar layout" styleClass="block"/>
+                     <p:inputTextarea id="dropZoneLayout" widgetVar="dropZoneLayout"
+                                      styleClass="w-full dropzone mb-3" rows="6" required="true"
+                                      placeholder="Arrastra y suelta aquí el archivo de importación de incisos"
+                                      value="#{polizaView.layoutFileUpload}" readonly="true"/>
+                     <span class="text-sm">
+                                    <p:link value="O haz clic aquí para elegir" onclick="PF('uploadLayout').show();return false"/>
+                                </span>
+                     <p:fileUpload widgetVar="uploadLayout" listener="#{polizaView.importarLayoutEndosoAlta}"
+                                   fileLimit="1" fileLimitMessage="Solo se permite subir un archivo"
+                                   sizeLimit="50000000" allowTypes="/(\.|\/)(xlsx|)$/" dropZone="dropZoneLayout"
+                                   update="growl" style="display: none"/>
+                  </p:outputPanel>
+
+                  <p:outputPanel styleClass="field col-12 mb-5" rendered="#{polizaView.showErrorImportacion}">
+                     <p:dataTable var="acuse" value="#{polizaView.acuseImportacionList}"
+                                  rows="25" rowHover="true"
+                                  rowIndexVar="index"
+                                  styleClass="dt-scrollable-x"
+                                  scrollable="true" scrollHeight="230" size="small"
+                                  paginator="true" paginatorPosition="bottom"
+                                  paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                  currentPageReportTemplate="{startRecord}-{endRecord} de {totalRecords} registros"
+                                  rowsPerPageTemplate="25,100,200,{ShowAll|'Todos'}">
+                        <f:facet name="header">
+                           Se encontraron errores al importar el layout
+                        </f:facet>
+
+                        <p:column headerText="Registro" width="180">
+                           <h:outputText value="#{acuse.titulo}"/>
+                        </p:column>
+
+                        <p:column headerText="Error" style="min-width: 200px">
+                           <h:outputText value="#{acuse.mensaje}"/>
+                        </p:column>
+
+                     </p:dataTable>
+                  </p:outputPanel>
+
+                  <p:outputPanel styleClass="field col-12 mt-5 mb-0" rendered="#{not polizaView.showErrorImportacion}">
+                     <p:outputPanel styleClass="flex justify-content-end">
+                        <p:commandButton value="Cancelar" ajax="true" process="@this"
+                                         action="#{polizaView.cerrarRegistroEndosoAltaDialog()}"
+                                         styleClass="ui-button-outlined mr-4"/>
+                        <p:commandButton value="Guardar" ajax="true" process="@form"
+                                         action="#{polizaView.guardarLayoutEndosoAlta()}"
+                                         update="growl @form form_datatable form_datatable_incisos"
+                                         validateClient="true"/>
+                     </p:outputPanel>
+                  </p:outputPanel>
+               </h:form>
+            </p:tab>
+         </p:tabView>
+      </p:outputPanel>
+   </p:dialog>
+
+</ui:composition>

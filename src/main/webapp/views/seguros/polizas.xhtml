@@ -1,0 +1,291 @@
+<ui:composition template="../../WEB-INF/facelets/main_layout.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="jakarta.faces.facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="jakarta.faces.html"
+                xmlns:f="jakarta.faces.core"
+                xmlns:sec="https://joinfaces.org/security">
+
+    <ui:define name="title">
+        #{polizaView.title}
+    </ui:define>
+
+    <ui:define name="content">
+
+        <p:ajaxStatus onstart="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()" rendered="false"/>
+
+        <p:dialog widgetVar="statusDialog" modal="true" draggable="false" rendered="false"
+                  closable="false" resizable="false" showHeader="false" styleClass="status-dialog">
+            <div class="flex align-items-center justify-content-center">
+                <div>
+                    <i class="pi pi-spin pi-spinner loading-icon text-3xl" aria-hidden="true"> </i>
+                </div>
+            </div>
+        </p:dialog>
+
+        <p:outputPanel id="container" styleClass="container-fluid">
+
+            <p:growl id="growl" showDetail="true" showSummary="true"
+                     skipDetailIfEqualsSummary="true" globalOnly="true"/>
+
+            <p:outputPanel id="panel_polizas" rendered="#{polizaView.showPanelPolizas}">
+
+                <h:form id="form_breadcrumb" styleClass="mb-3">
+                    <p:breadCrumb homeDisplay="text">
+                        <p:menuitem value="Inicio" ajax="false" action="#{menuSessionBean.goToHome()}"/>
+                        <p:menuitem value="Seguros"/>
+                        <p:menuitem value="Arrendamiento vehicular"/>
+                    </p:breadCrumb>
+                </h:form>
+
+                <h:form id="form_toolbar" styleClass="mb-5">
+                    <p:toolbar>
+                        <p:toolbarGroup>
+                            <p:commandButton id="accionesPolizas" type="button" value="Acciones"
+                                             iconPos="right" icon="fi fi-rr-angle-small-down"/>
+                            <p:menu overlay="true" trigger="accionesPolizas" my="left top" at="left bottom">
+                                <p:menuitem value="Registrar pólizas" ajax="true" action="#{polizaView.abrirRegistroPolizasDialog()}"/>
+                                <p:menuitem value="Registrar endoso de alta" ajax="true" action="#{polizaView.abrirRegistroEndosoAltaDialog()}"/>
+                            </p:menu>
+                        </p:toolbarGroup>
+                        <p:toolbarGroup align="right">
+                            <p:commandButton id="exportarPolizas" type="button" value="Exportar"
+                                             iconPos="right" icon="fi fi-rr-angle-small-down"
+                                             styleClass="ui-button-outlined"/>
+                            <p:menu overlay="true" trigger="exportarPolizas" my="left top" at="left bottom">
+                                <p:menuitem value="Exportar pólizas"/>
+                                <p:menuitem value="Layout Registro de Pólizas"/>
+                                <p:menuitem value="Layout Endoso de Alta"/>
+                            </p:menu>
+                        </p:toolbarGroup>
+                    </p:toolbar>
+                </h:form>
+
+                <h:form id="form_filtros" styleClass="mb-5">
+                    <p:panel header="Filtros" widgetVar="panelFiltros"
+                             toggleable="true" toggleSpeed="500">
+                        <p:outputPanel id="filtros" styleClass="formgrid grid mb-2">
+                            <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4 xl:col-3">
+                                <p:outputLabel for="@next" value="Aseguradora" styleClass="block"/>
+                                <p:selectOneMenu value="#{polizaView.polizaFilter.aseguradora.idAseguradora}" styleClass="w-full mw-auto">
+                                    <f:selectItem itemLabel="Todos" itemValue="#{null}"/>
+                                    <f:selectItems value="#{polizaView.aseguradoraList}" var="aseguradora"
+                                                   itemValue="#{aseguradora.idAseguradora}" itemLabel="#{aseguradora.nombre}"/>
+                                    <p:ajax event="blur"/>
+                                </p:selectOneMenu>
+                                <span class="text-sm hidden"> </span>
+                            </p:outputPanel>
+                        </p:outputPanel>
+                        <f:facet name="footer">
+                            <p:outputPanel styleClass="flex flex-row gap-4 justify-content-end">
+                                <p:commandButton value="Limpiar filtros" styleClass="ui-button-outlined"
+                                                 ajax="true" action="#{polizaView.limpiarFiltros()}"
+                                                 update="form_filtros form_datatable"/>
+                                <p:commandButton value="Buscar" ajax="true" action="#{polizaView.buscar()}"
+                                                 update="form_datatable"/>
+                            </p:outputPanel>
+                        </f:facet>
+                    </p:panel>
+                </h:form>
+
+                <h:form id="form_datatable" styleClass="mb-5">
+
+                    <p:dataTable id="dt_grupo_poliza"
+                                 var="poliza" value="#{polizaView.polizaList}"
+                                 rows="50" rowHover="true"
+                                 rowKey="#{poliza.idPoliza}" rowIndexVar="index"
+                                 selectionMode="single"
+                                 selection="#{polizaView.polizaSelected}"
+                                 styleClass="dt-scrollable-x"
+                                 scrollable="true" scrollHeight="450"
+                                 paginator="true" paginatorPosition="bottom"
+                                 paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                 currentPageReportTemplate="{startRecord}-{endRecord} de {totalRecords} registros"
+                                 rowsPerPageTemplate="50,100,200,{ShowAll|'Todos'}">
+                        <f:facet name="header">
+                            Pólizas
+                        </f:facet>
+                        <p:ajax event="rowSelect" listener="#{polizaView.verIncisos()}"/>
+                        <p:ajax event="rowUnselect" listener="#{polizaView.limpiarIncisos()}"/>
+                        <p:ajax event="toggleSelect" listener="#{polizaView.verIncisos()}"/>
+                        <p:column headerText="No." width="40">
+                            <h:outputText value="#{index + 1}" />
+                        </p:column>
+                        <p:column headerText="No. Póliza" width="120">
+                            <h:outputText value="#{poliza.numeroPoliza}"/>
+                        </p:column>
+                        <p:column headerText="Aseguradora" width="180">
+                            <h:outputText value="#{poliza.aseguradora.nombre}"/>
+                        </p:column>
+                        <p:column headerText="Fecha Inicio" width="100" styleClass="text-center">
+                            <h:outputText value="#{poliza.fechaInicioVigencia}">
+                                <f:convertDateTime pattern="dd/MM/yyyy"/>
+                            </h:outputText>
+                        </p:column>
+                        <p:column headerText="Fecha Fin" width="150" styleClass="text-center">
+                            <h:outputText value="#{poliza.fechaFinVigencia}">
+                                <f:convertDateTime pattern="dd/MM/yyyy"/>
+                            </h:outputText>
+                        </p:column>
+                        <p:column headerText="Costo total" width="150" styleClass="text-center">
+                            <h:outputText value="#{poliza.costoTotal}">
+                                <f:convertNumber maxFractionDigits="2"/>
+                            </h:outputText>
+                        </p:column>
+                        <p:column headerText="Saldo total" width="150" styleClass="text-center">
+                            <h:outputText value="#{poliza.saldoTotal}">
+                                <f:convertNumber maxFractionDigits="2"/>
+                            </h:outputText>
+                        </p:column>
+                        <p:column headerText="Cobertura" width="120">
+                            <h:outputText value="#{poliza.tipoCobertura}"/>
+                        </p:column>
+                        <p:column headerText="Beneficiario" width="200">
+                            <h:outputText value="#{poliza.beneficiarioPreferente}"/>
+                        </p:column>
+                        <p:column headerText="Total incisos" width="120" styleClass="text-center">
+                            <h:outputText value="#{poliza.totalIncisos}"/>
+                        </p:column>
+                        <p:column headerText="Acciones" width="150">
+                            <p:commandButton id="dtAccionesPolizas" type="button"
+                                             icon="fi fi-rr-menu-dots-vertical" styleClass="rounded-button ui-button-outlined" />
+                            <p:menu overlay="true" trigger="dtAccionesPolizas" my="left top" at="left bottom">
+                                <p:menuitem value="Exportar incisos"/>
+                                <p:menuitem value="Adjuntar póliza" ajax="true" action="#{polizaView.abrirAdjuntarPolizaDialog(poliza.idPoliza)}"
+                                            oncomplete="Main.changeChooseLabel();" update="growl form_datatable"/>
+                                <p:menuitem value="Descargar póliza" ajax="false" onclick="PrimeFaces.monitorDownload(start, stop);"
+                                            disabled="#{poliza.rutaArchivo == null}">
+                                    <p:fileDownload value="#{fileDownloadBean.downloadFileByPath(poliza.rutaArchivo)}" />
+                                </p:menuitem>
+                                <p:menuitem value="Eliminar" ajax="true" action="#{polizaView.eliminarPoliza(poliza.idPoliza)}" disabled="#{poliza.totalIncisos > 0}">
+                                    <p:confirm header="Confirmación" message="¿Está seguro que desea eliminar la póliza?" icon="pi pi-exclamation-triangle"/>
+                                </p:menuitem>
+                            </p:menu>
+                        </p:column>
+                    </p:dataTable>
+                </h:form>
+
+                <h:form id="form_datatable_incisos" styleClass="mb-5">
+                    <p:dataTable id="dt_incisos"
+                                 var="inciso" value="#{polizaView.incisoList}"
+                                 rows="50" rowHover="true"
+                                 rowKey="#{inciso.idInciso}" rowIndexVar="index"
+                                 rowSelectMode="add"
+                                 selection="#{polizaView.incisoSelectedList}"
+                                 styleClass="dt-scrollable-x"
+                                 scrollable="true" scrollHeight="450"
+                                 paginator="true" paginatorPosition="bottom"
+                                 paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                 currentPageReportTemplate="{startRecord}-{endRecord} de {totalRecords} registros"
+                                 rowsPerPageTemplate="50,100,200,{ShowAll|'Todos'}">
+                        <f:facet name="header">
+                            <div class="flex justify-content-between align-items-center">
+                                <div class="flex justify-content-start">
+                                    Incisos
+                                </div>
+                                <div class="flex justify-content-end">
+                                    <p:commandButton id="accionesIncisos" type="button" value="Acciones"
+                                                     iconPos="right" icon="fi fi-rr-angle-small-down"/>
+                                    <p:menu overlay="true" trigger="accionesIncisos" my="left top" at="left bottom">
+                                        <p:menuitem value="Solicitar pago" ajax="true" action="#{polizaView.solicitarPagoIncisos()}">
+                                            <p:confirm header="Confirmación" message="¿Estás seguro que deseas solicitar el pago de los incisos seleccionados?" icon="pi pi-exclamation-triangle"/>
+                                        </p:menuitem>
+                                        <p:menuitem value="Registrar pago" ajax="true" action="#{polizaView.abrirRegistrarPagoModal()}"/>
+                                        <p:menuitem value="Rechazar solicitud" ajax="true" action="#{polizaView.abrirRechazarSolicitudModal()}"/>
+                                    </p:menu>
+                                </div>
+                            </div>
+                        </f:facet>
+                        <p:ajax event="rowSelect" update="form_toolbar"/>
+                        <p:ajax event="rowUnselect" update="form_toolbar"/>
+                        <p:ajax event="rowSelectCheckbox" update="form_toolbar"/>
+                        <p:ajax event="rowUnselectCheckbox" update="form_toolbar"/>
+                        <p:ajax event="toggleSelect" update="form_toolbar"/>
+                        <p:column selectionMode="multiple" style="width:16px;text-align:center"/>
+                        <p:column headerText="No." width="40">
+                            <h:outputText value="#{index + 1}" />
+                        </p:column>
+                        <p:column headerText="Inciso" width="120" styleClass="text-center">
+                            <h:outputText value="#{inciso.inciso}"/>
+                        </p:column>
+                        <p:column headerText="Vehículo" width="180">
+                            <h:outputText value="#{inciso.vehiculo != null ? inciso.vehiculo.noSerie : ''}"/>
+                        </p:column>
+                        <p:column headerText="Fecha inicio" width="150" styleClass="text-center">
+                            <h:outputText value="#{inciso.fechaInicioVigencia}">
+                                <f:convertDateTime pattern="dd/MM/yyyy"/>
+                            </h:outputText>
+                        </p:column>
+                        <p:column headerText="Fecha fin" width="150" styleClass="text-center">
+                            <h:outputText value="#{inciso.fechaFinVigencia}">
+                                <f:convertDateTime pattern="dd/MM/yyyy"/>
+                            </h:outputText>
+                        </p:column>
+                        <p:column headerText="Costo" width="150" styleClass="text-center">
+                            <h:outputText value="#{inciso.costo}">
+                                <f:convertNumber maxFractionDigits="2"/>
+                            </h:outputText>
+                        </p:column>
+                        <p:column headerText="Saldo" width="150" styleClass="text-center">
+                            <h:outputText value="#{inciso.saldo}">
+                                <f:convertNumber maxFractionDigits="2"/>
+                            </h:outputText>
+                        </p:column>
+                        <p:column headerText="Frecuencia Pago" width="180" styleClass="text-center">
+                            <h:outputText value="#{inciso.frecuenciaPago}"/>
+                        </p:column>
+                        <p:column headerText="Baja pendiente" width="150"  styleClass="text-center">
+                            <h:outputText value="#{inciso.bajaPendienteSiniestro == 1 ?  'Sí' : ''}"/>
+                        </p:column>
+                        <p:column headerText="Nota crédito" width="150"  styleClass="text-center">
+                            <h:outputText value="#{inciso.tieneNotaCredito == 1 ?  'Sí' : ''}"/>
+                        </p:column>
+                        <p:column headerText="Pagado" width="80"  styleClass="text-center">
+                            <h:outputText value="#{inciso.incisoPagado == 1 ?  'Sí' : 'No'}"/>
+                        </p:column>
+                        <p:column headerText="Estatus" width="150" styleClass="text-center">
+                            <h:outputText value="#{inciso.estatusInciso.nombre}"/>
+                        </p:column>
+                        <p:column headerText="Observaciones" width="200">
+                            <h:outputText value="#{inciso.observaciones}"/>
+                        </p:column>
+
+                        <p:column headerText="Acciones" width="150">
+                            <p:commandButton id="dtAccionesIncisos" type="button"
+                                             icon="fi fi-rr-menu-dots-vertical" styleClass="rounded-button ui-button-outlined" />
+                            <p:menu overlay="true" trigger="dtAccionesIncisos" my="left top" at="left bottom">
+                                <p:menuitem value="Editar" ajax="true" action="#{polizaView.abrirEditarIncisoModal(inciso.idInciso)}"
+                                            disabled="#{inciso.estatusInciso.idEstatusInciso != polizaView.ESTATUS_INCISO_REGISTRADA or inciso.tieneNotaCredito == 1}"/>
+                                <p:menuitem value="Endoso de modificación" disabled="#{inciso.estatusInciso.idEstatusInciso != polizaView.ESTATUS_INCISO_PAGADA}"
+                                            ajax="true" action="#{polizaView.abrirEndosoModificacionModal(inciso.idInciso)}"/>
+                                <p:menuitem value="Endoso de baja" disabled="#{inciso.estatusInciso.idEstatusInciso != polizaView.ESTATUS_INCISO_PAGADA}"
+                                            ajax="true" action="#{polizaView.abrirEndosoBajaModal(inciso.idInciso)}"/>
+                            </p:menu>
+                        </p:column>
+                    </p:dataTable>
+                </h:form>
+
+            </p:outputPanel>
+
+            <ui:include src="/views/seguros/_registrar_polizas.xhtml"/>
+
+            <ui:include src="/views/seguros/_adjuntar_poliza_dialog.xhtml"/>
+
+            <ui:include src="/views/seguros/_registrar_endoso_alta_dialog.xhtml"/>
+
+            <ui:include src="/views/seguros/_rechazar_solicitud_dialog.xhtml"/>
+
+            <ui:include src="/views/seguros/_editar_incisos_dialog.xhtml"/>
+
+            <ui:include src="/views/seguros/_registrar_pago_dialog.xhtml"/>
+
+            <ui:include src="/views/seguros/_endoso_modificacion_dialog.xhtml"/>
+
+            <ui:include src="/views/seguros/_endoso_baja_dialog.xhtml"/>
+
+            
+        </p:outputPanel>
+
+    </ui:define>
+
+</ui:composition>

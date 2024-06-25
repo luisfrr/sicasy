@@ -39,13 +39,15 @@ public class AseguradoraServiceImpl implements IAseguradoraService {
                     aseguradora.getEstatus(),
                     Aseguradora_.ESTATUS));
 
-//        if (aseguradora.getRepresentante() != null && !aseguradora.getRepresentante().isEmpty()) {
-//            searchSpecification.add(new SearchCriteria(SearchOperation.MATCH,
-//                    aseguradora.getRepresentante(),
-//                    Aseguradora_.REPRESENTANTE));
-//        }
-
         return aseguradoraRepository.findAll(searchSpecification);
+    }
+
+    @Override
+    public List<Aseguradora> findAll() {
+        Aseguradora aseguradora = Aseguradora.builder()
+                .estatus(EstatusRegistro.ACTIVO)
+                .build();
+        return this.findAllDynamic(aseguradora);
     }
 
     @Override

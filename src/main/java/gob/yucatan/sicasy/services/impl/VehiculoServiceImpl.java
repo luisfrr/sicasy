@@ -6,23 +6,19 @@ import gob.yucatan.sicasy.business.enums.EstatusRegistro;
 import gob.yucatan.sicasy.business.exceptions.BadRequestException;
 import gob.yucatan.sicasy.business.exceptions.NotFoundException;
 import gob.yucatan.sicasy.repository.criteria.SearchCriteria;
+import gob.yucatan.sicasy.repository.criteria.SearchFetch;
 import gob.yucatan.sicasy.repository.criteria.SearchOperation;
 import gob.yucatan.sicasy.repository.criteria.SearchSpecification;
-import gob.yucatan.sicasy.repository.iface.IAnexoRepository;
-import gob.yucatan.sicasy.repository.iface.IEstatusVehiculoRepository;
-import gob.yucatan.sicasy.repository.iface.ILicitacionRepository;
-import gob.yucatan.sicasy.repository.iface.IVehiculoRepository;
+import gob.yucatan.sicasy.repository.iface.*;
 import gob.yucatan.sicasy.services.iface.IBitacoraVehiculoService;
 import gob.yucatan.sicasy.services.iface.IVehiculoService;
+import jakarta.persistence.criteria.JoinType;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -46,6 +42,7 @@ public class VehiculoServiceImpl implements IVehiculoService {
     private final IAnexoRepository anexoRepository;
     private final IEstatusVehiculoRepository estatusVehiculoRepository;
     private final IBitacoraVehiculoService bitacoraVehiculoService;
+    private final IIncisoRepository incisoRepository;
 
     @Override
     public List<Vehiculo> findAllDynamic(Vehiculo vehiculo) {
@@ -108,6 +105,15 @@ public class VehiculoServiceImpl implements IVehiculoService {
                     vehiculo.getEstatusRegistro(),
                     Vehiculo_.ESTATUS_REGISTRO));
 
+        if(vehiculo.getNoSerieList() != null && !vehiculo.getNoSerieList().isEmpty())
+            specification.add(new SearchCriteria(SearchOperation.IN,
+                    vehiculo.getNoSerieList(),
+                    Vehiculo_.NO_SERIE));
+
+        if(vehiculo.isFetchIncisoSet())
+            specification.add(new SearchFetch(JoinType.LEFT,
+                    Vehiculo_.INCISO_SET));
+
         return vehiculoRepository.findAll(specification);
     }
 
@@ -137,6 +143,13 @@ public class VehiculoServiceImpl implements IVehiculoService {
         if(vehiculo.getDependenciaAsignada() == null)
             vehiculo.setDependenciaAsignada(new Dependencia());
 
+        List<Inciso> incisos = incisoRepository.findByIdVehiculoAndEstatusRegistro(vehiculo.getIdVehiculo(),
+                EstatusRegistro.ACTIVO);
+        if(!incisos.isEmpty())
+            vehiculo.setIncisoSet(new HashSet<>(incisos));
+        else
+            vehiculo.setIncisoSet(new HashSet<>());
+
         return vehiculo;
     }
 
@@ -163,7 +176,7 @@ public class VehiculoServiceImpl implements IVehiculoService {
     @Override
     public Vehiculo findByNoSerie(String noSerie) {
         return vehiculoRepository.findVehiculoActivoByNoSerie(noSerie)
-                .orElseThrow(() -> new NotFoundException("No se ha encontrado el vehículo con el número de serie " + noSerie));
+                .orElseThrow(() -> new NotFoundException("No se ha encontrado el vehículo con el número de serie: " + noSerie));
     }
 
     @Override
@@ -537,4 +550,5 @@ public class VehiculoServiceImpl implements IVehiculoService {
             throw new BadRequestException("No se han recibido los vehículos por actualizar.");
         }
     }
+
 }

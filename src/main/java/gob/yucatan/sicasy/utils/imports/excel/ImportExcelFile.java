@@ -1,6 +1,8 @@
 package gob.yucatan.sicasy.utils.imports.excel;
 
+import gob.yucatan.sicasy.utils.date.DateFormatUtil;
 import gob.yucatan.sicasy.utils.numbers.DoubleUtil;
+import org.apache.coyote.BadRequestException;
 import org.apache.poi.ss.usermodel.*;
 import org.springframework.util.StringUtils;
 
@@ -27,17 +29,17 @@ public class ImportExcelFile<T> {
             // Verificar si las cabeceras del archivo coinciden con las cabeceras esperadas
             Row headerRow = sheet.getRow(0);
             if (headerRow == null) {
-                throw new IllegalArgumentException("El archivo Excel no tiene cabeceras.");
+                throw new BadRequestException("El archivo Excel no tiene cabeceras.");
             }
             int cellCount = headerRow.getPhysicalNumberOfCells();
             if (cellCount != headers.size()) {
-                throw new IllegalArgumentException("El número de cabeceras en el archivo Excel no coincide con el número esperado.");
+                throw new BadRequestException("El número de cabeceras en el archivo Excel no coincide con el número esperado.");
             }
             for (int i = 0; i < cellCount; i++) {
                 Cell cell = headerRow.getCell(i);
                 String headerCellValue = cell.getStringCellValue().trim();
                 if (!headerCellValue.equals(headers.get(i).getHeader())) {
-                    throw new IllegalArgumentException("Cabecera no válida en la posición " + (i + 1) + ": " + headerCellValue);
+                    throw new BadRequestException("Cabecera no válida en la posición " + (i + 1) + ": " + headerCellValue);
                 }
             }
 
@@ -65,13 +67,13 @@ public class ImportExcelFile<T> {
             }
         } catch (IOException | ParseException | NoSuchFieldException | InvocationTargetException |
                  NoSuchMethodException | IllegalAccessException e) {
-            throw new IOException("Error al procesar el archivo Excel.", e);
+            throw new BadRequestException("Error al procesar el archivo Excel.", e);
         }
 
         return entityList;
     }
 
-    private void fillEntityFromRow(T entity, Row row, List<ConfigHeaderExcelModel> headers) throws ParseException, NoSuchFieldException, InvocationTargetException, NoSuchMethodException, IllegalAccessException {
+    private void fillEntityFromRow(T entity, Row row, List<ConfigHeaderExcelModel> headers) throws ParseException, NoSuchFieldException, InvocationTargetException, NoSuchMethodException, IllegalAccessException, BadRequestException {
         for (ConfigHeaderExcelModel header : headers) {
             int columnIndex = header.getColumnIndex(); // Obtener el índice de la columna de la configuración
 
@@ -88,7 +90,7 @@ public class ImportExcelFile<T> {
                 Class<?> fieldType = getFieldClass(entity, fieldName);
 
                 // Convertir el valor de la celda al tipo de dato apropiado
-                Object cellValue = getCellValue(cell, fieldType);
+                Object cellValue = getCellValue(cell, fieldType, header.getDateFormat());
 
                 // Obtener el método setter del campo correspondiente
                 Method setterMethod = entity.getClass().getMethod("set" + StringUtils.capitalize(fieldName), fieldType);
@@ -105,7 +107,7 @@ public class ImportExcelFile<T> {
         return field.getType();
     }
 
-    private Object getCellValue(Cell cell, Class<?> fieldType) {
+    private Object getCellValue(Cell cell, Class<?> fieldType, String dateFormat) throws BadRequestException {
         // Convertir el valor de la celda al tipo de dato apropiado
         if (fieldType == String.class) {
             try {
@@ -119,12 +121,16 @@ public class ImportExcelFile<T> {
         } else if (fieldType == Double.class) {
             return DoubleUtil.parse(String.valueOf(cell.getNumericCellValue()));
         } else if (fieldType == Date.class) {
-            return cell.getDateCellValue();
+            try {
+                return cell.getDateCellValue();
+            } catch (Exception e) {
+                return DateFormatUtil.convertToDate(cell.getStringCellValue(), dateFormat);
+            }
         } else if (fieldType == Boolean.class) {
             return cell.getBooleanCellValue();
         } else {
             // Otros tipos de datos podrían manejarse de manera similar
-            throw new IllegalArgumentException("Tipo de dato no compatible: " + fieldType.getName());
+            throw new BadRequestException("Tipo de dato no compatible: " + fieldType.getName());
         }
     }
 

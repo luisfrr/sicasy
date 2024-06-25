@@ -11,4 +11,5 @@ public class ConfigHeaderExcelModel {
     private String header;
     private String fieldName;
     private int columnIndex;
+    private String dateFormat;
 }

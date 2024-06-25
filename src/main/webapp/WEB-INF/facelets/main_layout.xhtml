@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 <html lang="es-MX"
       xmlns="http://www.w3.org/1999/xhtml"
       xmlns:h="jakarta.faces.html"
@@ -90,6 +89,10 @@
                 <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no ui-button-outlined"/>
                 <p:commandButton value="Sí" type="button" styleClass="ui-confirmdialog-yes" />
             </p:confirmDialog>
+            <p:confirmPopup global="true">
+                <p:commandButton value="No" type="button" styleClass="ui-confirm-popup-no ui-button-flat"/>
+                <p:commandButton value="Sí" type="button" styleClass="ui-confirm-popup-yes" />
+            </p:confirmPopup>
             <ui:include src="/WEB-INF/facelets/footer_layout.xhtml"/>
             <div class="mask"> </div>
         </div>

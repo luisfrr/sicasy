@@ -1,12 +1,15 @@
 package gob.yucatan.sicasy.business.entities;
 
 import gob.yucatan.sicasy.business.enums.EstatusRegistro;
+import gob.yucatan.sicasy.utils.date.DateValidator;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 
 @Entity
 @Table(name = "vehiculo")
@@ -98,6 +101,10 @@ public class Vehiculo implements Cloneable, Serializable {
     @Column(name = "observaciones")
     private String observaciones;
 
+    @OneToMany(mappedBy = "vehiculo", fetch = FetchType.LAZY)
+    @ToString.Exclude
+    private Set<Inciso> incisoSet;
+
     @Column(name = "estatus_registro", nullable = false)
     @Enumerated(EnumType.ORDINAL)
     private EstatusRegistro estatusRegistro;
@@ -135,6 +142,12 @@ public class Vehiculo implements Cloneable, Serializable {
     @Transient
     private List<Integer> idEstatusVehiculoList;
 
+    @Transient
+    private List<String> noSerieList;
+
+    @Transient
+    private boolean fetchIncisoSet;
+
 
     @Override
     public Vehiculo clone() {
@@ -150,5 +163,29 @@ public class Vehiculo implements Cloneable, Serializable {
         } catch (CloneNotSupportedException e) {
             throw new AssertionError();
         }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Vehiculo vehiculo = (Vehiculo) o;
+        return Objects.equals(idVehiculo, vehiculo.idVehiculo) && Objects.equals(noSerie, vehiculo.noSerie);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(idVehiculo, noSerie);
+    }
+
+    public Inciso getIncisoVigente() {
+        if(this.incisoSet != null && !this.incisoSet.isEmpty()) {
+            Date today = new Date();
+            return this.incisoSet.stream()
+                    .filter(i -> DateValidator.isDateBetween(i.getFechaInicioVigencia(), i.getFechaFinVigencia(), today) &&
+                            i.getEstatusRegistro() == EstatusRegistro.ACTIVO)
+                    .findFirst().orElse(null);
+        }
+        return null;
     }
 }

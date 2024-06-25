@@ -76,7 +76,7 @@
                         </p:toolbarGroup>
                         <p:toolbarGroup align="right">
                             <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'VEHICULOS_READ_EXPORTAR_VEHICULOS', 'VEHICULOS_READ_OBTENER_LAYOUT')">
-                                <p:commandButton id="btn_descarga_vehiculos" type="button" value="Descargar"
+                                <p:commandButton id="btn_descarga_vehiculos" type="button" value="Exportar"
                                                  iconPos="right" icon="fi fi-rr-angle-small-down" styleClass="ui-button-outlined"/>
                                 <p:menu overlay="true" trigger="btn_descarga_vehiculos" my="left top" at="left bottom" maxHeight="250">
                                     <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'VEHICULOS_READ_EXPORTAR_VEHICULOS')">
@@ -327,7 +327,7 @@
 
                     <sec:authorize access="hasAuthority('ROLE_OWNER')">
 
-                        <p:column headerText="Fecha creación" width="150">
+                        <p:column headerText="Estatus" width="150">
                             <h:outputText value="#{vehiculo.estatusRegistro.label}">
                             </h:outputText>
                         </p:column>

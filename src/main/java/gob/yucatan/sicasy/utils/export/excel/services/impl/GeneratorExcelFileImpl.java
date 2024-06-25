@@ -143,10 +143,10 @@ public class GeneratorExcelFileImpl implements IGeneratorExcelFile {
                 .fontSize(12)
                 .isBold(false)
                 .isItalic(false)
-                .fontColor(ExcelFontColor.WHITE)
+                .fontColor(ExcelFontColor.BLACK)
                 .horizontalAlignment(HorizontalAlignment.CENTER)
                 .verticalAlignment(VerticalAlignment.CENTER)
-                .backgroundColor(ExcelBackgroundColor.DARK_BLUE)
+                .backgroundColor(ExcelBackgroundColor.LIGHT_BLUE)
                 .dataFormat(null)
                 .isWrapText(false)
                 .build());
@@ -359,6 +359,8 @@ public class GeneratorExcelFileImpl implements IGeneratorExcelFile {
                 cellStyle.setFillForegroundColor(IndexedColors.RED.getIndex());
             else if(backgroundColor == ExcelBackgroundColor.DARK_RED)
                 cellStyle.setFillForegroundColor(IndexedColors.DARK_RED.getIndex());
+            else if(backgroundColor == ExcelBackgroundColor.LIGHT_BLUE)
+                cellStyle.setFillForegroundColor(IndexedColors.PALE_BLUE.getIndex());
 
             cellStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
         }

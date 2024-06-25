@@ -16,7 +16,7 @@
 
         <p:growl id="growl" showDetail="true" showSummary="true" skipDetailIfEqualsSummary="true" globalOnly="true"/>
 
-        <h:form id="form_breadcum" styleClass="mb-5">
+        <h:form id="form_breadcum" rendered="false" styleClass="mb-5">
             <p:breadCrumb homeDisplay="text">
                 <p:menuitem value="Inicio"/>
                 <p:menuitem value="Notebook"/>
@@ -26,7 +26,7 @@
             </p:breadCrumb>
         </h:form>
 
-        <h:form id="form_buttons" styleClass="mb-5">
+        <h:form id="form_buttons" rendered="false" styleClass="mb-5">
             <p:outputPanel styleClass="flex flex-row gap-2">
                 <p:commandButton value="Nuevo"/>
 
@@ -52,7 +52,7 @@
             </p:outputPanel>
         </h:form>
 
-        <h:form id="form_inputs" styleClass="mb-5">
+        <h:form id="form_inputs" rendered="false" styleClass="mb-5">
             <p:outputPanel styleClass="grid formgrid">
 
                 <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4 xl:col-3">
@@ -84,7 +84,7 @@
             </p:outputPanel>
         </h:form>
 
-        <h:form id="form_toolbar" styleClass="mb-5">
+        <h:form id="form_toolbar" rendered="false" styleClass="mb-5">
             <p:toolbar>
                 <p:toolbarGroup>
                     <p:commandButton value="Nuevo" styleClass="mr-4"/>
@@ -102,7 +102,7 @@
             </p:toolbar>
         </h:form>
 
-        <h:form id="form_paneles" styleClass="mb-5">
+        <h:form id="form_paneles" rendered="false" styleClass="mb-5">
 
             <p:panel header="Título" widgetVar="panel"
                      toggleable="true" toggleSpeed="500">
@@ -128,7 +128,7 @@
 
         </h:form>
 
-        <p:tabView styleClass="mb-5">
+        <p:tabView rendered="false" styleClass="mb-5">
             <p:tab title="Titulo 1">
 
             </p:tab>
@@ -137,7 +137,7 @@
             </p:tab>
         </p:tabView>
 
-        <h:form id="form_datagrid" styleClass="mb-5">
+        <h:form id="form_datagrid" rendered="false" styleClass="mb-5">
 
             <p:dataTable id="dtExample"
                          var="example" value="#{homeView.exampleList}"
@@ -176,7 +176,7 @@
 
         </h:form>
 
-        <h:form id="form_fileUpload">
+        <h:form id="form_fileUpload" rendered="false">
 
             <div class="ui-fluid">
                 <div class="field">
