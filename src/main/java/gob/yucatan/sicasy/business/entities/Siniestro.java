@@ -6,6 +6,8 @@ import lombok.*;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
+import java.util.Objects;
 
 @Entity
 @Table(name = "siniestro")
@@ -105,6 +107,9 @@ public class Siniestro implements Cloneable, Serializable {
     @JoinColumn(name="deducible_id")
     private Deducible deducible;
 
+    @Column(name = "perdida_total", nullable = false)
+    private Integer perdidaTotal;
+
     @Column(name = "estatus_registro", nullable = false)
     @Enumerated(EnumType.ORDINAL)
     private EstatusRegistro estatusRegistro;
@@ -141,5 +146,10 @@ public class Siniestro implements Cloneable, Serializable {
         } catch (CloneNotSupportedException e) {
             throw new AssertionError();
         }
+    }
+
+    public boolean requierePadoDeducible() {
+        return this.responsable != null &&
+                Objects.equals(this.responsable, "ASEGURADO");
     }
 }

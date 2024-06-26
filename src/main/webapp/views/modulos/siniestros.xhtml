@@ -104,99 +104,167 @@
                         <h:outputText value="#{index + 1}" />
                     </p:column>
 
+                    <p:column headerText="No. Siniestro" width="150">
+                        <h:outputText value="#{siniestro.noSiniestroAseguradora}"/>
+                    </p:column>
+
+                    <p:column headerText="No. Siniestro SAF" width="150">
+                        <h:outputText value="#{siniestro.noSiniestroSAF}"/>
+                    </p:column>
+
+                    <p:column headerText="Fecha Siniestro" width="150">
+                        <h:outputText value="#{siniestro.fechaSiniestro}">
+                            <f:convertDateTime pattern="dd/MM/yyyy HH:mm:ss a"/>
+                        </h:outputText>
+                    </p:column>
+
+                    <p:column headerText="Responsable" width="150">
+                        <h:outputText value="#{siniestro.responsable}"/>
+                    </p:column>
+
+                    <p:column headerText="Ajustador" width="150">
+                        <h:outputText value="#{siniestro.ajustadorAseguradora}"/>
+                    </p:column>
+
+                    <p:column headerText="Ajustador SAF" width="150">
+                        <h:outputText value="#{siniestro.ajustadorSAF}"/>
+                    </p:column>
+
+                    <p:column headerText="Causa" width="150">
+                        <h:outputText value="#{siniestro.causa}"/>
+                    </p:column>
+
                     <p:column headerText="No. Serie" width="150">
                         <h:outputText value="#{siniestro.vehiculo.noSerie}"/>
                     </p:column>
 
-                    <p:column headerText="Póliza" width="150">
-                        <h:outputText value="#{siniestro.poliza.numeroPoliza}"/>
-                    </p:column>
-
-                    <p:column headerText="Inciso" width="100">
-                        <h:outputText value="#{siniestro.in}"/>
-                    </p:column>
-
                     <p:column headerText="Marca" width="150">
-                        <h:outputText value="#{siniestro.marca}"/>
+                        <h:outputText value="#{siniestro.vehiculo.marca}"/>
                     </p:column>
 
                     <p:column headerText="Modelo" width="150">
-                        <h:outputText value="#{siniestro.modelo}"/>
+                        <h:outputText value="#{siniestro.vehiculo.modelo}"/>
                     </p:column>
 
-                    <p:column headerText="Color" width="100">
-                        <h:outputText value="#{siniestro.color}"/>
+                    <p:column headerText="Año" width="150">
+                        <h:outputText value="#{siniestro.vehiculo.anio}"/>
                     </p:column>
 
-                    <p:column headerText="Condición" width="100" styleClass="text-center">
-                        <h:outputText value="#{siniestro.condicionVehiculo.nombre}"/>
+                    <p:column headerText="Reporta" width="150">
+                        <h:outputText value="#{siniestro.reporta}"/>
                     </p:column>
 
-                    <p:column headerText="Estatus" width="100" styleClass="text-center">
-                        <h:outputText value="#{siniestro.estatusVehiculo.nombre}"/>
+                    <p:column headerText="Fecha reporte" width="150">
+                        <h:outputText value="#{siniestro.fechaSiniestro}">
+                            <f:convertDateTime pattern="dd/MM/yyyy HH:mm:ss a"/>
+                        </h:outputText>
                     </p:column>
 
-                    <p:column headerText="Dependencia" width="150" styleClass="text-center">
-                        <h:outputText value="#{siniestro.dependencia.abreviatura}"/>
+                    <p:column headerText="Declaración" width="250">
+                        <h:outputText value="#{siniestro.declaracionSiniestro}"/>
                     </p:column>
 
-                    <p:column headerText="Dependencia asig." width="150" styleClass="text-center">
-                        <h:outputText value="#{siniestro.dependenciaAsignada != null ? siniestro.dependenciaAsignada.abreviatura : ''}"/>
+                    <p:column headerText="Conductor" width="150">
+                        <h:outputText value="#{siniestro.conductor}"/>
                     </p:column>
 
-                    <p:column headerText="Licitación" width="150" styleClass="text-center">
-                        <h:outputText value="#{siniestro.licitacion != null ? siniestro.licitacion.numeroLicitacion : ''}"/>
+                    <p:column headerText="No. Licencia" width="150">
+                        <h:outputText value="#{siniestro.noLicencia}"/>
                     </p:column>
 
-                    <p:column headerText="Anexo" width="150">
-                        <h:outputText value="#{siniestro.anexo != null ? siniestro.anexo.nombre : ''}"/>
+                    <p:column headerText="Tipo licencia" width="150">
+                        <h:outputText value="#{siniestro.tipoLicencia}"/>
                     </p:column>
 
-                    <p:column headerText="No. Motor" width="150">
-                        <h:outputText value="#{siniestro.noMotor}"/>
+                    <p:column headerText="Vencimiento licencia" width="150">
+                        <h:outputText value="#{siniestro.vencimientoLicencia}"/>
                     </p:column>
 
-                    <p:column headerText="Renta mensual" width="150">
-                        <h:outputText value="#{siniestro.rentaMensual}">
+                    <p:column headerText="Daño vía pública" width="150">
+                        <h:outputText value="#{siniestro.danioViaPublica == 1 ? 'Sí' : 'No'}"/>
+                    </p:column>
+
+                    <p:column headerText="Corralón" width="80">
+                        <h:outputText value="#{siniestro.corralon == 1 ? 'Sí' : 'No'}"/>
+                    </p:column>
+
+                    <p:column headerText="Multa" width="80">
+                        <h:outputText value="#{siniestro.multaVehiculo == 1 ? 'Sí' : 'No'}"/>
+                    </p:column>
+
+                    <p:column headerText="Costo multa" width="80">
+                        <h:outputText value="#{siniestro.costoMulta}">
                             <f:convertNumber maxFractionDigits="2"/>
                         </h:outputText>
                     </p:column>
 
-                    <p:column headerText="No. Factura" width="150">
-                        <h:outputText value="#{siniestro.noFactura}"/>
+                    <p:column headerText="Estado" width="150">
+                        <h:outputText value="#{siniestro.estado}"/>
                     </p:column>
 
-                    <p:column headerText="Valor factura" width="150">
-                        <h:outputText value="#{siniestro.montoFactura}"/>
+                    <p:column headerText="Municipio" width="150">
+                        <h:outputText value="#{siniestro.municipio}"/>
                     </p:column>
 
-                    <p:column headerText="Descripción" width="350">
-                        <h:outputText value="#{siniestro.descripcionVehiculo}"/>
+                    <p:column headerText="Localidad" width="150">
+                        <h:outputText value="#{siniestro.localidad}"/>
                     </p:column>
 
-                    <p:column headerText="Resguardante" width="180">
-                        <h:outputText value="#{siniestro.resguardante}"/>
+                    <p:column headerText="Estatus Siniestro" width="150">
+                        <h:outputText value="#{siniestro.estatus}"/>
                     </p:column>
 
-                    <p:column headerText="Área reguardante" width="180">
-                        <h:outputText value="#{siniestro.areaResguardante}"/>
+                    <p:column headerText="Perdida total" width="150">
+                        <h:outputText value="#{siniestro.perdidaTotal == 1 ? 'Sí' : 'No'}" rendered="#{siniestro.inciso != null}"/>
                     </p:column>
 
-                    <p:column headerText="Director administrativo" width="180">
-                        <h:outputText value="#{siniestro.autorizaDirectorAdmin}"/>
+                    <p:column headerText="¿Pago de deducible?" width="150">
+                        <h:outputText value="#{siniestro.requierePadoDeducible() ? 'Sí' : 'No'}"/>
                     </p:column>
 
-                    <p:column headerText="Director general" width="180">
-                        <h:outputText value="#{siniestro.autorizaDirectorGeneral}"/>
+                    <p:column headerText="Tipo deducible" width="150">
+                        <h:outputText value="#{siniestro.deducible.tipoDeducible}" rendered="#{siniestro.requierePadoDeducible()}"/>
                     </p:column>
 
-                    <p:column headerText="Proveedor" width="150">
-                        <h:outputText value="#{siniestro.proveedor}"/>
+                    <p:column headerText="Vehículo renta mensual" width="150">
+                        <h:outputText value="#{siniestro.deducible.vehiculoRentaMensual}" rendered="#{siniestro.requierePadoDeducible()}">
+                            <f:convertNumber maxFractionDigits="2"/>
+                        </h:outputText>
+                    </p:column>
+
+                    <p:column headerText="Vehículo valor factura" width="150">
+                        <h:outputText value="#{siniestro.deducible.vehiculoValorFactura}" rendered="#{siniestro.requierePadoDeducible()}">
+                            <f:convertNumber maxFractionDigits="2"/>
+                        </h:outputText>
+                    </p:column>
+
+                    <p:column headerText="Vehículo valor actual" width="150">
+                        <h:outputText value="#{siniestro.deducible.vehiculoValorActual}" rendered="#{siniestro.requierePadoDeducible()}">
+                            <f:convertNumber maxFractionDigits="2"/>
+                        </h:outputText>
+                    </p:column>
+
+                    <p:column headerText="Póliza" width="80">
+                        <h:outputText value="#{siniestro.deducible.noPoliza}" rendered="#{siniestro.requierePadoDeducible()}"/>
+                    </p:column>
+
+                    <p:column headerText="Inciso" width="80">
+                        <h:outputText value="#{siniestro.deducible.noInciso}" rendered="#{siniestro.requierePadoDeducible()}"/>
+                    </p:column>
+
+                    <p:column headerText="Póliza Vigente" width="120">
+                        <h:outputText value="#{siniestro.deducible.tienePolizaVigente == 1 ? 'Sí' : 'No'}" rendered="#{siniestro.inciso != null}"/>
+                    </p:column>
+
+                    <p:column headerText="Costo total deducible" width="150">
+                        <h:outputText value="#{siniestro.deducible.costoTotalDeducible}" rendered="#{siniestro.requierePadoDeducible()}">
+                            <f:convertNumber maxFractionDigits="2"/>
+                        </h:outputText>
                     </p:column>
 
                     <sec:authorize access="hasAuthority('ROLE_OWNER')">
 
-                        <p:column headerText="Estatus" width="150">
+                        <p:column headerText="Estatus Registro" width="150">
                             <h:outputText value="#{siniestro.estatusRegistro.label}">
                             </h:outputText>
                         </p:column>

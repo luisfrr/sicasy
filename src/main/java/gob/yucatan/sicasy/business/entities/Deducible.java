@@ -48,9 +48,6 @@ public class Deducible implements Cloneable, Serializable {
     @Column(name = "costo_total_deducible", nullable = false)
     private Double costoTotalDeducible;
 
-    @Column(name = "perdida_total", nullable = false)
-    private Integer perdidaTotal;
-
     @Column(name = "folio_factura_deducible", nullable = false)
     private String folioFacturaDeducible;
 

@@ -36,10 +36,11 @@ public class SiniestrosView implements Serializable {
     private @Getter @Setter Siniestro siniestroSelected;
     private @Getter @Setter Siniestro siniestroFilter;
 
-
-    // Render Paneles y Dialogs
+    // Variables para renderizar
     private @Getter boolean showSiniestroListPanel;
     private @Getter boolean showNuevoSiniestroPanel;
+
+
 
 
     @PostConstruct
