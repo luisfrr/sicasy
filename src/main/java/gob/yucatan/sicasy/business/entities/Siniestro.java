@@ -26,8 +26,8 @@ public class Siniestro implements Cloneable, Serializable {
     private Vehiculo vehiculo;
 
     @ManyToOne
-    @JoinColumn(name = "poliza_id")
-    private Poliza poliza;
+    @JoinColumn(name = "inciso_id")
+    private Inciso inciso;
 
     @Column(name = "no_siniestro_saf", nullable = false)
     private String noSiniestroSAF;
@@ -135,7 +135,7 @@ public class Siniestro implements Cloneable, Serializable {
         try {
             Siniestro clone = (Siniestro) super.clone();
             clone.vehiculo = this.vehiculo.clone();
-            clone.poliza = this.poliza.clone();
+            clone.inciso = this.inciso.clone();
             clone.deducible = this.deducible.clone();
             return clone;
         } catch (CloneNotSupportedException e) {

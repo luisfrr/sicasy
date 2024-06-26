@@ -7,7 +7,7 @@
                 xmlns:sec="https://joinfaces.org/security">
 
 <ui:define name="title">
-    #{vehiculoView.title}
+    #{siniestrosView.title}
 </ui:define>
 
 <ui:define name="content">
@@ -41,7 +41,7 @@
                                          iconPos="right" icon="fi fi-rr-angle-small-down" styleClass="ui-button-outlined"/>
                         <p:menu overlay="true" trigger="btn_exportar_siniestros" my="left top" at="left bottom" maxHeight="250">
                             <p:menuitem value="Exportar vehículos" ajax="false" onclick="PrimeFaces.monitorDownload(start, stop);">
-                                <p:fileDownload value="#{fileDownloadBean.downloadFile(vehiculoView.exportarVehiculos())}"/>
+                                <p:fileDownload value="#{fileDownloadBean.downloadFile(siniestrosView.exportarSiniestros())}"/>
                             </p:menuitem>
                         </p:menu>
                     </p:toolbarGroup>
@@ -54,10 +54,10 @@
                     <p:outputPanel id="filtros" styleClass="formgrid grid mb-2">
                         <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4 xl:col-3">
                             <p:outputLabel for="@next" value="Dependencia" styleClass="block"/>
-                            <p:selectOneMenu value="#{siniestrosView.siniestroFilter..idDependencia}" styleClass="w-full mw-auto">
+                            <p:selectOneMenu value="#{siniestrosView.siniestroFilter.responsable}" styleClass="w-full mw-auto">
                                 <f:selectItem itemLabel="Todos" itemValue="#{null}"/>
-                                <f:selectItems value="#{vehiculoView.dependenciaList}" var="dependencia"
-                                               itemValue="#{dependencia.idDependencia}" itemLabel="#{dependencia.abreviatura} - #{dependencia.nombre}"/>
+                                <f:selectItem itemLabel="Asegurado" itemValue="Asegurado"/>
+                                <f:selectItem itemLabel="Terceros" itemValue="Terceros"/>
                                 <p:ajax event="blur"/>
                             </p:selectOneMenu>
                             <span class="text-sm hidden"> </span>
@@ -77,12 +77,10 @@
 
             <h:form id="form_datatable" styleClass="mb-5">
 
-                <p:dataTable id="dt_vehiculos"
-                             var="vehiculo" value="#{vehiculoView.vehiculoList}"
+                <p:dataTable id="dt_siniestros"
+                             var="siniestro" value="#{siniestrosView.siniestroList}"
                              rows="50" rowHover="true"
-                             rowKey="#{vehiculo.idVehiculo}" rowIndexVar="index"
-                             rowSelectMode="add"
-                             selection="#{vehiculoView.vehiculoSelectedList}"
+                             rowKey="#{siniestro.idSiniestro}" rowIndexVar="index"
                              styleClass="dt-scrollable-x"
                              scrollable="true"
                              paginator="true" paginatorPosition="bottom"
@@ -107,129 +105,129 @@
                     </p:column>
 
                     <p:column headerText="No. Serie" width="150">
-                        <h:outputText value="#{vehiculo.noSerie}"/>
+                        <h:outputText value="#{siniestro.vehiculo.noSerie}"/>
                     </p:column>
 
-                    <p:column headerText="Placa" width="150">
-                        <h:outputText value="#{vehiculo.placa}"/>
+                    <p:column headerText="Póliza" width="150">
+                        <h:outputText value="#{siniestro.poliza.numeroPoliza}"/>
                     </p:column>
 
-                    <p:column headerText="Año" width="100">
-                        <h:outputText value="#{vehiculo.anio}"/>
+                    <p:column headerText="Inciso" width="100">
+                        <h:outputText value="#{siniestro.in}"/>
                     </p:column>
 
                     <p:column headerText="Marca" width="150">
-                        <h:outputText value="#{vehiculo.marca}"/>
+                        <h:outputText value="#{siniestro.marca}"/>
                     </p:column>
 
                     <p:column headerText="Modelo" width="150">
-                        <h:outputText value="#{vehiculo.modelo}"/>
+                        <h:outputText value="#{siniestro.modelo}"/>
                     </p:column>
 
                     <p:column headerText="Color" width="100">
-                        <h:outputText value="#{vehiculo.color}"/>
+                        <h:outputText value="#{siniestro.color}"/>
                     </p:column>
 
                     <p:column headerText="Condición" width="100" styleClass="text-center">
-                        <h:outputText value="#{vehiculo.condicionVehiculo.nombre}"/>
+                        <h:outputText value="#{siniestro.condicionVehiculo.nombre}"/>
                     </p:column>
 
                     <p:column headerText="Estatus" width="100" styleClass="text-center">
-                        <h:outputText value="#{vehiculo.estatusVehiculo.nombre}"/>
+                        <h:outputText value="#{siniestro.estatusVehiculo.nombre}"/>
                     </p:column>
 
                     <p:column headerText="Dependencia" width="150" styleClass="text-center">
-                        <h:outputText value="#{vehiculo.dependencia.abreviatura}"/>
+                        <h:outputText value="#{siniestro.dependencia.abreviatura}"/>
                     </p:column>
 
                     <p:column headerText="Dependencia asig." width="150" styleClass="text-center">
-                        <h:outputText value="#{vehiculo.dependenciaAsignada != null ? vehiculo.dependenciaAsignada.abreviatura : ''}"/>
+                        <h:outputText value="#{siniestro.dependenciaAsignada != null ? siniestro.dependenciaAsignada.abreviatura : ''}"/>
                     </p:column>
 
                     <p:column headerText="Licitación" width="150" styleClass="text-center">
-                        <h:outputText value="#{vehiculo.licitacion != null ? vehiculo.licitacion.numeroLicitacion : ''}"/>
+                        <h:outputText value="#{siniestro.licitacion != null ? siniestro.licitacion.numeroLicitacion : ''}"/>
                     </p:column>
 
                     <p:column headerText="Anexo" width="150">
-                        <h:outputText value="#{vehiculo.anexo != null ? vehiculo.anexo.nombre : ''}"/>
+                        <h:outputText value="#{siniestro.anexo != null ? siniestro.anexo.nombre : ''}"/>
                     </p:column>
 
                     <p:column headerText="No. Motor" width="150">
-                        <h:outputText value="#{vehiculo.noMotor}"/>
+                        <h:outputText value="#{siniestro.noMotor}"/>
                     </p:column>
 
                     <p:column headerText="Renta mensual" width="150">
-                        <h:outputText value="#{vehiculo.rentaMensual}">
+                        <h:outputText value="#{siniestro.rentaMensual}">
                             <f:convertNumber maxFractionDigits="2"/>
                         </h:outputText>
                     </p:column>
 
                     <p:column headerText="No. Factura" width="150">
-                        <h:outputText value="#{vehiculo.noFactura}"/>
+                        <h:outputText value="#{siniestro.noFactura}"/>
                     </p:column>
 
                     <p:column headerText="Valor factura" width="150">
-                        <h:outputText value="#{vehiculo.montoFactura}"/>
+                        <h:outputText value="#{siniestro.montoFactura}"/>
                     </p:column>
 
                     <p:column headerText="Descripción" width="350">
-                        <h:outputText value="#{vehiculo.descripcionVehiculo}"/>
+                        <h:outputText value="#{siniestro.descripcionVehiculo}"/>
                     </p:column>
 
                     <p:column headerText="Resguardante" width="180">
-                        <h:outputText value="#{vehiculo.resguardante}"/>
+                        <h:outputText value="#{siniestro.resguardante}"/>
                     </p:column>
 
                     <p:column headerText="Área reguardante" width="180">
-                        <h:outputText value="#{vehiculo.areaResguardante}"/>
+                        <h:outputText value="#{siniestro.areaResguardante}"/>
                     </p:column>
 
                     <p:column headerText="Director administrativo" width="180">
-                        <h:outputText value="#{vehiculo.autorizaDirectorAdmin}"/>
+                        <h:outputText value="#{siniestro.autorizaDirectorAdmin}"/>
                     </p:column>
 
                     <p:column headerText="Director general" width="180">
-                        <h:outputText value="#{vehiculo.autorizaDirectorGeneral}"/>
+                        <h:outputText value="#{siniestro.autorizaDirectorGeneral}"/>
                     </p:column>
 
                     <p:column headerText="Proveedor" width="150">
-                        <h:outputText value="#{vehiculo.proveedor}"/>
+                        <h:outputText value="#{siniestro.proveedor}"/>
                     </p:column>
 
                     <sec:authorize access="hasAuthority('ROLE_OWNER')">
 
                         <p:column headerText="Estatus" width="150">
-                            <h:outputText value="#{vehiculo.estatusRegistro.label}">
+                            <h:outputText value="#{siniestro.estatusRegistro.label}">
                             </h:outputText>
                         </p:column>
 
                         <p:column headerText="Fecha creación" width="150">
-                            <h:outputText value="#{vehiculo.fechaCreacion}">
+                            <h:outputText value="#{siniestro.fechaCreacion}">
                             </h:outputText>
                         </p:column>
 
                         <p:column headerText="Creado por" width="150">
-                            <h:outputText value="#{vehiculo.creadoPor}">
+                            <h:outputText value="#{siniestro.creadoPor}">
                             </h:outputText>
                         </p:column>
 
                         <p:column headerText="Fecha modificación" width="150">
-                            <h:outputText value="#{vehiculo.fechaModificacion}">
+                            <h:outputText value="#{siniestro.fechaModificacion}">
                             </h:outputText>
                         </p:column>
 
                         <p:column headerText="Modificado por" width="150">
-                            <h:outputText value="#{vehiculo.modificadoPor}">
+                            <h:outputText value="#{siniestro.modificadoPor}">
                             </h:outputText>
                         </p:column>
 
                         <p:column headerText="Fecha borrado" width="150">
-                            <h:outputText value="#{vehiculo.fechaBorrado}">
+                            <h:outputText value="#{siniestro.fechaBorrado}">
                             </h:outputText>
                         </p:column>
 
                         <p:column headerText="Borrado por" width="150">
-                            <h:outputText value="#{vehiculo.borradoPor}">
+                            <h:outputText value="#{siniestro.borradoPor}">
                             </h:outputText>
                         </p:column>
 
@@ -241,29 +239,12 @@
                             <p:commandButton id="buttonOptions" type="button"
                                              icon="fi fi-rr-menu-dots-vertical"
                                              styleClass="rounded-button ui-button-outlined"
-                                             rendered="#{vehiculo.estatusRegistro.label != 'Borrado'}"/>
+                                             rendered="#{siniestro.estatusRegistro.label != 'Borrado'}"/>
                             <p:menu overlay="true" trigger="buttonOptions" my="left top" at="left bottom" styleClass="w-16rem">
 
-                                <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'VEHICULOS_WRITE_VER_DETALLE')">
-                                    <p:menuitem value="Ver detalle del vehículo"
-                                                action="#{vehiculoView.verDetalle(vehiculo)}"
-                                                ajax="true" update="container"/>
-                                </sec:authorize>
-
-                                <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'VEHICULOS_WRITE_REGISTRAR_MANTENIMIENTO')">
-                                    <p:menuitem value="Registrar mantenimiento"
-                                                ajax="true" action="#{vehiculoView.abrirModalRegistroMantenimiento(vehiculo.idVehiculo)}"
-                                                update="growl form_datatable">
-                                    </p:menuitem>
-                                </sec:authorize>
-
-                                <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'VEHICULOS_WRITE_ADJUNTAR_FOTOS')">
-                                    <p:menuitem value="Adjuntar fotos"
-                                                ajax="true" action="#{vehiculoView.abrirModalAdjuntarFotos(vehiculo.idVehiculo)}"
-                                                oncomplete="Main.changeChooseLabel();"
-                                                update="growl form_datatable">
-                                    </p:menuitem>
-                                </sec:authorize>
+                                <p:menuitem value="Ver detalle del vehículo"
+                                            action="#{vehiculoView.verDetalle(siniestro)}"
+                                            ajax="true" update="container"/>
 
                             </p:menu>
 

@@ -54,6 +54,9 @@ public class SiniestrosView implements Serializable {
         this.siniestroSelected = null;
         this.siniestroFilter = new Siniestro();
         this.siniestroList = new ArrayList<>();
+
+        this.showSiniestroListPanel = true;
+
         PrimeFaces.current().ajax().update("form_filtros");
     }
 
