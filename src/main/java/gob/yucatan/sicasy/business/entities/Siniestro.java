@@ -6,7 +6,6 @@ import lombok.*;
 
 import java.io.Serializable;
 import java.util.Date;
-import java.util.List;
 import java.util.Objects;
 
 @Entity
@@ -52,8 +51,9 @@ public class Siniestro implements Cloneable, Serializable {
     @Column(name = "localidad")
     private String localidad;
 
-    @Column(name = "estatus", nullable = false)
-    private String estatus;
+    @ManyToOne
+    @JoinColumn(name = "estatus_siniestro_id", nullable = false)
+    private EstatusSiniestro estatusSiniestro;
 
     @Column(name = "causa", nullable = false)
     private String causa;

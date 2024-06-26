@@ -32,8 +32,10 @@
                         <p:commandButton id="btn_acciones_siniestros" type="button" value="Acciones"
                                          iconPos="right" icon="fi fi-rr-angle-small-down"/>
                         <p:menu overlay="true" trigger="btn_acciones_siniestros" my="left top" at="left bottom" maxHeight="250">
-                            <p:menuitem value="Registrar nuevos vehículos"/>
-                            <p:menuitem value="Registrar nuevos vehículos"/>
+                            <p:menuitem value="Registrar siniestros"/>
+                            <p:menuitem value="Solicitar pago de deducible"/>
+                            <p:menuitem value="Autorizar pago de deducible"/>
+                            <p:menuitem value="Rechazar solicitud de pago"/>
                         </p:menu>
                     </p:toolbarGroup>
                     <p:toolbarGroup align="right">
@@ -211,7 +213,7 @@
                     </p:column>
 
                     <p:column headerText="Estatus Siniestro" width="150">
-                        <h:outputText value="#{siniestro.estatus}"/>
+                        <h:outputText value="#{siniestro.estatusSiniestro}"/>
                     </p:column>
 
                     <p:column headerText="Perdida total" width="150">
