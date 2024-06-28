@@ -41,8 +41,6 @@ public class SiniestrosView implements Serializable {
     private @Getter boolean showNuevoSiniestroPanel;
 
 
-
-
     @PostConstruct
     public void init() {
         log.info("init - SiniestrosView");

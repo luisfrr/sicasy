@@ -22,28 +22,51 @@ public class Deducible implements Cloneable, Serializable {
     private Long idDeducible;
 
     @Column(name = "tipo_deducible", nullable = false)
-    private String tipoDeducible;
+    private String tipoDeducicle;
 
-    @Column(name = "vehiculo_renta_mensual", nullable = false)
-    private Double vehiculoRentaMensual;
+    @Column(name = "vehiculo_no_serie", nullable = false)
+    private String vehiculoNoSerie;
+
+    @Column(name = "vehiculo_placa", nullable = false)
+    private String vehiculoPlaca;
+
+    @Column(name = "vehiculo_marca", nullable = false)
+    private String vehiculoMarca;
+
+    @Column(name = "vehiculo_modelo", nullable = false)
+    private String vehiculoModelo;
+
+    @Column(name = "vehiculo_anio", nullable = false)
+    private Integer vehiculoAnio;
 
     @Column(name = "vehiculo_valor_factura", nullable = false)
     private Double vehiculoValorFactura;
 
-    @Column(name = "vehiculo_valor_actual", nullable = false)
-    private Double vehiculoValorActual;
+    @Column(name = "poliza_numero", nullable = false)
+    private String polizaNumero;
 
-    @Column(name = "no_poliza")
-    private String noPoliza;
+    @Column(name = "poliza_aseguradora", nullable = false)
+    private String polizaAseguradora;
 
-    @Column(name = "no_inciso")
-    private String noInciso;
+    @Column(name = "inciso_numero", nullable = false)
+    private String incisoNumero;
 
-    @Column(name = "poliza_total_asegurado")
-    private Double polizaTotalAsegurado;
+    @Column(name = "inciso_tipo_cobertura", nullable = false)
+    private String incisoTipoCobertura;
+
+    @Column(name = "inciso_fecha_inicio_vigencia", nullable = false)
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date incisoFechaInicioVigencia;
+
+    @Column(name = "inciso_fecha_fin_vigencia", nullable = false)
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date incisoFechaFinVigencia;
 
     @Column(name = "tiene_poliza_vigente", nullable = false)
     private Integer tienePolizaVigente;
+
+    @Column(name = "valor_actual", nullable = false)
+    private Double valorActual;
 
     @Column(name = "costo_total_deducible", nullable = false)
     private Double costoTotalDeducible;
