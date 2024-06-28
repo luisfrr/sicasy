@@ -230,7 +230,7 @@
                                               style="height: 100px; width: auto; display: block" stream="false" />
                            </f:facet>
                         </p:galleria>
-                        <p:outputPanel styleClass="mb-4 grid" rendered="#{vehiculoView.vehiculoFotoList == null or vehiculoView.vehiculoFotoList.size() == 0}">
+                        <p:outputPanel styleClass="grid" rendered="#{vehiculoView.vehiculoFotoList == null or vehiculoView.vehiculoFotoList.size() == 0}">
                            <p:outputPanel styleClass="field col-12">
                               No se han registrado fotos del vehículo
                            </p:outputPanel>
@@ -241,7 +241,7 @@
                <p:outputPanel styleClass="col-12 md:col-6 mb-5">
                   <h:form id="form_polizas">
                      <p:panel header="Póliza vigente" widgetVar="panelPolizaVigente" styleClass="mb-5">
-                        <p:outputPanel styleClass="mb-4 grid" rendered="#{vehiculoView.vehiculoSelected.incisoVigente != null}">
+                        <p:outputPanel styleClass="grid" rendered="#{vehiculoView.vehiculoSelected.incisoVigente != null}">
                            <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4">
                               <p:outputLabel for="@next" value="Aseguradora" styleClass="block"/>
                               <p:inputText styleClass="block w-full" readonly="true"
@@ -282,7 +282,7 @@
                               </p:commandLink>
                            </p:outputPanel>
                         </p:outputPanel>
-                        <p:outputPanel styleClass="mb-5 grid" rendered="#{vehiculoView.vehiculoSelected.incisoVigente == null}">
+                        <p:outputPanel styleClass="grid" rendered="#{vehiculoView.vehiculoSelected.incisoVigente == null}">
                            <p:outputPanel styleClass="field col-12">
                               No cuenta con una póliza vigente
                            </p:outputPanel>
