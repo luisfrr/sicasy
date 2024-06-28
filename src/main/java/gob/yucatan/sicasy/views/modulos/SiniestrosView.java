@@ -1,8 +1,12 @@
 package gob.yucatan.sicasy.views.modulos;
 
 import gob.yucatan.sicasy.business.annotations.ConfigPermiso;
+import gob.yucatan.sicasy.business.entities.EstatusSiniestro;
 import gob.yucatan.sicasy.business.entities.Siniestro;
 import gob.yucatan.sicasy.business.enums.TipoPermiso;
+import gob.yucatan.sicasy.repository.iface.IEstatusSiniestroRepository;
+import gob.yucatan.sicasy.services.iface.IEstatusSiniestroService;
+import gob.yucatan.sicasy.services.iface.ISiniestroService;
 import gob.yucatan.sicasy.utils.export.ExportFile;
 import jakarta.annotation.PostConstruct;
 import lombok.Getter;
@@ -28,17 +32,28 @@ import java.util.List;
 @PreAuthorize("hasAnyAuthority('ROLE_OWNER', 'SINIESTRO_VIEW')")
 public class SiniestrosView implements Serializable {
 
+    // Servicios/Beans
+    private final ISiniestroService siniestroService;
+    private final IEstatusSiniestroService estatusSiniestroService;
+
     // Constantes
+    private final @Getter String SINIESTRO_RESPONSABLE_ASEGURADO = "ASEGURADO";
+    private final @Getter String SINIESTRO_RESPONSABLE_TERCEROS = "TERCEROS";
 
     // Variables Generales
     private @Getter String title;
     private @Getter @Setter List<Siniestro> siniestroList;
+    private @Getter @Setter List<Siniestro> siniestroSelectedList;
     private @Getter @Setter Siniestro siniestroSelected;
     private @Getter @Setter Siniestro siniestroFilter;
+
+    // Variables selects
+    private @Getter List<EstatusSiniestro> estatusSiniestroList;
 
     // Variables para renderizar
     private @Getter boolean showSiniestroListPanel;
     private @Getter boolean showNuevoSiniestroPanel;
+
 
 
     @PostConstruct
@@ -52,21 +67,34 @@ public class SiniestrosView implements Serializable {
         log.info("limpiarFiltros - SiniestrosView");
         this.siniestroSelected = null;
         this.siniestroFilter = new Siniestro();
+        this.siniestroFilter.setEstatusSiniestro(new EstatusSiniestro());
         this.siniestroList = new ArrayList<>();
+
+        this.loadEstatusSiniestros();
 
         this.showSiniestroListPanel = true;
 
         PrimeFaces.current().ajax().update("form_filtros");
     }
 
-
-
-
+    public void buscar() {
+        log.info("buscar - SiniestrosView");
+        this.siniestroList = siniestroService.findAllDynamic(this.siniestroFilter);
+        PrimeFaces.current().ajax().update("form_datatable");
+    }
 
 
     public ExportFile exportarSiniestros() {
         return null;
     }
 
+
+    //region privates
+
+    private void loadEstatusSiniestros() {
+        this.estatusSiniestroList = estatusSiniestroService.findAll();
+    }
+
+    //endregion privates
 
 }

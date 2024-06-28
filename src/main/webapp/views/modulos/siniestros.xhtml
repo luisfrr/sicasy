@@ -54,12 +54,78 @@
                 <p:panel header="Filtros" widgetVar="panelFiltros"
                          toggleable="true" toggleSpeed="500">
                     <p:outputPanel id="filtros" styleClass="formgrid grid mb-2">
-                        <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4 xl:col-3">
-                            <p:outputLabel for="@next" value="Dependencia" styleClass="block"/>
+                        <p:outputPanel styleClass="field col-12 md:col-4 lg:col-2">
+                            <p:outputLabel for="@next" value="Responsable" styleClass="block"/>
                             <p:selectOneMenu value="#{siniestrosView.siniestroFilter.responsable}" styleClass="w-full mw-auto">
                                 <f:selectItem itemLabel="Todos" itemValue="#{null}"/>
-                                <f:selectItem itemLabel="Asegurado" itemValue="Asegurado"/>
-                                <f:selectItem itemLabel="Terceros" itemValue="Terceros"/>
+                                <f:selectItem itemLabel="#{siniestrosView.SINIESTRO_RESPONSABLE_ASEGURADO}" itemValue="#{siniestrosView.SINIESTRO_RESPONSABLE_ASEGURADO}"/>
+                                <f:selectItem itemLabel="#{siniestrosView.SINIESTRO_RESPONSABLE_TERCEROS}" itemValue="#{siniestrosView.SINIESTRO_RESPONSABLE_TERCEROS}"/>
+                                <p:ajax event="blur"/>
+                            </p:selectOneMenu>
+                            <span class="text-sm hidden"> </span>
+                        </p:outputPanel>
+                        <p:outputPanel styleClass="field col-12 md:col-4 lg:col-2">
+                            <p:outputLabel for="@next" styleClass="block" value="Fecha inicio"/>
+                            <p:datePicker value="#{siniestrosView.siniestroFilter.fechaInicioFilter}"
+                                          placeholder="dd/MM/yyyy" pattern="dd/MM/yyyy"
+                                          monthNavigator="true" yearNavigator="true"
+                                          showWeek="true" locale="es"
+                                          styleClass="w-full"/>
+                        </p:outputPanel>
+                        <p:outputPanel styleClass="field col-12 md:col-4 lg:col-2">
+                            <p:outputLabel for="@next" styleClass="block" value="Fecha fin"/>
+                            <p:datePicker value="#{siniestrosView.siniestroFilter.fechaFinFilter}"
+                                          placeholder="dd/MM/yyyy" pattern="dd/MM/yyyy"
+                                          monthNavigator="true" yearNavigator="true"
+                                          showWeek="true" locale="es"
+                                          styleClass="w-full"/>
+                        </p:outputPanel>
+                        <p:outputPanel styleClass="field col-12 md:col-4 lg:col-2">
+                            <p:outputLabel for="@next" value="Estatus" styleClass="block"/>
+                            <p:selectOneMenu value="#{siniestrosView.siniestroFilter.estatusSiniestro.idEstatusSiniestro}" styleClass="w-full mw-auto">
+                                <f:selectItem itemLabel="Todos" itemValue="#{null}"/>
+                                <f:selectItems value="#{siniestrosView.estatusSiniestroList}" var="estatusSiniestro"
+                                               itemValue="#{estatusSiniestro.idEstatusSiniestro}" itemLabel="#{estatusSiniestro.nombre}"/>
+                                <p:ajax event="blur"/>
+                            </p:selectOneMenu>
+                            <span class="text-sm hidden"> </span>
+                        </p:outputPanel>
+                        <p:outputPanel styleClass="field col-12 md:col-4 lg:col-2">
+                            <p:outputLabel for="@next" value="Corralón" styleClass="block"/>
+                            <p:selectOneMenu value="#{siniestrosView.siniestroFilter.corralon}" styleClass="w-full mw-auto">
+                                <f:selectItem itemLabel="Todos" itemValue="#{null}"/>
+                                <f:selectItem itemLabel="Sí" itemValue="1"/>
+                                <f:selectItem itemLabel="No" itemValue="0"/>
+                                <p:ajax event="blur"/>
+                            </p:selectOneMenu>
+                            <span class="text-sm hidden"> </span>
+                        </p:outputPanel>
+                        <p:outputPanel styleClass="field col-12 md:col-4 lg:col-2">
+                            <p:outputLabel for="@next" value="Multa" styleClass="block"/>
+                            <p:selectOneMenu value="#{siniestrosView.siniestroFilter.multaVehiculo}" styleClass="w-full mw-auto">
+                                <f:selectItem itemLabel="Todos" itemValue="#{null}"/>
+                                <f:selectItem itemLabel="Sí" itemValue="1"/>
+                                <f:selectItem itemLabel="No" itemValue="0"/>
+                                <p:ajax event="blur"/>
+                            </p:selectOneMenu>
+                            <span class="text-sm hidden"> </span>
+                        </p:outputPanel>
+                        <p:outputPanel styleClass="field col-12 md:col-4 lg:col-2">
+                            <p:outputLabel for="@next" value="Perdida total" styleClass="block"/>
+                            <p:selectOneMenu value="#{siniestrosView.siniestroFilter.perdidaTotal}" styleClass="w-full mw-auto">
+                                <f:selectItem itemLabel="Todos" itemValue="#{null}"/>
+                                <f:selectItem itemLabel="Sí" itemValue="1"/>
+                                <f:selectItem itemLabel="No" itemValue="0"/>
+                                <p:ajax event="blur"/>
+                            </p:selectOneMenu>
+                            <span class="text-sm hidden"> </span>
+                        </p:outputPanel>
+                        <p:outputPanel styleClass="field col-12 md:col-4 lg:col-2">
+                            <p:outputLabel for="@next" value="Requiere Pago Deducible" styleClass="block"/>
+                            <p:selectOneMenu value="#{siniestrosView.siniestroFilter.pagoDeducible}" styleClass="w-full mw-auto">
+                                <f:selectItem itemLabel="Todos" itemValue="#{null}"/>
+                                <f:selectItem itemLabel="Sí" itemValue="1"/>
+                                <f:selectItem itemLabel="No" itemValue="0"/>
                                 <p:ajax event="blur"/>
                             </p:selectOneMenu>
                             <span class="text-sm hidden"> </span>

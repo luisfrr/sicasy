@@ -135,6 +135,15 @@ public class Siniestro implements Cloneable, Serializable {
     @Column(name = "borrado_por", insertable = false)
     private String borradoPor;
 
+    @Transient
+    private Date fechaInicioFilter;
+
+    @Transient
+    private Date fechaFinFilter;
+
+    @Transient
+    private Integer pagoDeducible;
+
     @Override
     public Siniestro clone() {
         try {
