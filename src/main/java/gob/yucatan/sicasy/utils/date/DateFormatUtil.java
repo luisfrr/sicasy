@@ -18,6 +18,9 @@ public class DateFormatUtil {
      * @return fecha en cadena de texto
      */
     public static String convertToFormat(Date date, String pattern) {
+        if(date == null)
+            return "";
+
         if(pattern == null || pattern.isEmpty())
             pattern = "yyyy-MM-dd HH:mm:ss.SSS";
         DateFormat dateFormat = new SimpleDateFormat(pattern);
