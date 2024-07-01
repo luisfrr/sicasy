@@ -742,6 +742,18 @@ public class VehiculoView implements Serializable {
         }
     }
 
+    public void borrarFotoMantenimiento(Long idMantenimientoFoto){
+        log.info("borrar foto mantenimiento");
+
+        try {
+            mantenimientoFotoService.borrarFoto(idMantenimientoFoto, userSessionBean.getUserName());
+            this.mantenimientoFotoList = mantenimientoFotoService.getFotosMantenimientos(this.mantenimientoVehiculo.getIdMantenimiento());
+        }catch (Exception e) {
+            Messages.addError(e.getMessage());
+        }
+
+    }
+
     @ConfigPermiso(tipo = TipoPermiso.READ, codigo = "VEHICULOS_READ_EXPORTAR_VEHICULOS", orden = 6,
             nombre = "Exportar", descripcion = "Permite exportar en Excel el listado de vehículos.")
     @PreAuthorize("hasAnyAuthority('ROLE_OWNER', 'VEHICULOS_READ_EXPORTAR_VEHICULOS')")

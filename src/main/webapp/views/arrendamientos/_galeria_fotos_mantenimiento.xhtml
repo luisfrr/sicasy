@@ -6,20 +6,18 @@
         xmlns:p="http://primefaces.org/ui">
 
    <h:form id="form_galeria_mantenimiento" enctype="multipart/form-data">
-      <p:dialog header="Fotos" widgetVar="galeriaFotosMantenimientoDialog" styleClass="mb-5"
-                 width="800"
+      <p:dialog header="Fotos de los mantenimientos" widgetVar="galeriaFotosMantenimientoDialog" styleClass="mb-5"
+                minWidth="600"
                 showEffect="fade" modal="true"
                 cache="false" responsive="true">
-         <f:facet name="actions">
-            <p:commandLink styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default flex justify-content-center align-items-center" rendered="true"
+
+         <p:panel rendered="#{empty vehiculoView.mantenimientoFotoList}">
+            <p:outputLabel>No se han cargado fotos todavía</p:outputLabel>
+            <p:commandLink styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default flex justify-content-center align-items-center"
                            ajax="true" action="#{vehiculoView.abrirModalAdjuntarFotos(vehiculoView.vehiculoSelected.idVehiculo)}"
                            oncomplete="Main.changeChooseLabel();" update="growl">
                <i class="fi fi-rr-add-image"/>
             </p:commandLink>
-         </f:facet>
-
-         <p:panel rendered="#{empty vehiculoView.mantenimientoFotoList}">
-            <p:outputLabel>No se han cargado fotos todavía</p:outputLabel>
          </p:panel>
 
          <p:galleria value="#{vehiculoView.mantenimientoFotoList}" var="mantenimientoFoto" numVisible="5"
@@ -35,7 +33,7 @@
                <p:outputPanel class="flex justify-content-between align-items-center">
                   <p class="text-white">#{mantenimientoFoto.fechaCreacion}</p>
                   <p:commandLink styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default flex justify-content-center align-items-center"
-                                 ajax="true" action="#{vehiculoView.borrarFoto(mantenimientoFoto.idMantenimientoFoto)}">
+                                 ajax="true" action="#{vehiculoView.borrarFotoMantenimiento(mantenimientoFoto.idMantenimientoFoto)}">
                      <i class="fi fi-rr-trash text-xl text-white"/>
                   </p:commandLink>
                </p:outputPanel>
