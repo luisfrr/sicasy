@@ -4,7 +4,6 @@ import gob.yucatan.sicasy.business.annotations.ConfigPermiso;
 import gob.yucatan.sicasy.business.entities.EstatusSiniestro;
 import gob.yucatan.sicasy.business.entities.Siniestro;
 import gob.yucatan.sicasy.business.enums.TipoPermiso;
-import gob.yucatan.sicasy.repository.iface.IEstatusSiniestroRepository;
 import gob.yucatan.sicasy.services.iface.IEstatusSiniestroService;
 import gob.yucatan.sicasy.services.iface.ISiniestroService;
 import gob.yucatan.sicasy.utils.export.ExportFile;
