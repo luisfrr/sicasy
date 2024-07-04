@@ -44,6 +44,7 @@ public class SiniestrosView implements Serializable {
     private @Getter @Setter List<Siniestro> siniestroList;
     private @Getter @Setter List<Siniestro> siniestroSelectedList;
     private @Getter @Setter Siniestro siniestroSelected;
+    private @Getter @Setter Siniestro siniestroForm;
     private @Getter @Setter Siniestro siniestroFilter;
 
     // Variables selects
@@ -72,6 +73,8 @@ public class SiniestrosView implements Serializable {
         this.loadEstatusSiniestros();
 
         this.showSiniestroListPanel = true;
+        this.siniestroSelected = null;
+        this.siniestroForm = null;
 
         PrimeFaces.current().ajax().update("form_filtros");
     }
