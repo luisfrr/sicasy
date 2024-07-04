@@ -32,7 +32,7 @@
                         <p:commandButton id="btn_acciones_siniestros" type="button" value="Acciones"
                                          iconPos="right" icon="fi fi-rr-angle-small-down"/>
                         <p:menu overlay="true" trigger="btn_acciones_siniestros" my="left top" at="left bottom" maxHeight="250">
-                            <p:menuitem value="Registrar siniestros"/>
+                            <p:menuitem value="Registrar siniestros" ajax="true" action="#{siniestrosView.abrirRegistroSiniestroDialog()}"/>
                             <p:menuitem value="Solicitar pago de deducible"/>
                             <p:menuitem value="Autorizar pago de deducible"/>
                             <p:menuitem value="Rechazar solicitud de pago"/>
@@ -392,6 +392,8 @@
             </h:form>
 
         </p:outputPanel>
+
+        <ui:include src="/views/modulos/siniestros/_registrar_siniestro_dialog.xhtml"/>
 
     </p:outputPanel>
 

@@ -3,10 +3,16 @@ package gob.yucatan.sicasy.views.modulos;
 import gob.yucatan.sicasy.business.annotations.ConfigPermiso;
 import gob.yucatan.sicasy.business.entities.EstatusSiniestro;
 import gob.yucatan.sicasy.business.entities.Siniestro;
+import gob.yucatan.sicasy.business.entities.Vehiculo;
 import gob.yucatan.sicasy.business.enums.TipoPermiso;
+import gob.yucatan.sicasy.business.exceptions.BadRequestException;
+import gob.yucatan.sicasy.business.exceptions.NotFoundException;
 import gob.yucatan.sicasy.services.iface.IEstatusSiniestroService;
 import gob.yucatan.sicasy.services.iface.ISiniestroService;
+import gob.yucatan.sicasy.services.iface.IVehiculoService;
 import gob.yucatan.sicasy.utils.export.ExportFile;
+import gob.yucatan.sicasy.views.beans.Messages;
+import gob.yucatan.sicasy.views.beans.UserSessionBean;
 import jakarta.annotation.PostConstruct;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -32,8 +38,10 @@ import java.util.List;
 public class SiniestrosView implements Serializable {
 
     // Servicios/Beans
+    private final UserSessionBean userSessionBean;
     private final ISiniestroService siniestroService;
     private final IEstatusSiniestroService estatusSiniestroService;
+    private final IVehiculoService vehiculoService;
 
     // Constantes
     private final @Getter String SINIESTRO_RESPONSABLE_ASEGURADO = "ASEGURADO";
@@ -46,6 +54,7 @@ public class SiniestrosView implements Serializable {
     private @Getter @Setter Siniestro siniestroSelected;
     private @Getter @Setter Siniestro siniestroForm;
     private @Getter @Setter Siniestro siniestroFilter;
+    private @Getter @Setter String informacionVehiculo;
 
     // Variables selects
     private @Getter List<EstatusSiniestro> estatusSiniestroList;
@@ -85,11 +94,69 @@ public class SiniestrosView implements Serializable {
         PrimeFaces.current().ajax().update("form_datatable");
     }
 
-
     public ExportFile exportarSiniestros() {
         return null;
     }
 
+    public void abrirRegistroSiniestroDialog() {
+        log.info("abrirRegistroSiniestroDialog - SiniestrosView");
+        this.showNuevoSiniestroPanel = true;
+        this.siniestroForm = new Siniestro();
+        PrimeFaces.current().ajax().update("registrar-siniestro-dialog-content");
+        PrimeFaces.current().executeScript("PF('registrarSiniestroDialog').show()");
+    }
+
+    public void cerrarRegistroSiniestroDialog() {
+        log.info("cerrarRegistroSiniestroDialog - SiniestrosView");
+        this.showNuevoSiniestroPanel = false;
+        this.siniestroForm = null;
+        PrimeFaces.current().ajax().update("registrar-siniestro-dialog-content");
+        PrimeFaces.current().executeScript("PF('registrarSiniestroDialog').hide()");
+    }
+
+    public void guardarRegistroSiniestro() {
+        log.info("guardarRegistroPoliza - SiniestrosView");
+        try {
+            if(this.siniestroForm != null) {
+                siniestroService.registrarNuevoSiniestro(this.siniestroForm, userSessionBean.getUserName());
+                Messages.addInfo("Se ha guardado correctamente la póliza");
+                this.limpiarFiltros();
+                this.buscar();
+                this.cerrarRegistroSiniestroDialog();
+            }
+        } catch (Exception e) {
+            log.error("Error al registrar siniestro", e);
+            String message;
+            if(e instanceof BadRequestException)
+                message = e.getMessage();
+            else if(e instanceof NotFoundException)
+                message = e.getMessage();
+            else
+                message = "Ocurrió un error inesperado. Intenta de nuevo más tarde.";
+            Messages.addError(message);
+        }
+    }
+
+    public void buscarVehiculo(String noSerie) {
+        log.info("buscar vehiculos - SiniestrosView");
+        try {
+            if(noSerie != null) {
+                Vehiculo vehiculo = vehiculoService.findByNoSerie(noSerie);
+                this.informacionVehiculo = String.join(" | ",
+                        vehiculo.getNoSerie(),
+                        vehiculo.getMarca(),
+                        vehiculo.getAnio().toString(),
+                        vehiculo.getModelo(),
+                        vehiculo.getColor(),
+                        vehiculo.getDescripcionVehiculo());
+            } else {
+                this.informacionVehiculo = "";
+            }
+        } catch (Exception e) {
+            log.warn("Error al buscar un vehículo", e);
+            Messages.addWarn("No se ha encontrado el vehículo");
+        }
+    }
 
     //region privates
 

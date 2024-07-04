@@ -8,5 +8,6 @@ public interface ISiniestroService {
 
     List<Siniestro> findAllDynamic(Siniestro siniestro);
     Siniestro findById(Long id);
+    void registrarNuevoSiniestro(Siniestro siniestro, String userName);
 
 }

@@ -144,6 +144,18 @@ public class Siniestro implements Cloneable, Serializable {
     @Transient
     private Integer pagoDeducible;
 
+    @Transient
+    private boolean checkDanioViaPublica;
+
+    @Transient
+    private boolean checkCorralon;
+
+    @Transient
+    private boolean checkMulta;
+
+    @Transient
+    private boolean checkPerdidaTotal;
+
     @Override
     public Siniestro clone() {
         try {

@@ -74,12 +74,16 @@ public class SiniestroServiceImpl implements ISiniestroService {
             }
         }
 
-
         return siniestroRepository.findAll(specification);
     }
 
     @Override
     public Siniestro findById(Long id) {
         return null;
+    }
+
+    @Override
+    public void registrarNuevoSiniestro(Siniestro siniestro, String userName) {
+
     }
 }

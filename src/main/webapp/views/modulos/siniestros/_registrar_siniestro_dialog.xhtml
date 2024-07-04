@@ -8,12 +8,12 @@
 
    <p:dialog header="Registrar siniestro"
              id="registrar-siniestro-dialog" widgetVar="registrarSiniestroDialog"
-             minHeight="400" width="1000"
+             height="450" width="1000"
              showEffect="fade" modal="true"
              closable="true" closeOnEscape="true"
              cache="false" responsive="true">
       <p:outputPanel id="registrar-siniestro-dialog-content">
-         <h:form id="form-registro-siniestro" styleClass="formgrid grid">
+         <h:form id="form-registro-siniestro" styleClass="formgrid grid" rendered="#{siniestrosView.showNuevoSiniestroPanel}">
             <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4">
                <div class="flex justify-content-start align-items-end h-full">
                   <div class="flex flex-column align-items-start w-full mr-3">
@@ -27,7 +27,7 @@
                                       styleClass="ui-button-outlined"
                                       action="#{siniestrosView.buscarVehiculo(siniestrosView.siniestroForm.vehiculo.noSerie)}"
                                       process="@this,no_serie_vehiculo"
-                                      update="endoso-alta-indiv-form:info_vehiculo growl"/>
+                                      update="form-registro-siniestro:info_vehiculo growl"/>
                   </div>
                </div>
             </p:outputPanel>
@@ -68,7 +68,7 @@
                <span class="text-sm hidden"> </span>
             </p:outputPanel>
 
-            <p:outputPanel styleClass="field col-12 md:col-4 lg:col-2">
+            <p:outputPanel styleClass="field col-12 md:col-4 lg:col-4">
                <p:outputLabel for="@next" value="Responsable" styleClass="block"/>
                <p:selectOneMenu value="#{siniestrosView.siniestroFilter.responsable}" styleClass="w-full mw-auto" required="true">
                   <f:selectItem itemLabel="Seleccione uno..." itemValue="#{null}"/>
@@ -101,6 +101,11 @@
                <p:outputLabel for="@next" value="Reporta" styleClass="block"/>
                <p:inputText styleClass="block w-full"
                             value="#{siniestrosView.siniestroForm.reporta}"/>
+               <span class="text-sm hidden"> </span>
+            </p:outputPanel>
+
+            <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4">
+               <p:selectBooleanCheckbox value="#{siniestrosView.siniestroForm.checkPerdidaTotal}" itemLabel="¿Perdida total?"/>
                <span class="text-sm hidden"> </span>
             </p:outputPanel>
 
@@ -146,36 +151,46 @@
                <span class="text-sm hidden"> </span>
             </p:outputPanel>
 
-
-
             <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4">
-               <p:outputLabel for="@next" styleClass="block" value="Fecha fin"/>
-               <p:datePicker value="#{siniestrosView.siniestroForm.fechaFinVigencia}"
-                             placeholder="dd/MM/yyyy" pattern="dd/MM/yyyy"
-                             monthNavigator="true" yearNavigator="true"
-                             showWeek="true" locale="es" required="true"
-                             styleClass="w-full"/>
+               <p:outputLabel for="@next" value="No. Licencia" styleClass="block"/>
+               <p:inputText styleClass="block w-full"
+                            value="#{siniestrosView.siniestroForm.noLicencia}"/>
+               <span class="text-sm hidden"> </span>
             </p:outputPanel>
 
             <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4">
-               <p:outputLabel for="@next" styleClass="block" value="Costo"/>
-               <p:inputNumber styleClass="block w-full" required="true"
-                              value="#{siniestrosView.siniestroForm.costo}"/>
+               <p:outputLabel for="@next" value="Tipo de licencia" styleClass="block"/>
+               <p:inputText styleClass="block w-full"
+                            value="#{siniestrosView.siniestroForm.tipoLicencia}"/>
+               <span class="text-sm hidden"> </span>
             </p:outputPanel>
 
             <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4">
-               <p:outputLabel for="@next" value="Frecuencia de pago" styleClass="block"/>
-               <p:selectOneMenu id="select_anexo" value="#{siniestrosView.siniestroForm.frecuenciaPago}"
-                                styleClass="w-full mw-auto">
-                  <f:selectItem itemLabel="Selecciona uno..."
-                                itemValue="#{null}"/>
-                  <f:selectItem itemLabel="MENSUAL"
-                                itemValue="MENSUAL"/>
-                  <f:selectItem itemLabel="SEMESTRAL"
-                                itemValue="SEMESTRAL"/>
-                  <f:selectItem itemLabel="ANUAL"
-                                itemValue="ANUAL"/>
-               </p:selectOneMenu>
+               <p:outputLabel for="@next" value="Vencimiento licencia" styleClass="block"/>
+               <p:inputText styleClass="block w-full"
+                            value="#{siniestrosView.siniestroForm.vencimientoLicencia}"/>
+               <span class="text-sm hidden"> </span>
+            </p:outputPanel>
+
+            <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4">
+               <p:selectBooleanCheckbox value="#{siniestrosView.siniestroForm.checkDanioViaPublica}" itemLabel="Daño vía pública"/>
+               <span class="text-sm hidden"> </span>
+            </p:outputPanel>
+
+            <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4">
+               <p:selectBooleanCheckbox value="#{siniestrosView.siniestroForm.checkCorralon}" itemLabel="Corralón"/>
+               <span class="text-sm hidden"> </span>
+            </p:outputPanel>
+
+            <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4">
+               <p:selectBooleanCheckbox value="#{siniestrosView.siniestroForm.checkMulta}" itemLabel="Multa"/>
+               <span class="text-sm hidden"> </span>
+            </p:outputPanel>
+
+            <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4">
+               <p:outputLabel for="@next" value="Costo multa" styleClass="block"/>
+               <p:inputNumber styleClass="block w-full"
+                            value="#{siniestrosView.siniestroForm.costoMulta}"/>
                <span class="text-sm hidden"> </span>
             </p:outputPanel>
 
@@ -183,10 +198,10 @@
 
                <p:outputPanel styleClass="flex justify-content-end">
                   <p:commandButton value="Cancelar" ajax="true" process="@this"
-                                   action="#{siniestrosView.cerrarRegistroEndosoAltaDialog()}"
+                                   action="#{siniestrosView.cerrarRegistroSiniestroDialog()}"
                                    styleClass="ui-button-outlined mr-4"/>
                   <p:commandButton value="Guardar" ajax="true" process="@form"
-                                   action="#{siniestrosView.guardarEndosoAlta()}"
+                                   action="#{siniestrosView.guardarRegistroSiniestro()}"
                                    update="growl @form form_datatable"
                                    validateClient="true"/>
                </p:outputPanel>
