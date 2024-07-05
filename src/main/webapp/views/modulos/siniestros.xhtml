@@ -32,10 +32,11 @@
                         <p:commandButton id="btn_acciones_siniestros" type="button" value="Acciones"
                                          iconPos="right" icon="fi fi-rr-angle-small-down"/>
                         <p:menu overlay="true" trigger="btn_acciones_siniestros" my="left top" at="left bottom" maxHeight="250">
-                            <p:menuitem value="Registrar siniestros" ajax="true" action="#{siniestrosView.abrirRegistroSiniestroDialog()}"/>
+                            <p:menuitem value="Registrar siniestro" ajax="true" action="#{siniestrosView.abrirRegistroSiniestroDialog()}"/>
                             <p:menuitem value="Solicitar pago de deducible"/>
-                            <p:menuitem value="Autorizar pago de deducible"/>
-                            <p:menuitem value="Rechazar solicitud de pago"/>
+                            <p:menuitem value="Autorizar solicitud"/>
+                            <p:menuitem value="Rechazar solicitud"/>
+                            <p:menuitem value="Finalizar registro"/>
                         </p:menu>
                     </p:toolbarGroup>
                     <p:toolbarGroup align="right">
@@ -180,9 +181,9 @@
                         <h:outputText value="#{siniestro.noSiniestroSAF}"/>
                     </p:column>
 
-                    <p:column headerText="Fecha Siniestro" width="150">
+                    <p:column headerText="Fecha Siniestro" width="200">
                         <h:outputText value="#{siniestro.fechaSiniestro}">
-                            <f:convertDateTime pattern="dd/MM/yyyy HH:mm:ss a"/>
+                            <f:convertDateTime pattern="dd/MM/yyyy HH:mm a"/>
                         </h:outputText>
                     </p:column>
 
@@ -222,9 +223,9 @@
                         <h:outputText value="#{siniestro.reporta}"/>
                     </p:column>
 
-                    <p:column headerText="Fecha reporte" width="150">
+                    <p:column headerText="Fecha reporte" width="200">
                         <h:outputText value="#{siniestro.fechaSiniestro}">
-                            <f:convertDateTime pattern="dd/MM/yyyy HH:mm:ss a"/>
+                            <f:convertDateTime pattern="dd/MM/yyyy HH:mm a"/>
                         </h:outputText>
                     </p:column>
 
@@ -245,7 +246,9 @@
                     </p:column>
 
                     <p:column headerText="Vencimiento licencia" width="150">
-                        <h:outputText value="#{siniestro.vencimientoLicencia}"/>
+                        <h:outputText value="#{siniestro.vencimientoLicencia}">
+                            <f:convertDateTime pattern="dd/MM/yyyy"/>
+                        </h:outputText>
                     </p:column>
 
                     <p:column headerText="Daño vía pública" width="150">
@@ -280,6 +283,10 @@
 
                     <p:column headerText="Estatus Siniestro" width="150">
                         <h:outputText value="#{siniestro.estatusSiniestro}"/>
+                    </p:column>
+
+                    <p:column headerText="Observaciones" width="250">
+                        <h:outputText value="#{siniestro.observaciones}"/>
                     </p:column>
 
                     <p:column headerText="Perdida total" width="150">
@@ -339,6 +346,7 @@
 
                         <p:column headerText="Fecha creación" width="150">
                             <h:outputText value="#{siniestro.fechaCreacion}">
+                                <f:convertDateTime pattern="dd/MM/yyyy HH:mm:ss a"/>
                             </h:outputText>
                         </p:column>
 
@@ -349,6 +357,7 @@
 
                         <p:column headerText="Fecha modificación" width="150">
                             <h:outputText value="#{siniestro.fechaModificacion}">
+                                <f:convertDateTime pattern="dd/MM/yyyy HH:mm:ss a"/>
                             </h:outputText>
                         </p:column>
 
@@ -359,6 +368,7 @@
 
                         <p:column headerText="Fecha borrado" width="150">
                             <h:outputText value="#{siniestro.fechaBorrado}">
+                                <f:convertDateTime pattern="dd/MM/yyyy HH:mm:ss a"/>
                             </h:outputText>
                         </p:column>
 

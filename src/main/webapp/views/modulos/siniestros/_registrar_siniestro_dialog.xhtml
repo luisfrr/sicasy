@@ -11,9 +11,9 @@
              height="450" width="1000"
              showEffect="fade" modal="true"
              closable="true" closeOnEscape="true"
-             cache="false" responsive="true">
+             cache="false" responsive="true" focus="registro-siniestro-form:no_serie_vehiculo">
       <p:outputPanel id="registrar-siniestro-dialog-content">
-         <h:form id="form-registro-siniestro" styleClass="formgrid grid" rendered="#{siniestrosView.showNuevoSiniestroPanel}">
+         <h:form id="registro-siniestro-form" styleClass="formgrid grid" rendered="#{siniestrosView.showNuevoSiniestroPanel}">
             <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4">
                <div class="flex justify-content-start align-items-end h-full">
                   <div class="flex flex-column align-items-start w-full mr-3">
@@ -26,17 +26,64 @@
                      <p:commandButton icon="fi fi-rr-search" title="Buscar"
                                       styleClass="ui-button-outlined"
                                       action="#{siniestrosView.buscarVehiculo(siniestrosView.siniestroForm.vehiculo.noSerie)}"
-                                      process="@this,no_serie_vehiculo"
-                                      update="form-registro-siniestro:info_vehiculo growl"/>
+                                      process="@this,no_serie_vehiculo" update="growl"/>
                   </div>
                </div>
             </p:outputPanel>
 
-            <p:outputPanel styleClass="field col-12">
-               <p:outputLabel for="info_vehiculo" value="Información del vehículo" styleClass="block"/>
-               <p:inputTextarea id="info_vehiculo" styleClass="block w-full" required="true"
-                                readonly="true" rows="2" cols="50"
-                                value="#{siniestrosView.informacionVehiculo}"/>
+            <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4">
+               <p:outputLabel for="@next" value="Marca" styleClass="block"/>
+               <p:inputText id="vehiculo_marca" styleClass="block w-full" readonly="true" required="true"
+                            value="#{siniestrosView.siniestroForm.vehiculo.marca}"/>
+               <span class="text-sm hidden"> </span>
+            </p:outputPanel>
+
+            <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4">
+               <p:outputLabel for="@next" value="Año" styleClass="block"/>
+               <p:inputText id="vehiculo_anio" styleClass="block w-full" readonly="true" required="true"
+                            value="#{siniestrosView.siniestroForm.vehiculo.anio}"/>
+               <span class="text-sm hidden"> </span>
+            </p:outputPanel>
+
+            <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4">
+               <p:outputLabel for="@next" value="Modelo" styleClass="block"/>
+               <p:inputText id="vehiculo_modelo" styleClass="block w-full" readonly="true" required="true"
+                            value="#{siniestrosView.siniestroForm.vehiculo.modelo}"/>
+               <span class="text-sm hidden"> </span>
+            </p:outputPanel>
+
+            <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4">
+               <p:outputLabel for="@next" value="Placa" styleClass="block"/>
+               <p:inputText id="vehiculo_placa" styleClass="block w-full" readonly="true" required="true"
+                            value="#{siniestrosView.siniestroForm.vehiculo.placa}"/>
+               <span class="text-sm hidden"> </span>
+            </p:outputPanel>
+
+            <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4">
+               <p:outputLabel for="@next" value="Color" styleClass="block"/>
+               <p:inputText id="vehiculo_color" styleClass="block w-full" readonly="true"
+                            value="#{siniestrosView.siniestroForm.vehiculo.color}"/>
+               <span class="text-sm hidden"> </span>
+            </p:outputPanel>
+
+            <p:outputPanel styleClass="field col-12 md:col-6 lg:col-8">
+               <p:outputLabel for="@next" value="Dependencia" styleClass="block"/>
+               <p:inputText id="vehiculo_dependencia" styleClass="block w-full" readonly="true"
+                            value="#{siniestrosView.siniestroForm.vehiculo.dependencia.nombre}"/>
+               <span class="text-sm hidden"> </span>
+            </p:outputPanel>
+
+            <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4">
+               <p:outputLabel for="@next" value="Póliza" styleClass="block"/>
+               <p:inputText id="vehiculo_poliza" styleClass="block w-full" readonly="true"
+                            value="#{siniestrosView.siniestroForm.vehiculo.incisoVigente.poliza.numeroPoliza}"/>
+               <span class="text-sm hidden"> </span>
+            </p:outputPanel>
+
+            <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4">
+               <p:outputLabel for="@next" value="Inciso" styleClass="block"/>
+               <p:inputText id="vehiculo_inciso" styleClass="block w-full" readonly="true"
+                            value="#{siniestrosView.siniestroForm.vehiculo.incisoVigente.inciso}"/>
                <span class="text-sm hidden"> </span>
             </p:outputPanel>
 
@@ -70,7 +117,7 @@
 
             <p:outputPanel styleClass="field col-12 md:col-4 lg:col-4">
                <p:outputLabel for="@next" value="Responsable" styleClass="block"/>
-               <p:selectOneMenu value="#{siniestrosView.siniestroFilter.responsable}" styleClass="w-full mw-auto" required="true">
+               <p:selectOneMenu value="#{siniestrosView.siniestroForm.responsable}" styleClass="w-full mw-auto" required="true">
                   <f:selectItem itemLabel="Seleccione uno..." itemValue="#{null}"/>
                   <f:selectItem itemLabel="#{siniestrosView.SINIESTRO_RESPONSABLE_ASEGURADO}" itemValue="#{siniestrosView.SINIESTRO_RESPONSABLE_ASEGURADO}"/>
                   <f:selectItem itemLabel="#{siniestrosView.SINIESTRO_RESPONSABLE_TERCEROS}" itemValue="#{siniestrosView.SINIESTRO_RESPONSABLE_TERCEROS}"/>
@@ -82,8 +129,9 @@
             <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4">
                <p:outputLabel for="@next" styleClass="block" value="Fecha siniestro"/>
                <p:datePicker value="#{siniestrosView.siniestroForm.fechaSiniestro}"
-                             placeholder="dd/MM/yyyy" pattern="dd/MM/yyyy"
+                             placeholder="dd/MM/yyyy HH:mm a" pattern="dd/MM/yyyy HH:mm a"
                              monthNavigator="true" yearNavigator="true"
+                             showTime="true" hourFormat="12"
                              showWeek="true" locale="es" required="true"
                              styleClass="w-full"/>
             </p:outputPanel>
@@ -91,8 +139,9 @@
             <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4">
                <p:outputLabel for="@next" styleClass="block" value="Fecha reporte"/>
                <p:datePicker value="#{siniestrosView.siniestroForm.fechaReporte}"
-                             placeholder="dd/MM/yyyy" pattern="dd/MM/yyyy"
+                             placeholder="dd/MM/yyyy HH:mm a" pattern="dd/MM/yyyy HH:mm a"
                              monthNavigator="true" yearNavigator="true"
+                             showTime="true" hourFormat="12"
                              showWeek="true" locale="es" required="true"
                              styleClass="w-full"/>
             </p:outputPanel>
@@ -104,16 +153,18 @@
                <span class="text-sm hidden"> </span>
             </p:outputPanel>
 
-            <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4">
-               <p:selectBooleanCheckbox value="#{siniestrosView.siniestroForm.checkPerdidaTotal}" itemLabel="¿Perdida total?"/>
+            <p:outputPanel styleClass="field col-12 md:col-6 lg:col-8">
+               <p:outputLabel for="@next" value="Causa" styleClass="block"/>
+               <p:inputText styleClass="block w-full" required="true" maxlength="120"
+                            value="#{siniestrosView.siniestroForm.causa}"/>
                <span class="text-sm hidden"> </span>
             </p:outputPanel>
 
-            <p:outputPanel styleClass="field col-12">
-               <p:outputLabel for="@next" value="Causa" styleClass="block"/>
-               <p:inputText styleClass="block w-full"
-                            value="#{siniestrosView.siniestroForm.causa}"/>
-               <span class="text-sm hidden"> </span>
+            <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4">
+               <div class="flex align-items-end h-full">
+                  <p:selectBooleanCheckbox value="#{siniestrosView.siniestroForm.checkPerdidaTotal}" itemLabel="¿Perdida total?"/>
+                  <span class="text-sm hidden"> </span>
+               </div>
             </p:outputPanel>
 
             <p:outputPanel styleClass="field col-12">
@@ -146,14 +197,14 @@
 
             <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4">
                <p:outputLabel for="@next" value="Conductor" styleClass="block"/>
-               <p:inputText styleClass="block w-full"
+               <p:inputText styleClass="block w-full" required="true"
                             value="#{siniestrosView.siniestroForm.conductor}"/>
                <span class="text-sm hidden"> </span>
             </p:outputPanel>
 
             <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4">
                <p:outputLabel for="@next" value="No. Licencia" styleClass="block"/>
-               <p:inputText styleClass="block w-full"
+               <p:inputText styleClass="block w-full" required="true"
                             value="#{siniestrosView.siniestroForm.noLicencia}"/>
                <span class="text-sm hidden"> </span>
             </p:outputPanel>
@@ -166,30 +217,28 @@
             </p:outputPanel>
 
             <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4">
-               <p:outputLabel for="@next" value="Vencimiento licencia" styleClass="block"/>
-               <p:inputText styleClass="block w-full"
-                            value="#{siniestrosView.siniestroForm.vencimientoLicencia}"/>
-               <span class="text-sm hidden"> </span>
+               <p:outputLabel for="@next" styleClass="block" value="Vencimiento licencia"/>
+               <p:datePicker value="#{siniestrosView.siniestroForm.vencimientoLicencia}"
+                             placeholder="dd/MM/yyyy" pattern="dd/MM/yyyy"
+                             monthNavigator="true" yearNavigator="true"
+                             showWeek="true" locale="es" required="true"
+                             styleClass="w-full"/>
             </p:outputPanel>
 
-            <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4">
-               <p:selectBooleanCheckbox value="#{siniestrosView.siniestroForm.checkDanioViaPublica}" itemLabel="Daño vía pública"/>
-               <span class="text-sm hidden"> </span>
-            </p:outputPanel>
-
-            <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4">
-               <p:selectBooleanCheckbox value="#{siniestrosView.siniestroForm.checkCorralon}" itemLabel="Corralón"/>
-               <span class="text-sm hidden"> </span>
-            </p:outputPanel>
-
-            <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4">
-               <p:selectBooleanCheckbox value="#{siniestrosView.siniestroForm.checkMulta}" itemLabel="Multa"/>
-               <span class="text-sm hidden"> </span>
+            <p:outputPanel styleClass="field col-12 lg:col-8">
+               <div class="flex align-items-end h-full flex-row gap-3">
+                  <p:selectBooleanCheckbox value="#{siniestrosView.siniestroForm.checkDanioViaPublica}" itemLabel="Daño vía pública"/>
+                  <p:selectBooleanCheckbox value="#{siniestrosView.siniestroForm.checkCorralon}" itemLabel="Corralón"/>
+                  <p:selectBooleanCheckbox value="#{siniestrosView.siniestroForm.checkMulta}" itemLabel="Multa">
+                     <p:ajax update="registro-siniestro-form:costo_multa" listener="#{siniestrosView.vaciarMulta()}"/>
+                  </p:selectBooleanCheckbox>
+               </div>
             </p:outputPanel>
 
             <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4">
                <p:outputLabel for="@next" value="Costo multa" styleClass="block"/>
-               <p:inputNumber styleClass="block w-full"
+               <p:inputNumber id="costo_multa" styleClass="block w-full"
+                              disabled="#{not siniestrosView.siniestroForm.checkMulta}"
                             value="#{siniestrosView.siniestroForm.costoMulta}"/>
                <span class="text-sm hidden"> </span>
             </p:outputPanel>

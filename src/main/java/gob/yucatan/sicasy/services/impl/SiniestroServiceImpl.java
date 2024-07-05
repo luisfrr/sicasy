@@ -1,8 +1,10 @@
 package gob.yucatan.sicasy.services.impl;
 
+import gob.yucatan.sicasy.business.entities.EstatusSiniestro;
 import gob.yucatan.sicasy.business.entities.EstatusSiniestro_;
 import gob.yucatan.sicasy.business.entities.Siniestro;
 import gob.yucatan.sicasy.business.entities.Siniestro_;
+import gob.yucatan.sicasy.business.enums.EstatusRegistro;
 import gob.yucatan.sicasy.repository.criteria.SearchCriteria;
 import gob.yucatan.sicasy.repository.criteria.SearchOperation;
 import gob.yucatan.sicasy.repository.criteria.SearchSpecification;
@@ -12,12 +14,15 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class SiniestroServiceImpl implements ISiniestroService {
+
+    private final Integer ESTATUS_SINIESTRO_REGISTRADO = 1;
 
     private final ISiniestroRepository siniestroRepository;
 
@@ -85,5 +90,22 @@ public class SiniestroServiceImpl implements ISiniestroService {
     @Override
     public void registrarNuevoSiniestro(Siniestro siniestro, String userName) {
 
+        if(siniestro.getVehiculo() != null && siniestro.getVehiculo().getIncisoVigente() != null) {
+            siniestro.setInciso(siniestro.getVehiculo().getIncisoVigente());
+        }
+
+        siniestro.setCorralon(siniestro.isCheckCorralon() ? 1 : 0);
+        siniestro.setDanioViaPublica(siniestro.isCheckDanioViaPublica() ? 1 : 0);
+        siniestro.setPerdidaTotal(siniestro.isCheckPerdidaTotal() ? 1 : 0);
+        siniestro.setMultaVehiculo(siniestro.isCheckMulta() ? 1 : 0);
+
+        siniestro.setEstatusSiniestro(EstatusSiniestro.builder()
+                .idEstatusSiniestro(ESTATUS_SINIESTRO_REGISTRADO)
+                .build());
+        siniestro.setEstatusRegistro(EstatusRegistro.ACTIVO);
+        siniestro.setCreadoPor(userName);
+        siniestro.setFechaCreacion(new Date());
+
+        siniestroRepository.save(siniestro);
     }
 }

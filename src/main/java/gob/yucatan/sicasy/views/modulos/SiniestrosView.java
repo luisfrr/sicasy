@@ -54,7 +54,6 @@ public class SiniestrosView implements Serializable {
     private @Getter @Setter Siniestro siniestroSelected;
     private @Getter @Setter Siniestro siniestroForm;
     private @Getter @Setter Siniestro siniestroFilter;
-    private @Getter @Setter String informacionVehiculo;
 
     // Variables selects
     private @Getter List<EstatusSiniestro> estatusSiniestroList;
@@ -102,6 +101,7 @@ public class SiniestrosView implements Serializable {
         log.info("abrirRegistroSiniestroDialog - SiniestrosView");
         this.showNuevoSiniestroPanel = true;
         this.siniestroForm = new Siniestro();
+        this.siniestroForm.setVehiculo(new Vehiculo());
         PrimeFaces.current().ajax().update("registrar-siniestro-dialog-content");
         PrimeFaces.current().executeScript("PF('registrarSiniestroDialog').show()");
     }
@@ -142,20 +142,27 @@ public class SiniestrosView implements Serializable {
         try {
             if(noSerie != null) {
                 Vehiculo vehiculo = vehiculoService.findByNoSerie(noSerie);
-                this.informacionVehiculo = String.join(" | ",
-                        vehiculo.getNoSerie(),
-                        vehiculo.getMarca(),
-                        vehiculo.getAnio().toString(),
-                        vehiculo.getModelo(),
-                        vehiculo.getColor(),
-                        vehiculo.getDescripcionVehiculo());
+                this.siniestroForm.setVehiculo(vehiculo);
             } else {
-                this.informacionVehiculo = "";
+                this.siniestroForm = new Siniestro();
+                this.siniestroForm.setVehiculo(new Vehiculo());
             }
+            PrimeFaces.current().ajax().update("registro-siniestro-form:vehiculo_marca",
+                    "registro-siniestro-form:vehiculo_anio",
+                    "registro-siniestro-form:vehiculo_modelo",
+                    "registro-siniestro-form:vehiculo_placa",
+                    "registro-siniestro-form:vehiculo_color",
+                    "registro-siniestro-form:vehiculo_dependencia",
+                    "registro-siniestro-form:vehiculo_poliza",
+                    "registro-siniestro-form:vehiculo_inciso");
         } catch (Exception e) {
-            log.warn("Error al buscar un vehículo", e);
+            log.warn("No se ha encontrado el vehiculo con el No. Serie: {}", noSerie, e);
             Messages.addWarn("No se ha encontrado el vehículo");
         }
+    }
+
+    public void vaciarMulta() {
+        this.siniestroForm.setCostoMulta(null);
     }
 
     //region privates
