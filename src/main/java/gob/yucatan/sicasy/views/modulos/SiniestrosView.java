@@ -54,6 +54,7 @@ public class SiniestrosView implements Serializable {
     private @Getter @Setter Siniestro siniestroSelected;
     private @Getter @Setter Siniestro siniestroForm;
     private @Getter @Setter Siniestro siniestroFilter;
+    private @Getter @Setter String motivoRechazo;
 
     // Variables selects
     private @Getter List<EstatusSiniestro> estatusSiniestroList;
@@ -61,6 +62,7 @@ public class SiniestrosView implements Serializable {
     // Variables para renderizar
     private @Getter boolean showSiniestroListPanel;
     private @Getter boolean showNuevoSiniestroPanel;
+    private @Getter boolean showRechazarSolicitudDialog;
 
 
 
@@ -165,10 +167,87 @@ public class SiniestrosView implements Serializable {
         this.siniestroForm.setCostoMulta(null);
     }
 
+    public void solicitarPagoDeducible() {
+        log.info("solicitarPagoDeducible - SiniestrosView");
+        try {
+            List<Long> idSiniestroSelectedList = this.getIdSiniestroSelectedList();
+            siniestroService.solicitarPagoDeducible(idSiniestroSelectedList, userSessionBean.getUserName());
+            this.buscar();
+            Messages.addInfo("Se ha solicitado el pago de deducible correctamente.");
+        } catch (Exception e) {
+            log.warn(e.getMessage());
+            Messages.addError(e.getMessage());
+        }
+    }
+
+    public void autorizarPagoDeducible() {
+        log.info("autorizarPagoDeducible - SiniestrosView");
+        try {
+            List<Long> idSiniestroSelectedList = this.getIdSiniestroSelectedList();
+            siniestroService.autorizarPagoDeducible(idSiniestroSelectedList, userSessionBean.getUserName());
+            this.buscar();
+            Messages.addInfo("Se autorizó correctamente el pago de deducible.");
+        } catch (Exception e) {
+            log.warn(e.getMessage());
+            Messages.addError(e.getMessage());
+        }
+    }
+
+    public void finalizarRegistro() {
+        log.info("finalizarRegistro - SiniestrosView");
+        try {
+            List<Long> idSiniestroSelectedList = this.getIdSiniestroSelectedList();
+            siniestroService.finalizarRegistro(idSiniestroSelectedList, userSessionBean.getUserName());
+            this.buscar();
+            Messages.addInfo("Se han finalizado correctamente los registros seleccionados.");
+        } catch (Exception e) {
+            log.warn(e.getMessage());
+            Messages.addError(e.getMessage());
+        }
+    }
+
+    public void abrirRechazarSolicitudDialog() {
+        log.info("abrirRechazarSolicitudDialog - SiniestrosView");
+        this.showRechazarSolicitudDialog = true;
+        this.motivoRechazo = "";
+        PrimeFaces.current().ajax().update("rechazar-solicitud-dialog-content");
+        PrimeFaces.current().executeScript("PF('rechazarSolicitudDialog').show()");
+    }
+
+    public void cerrarRechazarSolicitudDialog() {
+        log.info("cerrarRechazarSolicitudDialog - SiniestrosView");
+        this.showRechazarSolicitudDialog = false;
+        this.motivoRechazo = null;
+        PrimeFaces.current().ajax().update("rechazar-solicitud-dialog-content");
+        PrimeFaces.current().executeScript("PF('rechazarSolicitudDialog').hide()");
+    }
+
+    public void rechazarSolicitud() {
+        log.info("rechazarSolicitud - SiniestrosView");
+        try {
+            List<Long> idSiniestroSelectedList = this.getIdSiniestroSelectedList();
+            siniestroService.rechazarSolicitud(idSiniestroSelectedList, this.motivoRechazo, userSessionBean.getUserName());
+            this.buscar();
+            Messages.addInfo("Se ha rechazado correctamente las solicitudes de los registros seleccionados.");
+        } catch (Exception e) {
+            log.warn(e.getMessage());
+            Messages.addError(e.getMessage());
+        }
+    }
+
     //region privates
 
     private void loadEstatusSiniestros() {
         this.estatusSiniestroList = estatusSiniestroService.findAll();
+    }
+
+    private List<Long> getIdSiniestroSelectedList() {
+        if(this.siniestroSelectedList.isEmpty())
+            throw new BadRequestException("No has seleccionado ningún registro.");
+
+        return siniestroSelectedList.stream()
+                .map(Siniestro::getIdSiniestro)
+                .toList();
     }
 
     //endregion privates

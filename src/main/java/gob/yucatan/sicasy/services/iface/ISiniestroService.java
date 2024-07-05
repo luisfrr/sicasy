@@ -10,4 +10,10 @@ public interface ISiniestroService {
     Siniestro findById(Long id);
     void registrarNuevoSiniestro(Siniestro siniestro, String userName);
 
+    void solicitarPagoDeducible(List<Long> idSiniestroList, String userName);
+    void autorizarPagoDeducible(List<Long> idSiniestroList, String userName);
+    void rechazarSolicitud(List<Long> idSiniestroList, String motivo, String userName);
+    void finalizarRegistro(List<Long> idSiniestroList, String userName);
+
+
 }

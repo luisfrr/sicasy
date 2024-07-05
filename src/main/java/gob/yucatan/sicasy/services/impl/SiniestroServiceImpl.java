@@ -1,21 +1,24 @@
 package gob.yucatan.sicasy.services.impl;
 
-import gob.yucatan.sicasy.business.entities.EstatusSiniestro;
-import gob.yucatan.sicasy.business.entities.EstatusSiniestro_;
-import gob.yucatan.sicasy.business.entities.Siniestro;
-import gob.yucatan.sicasy.business.entities.Siniestro_;
+import gob.yucatan.sicasy.business.entities.*;
 import gob.yucatan.sicasy.business.enums.EstatusRegistro;
+import gob.yucatan.sicasy.business.exceptions.BadRequestException;
+import gob.yucatan.sicasy.business.exceptions.NotFoundException;
 import gob.yucatan.sicasy.repository.criteria.SearchCriteria;
 import gob.yucatan.sicasy.repository.criteria.SearchOperation;
 import gob.yucatan.sicasy.repository.criteria.SearchSpecification;
+import gob.yucatan.sicasy.repository.iface.IEstatusSiniestroRepository;
+import gob.yucatan.sicasy.repository.iface.IIncisoRepository;
 import gob.yucatan.sicasy.repository.iface.ISiniestroRepository;
 import gob.yucatan.sicasy.services.iface.ISiniestroService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -23,8 +26,17 @@ import java.util.List;
 public class SiniestroServiceImpl implements ISiniestroService {
 
     private final Integer ESTATUS_SINIESTRO_REGISTRADO = 1;
+    private final Integer ESTATUS_SINIESTRO_EN_PROCESO_PAGO = 2;
+    private final Integer ESTATUS_SINIESTRO_FINALIZADO = 3;
+
+    private final Integer ACCION_SOLICITAR_PAGO_DEDUCIBLE = 1;
+    private final Integer ACCION_RECHAZAR_SOLICITUD = 2;
+    private final Integer ACCION_AUTORIZAR_PAGO_DEDUCIBLE = 3;
+    private final Integer ACCION_FINALIZAR_REGISTRO = 4;
 
     private final ISiniestroRepository siniestroRepository;
+    private final IEstatusSiniestroRepository estatusSiniestroRepository;
+    private final IIncisoRepository incisoRepository;
 
     @Override
     public List<Siniestro> findAllDynamic(Siniestro siniestro) {
@@ -88,6 +100,7 @@ public class SiniestroServiceImpl implements ISiniestroService {
     }
 
     @Override
+    @Transactional
     public void registrarNuevoSiniestro(Siniestro siniestro, String userName) {
 
         if(siniestro.getVehiculo() != null && siniestro.getVehiculo().getIncisoVigente() != null) {
@@ -108,4 +121,130 @@ public class SiniestroServiceImpl implements ISiniestroService {
 
         siniestroRepository.save(siniestro);
     }
+
+    @Override
+    @Transactional
+    public void solicitarPagoDeducible(List<Long> idSiniestroList, String userName) {
+        // Al solicitar el pago de deducible cambia a estatus en proceso de pago
+        this.cambioEstatus(ACCION_SOLICITAR_PAGO_DEDUCIBLE, ESTATUS_SINIESTRO_EN_PROCESO_PAGO,
+                idSiniestroList, null, userName);
+    }
+
+    @Override
+    @Transactional
+    public void autorizarPagoDeducible(List<Long> idSiniestroList, String userName) {
+        // Al autorizar el pago de deducible cambia a estatus finalizado
+        this.cambioEstatus(ACCION_AUTORIZAR_PAGO_DEDUCIBLE, ESTATUS_SINIESTRO_FINALIZADO,
+                idSiniestroList, null, userName);
+    }
+
+    @Override
+    @Transactional
+    public void rechazarSolicitud(List<Long> idSiniestroList, String motivo, String userName) {
+        // Al rechazar la solicitud cambia a estatus registrado
+        this.cambioEstatus(ACCION_RECHAZAR_SOLICITUD, ESTATUS_SINIESTRO_REGISTRADO,
+                idSiniestroList, motivo, userName);
+    }
+
+    @Override
+    @Transactional
+    public void finalizarRegistro(List<Long> idSiniestroList, String userName) {
+        // Al finalizar el registro del siniestro cambia a estatus finalizado
+        this.cambioEstatus(ACCION_FINALIZAR_REGISTRO, ESTATUS_SINIESTRO_FINALIZADO,
+                idSiniestroList, null, userName);
+    }
+
+
+
+
+    private void cambioEstatus(Integer accion, Integer estatusPorAsignar, List<Long> idSiniestroList, String motivo, String username) {
+
+        Integer VEHICULO_PERDIDA_TOTAL = 1;
+        Integer INCISO_MARCAR_BAJA_PENDIENTE = 1;
+
+        List<Siniestro> siniestroToUpdateList = siniestroRepository.findByIdSiniestroIn(idSiniestroList);
+
+        if(!siniestroToUpdateList.isEmpty()) {
+
+            EstatusSiniestro estatusSiniestro = estatusSiniestroRepository.findById(estatusPorAsignar)
+                    .orElseThrow(() -> new NotFoundException("No se ha encontrado el estatus seleccionado."));
+
+            List<Integer> distinctEstatusSiniestros = siniestroToUpdateList.stream()
+                    .map(Siniestro::getEstatusSiniestro)
+                    .map(EstatusSiniestro::getIdEstatusSiniestro)
+                    .distinct()
+                    .toList();
+
+            // Si los siniestros seleccionados tienen diferentes estatus
+            // entonces no se puede actualizar. Todos deben tener el mismo estatus.
+            if(distinctEstatusSiniestros.size() > 1) {
+                throw new BadRequestException("Asegurate de seleccionar registros con el mismo estatus.");
+            }
+
+            Integer estatusActual = distinctEstatusSiniestros.getFirst();
+
+            String accionStr = "";
+
+            if(Objects.equals(accion, ACCION_SOLICITAR_PAGO_DEDUCIBLE)) {
+                accionStr = "Solicitar pago de deducible";
+                // El estatus actual debe ser REGISTADO, si no entonces marca error
+                if(!Objects.equals(estatusActual, ESTATUS_SINIESTRO_REGISTRADO)) {
+                    throw new BadRequestException("Para solicitar el pago de deducible asegúrate de seleccionar registros con estatus REGISTRADO.");
+                }
+
+                if(siniestroToUpdateList.stream().allMatch(Siniestro::requierePadoDeducible)) {
+                    throw new BadRequestException("Alguno de los registros seleccionados no requiere pago de deducible. Asegúrate de seleccionar registros que requieran pago de deducible.");
+                }
+
+            } else if(Objects.equals(accion, ACCION_AUTORIZAR_PAGO_DEDUCIBLE)) {
+                accionStr = "Autorizar pago de deducible";
+                // El estatus actual debe ser EN PROCESO PAGO, si no entonces marca error
+                if(!Objects.equals(estatusActual, ESTATUS_SINIESTRO_EN_PROCESO_PAGO)) {
+                    throw new BadRequestException("Para autorizar el pago de deducible asegúrate de seleccionar registros con estatus EN PROCESO DE PAGO.");
+                }
+            } else if(Objects.equals(accion, ACCION_RECHAZAR_SOLICITUD)) {
+                accionStr = "Rechazar solicitud de pago";
+                // El estatus actual debe ser EN PROCESO PAGO, si no entonces marca error
+                if(!Objects.equals(estatusActual, ESTATUS_SINIESTRO_EN_PROCESO_PAGO)) {
+                    throw new BadRequestException("Para rechazar la solicitud de pago asegúrate de seleccionar registros con estatus EN PROCESO DE PAGO.");
+                }
+            } else if(Objects.equals(accion, ACCION_FINALIZAR_REGISTRO)) {
+                accionStr = "Finalizar registro";
+                // El estatus actual debe ser EN PROCESO PAGO, si no entonces marca error
+                if(!Objects.equals(estatusActual, ESTATUS_SINIESTRO_REGISTRADO)) {
+                    throw new BadRequestException("Para finalizar el registro del siniestro asegúrate de seleccionar registros con estatus REGISTRADO.");
+                }
+
+                if(siniestroToUpdateList.stream().anyMatch(Siniestro::requierePadoDeducible)) {
+                    throw new BadRequestException("Alguno de los registros seleccionados requiere pago de deducible. Solo puedes finalizar el registro del siniestro si no requiere pago de deducible.");
+                }
+            }
+
+            for(Siniestro siniestro : siniestroToUpdateList) {
+
+                siniestro.setEstatusSiniestro(estatusSiniestro);
+                siniestro.setObservaciones(motivo);
+                siniestro.setModificadoPor(username);
+                siniestro.setFechaModificacion(new Date());
+
+                if(Objects.equals(siniestro.getPerdidaTotal(), VEHICULO_PERDIDA_TOTAL)
+                        && siniestro.getInciso() != null) {
+
+                    Inciso inciso = siniestro.getInciso();
+                    inciso.setBajaPendienteSiniestro(INCISO_MARCAR_BAJA_PENDIENTE);
+                    inciso.setFechaModificacion(new Date());
+                    inciso.setModificadoPor(username);
+
+                    incisoRepository.save(inciso);
+                }
+            }
+            log.info("Cambio estatus: {} - Accion: {}", estatusSiniestro.getNombre(), accionStr);
+            siniestroRepository.saveAll(siniestroToUpdateList);
+
+        } else {
+            throw new BadRequestException("No has seleccionado registros. Intenta de nuevo.");
+        }
+
+    }
+
 }
