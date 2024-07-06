@@ -15,5 +15,5 @@ public interface ISiniestroService {
     void rechazarSolicitud(List<Long> idSiniestroList, String motivo, String userName);
     void finalizarRegistro(List<Long> idSiniestroList, String userName);
 
-
+    void editar(Siniestro siniestro, String userName);
 }

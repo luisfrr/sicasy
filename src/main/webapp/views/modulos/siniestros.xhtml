@@ -240,8 +240,10 @@
                         </h:outputText>
                     </p:column>
 
-                    <p:column headerText="Declaración" width="250">
-                        <h:outputText value="#{siniestro.declaracionSiniestro}"/>
+                    <p:column headerText="Declaración" width="350">
+                        <div style="overflow: hidden;text-overflow: ellipsis;display: -webkit-box;-webkit-line-clamp: 2;-webkit-box-orient: vertical;">
+                            <h:outputText value="#{siniestro.declaracionSiniestro}"/>
+                        </div>
                     </p:column>
 
                     <p:column headerText="Conductor" width="150">
@@ -350,12 +352,12 @@
 
                     <sec:authorize access="hasAuthority('ROLE_OWNER')">
 
-                        <p:column headerText="Estatus Registro" width="150">
+                        <p:column headerText="Estatus registro" width="150">
                             <h:outputText value="#{siniestro.estatusRegistro.label}">
                             </h:outputText>
                         </p:column>
 
-                        <p:column headerText="Fecha creación" width="150">
+                        <p:column headerText="Fecha creación" width="180">
                             <h:outputText value="#{siniestro.fechaCreacion}">
                                 <f:convertDateTime pattern="dd/MM/yyyy HH:mm:ss a"/>
                             </h:outputText>
@@ -366,7 +368,7 @@
                             </h:outputText>
                         </p:column>
 
-                        <p:column headerText="Fecha modificación" width="150">
+                        <p:column headerText="Fecha modificación" width="180">
                             <h:outputText value="#{siniestro.fechaModificacion}">
                                 <f:convertDateTime pattern="dd/MM/yyyy HH:mm:ss a"/>
                             </h:outputText>
@@ -377,7 +379,7 @@
                             </h:outputText>
                         </p:column>
 
-                        <p:column headerText="Fecha borrado" width="150">
+                        <p:column headerText="Fecha borrado" width="180">
                             <h:outputText value="#{siniestro.fechaBorrado}">
                                 <f:convertDateTime pattern="dd/MM/yyyy HH:mm:ss a"/>
                             </h:outputText>
@@ -399,8 +401,8 @@
                                              rendered="#{siniestro.estatusRegistro.label != 'Borrado'}"/>
                             <p:menu overlay="true" trigger="buttonOptions" my="left top" at="left bottom" styleClass="w-16rem">
 
-                                <p:menuitem value="Ver detalle del vehículo"
-                                            action="#{vehiculoView.verDetalle(siniestro)}"
+                                <p:menuitem value="Ver detalle"
+                                            action="#{siniestrosView.verDetalle(siniestro)}"
                                             ajax="true" update="container"/>
 
                             </p:menu>
@@ -417,6 +419,8 @@
         <ui:include src="/views/modulos/siniestros/_registrar_siniestro_dialog.xhtml"/>
 
         <ui:include src="/views/modulos/siniestros/_rechazar_solicitud_dialog.xhtml"/>
+
+        <ui:include src="/views/modulos/siniestros/_detalle_siniestro.xhtml"/>
 
     </p:outputPanel>
 

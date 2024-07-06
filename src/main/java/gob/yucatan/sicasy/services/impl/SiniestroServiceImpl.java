@@ -96,7 +96,19 @@ public class SiniestroServiceImpl implements ISiniestroService {
 
     @Override
     public Siniestro findById(Long id) {
-        return null;
+        Siniestro siniestro = siniestroRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("No se ha encontrado el registro del siniestro."));
+
+        if(siniestro.getDeducible() != null) {
+            siniestro.setDeducible(new Deducible());
+        }
+
+        siniestro.setCheckCorralon(siniestro.getCorralon() == 1);
+        siniestro.setCheckMulta(siniestro.getMultaVehiculo() == 1);
+        siniestro.setCheckDanioViaPublica(siniestro.getDanioViaPublica() == 1);
+        siniestro.setCheckPerdidaTotal(siniestro.getPerdidaTotal() == 1);
+
+        return siniestro;
     }
 
     @Override
@@ -154,7 +166,18 @@ public class SiniestroServiceImpl implements ISiniestroService {
                 idSiniestroList, null, userName);
     }
 
+    @Override
+    public void editar(Siniestro siniestro, String userName) {
+        siniestro.setCorralon(siniestro.isCheckCorralon() ? 1 : 0);
+        siniestro.setDanioViaPublica(siniestro.isCheckDanioViaPublica() ? 1 : 0);
+        siniestro.setPerdidaTotal(siniestro.isCheckPerdidaTotal() ? 1 : 0);
+        siniestro.setMultaVehiculo(siniestro.isCheckMulta() ? 1 : 0);
 
+        siniestro.setModificadoPor(userName);
+        siniestro.setFechaModificacion(new Date());
+
+        siniestroRepository.save(siniestro);
+    }
 
 
     private void cambioEstatus(Integer accion, Integer estatusPorAsignar, List<Long> idSiniestroList, String motivo, String username) {

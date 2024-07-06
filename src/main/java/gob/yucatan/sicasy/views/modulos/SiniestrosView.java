@@ -55,15 +55,16 @@ public class SiniestrosView implements Serializable {
     private @Getter @Setter Siniestro siniestroForm;
     private @Getter @Setter Siniestro siniestroFilter;
     private @Getter @Setter String motivoRechazo;
+    private @Getter boolean readOnlyEditForm;
 
     // Variables selects
     private @Getter List<EstatusSiniestro> estatusSiniestroList;
 
     // Variables para renderizar
     private @Getter boolean showSiniestroListPanel;
-    private @Getter boolean showNuevoSiniestroPanel;
+    private @Getter boolean showNuevoSiniestroDialog;
     private @Getter boolean showRechazarSolicitudDialog;
-
+    private @Getter boolean showDetalleSiniestroPanel;
 
 
     @PostConstruct
@@ -101,7 +102,7 @@ public class SiniestrosView implements Serializable {
 
     public void abrirRegistroSiniestroDialog() {
         log.info("abrirRegistroSiniestroDialog - SiniestrosView");
-        this.showNuevoSiniestroPanel = true;
+        this.showNuevoSiniestroDialog = true;
         this.siniestroForm = new Siniestro();
         this.siniestroForm.setVehiculo(new Vehiculo());
         PrimeFaces.current().ajax().update("registrar-siniestro-dialog-content");
@@ -110,7 +111,7 @@ public class SiniestrosView implements Serializable {
 
     public void cerrarRegistroSiniestroDialog() {
         log.info("cerrarRegistroSiniestroDialog - SiniestrosView");
-        this.showNuevoSiniestroPanel = false;
+        this.showNuevoSiniestroDialog = false;
         this.siniestroForm = null;
         PrimeFaces.current().ajax().update("registrar-siniestro-dialog-content");
         PrimeFaces.current().executeScript("PF('registrarSiniestroDialog').hide()");
@@ -164,7 +165,12 @@ public class SiniestrosView implements Serializable {
     }
 
     public void vaciarMulta() {
-        this.siniestroForm.setCostoMulta(null);
+        if(this.siniestroSelected != null) {
+            this.siniestroSelected.setCostoMulta(null);
+        }
+        if(this.siniestroForm != null) {
+            this.siniestroForm.setCostoMulta(null);
+        }
     }
 
     public void solicitarPagoDeducible() {
@@ -232,6 +238,57 @@ public class SiniestrosView implements Serializable {
         } catch (Exception e) {
             log.warn(e.getMessage());
             Messages.addError(e.getMessage());
+        }
+    }
+
+    public void regresar() {
+        log.info("regresar - SiniestrosView");
+        try {
+            this.showSiniestroListPanel = true;
+            this.showDetalleSiniestroPanel = false;
+            PrimeFaces.current().ajax().update("container");
+        } catch (Exception e) {
+            log.warn(e.getMessage());
+            Messages.addError(e.getMessage());
+        }
+    }
+
+    public void verDetalle(Siniestro siniestro) {
+        log.info("verDetalle - SiniestrosView");
+        try {
+            this.showSiniestroListPanel = false;
+            this.showDetalleSiniestroPanel = true;
+            this.siniestroSelected = siniestroService.findById(siniestro.getIdSiniestro());
+            this.readOnlyEditForm = true;
+            PrimeFaces.current().ajax().update("container");
+        } catch (Exception e) {
+            log.warn(e.getMessage());
+            Messages.addError(e.getMessage());
+        }
+    }
+
+    public void permitirEditar() {
+        this.readOnlyEditForm = false;
+        PrimeFaces.current().ajax().update("tab_view_detalles:edit_siniestro_form");
+    }
+
+    public void cancelarEdicion() {
+        this.siniestroSelected = siniestroService.findById(this.siniestroSelected.getIdSiniestro());
+        this.readOnlyEditForm = true;
+        PrimeFaces.current().ajax().update("tab_view_detalles:edit_siniestro_form");
+    }
+
+    public void guardarEdicion() {
+        try {
+            siniestroService.editar(this.siniestroSelected, userSessionBean.getUserName());
+            this.siniestroSelected = siniestroService.findById(this.siniestroSelected.getIdSiniestro());
+            this.readOnlyEditForm = true;
+            Messages.addInfo("Se ha actualizado correctamente la información del siniestro");
+            PrimeFaces.current().ajax().update("tab_view_detalles:edit_siniestro_form", "growl");
+        } catch (Exception e) {
+            log.error("Error al guardar la información del siniestro", e);
+            Messages.addError(e.getMessage());
+            PrimeFaces.current().ajax().update("tab_view_detalles:edit_siniestro_form", "growl");
         }
     }
 
