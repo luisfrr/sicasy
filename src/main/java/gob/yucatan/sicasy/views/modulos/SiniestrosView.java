@@ -1,31 +1,34 @@
 package gob.yucatan.sicasy.views.modulos;
 
 import gob.yucatan.sicasy.business.annotations.ConfigPermiso;
-import gob.yucatan.sicasy.business.entities.EstatusSiniestro;
-import gob.yucatan.sicasy.business.entities.Siniestro;
-import gob.yucatan.sicasy.business.entities.Vehiculo;
+import gob.yucatan.sicasy.business.entities.*;
 import gob.yucatan.sicasy.business.enums.TipoPermiso;
 import gob.yucatan.sicasy.business.exceptions.BadRequestException;
 import gob.yucatan.sicasy.business.exceptions.NotFoundException;
-import gob.yucatan.sicasy.services.iface.IEstatusSiniestroService;
-import gob.yucatan.sicasy.services.iface.ISiniestroService;
-import gob.yucatan.sicasy.services.iface.IVehiculoService;
+import gob.yucatan.sicasy.services.iface.*;
 import gob.yucatan.sicasy.utils.export.ExportFile;
+import gob.yucatan.sicasy.utils.imports.excel.SaveFile;
 import gob.yucatan.sicasy.views.beans.Messages;
 import gob.yucatan.sicasy.views.beans.UserSessionBean;
 import jakarta.annotation.PostConstruct;
+import jakarta.faces.context.FacesContext;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.primefaces.PrimeFaces;
+import org.primefaces.event.FileUploadEvent;
+import org.primefaces.model.ResponsiveOption;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 @Component
 @Scope("view")
@@ -42,10 +45,14 @@ public class SiniestrosView implements Serializable {
     private final ISiniestroService siniestroService;
     private final IEstatusSiniestroService estatusSiniestroService;
     private final IVehiculoService vehiculoService;
+    private final ISiniestroFotoService siniestroFotoService;
 
     // Constantes
     private final @Getter String SINIESTRO_RESPONSABLE_ASEGURADO = "ASEGURADO";
     private final @Getter String SINIESTRO_RESPONSABLE_TERCEROS = "TERCEROS";
+
+    @Value("${app.files.folder.siniestros}")
+    private @Getter String FOLDER_SINIESTROS;
 
     // Variables Generales
     private @Getter String title;
@@ -56,6 +63,9 @@ public class SiniestrosView implements Serializable {
     private @Getter @Setter Siniestro siniestroFilter;
     private @Getter @Setter String motivoRechazo;
     private @Getter boolean readOnlyEditForm;
+    private @Getter @Setter List<SiniestroFoto> siniestroFotoList;
+    private @Getter List<ResponsiveOption> responsiveOptionsGallery;
+    private @Getter int activeIndex = 0;
 
     // Variables selects
     private @Getter List<EstatusSiniestro> estatusSiniestroList;
@@ -65,6 +75,7 @@ public class SiniestrosView implements Serializable {
     private @Getter boolean showNuevoSiniestroDialog;
     private @Getter boolean showRechazarSolicitudDialog;
     private @Getter boolean showDetalleSiniestroPanel;
+    private @Getter boolean showAdjuntarFotos;
 
 
     @PostConstruct
@@ -72,6 +83,7 @@ public class SiniestrosView implements Serializable {
         log.info("init - SiniestrosView");
         this.title = "Siniestros";
         this.limpiarFiltros();
+        this.loadResponsiveOptionsGallery();
     }
 
     public void limpiarFiltros() {
@@ -84,6 +96,10 @@ public class SiniestrosView implements Serializable {
         this.loadEstatusSiniestros();
 
         this.showSiniestroListPanel = true;
+        this.showNuevoSiniestroDialog = false;
+        this.showRechazarSolicitudDialog = false;
+        this.showDetalleSiniestroPanel = false;
+        this.showAdjuntarFotos = false;
         this.siniestroSelected = null;
         this.siniestroForm = null;
 
@@ -259,6 +275,7 @@ public class SiniestrosView implements Serializable {
             this.showSiniestroListPanel = false;
             this.showDetalleSiniestroPanel = true;
             this.siniestroSelected = siniestroService.findById(siniestro.getIdSiniestro());
+            this.siniestroFotoList = siniestroFotoService.getSiniestroFotos(this.siniestroSelected.getIdSiniestro());
             this.readOnlyEditForm = true;
             PrimeFaces.current().ajax().update("container");
         } catch (Exception e) {
@@ -268,17 +285,20 @@ public class SiniestrosView implements Serializable {
     }
 
     public void permitirEditar() {
+        log.info("permitirEditar - SiniestrosView");
         this.readOnlyEditForm = false;
         PrimeFaces.current().ajax().update("tab_view_detalles:edit_siniestro_form");
     }
 
     public void cancelarEdicion() {
+        log.info("cancelarEdicion - SiniestrosView");
         this.siniestroSelected = siniestroService.findById(this.siniestroSelected.getIdSiniestro());
         this.readOnlyEditForm = true;
         PrimeFaces.current().ajax().update("tab_view_detalles:edit_siniestro_form");
     }
 
     public void guardarEdicion() {
+        log.info("guardarEdicion - SiniestrosView");
         try {
             siniestroService.editar(this.siniestroSelected, userSessionBean.getUserName());
             this.siniestroSelected = siniestroService.findById(this.siniestroSelected.getIdSiniestro());
@@ -291,6 +311,77 @@ public class SiniestrosView implements Serializable {
             PrimeFaces.current().ajax().update("tab_view_detalles:edit_siniestro_form", "growl");
         }
     }
+
+    public void abrirModalAdjuntarFotos() {
+        log.info("abrirModalAdjuntarFotos - SiniestrosView");
+        this.showAdjuntarFotos = true;
+        PrimeFaces.current().ajax().update("form_adjuntar_fotos", "growl");
+        PrimeFaces.current().executeScript("PF('adjuntarFotosDialog').show();");
+    }
+
+    public void cerrarModalAdjuntarFotos() {
+        log.info("cerrarModalAdjuntarFotos - SiniestrosView");
+        this.showAdjuntarFotos = false;
+        PrimeFaces.current().ajax().update("form_adjuntar_fotos");
+        PrimeFaces.current().executeScript("PF('adjuntarFotosDialog').hide();");
+    }
+
+    public void subirFotoSiniestro(FileUploadEvent event) {
+        log.info("subirFotoSiniestro - SiniestrosView");
+        String fileName = event.getFile().getFileName();
+        try {
+            if(this.siniestroSelected != null) {
+                String filePath = SaveFile.importFileToPath(event.getFile().getContent(), fileName, FOLDER_SINIESTROS);
+
+                SiniestroFoto siniestroFoto = SiniestroFoto.builder()
+                        .siniestro(this.siniestroSelected)
+                        .rutaArchivo(filePath)
+                        .nombreArchivo(fileName)
+                        .fechaCreacion(new Date())
+                        .creadoPor(userSessionBean.getUserName())
+                        .borrado(0)
+                        .build();
+
+                siniestroFotoService.guardarFoto(siniestroFoto);
+                Messages.addInfo("Se ha guardado correctamente la foto: " + fileName);
+
+                this.siniestroFotoList = siniestroFotoService.getSiniestroFotos(this.siniestroSelected.getIdSiniestro());
+                PrimeFaces.current().ajax().update("tab_view_detalles:form_galeria");
+
+            } else {
+                Messages.addWarn("No se ha seleccionado el vehículo");
+            }
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            Messages.addError("No se ha logrado guardar la foto: " + fileName);
+        }
+    }
+
+    public void borrarFoto(Long idSiniestroFoto) {
+        log.info("borrarFoto - SiniestrosView");
+        try {
+            siniestroFotoService.borrarFoto(idSiniestroFoto, userSessionBean.getUserName());
+            this.siniestroFotoList = siniestroFotoService.getSiniestroFotos(this.siniestroSelected.getIdSiniestro());
+            PrimeFaces.current().ajax().update("tab_view_detalles:form_galeria");
+            Messages.addInfo("Se ha eliminado correctamente la foto");
+        } catch (Exception e) {
+            Messages.addError(e.getMessage());
+        }
+    }
+
+    public void changeActiveIndex() {
+        log.info("changeActiveIndex - SiniestrosView");
+        Map<String, String> params = FacesContext.getCurrentInstance().getExternalContext().getRequestParameterMap();
+        this.activeIndex = Integer.parseInt(params.get("index"));
+        log.info("activeIndex {}", this.activeIndex);
+    }
+
+    public void presentGallery() {
+        log.info("presentGallery - SiniestrosView");
+        this.activeIndex = 0;
+    }
+
+
 
     //region privates
 
@@ -305,6 +396,13 @@ public class SiniestrosView implements Serializable {
         return siniestroSelectedList.stream()
                 .map(Siniestro::getIdSiniestro)
                 .toList();
+    }
+
+    private void loadResponsiveOptionsGallery() {
+        this.responsiveOptionsGallery = new ArrayList<>();
+        responsiveOptionsGallery.add(new ResponsiveOption("1024px", 5));
+        responsiveOptionsGallery.add(new ResponsiveOption("768px", 3));
+        responsiveOptionsGallery.add(new ResponsiveOption("560px", 1));
     }
 
     //endregion privates

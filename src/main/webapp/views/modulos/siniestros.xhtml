@@ -311,13 +311,7 @@
                     </p:column>
 
                     <p:column headerText="Tipo deducible" width="150">
-                        <h:outputText value="#{siniestro.deducible.tipoDeducible}" rendered="#{siniestro.requierePadoDeducible()}"/>
-                    </p:column>
-
-                    <p:column headerText="Vehículo renta mensual" width="150">
-                        <h:outputText value="#{siniestro.deducible.vehiculoRentaMensual}" rendered="#{siniestro.requierePadoDeducible()}">
-                            <f:convertNumber maxFractionDigits="2"/>
-                        </h:outputText>
+                        <h:outputText value="#{siniestro.deducible.tipoDeducicle}" rendered="#{siniestro.requierePadoDeducible()}"/>
                     </p:column>
 
                     <p:column headerText="Vehículo valor factura" width="150">
@@ -327,17 +321,17 @@
                     </p:column>
 
                     <p:column headerText="Vehículo valor actual" width="150">
-                        <h:outputText value="#{siniestro.deducible.vehiculoValorActual}" rendered="#{siniestro.requierePadoDeducible()}">
+                        <h:outputText value="#{siniestro.deducible.valorActual}" rendered="#{siniestro.requierePadoDeducible()}">
                             <f:convertNumber maxFractionDigits="2"/>
                         </h:outputText>
                     </p:column>
 
                     <p:column headerText="Póliza" width="80">
-                        <h:outputText value="#{siniestro.deducible.noPoliza}" rendered="#{siniestro.requierePadoDeducible()}"/>
+                        <h:outputText value="#{siniestro.deducible.polizaNumero}" rendered="#{siniestro.requierePadoDeducible()}"/>
                     </p:column>
 
                     <p:column headerText="Inciso" width="80">
-                        <h:outputText value="#{siniestro.deducible.noInciso}" rendered="#{siniestro.requierePadoDeducible()}"/>
+                        <h:outputText value="#{siniestro.deducible.incisoNumero}" rendered="#{siniestro.requierePadoDeducible()}"/>
                     </p:column>
 
                     <p:column headerText="Póliza Vigente" width="120">
@@ -421,6 +415,8 @@
         <ui:include src="/views/modulos/siniestros/_rechazar_solicitud_dialog.xhtml"/>
 
         <ui:include src="/views/modulos/siniestros/_detalle_siniestro.xhtml"/>
+
+        <ui:include src="/views/modulos/siniestros/_adjuntar_fotos_dialog.xhtml"/>
 
     </p:outputPanel>
 
