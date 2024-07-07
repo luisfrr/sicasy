@@ -134,8 +134,8 @@ public class SiniestroServiceImpl implements ISiniestroService {
         siniestro.setCreadoPor(userName);
         siniestro.setFechaCreacion(new Date());
 
-        bitacoraSiniestroService.guardarBitacora("Nuevo registro", null, siniestro, userName);
-        siniestroRepository.save(siniestro);
+        Siniestro siniestroSaved = siniestroRepository.save(siniestro);
+        bitacoraSiniestroService.guardarBitacora("Nuevo registro", null, siniestroSaved, userName);
     }
 
     @Override
