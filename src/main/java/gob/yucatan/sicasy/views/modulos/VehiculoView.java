@@ -77,6 +77,8 @@ public class VehiculoView implements Serializable {
     private @Getter @Setter List<MantenimientoFoto> mantenimientoFotoList;
     private @Getter List<ResponsiveOption> responsiveOptions;
     private @Getter List<Integer> idEstatusVehiculoList;
+    private @Getter List<ResponsiveOption> responsiveOptionsGallery;
+    private @Getter int activeIndex = 0;
 
     // Registro nuevos
     private @Getter boolean showNuevoFormDialog;
@@ -137,6 +139,7 @@ public class VehiculoView implements Serializable {
     public void init() {
         log.info("Inicializando VehiculoView");
         this.title = "Vehículo";
+        this.loadResponsiveOptionsGallery();
         this.getPermisosFiltroEstatus();
         this.limpiarFiltros();
 
@@ -835,6 +838,18 @@ public class VehiculoView implements Serializable {
         return new ExportFile();
     }
 
+    public void changeActiveIndex() {
+        log.info("changeActiveIndex - SiniestrosView");
+        Map<String, String> params = FacesContext.getCurrentInstance().getExternalContext().getRequestParameterMap();
+        this.activeIndex = Integer.parseInt(params.get("index"));
+        log.info("activeIndex {}", this.activeIndex);
+    }
+
+    public void presentGallery() {
+        log.info("presentGallery - SiniestrosView");
+        this.activeIndex = 0;
+    }
+
     //region Events
 
     public void onChangeLicitacionFilter() {
@@ -982,6 +997,13 @@ public class VehiculoView implements Serializable {
         if(userSessionBean.userHasAuthority("VEHICULOS_READ_FILTRAR_ESTATUS_CANCELADO") ||
                 userSessionBean.userHasAuthority("ROLE_OWNER"))
             this.idEstatusVehiculoList.add(ESTATUS_CANCELADO);
+    }
+
+    private void loadResponsiveOptionsGallery() {
+        this.responsiveOptionsGallery = new ArrayList<>();
+        responsiveOptionsGallery.add(new ResponsiveOption("1024px", 5));
+        responsiveOptionsGallery.add(new ResponsiveOption("768px", 3));
+        responsiveOptionsGallery.add(new ResponsiveOption("560px", 1));
     }
 
     //endregion private methods
