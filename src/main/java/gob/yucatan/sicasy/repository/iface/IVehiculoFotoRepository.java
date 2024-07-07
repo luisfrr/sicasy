@@ -9,7 +9,7 @@ import java.util.List;
 
 public interface IVehiculoFotoRepository extends JpaRepository<VehiculoFoto, Long>, JpaSpecificationExecutor<VehiculoFoto> {
 
-    @Query("select vf from VehiculoFoto vf where vf.borrado = 0 and vf.vehiculo.idVehiculo = ?1 order by vf.fechaCreacion desc limit 5")
+    @Query("select vf from VehiculoFoto vf where vf.borrado = 0 and vf.vehiculo.idVehiculo = ?1 order by vf.fechaCreacion desc limit 12")
     List<VehiculoFoto> findVehiculoFotosByIdVehiculo(Long idVehiculo);
 
 }
