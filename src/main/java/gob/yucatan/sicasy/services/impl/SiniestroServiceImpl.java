@@ -10,12 +10,14 @@ import gob.yucatan.sicasy.repository.criteria.SearchSpecification;
 import gob.yucatan.sicasy.repository.iface.IEstatusSiniestroRepository;
 import gob.yucatan.sicasy.repository.iface.IIncisoRepository;
 import gob.yucatan.sicasy.repository.iface.ISiniestroRepository;
+import gob.yucatan.sicasy.services.iface.IBitacoraSiniestroService;
 import gob.yucatan.sicasy.services.iface.ISiniestroService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
@@ -37,6 +39,7 @@ public class SiniestroServiceImpl implements ISiniestroService {
     private final ISiniestroRepository siniestroRepository;
     private final IEstatusSiniestroRepository estatusSiniestroRepository;
     private final IIncisoRepository incisoRepository;
+    private final IBitacoraSiniestroService bitacoraSiniestroService;
 
     @Override
     public List<Siniestro> findAllDynamic(Siniestro siniestro) {
@@ -131,6 +134,7 @@ public class SiniestroServiceImpl implements ISiniestroService {
         siniestro.setCreadoPor(userName);
         siniestro.setFechaCreacion(new Date());
 
+        bitacoraSiniestroService.guardarBitacora("Nuevo registro", null, siniestro, userName);
         siniestroRepository.save(siniestro);
     }
 
@@ -168,6 +172,10 @@ public class SiniestroServiceImpl implements ISiniestroService {
 
     @Override
     public void editar(Siniestro siniestro, String userName) {
+
+        Siniestro siniestroAnterior = siniestroRepository.findById(siniestro.getIdSiniestro())
+                        .orElseThrow(() -> new NotFoundException("No se ha logrado obtener la información del siniestro"));
+
         siniestro.setCorralon(siniestro.isCheckCorralon() ? 1 : 0);
         siniestro.setDanioViaPublica(siniestro.isCheckDanioViaPublica() ? 1 : 0);
         siniestro.setPerdidaTotal(siniestro.isCheckPerdidaTotal() ? 1 : 0);
@@ -176,6 +184,7 @@ public class SiniestroServiceImpl implements ISiniestroService {
         siniestro.setModificadoPor(userName);
         siniestro.setFechaModificacion(new Date());
 
+        bitacoraSiniestroService.guardarBitacora("Editar registro", siniestroAnterior, siniestro, userName);
         siniestroRepository.save(siniestro);
     }
 
@@ -243,7 +252,11 @@ public class SiniestroServiceImpl implements ISiniestroService {
                 }
             }
 
+            List<BitacoraSiniestro> bitacoraSiniestroList = new ArrayList<>();
             for(Siniestro siniestro : siniestroToUpdateList) {
+
+                // Se genera la copia de siniestro
+                Siniestro siniestroAnterior = siniestro.clone();
 
                 siniestro.setEstatusSiniestro(estatusSiniestro);
                 siniestro.setObservaciones(motivo);
@@ -260,10 +273,12 @@ public class SiniestroServiceImpl implements ISiniestroService {
 
                     incisoRepository.save(inciso);
                 }
-            }
-            log.info("Cambio estatus: {} - Accion: {}", estatusSiniestro.getNombre(), accionStr);
-            siniestroRepository.saveAll(siniestroToUpdateList);
 
+                bitacoraSiniestroList.add(bitacoraSiniestroService.getBitacora(accionStr, siniestroAnterior, siniestro, username));
+            }
+
+            siniestroRepository.saveAll(siniestroToUpdateList);
+            bitacoraSiniestroService.saveAll(bitacoraSiniestroList);
         } else {
             throw new BadRequestException("No has seleccionado registros. Intenta de nuevo.");
         }
