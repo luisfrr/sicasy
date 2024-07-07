@@ -563,7 +563,7 @@ public class VehiculoView implements Serializable {
             this.mantenimientoVehiculoList = mantenimientoService.findByVehiculoId(mantenimientoVehiculo.getVehiculo().getIdVehiculo());
 
             Messages.addInfo("Atención","Se ha eliminado la información");
-            PrimeFaces.current().ajax().update("tab_view_detalles:form_bitacoras:dt_mantenimiento", "growl");
+            PrimeFaces.current().ajax().update("tab_view_detalles:frm_mantenimientos:dt_mantenimiento", "growl");
             PrimeFaces.current().executeScript("PF('confirmDialog').hide();");
 
         }catch (Exception e){
@@ -601,7 +601,7 @@ public class VehiculoView implements Serializable {
                 FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_INFO,
                         "Operación exitosa", "Se ha guardado correctamente la información");
                 FacesContext.getCurrentInstance().addMessage(null, msg);
-                PrimeFaces.current().ajax().update("tab_view_detalles:form_bitacoras:dt_mantenimiento", "growl");
+                PrimeFaces.current().ajax().update("tab_view_detalles:frm_mantenimientos:dt_mantenimiento", "growl");
                 PrimeFaces.current().executeScript("PF('registroMantenimientoDialog').hide();");
                 this.buscar();
                 this.mantenimientoVehiculo  = new Mantenimiento();
@@ -647,6 +647,8 @@ public class VehiculoView implements Serializable {
         PrimeFaces.current().ajax().update("form_registrar_mantenimiento:bnt_saveRegistro");
 
     }
+
+
 
     @ConfigPermiso(tipo = TipoPermiso.WRITE, codigo = "VEHICULOS_WRITE_ADJUNTAR_FOTOS", orden = 11,
             nombre = "Adjuntar fotos", descripcion = "Permite adjuntar fotos del vehículo.")
