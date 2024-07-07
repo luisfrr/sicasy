@@ -1,0 +1,425 @@
+<ui:composition template="../../WEB-INF/facelets/main_layout.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="jakarta.faces.facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="jakarta.faces.html"
+                xmlns:f="jakarta.faces.core"
+                xmlns:sec="https://joinfaces.org/security">
+
+<ui:define name="title">
+    #{siniestrosView.title}
+</ui:define>
+
+<ui:define name="content">
+
+    <p:outputPanel id="container" styleClass="container-fluid">
+
+        <p:growl id="growl" showDetail="true" showSummary="true"
+                 skipDetailIfEqualsSummary="true" globalOnly="true"/>
+
+        <p:outputPanel id="panel_siniestros" rendered="#{siniestrosView.showSiniestroListPanel}">
+
+            <h:form id="form_breadcrumb" styleClass="mb-3">
+                <p:breadCrumb homeDisplay="text">
+                    <p:menuitem value="Inicio" ajax="false" action="#{menuSessionBean.goToHome()}"/>
+                    <p:menuitem value="Siniestros" ajax="false" action="#{menuSessionBean.goToSiniestros()}"/>
+                </p:breadCrumb>
+            </h:form>
+
+            <h:form id="form_toolbar" styleClass="mb-5">
+                <p:toolbar>
+                    <p:toolbarGroup>
+                        <p:commandButton id="btn_acciones_siniestros" type="button" value="Acciones"
+                                         iconPos="right" icon="fi fi-rr-angle-small-down"/>
+                        <p:menu overlay="true" trigger="btn_acciones_siniestros" my="left top" at="left bottom" maxHeight="250">
+                            <p:menuitem value="Registrar siniestro" ajax="true" action="#{siniestrosView.abrirRegistroSiniestroDialog()}"/>
+                            <p:menuitem value="Solicitar pago de deducible" ajax="true" action="#{siniestrosView.solicitarPagoDeducible()}">
+                                <p:confirm header="Confirmación" message="¿Está seguro que desea solicitar el pago de deducible de los registros seleccionados?" icon="pi pi-exclamation-triangle"/>
+                            </p:menuitem>
+                            <p:menuitem value="Autorizar solicitud" ajax="true" action="#{siniestrosView.autorizarPagoDeducible()}">
+                                <p:confirm header="Confirmación" message="¿Está seguro que desea autorizar el pago de deducible de los registros seleccionados?" icon="pi pi-exclamation-triangle"/>
+                            </p:menuitem>
+                            <p:menuitem value="Rechazar solicitud" ajax="true"
+                                        action="#{siniestrosView.abrirRechazarSolicitudDialog()}">
+                                <p:resetInput target="rechazar-solicitud-dialog"/>
+                            </p:menuitem>
+                            <p:menuitem value="Finalizar registro" ajax="true" action="#{siniestrosView.finalizarRegistro()}">
+                                <p:confirm header="Confirmación" message="¿Está seguro que desea finalizar el registro de los siniestros seleccionados?" icon="pi pi-exclamation-triangle"/>
+                            </p:menuitem>
+                        </p:menu>
+                    </p:toolbarGroup>
+                    <p:toolbarGroup align="right">
+                        <p:commandButton id="btn_exportar_siniestros" type="button" value="Exportar"
+                                         iconPos="right" icon="fi fi-rr-angle-small-down" styleClass="ui-button-outlined"/>
+                        <p:menu overlay="true" trigger="btn_exportar_siniestros" my="left top" at="left bottom" maxHeight="250">
+                            <p:menuitem value="Exportar vehículos" ajax="false" onclick="PrimeFaces.monitorDownload(start, stop);">
+                                <p:fileDownload value="#{fileDownloadBean.downloadFile(siniestrosView.exportarSiniestros())}"/>
+                            </p:menuitem>
+                        </p:menu>
+                    </p:toolbarGroup>
+                </p:toolbar>
+            </h:form>
+
+            <h:form id="form_filtros" styleClass="mb-5">
+                <p:panel header="Filtros" widgetVar="panelFiltros"
+                         toggleable="true" toggleSpeed="500">
+                    <p:outputPanel id="filtros" styleClass="formgrid grid mb-2">
+                        <p:outputPanel styleClass="field col-12 md:col-4 lg:col-2">
+                            <p:outputLabel for="@next" value="Responsable" styleClass="block"/>
+                            <p:selectOneMenu value="#{siniestrosView.siniestroFilter.responsable}" styleClass="w-full mw-auto">
+                                <f:selectItem itemLabel="Todos" itemValue="#{null}"/>
+                                <f:selectItem itemLabel="#{siniestrosView.SINIESTRO_RESPONSABLE_ASEGURADO}" itemValue="#{siniestrosView.SINIESTRO_RESPONSABLE_ASEGURADO}"/>
+                                <f:selectItem itemLabel="#{siniestrosView.SINIESTRO_RESPONSABLE_TERCEROS}" itemValue="#{siniestrosView.SINIESTRO_RESPONSABLE_TERCEROS}"/>
+                                <p:ajax event="blur"/>
+                            </p:selectOneMenu>
+                            <span class="text-sm hidden"> </span>
+                        </p:outputPanel>
+                        <p:outputPanel styleClass="field col-12 md:col-4 lg:col-2">
+                            <p:outputLabel for="@next" styleClass="block" value="Fecha inicio"/>
+                            <p:datePicker value="#{siniestrosView.siniestroFilter.fechaInicioFilter}"
+                                          placeholder="dd/MM/yyyy" pattern="dd/MM/yyyy"
+                                          monthNavigator="true" yearNavigator="true"
+                                          showWeek="true" locale="es"
+                                          styleClass="w-full"/>
+                        </p:outputPanel>
+                        <p:outputPanel styleClass="field col-12 md:col-4 lg:col-2">
+                            <p:outputLabel for="@next" styleClass="block" value="Fecha fin"/>
+                            <p:datePicker value="#{siniestrosView.siniestroFilter.fechaFinFilter}"
+                                          placeholder="dd/MM/yyyy" pattern="dd/MM/yyyy"
+                                          monthNavigator="true" yearNavigator="true"
+                                          showWeek="true" locale="es"
+                                          styleClass="w-full"/>
+                        </p:outputPanel>
+                        <p:outputPanel styleClass="field col-12 md:col-4 lg:col-2">
+                            <p:outputLabel for="@next" value="Estatus" styleClass="block"/>
+                            <p:selectOneMenu value="#{siniestrosView.siniestroFilter.estatusSiniestro.idEstatusSiniestro}" styleClass="w-full mw-auto">
+                                <f:selectItem itemLabel="Todos" itemValue="#{null}"/>
+                                <f:selectItems value="#{siniestrosView.estatusSiniestroList}" var="estatusSiniestro"
+                                               itemValue="#{estatusSiniestro.idEstatusSiniestro}" itemLabel="#{estatusSiniestro.nombre}"/>
+                                <p:ajax event="blur"/>
+                            </p:selectOneMenu>
+                            <span class="text-sm hidden"> </span>
+                        </p:outputPanel>
+                        <p:outputPanel styleClass="field col-12 md:col-4 lg:col-2">
+                            <p:outputLabel for="@next" value="Corralón" styleClass="block"/>
+                            <p:selectOneMenu value="#{siniestrosView.siniestroFilter.corralon}" styleClass="w-full mw-auto">
+                                <f:selectItem itemLabel="Todos" itemValue="#{null}"/>
+                                <f:selectItem itemLabel="Sí" itemValue="1"/>
+                                <f:selectItem itemLabel="No" itemValue="0"/>
+                                <p:ajax event="blur"/>
+                            </p:selectOneMenu>
+                            <span class="text-sm hidden"> </span>
+                        </p:outputPanel>
+                        <p:outputPanel styleClass="field col-12 md:col-4 lg:col-2">
+                            <p:outputLabel for="@next" value="Multa" styleClass="block"/>
+                            <p:selectOneMenu value="#{siniestrosView.siniestroFilter.multaVehiculo}" styleClass="w-full mw-auto">
+                                <f:selectItem itemLabel="Todos" itemValue="#{null}"/>
+                                <f:selectItem itemLabel="Sí" itemValue="1"/>
+                                <f:selectItem itemLabel="No" itemValue="0"/>
+                                <p:ajax event="blur"/>
+                            </p:selectOneMenu>
+                            <span class="text-sm hidden"> </span>
+                        </p:outputPanel>
+                        <p:outputPanel styleClass="field col-12 md:col-4 lg:col-2">
+                            <p:outputLabel for="@next" value="Perdida total" styleClass="block"/>
+                            <p:selectOneMenu value="#{siniestrosView.siniestroFilter.perdidaTotal}" styleClass="w-full mw-auto">
+                                <f:selectItem itemLabel="Todos" itemValue="#{null}"/>
+                                <f:selectItem itemLabel="Sí" itemValue="1"/>
+                                <f:selectItem itemLabel="No" itemValue="0"/>
+                                <p:ajax event="blur"/>
+                            </p:selectOneMenu>
+                            <span class="text-sm hidden"> </span>
+                        </p:outputPanel>
+                        <p:outputPanel styleClass="field col-12 md:col-4 lg:col-2">
+                            <p:outputLabel for="@next" value="Requiere Pago Deducible" styleClass="block"/>
+                            <p:selectOneMenu value="#{siniestrosView.siniestroFilter.pagoDeducible}" styleClass="w-full mw-auto">
+                                <f:selectItem itemLabel="Todos" itemValue="#{null}"/>
+                                <f:selectItem itemLabel="Sí" itemValue="1"/>
+                                <f:selectItem itemLabel="No" itemValue="0"/>
+                                <p:ajax event="blur"/>
+                            </p:selectOneMenu>
+                            <span class="text-sm hidden"> </span>
+                        </p:outputPanel>
+                    </p:outputPanel>
+                    <f:facet name="footer">
+                        <p:outputPanel styleClass="flex flex-row gap-4 justify-content-end">
+                            <p:commandButton value="Limpiar filtros" styleClass="ui-button-outlined"
+                                             ajax="true" action="#{siniestrosView.limpiarFiltros()}"
+                                             update="form_filtros form_datatable"/>
+                            <p:commandButton value="Buscar" ajax="true" action="#{siniestrosView.buscar()}"
+                                             update="form_datatable"/>
+                        </p:outputPanel>
+                    </f:facet>
+                </p:panel>
+            </h:form>
+
+            <h:form id="form_datatable" styleClass="mb-5">
+
+                <p:dataTable id="dt_siniestros"
+                             var="siniestro" value="#{siniestrosView.siniestroList}"
+                             rows="50" rowHover="true"
+                             rowKey="#{siniestro.idSiniestro}" rowIndexVar="index"
+                             rowSelectMode="add"
+                             selection="#{siniestrosView.siniestroSelectedList}"
+                             styleClass="dt-scrollable-x"
+                             scrollable="true"
+                             paginator="true" paginatorPosition="bottom"
+                             paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             currentPageReportTemplate="{startRecord}-{endRecord} de {totalRecords} registros"
+                             rowsPerPageTemplate="50,100,200,{ShowAll|'Todos'}">
+
+                    <f:facet name="header">
+                        Siniestros
+                    </f:facet>
+
+                    <p:ajax event="rowSelect" update="form_toolbar"/>
+                    <p:ajax event="rowUnselect" update="form_toolbar"/>
+                    <p:ajax event="rowSelectCheckbox" update="form_toolbar"/>
+                    <p:ajax event="rowUnselectCheckbox" update="form_toolbar"/>
+                    <p:ajax event="toggleSelect" update="form_toolbar"/>
+                    
+                    <p:column selectionMode="multiple" style="width:16px;text-align:center"/>
+
+                    <p:column headerText="No." width="40">
+                        <h:outputText value="#{index + 1}" />
+                    </p:column>
+
+                    <p:column headerText="No. Siniestro" width="150">
+                        <h:outputText value="#{siniestro.noSiniestroAseguradora}"/>
+                    </p:column>
+
+                    <p:column headerText="No. Siniestro SAF" width="150">
+                        <h:outputText value="#{siniestro.noSiniestroSAF}"/>
+                    </p:column>
+
+                    <p:column headerText="Fecha Siniestro" width="200">
+                        <h:outputText value="#{siniestro.fechaSiniestro}">
+                            <f:convertDateTime pattern="dd/MM/yyyy HH:mm a"/>
+                        </h:outputText>
+                    </p:column>
+
+                    <p:column headerText="Responsable" width="150">
+                        <h:outputText value="#{siniestro.responsable}"/>
+                    </p:column>
+
+                    <p:column headerText="Ajustador" width="150">
+                        <h:outputText value="#{siniestro.ajustadorAseguradora}"/>
+                    </p:column>
+
+                    <p:column headerText="Ajustador SAF" width="150">
+                        <h:outputText value="#{siniestro.ajustadorSAF}"/>
+                    </p:column>
+
+                    <p:column headerText="Causa" width="150">
+                        <h:outputText value="#{siniestro.causa}"/>
+                    </p:column>
+
+                    <p:column headerText="No. Serie" width="150">
+                        <h:outputText value="#{siniestro.vehiculo.noSerie}"/>
+                    </p:column>
+
+                    <p:column headerText="Marca" width="150">
+                        <h:outputText value="#{siniestro.vehiculo.marca}"/>
+                    </p:column>
+
+                    <p:column headerText="Modelo" width="150">
+                        <h:outputText value="#{siniestro.vehiculo.modelo}"/>
+                    </p:column>
+
+                    <p:column headerText="Año" width="150">
+                        <h:outputText value="#{siniestro.vehiculo.anio}"/>
+                    </p:column>
+
+                    <p:column headerText="Reporta" width="150">
+                        <h:outputText value="#{siniestro.reporta}"/>
+                    </p:column>
+
+                    <p:column headerText="Fecha reporte" width="200">
+                        <h:outputText value="#{siniestro.fechaSiniestro}">
+                            <f:convertDateTime pattern="dd/MM/yyyy HH:mm a"/>
+                        </h:outputText>
+                    </p:column>
+
+                    <p:column headerText="Declaración" width="350">
+                        <div style="overflow: hidden;text-overflow: ellipsis;display: -webkit-box;-webkit-line-clamp: 2;-webkit-box-orient: vertical;">
+                            <h:outputText value="#{siniestro.declaracionSiniestro}"/>
+                        </div>
+                    </p:column>
+
+                    <p:column headerText="Conductor" width="150">
+                        <h:outputText value="#{siniestro.conductor}"/>
+                    </p:column>
+
+                    <p:column headerText="No. Licencia" width="150">
+                        <h:outputText value="#{siniestro.noLicencia}"/>
+                    </p:column>
+
+                    <p:column headerText="Tipo licencia" width="150">
+                        <h:outputText value="#{siniestro.tipoLicencia}"/>
+                    </p:column>
+
+                    <p:column headerText="Vencimiento licencia" width="150">
+                        <h:outputText value="#{siniestro.vencimientoLicencia}">
+                            <f:convertDateTime pattern="dd/MM/yyyy"/>
+                        </h:outputText>
+                    </p:column>
+
+                    <p:column headerText="Daño vía pública" width="150">
+                        <h:outputText value="#{siniestro.danioViaPublica == 1 ? 'Sí' : 'No'}"/>
+                    </p:column>
+
+                    <p:column headerText="Corralón" width="80">
+                        <h:outputText value="#{siniestro.corralon == 1 ? 'Sí' : 'No'}"/>
+                    </p:column>
+
+                    <p:column headerText="Multa" width="80">
+                        <h:outputText value="#{siniestro.multaVehiculo == 1 ? 'Sí' : 'No'}"/>
+                    </p:column>
+
+                    <p:column headerText="Costo multa" width="80">
+                        <h:outputText value="#{siniestro.costoMulta}">
+                            <f:convertNumber maxFractionDigits="2"/>
+                        </h:outputText>
+                    </p:column>
+
+                    <p:column headerText="Estado" width="150">
+                        <h:outputText value="#{siniestro.estado}"/>
+                    </p:column>
+
+                    <p:column headerText="Municipio" width="150">
+                        <h:outputText value="#{siniestro.municipio}"/>
+                    </p:column>
+
+                    <p:column headerText="Localidad" width="150">
+                        <h:outputText value="#{siniestro.localidad}"/>
+                    </p:column>
+
+                    <p:column headerText="Estatus Siniestro" width="150">
+                        <h:outputText value="#{siniestro.estatusSiniestro.nombre}"/>
+                    </p:column>
+
+                    <p:column headerText="Observaciones" width="250">
+                        <h:outputText value="#{siniestro.observaciones}"/>
+                    </p:column>
+
+                    <p:column headerText="Perdida total" width="150">
+                        <h:outputText value="#{siniestro.perdidaTotal == 1 ? 'Sí' : 'No'}" rendered="#{siniestro.inciso != null}"/>
+                    </p:column>
+
+                    <p:column headerText="¿Pago de deducible?" width="150">
+                        <h:outputText value="#{siniestro.requierePadoDeducible() ? 'Sí' : 'No'}"/>
+                    </p:column>
+
+                    <p:column headerText="Tipo deducible" width="150">
+                        <h:outputText value="#{siniestro.deducible.tipoDeducicle}" rendered="#{siniestro.requierePadoDeducible()}"/>
+                    </p:column>
+
+                    <p:column headerText="Vehículo valor factura" width="150">
+                        <h:outputText value="#{siniestro.deducible.vehiculoValorFactura}" rendered="#{siniestro.requierePadoDeducible()}">
+                            <f:convertNumber maxFractionDigits="2"/>
+                        </h:outputText>
+                    </p:column>
+
+                    <p:column headerText="Vehículo valor actual" width="150">
+                        <h:outputText value="#{siniestro.deducible.valorActual}" rendered="#{siniestro.requierePadoDeducible()}">
+                            <f:convertNumber maxFractionDigits="2"/>
+                        </h:outputText>
+                    </p:column>
+
+                    <p:column headerText="Póliza" width="80">
+                        <h:outputText value="#{siniestro.deducible.polizaNumero}" rendered="#{siniestro.requierePadoDeducible()}"/>
+                    </p:column>
+
+                    <p:column headerText="Inciso" width="80">
+                        <h:outputText value="#{siniestro.deducible.incisoNumero}" rendered="#{siniestro.requierePadoDeducible()}"/>
+                    </p:column>
+
+                    <p:column headerText="Póliza Vigente" width="120">
+                        <h:outputText value="#{siniestro.deducible.tienePolizaVigente == 1 ? 'Sí' : 'No'}" rendered="#{siniestro.inciso != null}"/>
+                    </p:column>
+
+                    <p:column headerText="Costo total deducible" width="150">
+                        <h:outputText value="#{siniestro.deducible.costoTotalDeducible}" rendered="#{siniestro.requierePadoDeducible()}">
+                            <f:convertNumber maxFractionDigits="2"/>
+                        </h:outputText>
+                    </p:column>
+
+                    <sec:authorize access="hasAuthority('ROLE_OWNER')">
+
+                        <p:column headerText="Estatus registro" width="150">
+                            <h:outputText value="#{siniestro.estatusRegistro.label}">
+                            </h:outputText>
+                        </p:column>
+
+                        <p:column headerText="Fecha creación" width="180">
+                            <h:outputText value="#{siniestro.fechaCreacion}">
+                                <f:convertDateTime pattern="dd/MM/yyyy HH:mm:ss a"/>
+                            </h:outputText>
+                        </p:column>
+
+                        <p:column headerText="Creado por" width="150">
+                            <h:outputText value="#{siniestro.creadoPor}">
+                            </h:outputText>
+                        </p:column>
+
+                        <p:column headerText="Fecha modificación" width="180">
+                            <h:outputText value="#{siniestro.fechaModificacion}">
+                                <f:convertDateTime pattern="dd/MM/yyyy HH:mm:ss a"/>
+                            </h:outputText>
+                        </p:column>
+
+                        <p:column headerText="Modificado por" width="150">
+                            <h:outputText value="#{siniestro.modificadoPor}">
+                            </h:outputText>
+                        </p:column>
+
+                        <p:column headerText="Fecha borrado" width="180">
+                            <h:outputText value="#{siniestro.fechaBorrado}">
+                                <f:convertDateTime pattern="dd/MM/yyyy HH:mm:ss a"/>
+                            </h:outputText>
+                        </p:column>
+
+                        <p:column headerText="Borrado por" width="150">
+                            <h:outputText value="#{siniestro.borradoPor}">
+                            </h:outputText>
+                        </p:column>
+
+                    </sec:authorize>
+
+                    <sec:authorize access="hasAnyAuthority('ROLE_OWNER','VEHICULOS_WRITE_VER_DETALLE', 'VEHICULOS_WRITE_REGISTRAR_MANTENIMIENTO', 'VEHICULOS_WRITE_ADJUNTAR_FOTOS')">
+                        <p:column headerText="Acciones" width="120">
+
+                            <p:commandButton id="buttonOptions" type="button"
+                                             icon="fi fi-rr-menu-dots-vertical"
+                                             styleClass="rounded-button ui-button-outlined"
+                                             rendered="#{siniestro.estatusRegistro.label != 'Borrado'}"/>
+                            <p:menu overlay="true" trigger="buttonOptions" my="left top" at="left bottom" styleClass="w-16rem">
+
+                                <p:menuitem value="Ver detalle"
+                                            action="#{siniestrosView.verDetalle(siniestro)}"
+                                            ajax="true" update="container"/>
+
+                            </p:menu>
+
+                        </p:column>
+                    </sec:authorize>
+
+                </p:dataTable>
+
+            </h:form>
+
+        </p:outputPanel>
+
+        <ui:include src="/views/modulos/siniestros/_registrar_siniestro_dialog.xhtml"/>
+
+        <ui:include src="/views/modulos/siniestros/_rechazar_solicitud_dialog.xhtml"/>
+
+        <ui:include src="/views/modulos/siniestros/_detalle_siniestro.xhtml"/>
+
+        <ui:include src="/views/modulos/siniestros/_adjuntar_fotos_dialog.xhtml"/>
+
+    </p:outputPanel>
+
+</ui:define>
+
+</ui:composition>

@@ -1,0 +1,27 @@
+<ui:composition
+        xmlns="http://www.w3.org/1999/xhtml"
+        xmlns:h="http://xmlns.jcp.org/jsf/html"
+        xmlns:f="http://xmlns.jcp.org/jsf/core"
+        xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+        xmlns:p="http://primefaces.org/ui">
+
+   <p:outputPanel id="panel_detalle" rendered="#{siniestrosView.showDetalleSiniestroPanel}">
+
+      <h:form id="form_breadcrumb_detalle" styleClass="mb-5">
+         <p:breadCrumb homeDisplay="text">
+            <p:menuitem value="Inicio" ajax="false" action="#{menuSessionBean.goToHome()}"/>
+            <p:menuitem value="Siniestros" ajax="true" action="#{siniestrosView.regresar()}"/>
+            <p:menuitem value="Detalle"/>
+         </p:breadCrumb>
+      </h:form>
+
+      <p:tabView id="tab_view_detalles" styleClass="mb-5">
+         <p:tab id="tab_detalle_siniestro" title="Información del siniestro">
+            <ui:include src="/views/modulos/siniestros/_detalle_tab_siniestro.xhtml"/>
+         </p:tab>
+         <p:tab id="tab_bitacora" title="Bitácora">
+            <ui:include src="/views/modulos/siniestros/_detalle_tab_bitacora.xhtml"/>
+         </p:tab>
+      </p:tabView>
+   </p:outputPanel>
+</ui:composition>

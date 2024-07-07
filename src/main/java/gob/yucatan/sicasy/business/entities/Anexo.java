@@ -73,7 +73,6 @@ public class Anexo implements Cloneable {
     @Transient
     private String numLicitacionString;
 
-
     public String fechaInicioString(){
         return DateFormatUtil.convertToFormat(fechaInicio,"dd-MM-yyyy");
     }

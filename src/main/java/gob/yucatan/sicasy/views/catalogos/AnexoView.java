@@ -242,18 +242,17 @@ public class AnexoView implements Serializable {
                 .isWrapText(true)
                 .build());
 
-        cellList.add(ExcelCell.builder().columnName("Anexo").propertyExpression("nombre").cellStyle(centerTopStyle).cellWidth(150).build());
-        cellList.add(ExcelCell.builder().columnName("Número Licitación").propertyExpression("numLicitacionString()").cellStyle(leftTopStyle).cellWidth(450).build());
-        cellList.add(ExcelCell.builder().columnName("Descripción").propertyExpression("descripcion").cellStyle(leftTopStyle).cellWidth(450).build());
-        cellList.add(ExcelCell.builder().columnName("Fecha de inicio").propertyExpression("fechaInicioString()").cellStyle(leftTopStyle).cellWidth(450).build());
-        cellList.add(ExcelCell.builder().columnName("Fecha de termino").propertyExpression("fechaFinalString()").cellStyle(leftTopStyle).cellWidth(450).build());
-        cellList.add(ExcelCell.builder().columnName("Fecha de firma").propertyExpression("fechaFirmaString()").cellStyle(leftTopStyle).cellWidth(450).build());
+        cellList.add(ExcelCell.builder().columnName("NUM_LICITACION").propertyExpression("licitacion.numeroLicitacion").cellStyle(leftTopStyle).cellWidth(450).build());
+        cellList.add(ExcelCell.builder().columnName("NUM_ANEXO").propertyExpression("nombre").cellStyle(centerTopStyle).cellWidth(150).build());
+        cellList.add(ExcelCell.builder().columnName("DESCRIPCION").propertyExpression("descripcion").cellStyle(leftTopStyle).cellWidth(450).build());
+        cellList.add(ExcelCell.builder().columnName("FECHA_INICIO").propertyExpression("fechaInicioString()").cellStyle(leftTopStyle).cellWidth(450).build());
+        cellList.add(ExcelCell.builder().columnName("FECHA_FIN").propertyExpression("fechaFinalString()").cellStyle(leftTopStyle).cellWidth(450).build());
+        cellList.add(ExcelCell.builder().columnName("FECHA_FIRMA").propertyExpression("fechaFirmaString()").cellStyle(leftTopStyle).cellWidth(450).build());
 
         ExcelDataSheet excelDataSheet = ExcelDataSheet.builder()
                 .data(this.anexoList)
                 .cells(cellList)
-                .title("Anexos")
-                .sheetName("DATA")
+                .sheetName("ANEXOS")
                 .filename("Anexos")
                 .autoFilter(true)
                 .agregarFechaGeneracion(true)
@@ -261,7 +260,6 @@ public class AnexoView implements Serializable {
                 .build();
 
         return generatorExcelFile.createExcelFile(workbook, excelDataSheet);
-
     }
 
     public void validateFechaInicioFinal(SelectEvent event){
@@ -342,7 +340,7 @@ public class AnexoView implements Serializable {
             Class<Anexo> anexoClass = Anexo.class;
             List<ConfigHeaderExcelModel> list = new ArrayList<>();
             list.add(ConfigHeaderExcelModel.builder().header("NUM_LICITACION").fieldName("numLicitacionString").columnIndex(0).build());
-            list.add(ConfigHeaderExcelModel.builder().header("NOMBRE").fieldName("nombre").columnIndex(1).build());
+            list.add(ConfigHeaderExcelModel.builder().header("NUM_ANEXO").fieldName("nombre").columnIndex(1).build());
             list.add(ConfigHeaderExcelModel.builder().header("DESCRIPCION").fieldName("descripcion").columnIndex(2).build());
             list.add(ConfigHeaderExcelModel.builder().header("FECHA_INICIO").fieldName("fechaInicio").columnIndex(3).build());
             list.add(ConfigHeaderExcelModel.builder().header("FECHA_FIN").fieldName("fechaFinal").columnIndex(4).build());

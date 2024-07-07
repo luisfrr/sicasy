@@ -15,7 +15,6 @@ import java.io.Serializable;
 public class EstatusInciso implements Cloneable, Serializable {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "estatus_inciso_id")
     private Integer idEstatusInciso;
 

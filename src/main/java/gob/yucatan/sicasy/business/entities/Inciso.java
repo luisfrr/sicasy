@@ -1,6 +1,7 @@
 package gob.yucatan.sicasy.business.entities;
 
 import gob.yucatan.sicasy.business.enums.EstatusRegistro;
+import gob.yucatan.sicasy.utils.date.DateValidator;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -121,6 +122,11 @@ public class Inciso implements Cloneable, Serializable {
     @Transient
     private boolean saldoDiferenteCero;
 
+    public boolean esIncisoVigente() {
+        Date hoy = new Date();
+        return DateValidator.isDateBetween(this.fechaInicioVigencia, this.fechaFinVigencia, hoy);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -146,4 +152,5 @@ public class Inciso implements Cloneable, Serializable {
             throw new AssertionError();
         }
     }
+
 }

@@ -6,17 +6,17 @@ import lombok.*;
 import java.io.Serializable;
 
 @Entity
-@Table(name = "estatus_vehiculo")
+@Table(name = "estatus_siniestro")
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
 @Builder
-public class EstatusVehiculo implements Cloneable, Serializable {
+public class EstatusSiniestro implements Serializable, Cloneable {
 
     @Id
-    @Column(name = "estatus_vehiculo_id", nullable = false)
-    private Integer idEstatusVehiculo;
+    @Column(name = "estatus_siniestro_id", nullable = false)
+    private Integer idEstatusSiniestro;
 
     @Column(name = "nombre", nullable = false)
     private String nombre;
@@ -25,11 +25,12 @@ public class EstatusVehiculo implements Cloneable, Serializable {
     private String descripcion;
 
     @Override
-    public EstatusVehiculo clone() {
+    public EstatusSiniestro clone() {
         try {
-            return (EstatusVehiculo) super.clone();
+            return (EstatusSiniestro) super.clone();
         } catch (CloneNotSupportedException e) {
             throw new AssertionError();
         }
     }
+
 }
