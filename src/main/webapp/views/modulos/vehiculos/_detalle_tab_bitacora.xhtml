@@ -233,17 +233,13 @@
                </p:menuitem>
 
                <p:menuitem value="Adjuntar fotos" icon="fi fi-rr-add-image"
-                           action="#{vehiculoView.abrirModalAdjuntaVerFotosMantenimiento(mantenimiento)}"
+                           action="#{vehiculoView.abrirModalFotosMantenimiento2(mantenimiento)}"
                            update="growl dt_mantenimiento">
                </p:menuitem>
 
                <p:menuitem value="Ver fotos" icon="fi fi-rr-images"
                            action="#{vehiculoView.abrirModalAdjuntaVerFotosMantenimiento(mantenimiento)}"
                            update="growl dt_mantenimiento">
-               </p:menuitem>
-
-               <p:menuitem value="Galería" icon="fi fi-rr-images">
-
                </p:menuitem>
 
             </p:menu>
@@ -275,5 +271,7 @@
          </f:facet>
       </p:dialog>
    </h:form>
+
+
 
 </ui:composition>

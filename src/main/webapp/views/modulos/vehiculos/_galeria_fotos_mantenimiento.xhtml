@@ -46,4 +46,45 @@
       </p:dialog>
    </h:form>
 
+   <h:form id="form_adjuntar_fotos-mantenimiento">
+
+      <p:dialog header="Adjuntar fotos"
+                id="adjuntar-fotos-dialog-mantenimiento" widgetVar="adjuntarFotosMantenimientoDialog"
+                height="450" width="800"
+                showEffect="fade" modal="true"
+                closable="false" closeOnEscape="false"
+                cache="false" responsive="true">
+
+         <p:outputPanel id="adjuntar-fotos-dialog-content" styleClass="formgrid grid">
+
+            <p:outputPanel styleClass="field col-12 mb-5">
+               <p:fileUpload listener="#{vehiculoView.subirFotoMantenimiento2}" mode="advanced" dragDropSupport="true"
+                             chooseButtonTitle="Elegir" chooseLabel="Elegir"
+                             cancelButtonTitle="Cancelar" cancelLabel="Cancelar"
+                             uploadButtonTitle="Subir" uploadLabel="Subir"
+                             multiple="true" update="growl" sizeLimit="10000000" fileLimit="10"
+                             fileLimitMessage="Has superado el número máximo de archivos"
+                             invalidFileMessage="Archivo no válido"
+                             invalidSizeMessage="Has superado el tamaño máximo por archivo"
+                             accept=".jpg,.jpeg,.png">
+               </p:fileUpload>
+               <span class="text-sm">Sólo se permiten archivos .jpg, .jpeg y .png. Máximo 10 archivos</span>
+            </p:outputPanel>
+
+            <p:outputPanel styleClass="field col-12 mb-0">
+
+               <p:outputPanel styleClass="flex justify-content-end">
+                  <p:commandButton value="Cerrar" ajax="true" process="@this"
+                                   action="#{vehiculoView.cerrarGaleriaFotosMantenimiento()}"
+                                   styleClass="ui-button-outlined"/>
+               </p:outputPanel>
+
+            </p:outputPanel>
+
+         </p:outputPanel>
+
+      </p:dialog>
+
+   </h:form>
+
 </ui:composition>

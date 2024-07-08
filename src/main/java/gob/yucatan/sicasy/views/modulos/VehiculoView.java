@@ -525,6 +525,13 @@ public class VehiculoView implements Serializable {
 
     }
 
+    public void abrirModalFotosMantenimiento2(Mantenimiento mantenimiento){
+        this.mantenimientoVehiculo = mantenimiento;
+
+        PrimeFaces.current().ajax().update("form_adjuntar_fotos-mantenimiento", "growl");
+        PrimeFaces.current().executeScript("PF('adjuntarFotosMantenimientoDialog').show();");
+    }
+
     public void abrirModalAdjuntaVerFotosMantenimiento(Mantenimiento mantenimiento){
         this.mantenimientoVehiculo = mantenimiento;
 
@@ -535,10 +542,10 @@ public class VehiculoView implements Serializable {
         PrimeFaces.current().executeScript("PF('galeriaFotosMantenimientoDialog').show();");
     }
 
-    public void cerrarGaleriaFotosMantenimiento(){
+    public void cerrarGaleriaFotosMantenimiento(){ // todo: actualiza el compponente a cerrar
         this.vehiculoSelected = null;
-        PrimeFaces.current().ajax().update("form_galeria_mantenimiento", "growl");
-        PrimeFaces.current().executeScript("PF('galeriaFotosMantenimientoDialog').hide();");
+        PrimeFaces.current().ajax().update("form_adjuntar_fotos-mantenimiento", "growl");
+        PrimeFaces.current().executeScript("PF('adjuntarFotosMantenimientoDialog').hide();");
     }
 
     public void abrirModalEditarMantenimiento(Mantenimiento mantenimiento) {
@@ -667,6 +674,36 @@ public class VehiculoView implements Serializable {
         this.vehiculoFotoSelected = null;
         PrimeFaces.current().ajax().update("form_adjuntar_fotos");
         PrimeFaces.current().executeScript("PF('adjuntarFotosDialog').hide();");
+    }
+
+    public void subirFotoMantenimiento2(FileUploadEvent event) {
+        String fileName = event.getFile().getFileName();
+        try {
+            if(this.mantenimientoVehiculo != null) {
+                String filePath = SaveFile.importFileToPath(event.getFile().getContent(), fileName, FOLDER_VEHICULOS);
+
+                MantenimientoFoto mantenimientoFoto = MantenimientoFoto.builder()
+                        .mantenimiento(mantenimientoVehiculo)
+                        .rutaArchivo(filePath)
+                        .nombreArchivo(fileName)
+                        .fechaCreacion(new Date())
+                        .creadoPor(userSessionBean.getUserName())
+                        .borrado(0)
+                        .build();
+
+                mantenimientoFotoService.guardarFoto(mantenimientoFoto);
+                Messages.addInfo("Se ha guardado correctamente la foto: " + fileName);
+
+                this.mantenimientoFotoList = mantenimientoFotoService.getFotosMantenimientos(mantenimientoFoto.getMantenimiento().getIdMantenimiento());
+                PrimeFaces.current().ajax().update("tab_view_detalles:form_galeria_mantenimiento"); // aqui actualiza la galeria correspondiente
+
+            } else {
+                Messages.addWarn("No se ha seleccionado el mantenimiento del vehiculo");
+            }
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            Messages.addError("No se ha logrado guardar la foto: " + fileName);
+        }
     }
 
     public void subirFotoMantenimiento(){
