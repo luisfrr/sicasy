@@ -306,32 +306,32 @@
                         <h:outputText value="#{siniestro.perdidaTotal == 1 ? 'Sí' : 'No'}" rendered="#{siniestro.inciso != null}"/>
                     </p:column>
 
-                    <p:column headerText="¿Pago de deducible?" width="150">
-                        <h:outputText value="#{siniestro.requierePadoDeducible() ? 'Sí' : 'No'}"/>
+                    <p:column headerText="Requiere pago de deducible" width="180">
+                        <h:outputText value="#{siniestro.requierePagoDeducible() ? 'Sí' : 'No'}"/>
                     </p:column>
 
                     <p:column headerText="Tipo deducible" width="150">
-                        <h:outputText value="#{siniestro.deducible.tipoDeducicle}" rendered="#{siniestro.requierePadoDeducible()}"/>
+                        <h:outputText value="#{siniestro.deducible.tipoDeducicle}" rendered="#{siniestro.requierePagoDeducible()}"/>
                     </p:column>
 
                     <p:column headerText="Vehículo valor factura" width="150">
-                        <h:outputText value="#{siniestro.deducible.vehiculoValorFactura}" rendered="#{siniestro.requierePadoDeducible()}">
+                        <h:outputText value="#{siniestro.deducible.vehiculoValorFactura}" rendered="#{siniestro.requierePagoDeducible()}">
                             <f:convertNumber maxFractionDigits="2"/>
                         </h:outputText>
                     </p:column>
 
                     <p:column headerText="Vehículo valor actual" width="150">
-                        <h:outputText value="#{siniestro.deducible.valorActual}" rendered="#{siniestro.requierePadoDeducible()}">
+                        <h:outputText value="#{siniestro.deducible.valorActual}" rendered="#{siniestro.requierePagoDeducible()}">
                             <f:convertNumber maxFractionDigits="2"/>
                         </h:outputText>
                     </p:column>
 
                     <p:column headerText="Póliza" width="80">
-                        <h:outputText value="#{siniestro.deducible.polizaNumero}" rendered="#{siniestro.requierePadoDeducible()}"/>
+                        <h:outputText value="#{siniestro.deducible.polizaNumero}" rendered="#{siniestro.requierePagoDeducible()}"/>
                     </p:column>
 
                     <p:column headerText="Inciso" width="80">
-                        <h:outputText value="#{siniestro.deducible.incisoNumero}" rendered="#{siniestro.requierePadoDeducible()}"/>
+                        <h:outputText value="#{siniestro.deducible.incisoNumero}" rendered="#{siniestro.requierePagoDeducible()}"/>
                     </p:column>
 
                     <p:column headerText="Póliza Vigente" width="120">
@@ -339,7 +339,7 @@
                     </p:column>
 
                     <p:column headerText="Costo total deducible" width="150">
-                        <h:outputText value="#{siniestro.deducible.costoTotalDeducible}" rendered="#{siniestro.requierePadoDeducible()}">
+                        <h:outputText value="#{siniestro.deducible.costoTotalDeducible}" rendered="#{siniestro.requierePagoDeducible()}">
                             <f:convertNumber maxFractionDigits="2"/>
                         </h:outputText>
                     </p:column>
