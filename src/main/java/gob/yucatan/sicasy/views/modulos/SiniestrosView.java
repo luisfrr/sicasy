@@ -46,6 +46,7 @@ public class SiniestrosView implements Serializable {
     private final IEstatusSiniestroService estatusSiniestroService;
     private final IVehiculoService vehiculoService;
     private final ISiniestroFotoService siniestroFotoService;
+    private final IBitacoraSiniestroService bitacoraSiniestroService;
 
     // Constantes
     private final @Getter String SINIESTRO_RESPONSABLE_ASEGURADO = "ASEGURADO";
@@ -58,6 +59,7 @@ public class SiniestrosView implements Serializable {
     private @Getter String title;
     private @Getter @Setter List<Siniestro> siniestroList;
     private @Getter @Setter List<Siniestro> siniestroSelectedList;
+    private @Getter List<BitacoraSiniestro> siniestroBitacoraList;
     private @Getter @Setter Siniestro siniestroSelected;
     private @Getter @Setter Siniestro siniestroForm;
     private @Getter @Setter Siniestro siniestroFilter;
@@ -276,6 +278,7 @@ public class SiniestrosView implements Serializable {
             this.showDetalleSiniestroPanel = true;
             this.siniestroSelected = siniestroService.findById(siniestro.getIdSiniestro());
             this.siniestroFotoList = siniestroFotoService.getSiniestroFotos(this.siniestroSelected.getIdSiniestro());
+            this.siniestroBitacoraList = bitacoraSiniestroService.findBySiniestroId(siniestro.getIdSiniestro());
             this.readOnlyEditForm = true;
             PrimeFaces.current().ajax().update("container");
         } catch (Exception e) {
