@@ -542,9 +542,9 @@ public class VehiculoView implements Serializable {
         PrimeFaces.current().executeScript("PF('galeriaFotosMantenimientoDialog').show();");
     }
 
-    public void cerrarGaleriaFotosMantenimiento(){ // todo: actualiza el compponente a cerrar
+    public void cerrarGaleriaFotosMantenimiento(){ //
         this.vehiculoSelected = null;
-        PrimeFaces.current().ajax().update("form_adjuntar_fotos-mantenimiento", "growl");
+        PrimeFaces.current().ajax().update("form_adjuntar_fotos-mantenimiento form_galeria_mantenimiento", "growl");
         PrimeFaces.current().executeScript("PF('adjuntarFotosMantenimientoDialog').hide();");
     }
 
@@ -790,6 +790,7 @@ public class VehiculoView implements Serializable {
         try {
             mantenimientoFotoService.borrarFoto(idMantenimientoFoto, userSessionBean.getUserName());
             this.mantenimientoFotoList = mantenimientoFotoService.getFotosMantenimientos(this.mantenimientoVehiculo.getIdMantenimiento());
+            PrimeFaces.current().ajax().update("tab_view_detalles:form_galeria_mantenimiento");
         }catch (Exception e) {
             Messages.addError(e.getMessage());
         }
