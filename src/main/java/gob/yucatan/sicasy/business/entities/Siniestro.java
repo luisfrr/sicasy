@@ -161,15 +161,15 @@ public class Siniestro implements Cloneable, Serializable {
         try {
             Siniestro clone = (Siniestro) super.clone();
             clone.vehiculo = this.vehiculo.clone();
-            clone.inciso = this.inciso.clone();
-            clone.deducible = this.deducible.clone();
+            clone.inciso = this.inciso != null ? this.inciso.clone() : null;
+            clone.deducible = this.deducible != null ? this.deducible.clone() : null;
             return clone;
         } catch (CloneNotSupportedException e) {
             throw new AssertionError();
         }
     }
 
-    public boolean requierePadoDeducible() {
+    public boolean requierePagoDeducible() {
         return this.responsable != null &&
                 Objects.equals(this.responsable, "ASEGURADO");
     }

@@ -102,8 +102,26 @@ public class SiniestroServiceImpl implements ISiniestroService {
         Siniestro siniestro = siniestroRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("No se ha encontrado el registro del siniestro."));
 
-        if(siniestro.getDeducible() != null) {
-            siniestro.setDeducible(new Deducible());
+        if(siniestro.getDeducible() == null) {
+            Deducible deducible = Deducible.builder()
+                    .vehiculoNoSerie(siniestro.getVehiculo().getNoSerie())
+                    .vehiculoPlaca(siniestro.getVehiculo().getPlaca())
+                    .vehiculoMarca(siniestro.getVehiculo().getMarca())
+                    .vehiculoModelo(siniestro.getVehiculo().getModelo())
+                    .vehiculoAnio(siniestro.getVehiculo().getAnio())
+                    .vehiculoValorFactura(siniestro.getVehiculo().getMontoFactura())
+                    .polizaNumero(siniestro.getInciso() != null ? siniestro.getInciso().getPoliza().getNumeroPoliza() : null)
+                    .polizaAseguradora(siniestro.getInciso() != null ? siniestro.getInciso().getPoliza().getAseguradora().getNombre() : null)
+                    .incisoNumero(siniestro.getInciso() != null ? siniestro.getInciso().getInciso() : null)
+                    .incisoTipoCobertura(siniestro.getInciso() != null ? siniestro.getInciso().getTipoCobertura() : null)
+                    .incisoFechaInicioVigencia(siniestro.getInciso() != null ? siniestro.getInciso().getFechaInicioVigencia() : null)
+                    .incisoFechaFinVigencia(siniestro.getInciso() != null ? siniestro.getInciso().getFechaFinVigencia() : null)
+                    .tienePolizaVigente(siniestro.getInciso() != null ? 1 : 0)
+                    .build();
+
+
+            siniestro.setDeducible(deducible);
+
         }
 
         siniestro.setCheckCorralon(siniestro.getCorralon() == 1);
@@ -224,7 +242,7 @@ public class SiniestroServiceImpl implements ISiniestroService {
                     throw new BadRequestException("Para solicitar el pago de deducible asegúrate de seleccionar registros con estatus REGISTRADO.");
                 }
 
-                if(siniestroToUpdateList.stream().allMatch(Siniestro::requierePadoDeducible)) {
+                if(!siniestroToUpdateList.stream().allMatch(Siniestro::requierePagoDeducible)) {
                     throw new BadRequestException("Alguno de los registros seleccionados no requiere pago de deducible. Asegúrate de seleccionar registros que requieran pago de deducible.");
                 }
 
@@ -247,7 +265,7 @@ public class SiniestroServiceImpl implements ISiniestroService {
                     throw new BadRequestException("Para finalizar el registro del siniestro asegúrate de seleccionar registros con estatus REGISTRADO.");
                 }
 
-                if(siniestroToUpdateList.stream().anyMatch(Siniestro::requierePadoDeducible)) {
+                if(siniestroToUpdateList.stream().anyMatch(Siniestro::requierePagoDeducible)) {
                     throw new BadRequestException("Alguno de los registros seleccionados requiere pago de deducible. Solo puedes finalizar el registro del siniestro si no requiere pago de deducible.");
                 }
             }

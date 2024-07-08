@@ -118,7 +118,7 @@
          <f:facet name="actions">
             <p:commandLink styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default"
                            ajax="true" action="#{siniestrosView.permitirEditar()}"
-                           rendered="#{siniestrosView.readOnlyEditForm}" title="Editar">
+                           rendered="#{siniestrosView.siniestroSelected.estatusSiniestro.idEstatusSiniestro == siniestrosView.ESTATUS_SINIESTRO_REGISTRADO and siniestrosView.readOnlyEditForm}" title="Editar">
                <h:outputText styleClass="ui-icon pi pi-pencil"/>
             </p:commandLink>
          </f:facet>
@@ -197,6 +197,7 @@
             <p:outputPanel styleClass="field col-12 md:col-6 lg:col-8">
                <p:outputLabel for="@next" value="Causa" styleClass="block"/>
                <p:inputText styleClass="block w-full" required="true" maxlength="120"
+                            disabled="#{siniestrosView.readOnlyEditForm}"
                             value="#{siniestrosView.siniestroSelected.causa}"/>
                <span class="text-sm hidden"> </span>
             </p:outputPanel>
@@ -312,9 +313,57 @@
       <p:outputPanel styleClass="col-12 md:col-6 mb-5">
          <h:form id="deducible_form">
             <p:panel header="Deducible" widgetVar="panelDeducible" styleClass="mb-5">
-               <p:outputPanel styleClass="grid" rendered="#{vehiculoView.vehiculoSelected.incisoVigente == null}">
-                  <p:outputPanel styleClass="field col-12">
-                     No cuenta con una póliza vigente
+               <p:outputPanel styleClass="grid" rendered="#{siniestrosView.siniestroSelected.deducible.idDeducible == null and siniestrosView.siniestroSelected.estatusSiniestro.idEstatusSiniestro == siniestrosView.ESTATUS_SINIESTRO_REGISTRADO and siniestrosView.siniestroSelected.requierePagoDeducible()}">
+                  <p:outputPanel styleClass="col-12">
+                     <p:chip label="SOLICITA PAGO DE DEDUCIBLE" styleClass="mr-2"/>
+                  </p:outputPanel>
+               </p:outputPanel>
+               <p:outputPanel styleClass="grid" rendered="#{siniestrosView.siniestroSelected.deducible.idDeducible == null and siniestrosView.siniestroSelected.estatusSiniestro.idEstatusSiniestro == siniestrosView.ESTATUS_SINIESTRO_REGISTRADO and not siniestrosView.siniestroSelected.requierePagoDeducible()}">
+                  <p:outputPanel styleClass="col-12">
+                     <p:chip label="NO REQUIERE PAGO DE DEDUCIBLE" styleClass="mr-2"/>
+                  </p:outputPanel>
+               </p:outputPanel>
+               <p:outputPanel styleClass="grid" rendered="#{siniestrosView.siniestroSelected.estatusSiniestro.idEstatusSiniestro == siniestrosView.ESTATUS_SINIESTRO_EN_PROCESO_PAGO or siniestrosView.siniestroSelected.estatusSiniestro.idEstatusSiniestro == siniestrosView.ESTATUS_SINIESTRO_FINALIZADO}">
+                  <p:outputPanel styleClass="field col-12 md:col-6">
+                     <p:outputLabel for="@next" value="Tipo deducible" styleClass="block"/>
+                     <p:selectOneMenu value="#{siniestrosView.siniestroSelected.deducible.tipoDeducicle}"
+                                      disabled="#{siniestrosView.siniestroSelected.estatusSiniestro.idEstatusSiniestro == siniestrosView.ESTATUS_SINIESTRO_FINALIZADO}"
+                                      styleClass="w-full mw-auto" required="true">
+                        <f:selectItem itemLabel="Seleccione uno..." itemValue="#{null}"/>
+                        <f:selectItems value="#{siniestrosView.tipoDeducibleList}" var="tipoDeducible"
+                                       itemValue="#{tipoDeducible}" itemLabel="#{tipoDeducible}"/>
+                        <p:ajax event="blur"/>
+                     </p:selectOneMenu>
+                     <span class="text-sm hidden"> </span>
+                  </p:outputPanel>
+                  <p:outputPanel styleClass="field col-12 md:col-6">
+                     <p:outputLabel for="@next" value="Valor factura" styleClass="block"/>
+                     <p:inputNumber value="#{siniestrosView.siniestroSelected.deducible.vehiculoValorFactura}"
+                                    readonly="true" required="true" styleClass="w-full">
+                     </p:inputNumber>
+                     <span class="text-sm hidden"> </span>
+                  </p:outputPanel>
+                  <p:outputPanel styleClass="field col-12 md:col-6">
+                     <p:outputLabel for="@next" value="Valor actual" styleClass="block"/>
+                     <p:inputNumber value="#{siniestrosView.siniestroSelected.deducible.valorActual}"
+                                    required="true" styleClass="w-full">
+                        <f:convertNumber maxFractionDigits="2"/>
+                     </p:inputNumber>
+                     <span class="text-sm hidden"> </span>
+                  </p:outputPanel>
+                  <p:outputPanel styleClass="field col-12 md:col-6">
+                     <p:outputLabel for="@next" value="Costo total deducible" styleClass="block"/>
+                     <p:inputNumber value="#{siniestrosView.siniestroSelected.deducible.costoTotalDeducible}"
+                                    required="true" styleClass="w-full">
+                        <f:convertNumber maxFractionDigits="2"/>
+                     </p:inputNumber>
+                     <span class="text-sm hidden"> </span>
+                  </p:outputPanel>
+                  <p:outputPanel styleClass="field col-12 md:col-6">
+                     <p:outputLabel for="@next" value="Folio factura" styleClass="block"/>
+                     <p:inputText value="#{siniestrosView.siniestroSelected.deducible.folioFacturaDeducible}"
+                                  required="true" styleClass="w-full"/>
+                     <span class="text-sm hidden"> </span>
                   </p:outputPanel>
                </p:outputPanel>
             </p:panel>

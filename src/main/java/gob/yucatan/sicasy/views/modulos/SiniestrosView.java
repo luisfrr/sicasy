@@ -50,6 +50,12 @@ public class SiniestrosView implements Serializable {
     // Constantes
     private final @Getter String SINIESTRO_RESPONSABLE_ASEGURADO = "ASEGURADO";
     private final @Getter String SINIESTRO_RESPONSABLE_TERCEROS = "TERCEROS";
+    private final @Getter Integer ESTATUS_SINIESTRO_REGISTRADO = 1;
+    private final @Getter Integer ESTATUS_SINIESTRO_EN_PROCESO_PAGO = 2;
+    private final @Getter Integer ESTATUS_SINIESTRO_FINALIZADO = 3;
+    private final @Getter String DEDUCIBLE_AUTOSEGUROS = "AUTOSEGUROS";
+    private final @Getter String DEDUCIBLE_DEDUCIBLE = "DEDUCIBLE";
+    private final @Getter String DEDUCIBLE_PERDIDA_TOTAL = "PERDIDA TOTAL";
 
     @Value("${app.files.folder.siniestros}")
     private @Getter String FOLDER_SINIESTROS;
@@ -69,6 +75,7 @@ public class SiniestrosView implements Serializable {
 
     // Variables selects
     private @Getter List<EstatusSiniestro> estatusSiniestroList;
+    private @Getter List<String> tipoDeducibleList;
 
     // Variables para renderizar
     private @Getter boolean showSiniestroListPanel;
@@ -277,6 +284,7 @@ public class SiniestrosView implements Serializable {
             this.siniestroSelected = siniestroService.findById(siniestro.getIdSiniestro());
             this.siniestroFotoList = siniestroFotoService.getSiniestroFotos(this.siniestroSelected.getIdSiniestro());
             this.readOnlyEditForm = true;
+            this.loadTipoDeducible();
             PrimeFaces.current().ajax().update("container");
         } catch (Exception e) {
             log.warn(e.getMessage());
@@ -381,8 +389,6 @@ public class SiniestrosView implements Serializable {
         this.activeIndex = 0;
     }
 
-
-
     //region privates
 
     private void loadEstatusSiniestros() {
@@ -403,6 +409,16 @@ public class SiniestrosView implements Serializable {
         responsiveOptionsGallery.add(new ResponsiveOption("1024px", 5));
         responsiveOptionsGallery.add(new ResponsiveOption("768px", 3));
         responsiveOptionsGallery.add(new ResponsiveOption("560px", 1));
+    }
+
+    private void loadTipoDeducible() {
+        if(this.siniestroSelected != null && this.siniestroSelected.getPerdidaTotal() == 0) {
+            this.tipoDeducibleList = List.of(DEDUCIBLE_AUTOSEGUROS, DEDUCIBLE_DEDUCIBLE);
+        } else if(this.siniestroSelected != null && this.siniestroSelected.getPerdidaTotal() == 1) {
+            this.tipoDeducibleList = List.of(DEDUCIBLE_PERDIDA_TOTAL);
+        } else {
+            tipoDeducibleList = new ArrayList<>();
+        }
     }
 
     //endregion privates
