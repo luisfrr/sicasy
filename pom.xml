@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.2.1</version>
+        <version>3.2.6</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
 
@@ -18,8 +18,34 @@
 
     <properties>
         <java.version>21</java.version>
-        <joinfaces.version>5.2.1</joinfaces.version>
+        <joinfaces.version>5.2.6</joinfaces.version>
+        <apache-poi.version>5.2.3</apache-poi.version>
+        <commons-csv.version>1.8</commons-csv.version>
     </properties>
+
+    <profiles>
+        <profile>
+            <id>dev</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <properties>
+                <spring.profiles.active>dev</spring.profiles.active>
+            </properties>
+        </profile>
+        <profile>
+            <id>test</id>
+            <properties>
+                <spring.profiles.active>test</spring.profiles.active>
+            </properties>
+        </profile>
+        <profile>
+            <id>test02</id>
+            <properties>
+                <spring.profiles.active>test02</spring.profiles.active>
+            </properties>
+        </profile>
+    </profiles>
 
     <dependencyManagement>
         <dependencies>
@@ -111,6 +137,12 @@
         </dependency>
 
         <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+
+        <dependency>
             <groupId>org.hibernate.orm</groupId>
             <artifactId>hibernate-jpamodelgen</artifactId>
         </dependency>
@@ -144,9 +176,37 @@
             <artifactId>jakarta.xml.bind-api</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi</artifactId>
+            <version>${apache-poi.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi-ooxml</artifactId>
+            <version>${apache-poi.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-csv</artifactId>
+            <version>${commons-csv.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>net.coobird</groupId>
+            <artifactId>thumbnailator</artifactId>
+            <version>0.4.14</version>
+        </dependency>
+
+
     </dependencies>
 
     <build>
+
+        <finalName>sicasy</finalName>
+
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>

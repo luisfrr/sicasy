@@ -1,0 +1,436 @@
+<ui:composition
+        xmlns="http://www.w3.org/1999/xhtml"
+        xmlns:h="http://xmlns.jcp.org/jsf/html"
+        xmlns:f="http://xmlns.jcp.org/jsf/core"
+        xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+        xmlns:p="http://primefaces.org/ui"
+        xmlns:sec="https://joinfaces.org/security">
+
+   <h:form id="siniestro_vehiculo_form">
+      <p:panel header="Datos del vehículo" styleClass="mb-5">
+         <p:outputPanel styleClass="formgrid grid">
+            <p:outputPanel styleClass="field col-12 md:col-6 lg:col-3">
+               <p:outputLabel for="@next" value="No. Serie" styleClass="block"/>
+               <p:inputText styleClass="block w-full" readonly="true"
+                            value="#{siniestrosView.siniestroSelected.vehiculo.noSerie}"/>
+               <span class="text-sm hidden"> </span>
+            </p:outputPanel>
+            <p:outputPanel styleClass="field col-12 md:col-6 lg:col-3">
+               <p:outputLabel for="@next" value="Marca" styleClass="block"/>
+               <p:inputText styleClass="block w-full" readonly="true"
+                            value="#{siniestrosView.siniestroSelected.vehiculo.marca}"/>
+               <span class="text-sm hidden"> </span>
+            </p:outputPanel>
+            <p:outputPanel styleClass="field col-12 md:col-6 lg:col-3">
+               <p:outputLabel for="@next" value="Modelo" styleClass="block"/>
+               <p:inputText styleClass="block w-full" readonly="true"
+                            value="#{siniestrosView.siniestroSelected.vehiculo.modelo}"/>
+               <span class="text-sm hidden"> </span>
+            </p:outputPanel>
+            <p:outputPanel styleClass="field col-12 md:col-6 lg:col-3">
+               <p:outputLabel for="@next" value="Año" styleClass="block"/>
+               <p:inputText styleClass="block w-full" readonly="true"
+                            value="#{siniestrosView.siniestroSelected.vehiculo.anio}"/>
+               <span class="text-sm hidden"> </span>
+            </p:outputPanel>
+            <p:outputPanel styleClass="field col-12 md:col-6 lg:col-3">
+               <p:outputLabel for="@next" value="Placa" styleClass="block"/>
+               <p:inputText styleClass="block w-full" readonly="true"
+                            value="#{siniestrosView.siniestroSelected.vehiculo.placa}"/>
+               <span class="text-sm hidden"> </span>
+            </p:outputPanel>
+            <p:outputPanel styleClass="field col-12 md:col-6 lg:col-3">
+               <p:outputLabel for="@next" value="Color" styleClass="block"/>
+               <p:inputText styleClass="block w-full" readonly="true"
+                            value="#{siniestrosView.siniestroSelected.vehiculo.color}"/>
+               <span class="text-sm hidden"> </span>
+            </p:outputPanel>
+            <p:outputPanel styleClass="field col-12 md:col-6 lg:col-3">
+               <p:outputLabel for="@next" value="No. Motor" styleClass="block"/>
+               <p:inputText styleClass="block w-full" readonly="true"
+                            value="#{siniestrosView.siniestroSelected.vehiculo.noMotor}"/>
+               <span class="text-sm hidden"> </span>
+            </p:outputPanel>
+            <p:outputPanel styleClass="field col-12 md:col-6 lg:col-3">
+               <p:outputLabel for="@next" value="Condición actual" styleClass="block"/>
+               <p:inputText styleClass="block w-full" readonly="true"
+                            value="#{siniestrosView.siniestroSelected.vehiculo.condicionVehiculo.nombre}"/>
+               <span class="text-sm hidden"> </span>
+            </p:outputPanel>
+            <p:outputPanel styleClass="field col-12 md:col-6 lg:col-6">
+               <p:outputLabel for="@next" value="Dependencia" styleClass="block"/>
+               <p:inputText styleClass="block w-full" readonly="true"
+                            value="#{siniestrosView.siniestroSelected.vehiculo.dependencia.nombre}"/>
+               <span class="text-sm hidden"> </span>
+            </p:outputPanel>
+         </p:outputPanel>
+      </p:panel>
+   </h:form>
+
+   <h:form id="siniestro_inciso_form">
+      <p:panel header="Datos de la póliza" styleClass="mb-5">
+         <p:outputPanel styleClass="formgrid grid">
+            <p:outputPanel styleClass="field col-12 md:col-6 lg:col-3">
+               <p:outputLabel for="@next" value="Aseguradora" styleClass="block"/>
+               <p:inputText styleClass="block w-full" readonly="true"
+                            value="#{siniestrosView.siniestroSelected.inciso.poliza.aseguradora.nombre}"/>
+               <span class="text-sm hidden"> </span>
+            </p:outputPanel>
+            <p:outputPanel styleClass="field col-12 md:col-6 lg:col-3">
+               <p:outputLabel for="@next" value="No. póliza" styleClass="block"/>
+               <p:inputText styleClass="block w-full" readonly="true"
+                            value="#{siniestrosView.siniestroSelected.inciso.poliza.numeroPoliza}"/>
+               <span class="text-sm hidden"> </span>
+            </p:outputPanel>
+            <p:outputPanel styleClass="field col-12 md:col-6 lg:col-3">
+               <p:outputLabel for="@next" value="Cobertura" styleClass="block"/>
+               <p:inputText styleClass="block w-full" readonly="true"
+                            value="#{siniestrosView.siniestroSelected.inciso.poliza.tipoCobertura}"/>
+               <span class="text-sm hidden"> </span>
+            </p:outputPanel>
+            <p:outputPanel styleClass="field col-12 md:col-6 lg:col-3">
+               <p:outputLabel for="@next" value="Inciso" styleClass="block"/>
+               <p:inputText styleClass="block w-full" readonly="true"
+                            value="#{siniestrosView.siniestroSelected.inciso.inciso}"/>
+               <span class="text-sm hidden"> </span>
+            </p:outputPanel>
+            <p:outputPanel styleClass="field col-12 md:col-6 lg:col-3">
+               <p:outputLabel for="@next" value="Fecha inicio vigencia" styleClass="block"/>
+               <p:inputText styleClass="block w-full" readonly="true"
+                            value="#{siniestrosView.siniestroSelected.inciso.fechaInicioVigencia}">
+                  <f:convertDateTime pattern="dd/MM/yyyy"/>
+               </p:inputText>
+               <span class="text-sm hidden"> </span>
+            </p:outputPanel>
+            <p:outputPanel styleClass="field col-12 md:col-6 lg:col-3">
+               <p:outputLabel for="@next" value="Fecha fin vigencia" styleClass="block"/>
+               <p:inputText styleClass="block w-full" readonly="true"
+                            value="#{siniestrosView.siniestroSelected.inciso.fechaFinVigencia}">
+                  <f:convertDateTime pattern="dd/MM/yyyy"/>
+               </p:inputText>
+               <span class="text-sm hidden"> </span>
+            </p:outputPanel>
+         </p:outputPanel>
+      </p:panel>
+   </h:form>
+
+   <h:form id="edit_siniestro_form">
+      <p:panel header="Datos del siniestro" styleClass="mb-5">
+         <f:facet name="actions">
+            <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'SINIESTRO_WRITE_EDITAR')">
+               <p:commandLink styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default"
+                              ajax="true" action="#{siniestrosView.permitirEditar()}"
+                              rendered="#{siniestrosView.siniestroSelected.estatusSiniestro.idEstatusSiniestro == siniestrosView.ESTATUS_SINIESTRO_REGISTRADO and siniestrosView.readOnlyEditForm}" title="Editar">
+                  <h:outputText styleClass="ui-icon pi pi-pencil"/>
+               </p:commandLink>
+            </sec:authorize>
+         </f:facet>
+         <p:outputPanel styleClass="formgrid grid">
+            <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4">
+               <p:outputLabel for="@next" value="No. Siniestro" styleClass="block"/>
+               <p:inputText styleClass="block w-full" required="true" disabled="#{siniestrosView.readOnlyEditForm}"
+                            value="#{siniestrosView.siniestroSelected.noSiniestroAseguradora}"/>
+               <span class="text-sm hidden"> </span>
+            </p:outputPanel>
+
+            <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4">
+               <p:outputLabel for="@next" value="No. Siniestro SAF" styleClass="block"/>
+               <p:inputText styleClass="block w-full" required="true" disabled="#{siniestrosView.readOnlyEditForm}"
+                            value="#{siniestrosView.siniestroSelected.noSiniestroSAF}"/>
+               <span class="text-sm hidden"> </span>
+            </p:outputPanel>
+
+            <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4">
+               <p:outputLabel for="@next" value="Ajustador" styleClass="block"/>
+               <p:inputText styleClass="block w-full" required="true" disabled="#{siniestrosView.readOnlyEditForm}"
+                            value="#{siniestrosView.siniestroSelected.ajustadorAseguradora}"/>
+               <span class="text-sm hidden"> </span>
+            </p:outputPanel>
+
+            <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4">
+               <p:outputLabel for="@next" value="Ajustador SAF" styleClass="block"/>
+               <p:inputText styleClass="block w-full" required="true" disabled="#{siniestrosView.readOnlyEditForm}"
+                            value="#{siniestrosView.siniestroSelected.ajustadorSAF}"/>
+               <span class="text-sm hidden"> </span>
+            </p:outputPanel>
+
+            <p:outputPanel styleClass="field col-12 md:col-4 lg:col-4">
+               <p:outputLabel for="@next" value="Responsable" styleClass="block"/>
+               <p:selectOneMenu value="#{siniestrosView.siniestroSelected.responsable}"
+                                disabled="#{siniestrosView.readOnlyEditForm}"
+                                styleClass="w-full mw-auto" required="true">
+                  <f:selectItem itemLabel="Seleccione uno..." itemValue="#{null}"/>
+                  <f:selectItem itemLabel="#{siniestrosView.SINIESTRO_RESPONSABLE_ASEGURADO}" itemValue="#{siniestrosView.SINIESTRO_RESPONSABLE_ASEGURADO}"/>
+                  <f:selectItem itemLabel="#{siniestrosView.SINIESTRO_RESPONSABLE_TERCEROS}" itemValue="#{siniestrosView.SINIESTRO_RESPONSABLE_TERCEROS}"/>
+                  <p:ajax event="blur"/>
+               </p:selectOneMenu>
+               <span class="text-sm hidden"> </span>
+            </p:outputPanel>
+
+            <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4">
+               <p:outputLabel for="@next" styleClass="block" value="Fecha siniestro"/>
+               <p:datePicker value="#{siniestrosView.siniestroSelected.fechaSiniestro}"
+                             disabled="#{siniestrosView.readOnlyEditForm}"
+                             placeholder="dd/MM/yyyy HH:mm a" pattern="dd/MM/yyyy HH:mm a"
+                             monthNavigator="true" yearNavigator="true"
+                             showTime="true" hourFormat="12"
+                             showWeek="true" locale="es" required="true"
+                             styleClass="w-full"/>
+            </p:outputPanel>
+
+            <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4">
+               <p:outputLabel for="@next" styleClass="block" value="Fecha reporte"/>
+               <p:datePicker value="#{siniestrosView.siniestroSelected.fechaReporte}"
+                             disabled="#{siniestrosView.readOnlyEditForm}"
+                             placeholder="dd/MM/yyyy HH:mm a" pattern="dd/MM/yyyy HH:mm a"
+                             monthNavigator="true" yearNavigator="true"
+                             showTime="true" hourFormat="12"
+                             showWeek="true" locale="es" required="true"
+                             styleClass="w-full"/>
+            </p:outputPanel>
+
+            <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4">
+               <p:outputLabel for="@next" value="Reporta" styleClass="block"/>
+               <p:inputText styleClass="block w-full"
+                            disabled="#{siniestrosView.readOnlyEditForm}"
+                            value="#{siniestrosView.siniestroSelected.reporta}"/>
+               <span class="text-sm hidden"> </span>
+            </p:outputPanel>
+
+            <p:outputPanel styleClass="field col-12 md:col-6 lg:col-8">
+               <p:outputLabel for="@next" value="Causa" styleClass="block"/>
+               <p:inputText styleClass="block w-full" required="true" maxlength="120"
+                            disabled="#{siniestrosView.readOnlyEditForm}"
+                            value="#{siniestrosView.siniestroSelected.causa}"/>
+               <span class="text-sm hidden"> </span>
+            </p:outputPanel>
+
+            <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4">
+               <div class="flex align-items-end h-full">
+                  <p:selectBooleanCheckbox value="#{siniestrosView.siniestroSelected.checkPerdidaTotal}"
+                                           disabled="#{siniestrosView.readOnlyEditForm}"
+                                           itemLabel="¿Perdida total?"/>
+                  <span class="text-sm hidden"> </span>
+               </div>
+            </p:outputPanel>
+
+            <p:outputPanel styleClass="field col-12">
+               <p:outputLabel for="@next" value="Declaración siniestro" styleClass="block"/>
+               <p:inputTextarea styleClass="block w-full" rows="5" required="true"
+                                disabled="#{siniestrosView.readOnlyEditForm}"
+                                value="#{siniestrosView.siniestroSelected.declaracionSiniestro}"/>
+               <span class="text-sm hidden"> </span>
+            </p:outputPanel>
+
+            <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4">
+               <p:outputLabel for="@next" value="Estado" styleClass="block"/>
+               <p:inputText styleClass="block w-full" disabled="#{siniestrosView.readOnlyEditForm}"
+                            value="#{siniestrosView.siniestroSelected.estado}"/>
+               <span class="text-sm hidden"> </span>
+            </p:outputPanel>
+
+            <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4">
+               <p:outputLabel for="@next" value="Municipio" styleClass="block"/>
+               <p:inputText styleClass="block w-full" disabled="#{siniestrosView.readOnlyEditForm}"
+                            value="#{siniestrosView.siniestroSelected.municipio}"/>
+               <span class="text-sm hidden"> </span>
+            </p:outputPanel>
+
+            <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4">
+               <p:outputLabel for="@next" value="Localidad" styleClass="block"/>
+               <p:inputText styleClass="block w-full" disabled="#{siniestrosView.readOnlyEditForm}"
+                            value="#{siniestrosView.siniestroSelected.localidad}"/>
+               <span class="text-sm hidden"> </span>
+            </p:outputPanel>
+
+            <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4">
+               <p:outputLabel for="@next" value="Conductor" styleClass="block"/>
+               <p:inputText styleClass="block w-full" required="true" disabled="#{siniestrosView.readOnlyEditForm}"
+                            value="#{siniestrosView.siniestroSelected.conductor}"/>
+               <span class="text-sm hidden"> </span>
+            </p:outputPanel>
+
+            <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4">
+               <p:outputLabel for="@next" value="No. Licencia" styleClass="block"/>
+               <p:inputText styleClass="block w-full" required="true" disabled="#{siniestrosView.readOnlyEditForm}"
+                            value="#{siniestrosView.siniestroSelected.noLicencia}"/>
+               <span class="text-sm hidden"> </span>
+            </p:outputPanel>
+
+            <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4">
+               <p:outputLabel for="@next" value="Tipo de licencia" styleClass="block"/>
+               <p:inputText styleClass="block w-full" disabled="#{siniestrosView.readOnlyEditForm}"
+                            value="#{siniestrosView.siniestroSelected.tipoLicencia}"/>
+               <span class="text-sm hidden"> </span>
+            </p:outputPanel>
+
+            <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4">
+               <p:outputLabel for="@next" styleClass="block" value="Vencimiento licencia"/>
+               <p:datePicker value="#{siniestrosView.siniestroSelected.vencimientoLicencia}"
+                             disabled="#{siniestrosView.readOnlyEditForm}"
+                             placeholder="dd/MM/yyyy" pattern="dd/MM/yyyy"
+                             monthNavigator="true" yearNavigator="true"
+                             showWeek="true" locale="es" required="true"
+                             styleClass="w-full"/>
+            </p:outputPanel>
+
+            <p:outputPanel styleClass="field col-12 lg:col-8">
+               <div class="flex align-items-end h-full flex-row gap-3">
+                  <p:selectBooleanCheckbox value="#{siniestrosView.siniestroSelected.checkDanioViaPublica}"
+                                           disabled="#{siniestrosView.readOnlyEditForm}"
+                                           itemLabel="Daño vía pública"/>
+                  <p:selectBooleanCheckbox value="#{siniestrosView.siniestroSelected.checkCorralon}"
+                                           disabled="#{siniestrosView.readOnlyEditForm}"
+                                           itemLabel="Corralón"/>
+                  <p:selectBooleanCheckbox value="#{siniestrosView.siniestroSelected.checkMulta}"
+                                           disabled="#{siniestrosView.readOnlyEditForm}"
+                                           itemLabel="Multa">
+                     <p:ajax update="registro-siniestro-form:costo_multa" listener="#{siniestrosView.vaciarMulta()}"/>
+                  </p:selectBooleanCheckbox>
+               </div>
+            </p:outputPanel>
+
+            <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4">
+               <p:outputLabel for="@next" value="Costo multa" styleClass="block"/>
+               <p:inputNumber id="costo_multa" styleClass="block w-full"
+                              disabled="#{siniestrosView.readOnlyEditForm or (not siniestrosView.siniestroSelected.checkMulta)}"
+                              value="#{siniestrosView.siniestroSelected.costoMulta}"/>
+               <span class="text-sm hidden"> </span>
+            </p:outputPanel>
+            <p:outputPanel styleClass="w-full" rendered="#{not siniestrosView.readOnlyEditForm}">
+               <p:outputPanel styleClass="flex justify-content-end">
+                  <p:commandButton value="Cancelar" ajax="true" process="@this"
+                                   action="#{siniestrosView.cancelarEdicion()}"
+                                   styleClass="ui-button-outlined mr-4"/>
+                  <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'SINIESTRO_WRITE_EDITAR')">
+                     <p:commandButton value="Guardar" ajax="true" process="@form"
+                                      action="#{siniestrosView.guardarEdicion()}"
+                                      update="growl @form form_datatable"
+                                      validateClient="true"/>
+                  </sec:authorize>
+               </p:outputPanel>
+            </p:outputPanel>
+         </p:outputPanel>
+      </p:panel>
+   </h:form>
+
+   <p:outputPanel styleClass="grid">
+      <p:outputPanel styleClass="col-12 md:col-6 mb-5">
+         <h:form id="deducible_form">
+            <p:panel header="Deducible" widgetVar="panelDeducible" styleClass="mb-5">
+               <p:outputPanel styleClass="grid" rendered="#{siniestrosView.siniestroSelected.deducible.idDeducible == null and siniestrosView.siniestroSelected.estatusSiniestro.idEstatusSiniestro == siniestrosView.ESTATUS_SINIESTRO_REGISTRADO and siniestrosView.siniestroSelected.requierePagoDeducible()}">
+                  <p:outputPanel styleClass="col-12">
+                     <p:chip label="SOLICITA PAGO DE DEDUCIBLE" styleClass="mr-2"/>
+                  </p:outputPanel>
+               </p:outputPanel>
+               <p:outputPanel styleClass="grid" rendered="#{siniestrosView.siniestroSelected.deducible.idDeducible == null and siniestrosView.siniestroSelected.estatusSiniestro.idEstatusSiniestro == siniestrosView.ESTATUS_SINIESTRO_REGISTRADO and not siniestrosView.siniestroSelected.requierePagoDeducible()}">
+                  <p:outputPanel styleClass="col-12">
+                     <p:chip label="NO REQUIERE PAGO DE DEDUCIBLE" styleClass="mr-2"/>
+                  </p:outputPanel>
+               </p:outputPanel>
+               <p:outputPanel styleClass="grid" rendered="#{siniestrosView.siniestroSelected.estatusSiniestro.idEstatusSiniestro == siniestrosView.ESTATUS_SINIESTRO_EN_PROCESO_PAGO or siniestrosView.siniestroSelected.estatusSiniestro.idEstatusSiniestro == siniestrosView.ESTATUS_SINIESTRO_FINALIZADO}">
+                  <p:outputPanel styleClass="field col-12 md:col-6">
+                     <p:outputLabel for="@next" value="Tipo deducible" styleClass="block"/>
+                     <p:selectOneMenu value="#{siniestrosView.siniestroSelected.deducible.tipoDeducicle}"
+                                      disabled="#{siniestrosView.siniestroSelected.estatusSiniestro.idEstatusSiniestro == siniestrosView.ESTATUS_SINIESTRO_FINALIZADO}"
+                                      styleClass="w-full mw-auto" required="true">
+                        <f:selectItem itemLabel="Seleccione uno..." itemValue="#{null}"/>
+                        <f:selectItems value="#{siniestrosView.tipoDeducibleList}" var="tipoDeducible"
+                                       itemValue="#{tipoDeducible}" itemLabel="#{tipoDeducible}"/>
+                        <p:ajax event="blur"/>
+                     </p:selectOneMenu>
+                     <span class="text-sm hidden"> </span>
+                  </p:outputPanel>
+                  <p:outputPanel styleClass="field col-12 md:col-6">
+                     <p:outputLabel for="@next" value="Valor factura" styleClass="block"/>
+                     <p:inputNumber value="#{siniestrosView.siniestroSelected.deducible.vehiculoValorFactura}"
+                                    readonly="true" required="true" styleClass="w-full">
+                     </p:inputNumber>
+                     <span class="text-sm hidden"> </span>
+                  </p:outputPanel>
+                  <p:outputPanel styleClass="field col-12 md:col-6">
+                     <p:outputLabel for="@next" value="Valor actual" styleClass="block"/>
+                     <p:inputNumber value="#{siniestrosView.siniestroSelected.deducible.valorActual}"
+                                    required="true" styleClass="w-full">
+                        <f:convertNumber maxFractionDigits="2"/>
+                     </p:inputNumber>
+                     <span class="text-sm hidden"> </span>
+                  </p:outputPanel>
+                  <p:outputPanel styleClass="field col-12 md:col-6">
+                     <p:outputLabel for="@next" value="Costo total deducible" styleClass="block"/>
+                     <p:inputNumber value="#{siniestrosView.siniestroSelected.deducible.costoTotalDeducible}"
+                                    required="true" styleClass="w-full">
+                        <f:convertNumber maxFractionDigits="2"/>
+                     </p:inputNumber>
+                     <span class="text-sm hidden"> </span>
+                  </p:outputPanel>
+                  <p:outputPanel styleClass="field col-12 md:col-6">
+                     <p:outputLabel for="@next" value="Folio factura" styleClass="block"/>
+                     <p:inputText value="#{siniestrosView.siniestroSelected.deducible.folioFacturaDeducible}"
+                                  required="true" styleClass="w-full"/>
+                     <span class="text-sm hidden"> </span>
+                  </p:outputPanel>
+               </p:outputPanel>
+            </p:panel>
+         </h:form>
+      </p:outputPanel>
+      <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'SINIESTRO_READ_VER_PANEL_FOTOS')">
+         <p:outputPanel styleClass="col-12 md:col-6 mb-5">
+            <p:remoteCommand name="rc" actionListener="#{siniestrosView.changeActiveIndex}" update="form_galeria:galleria-siniestro"
+                             oncomplete="PF('galleriaSiniestro').show()" />
+            <h:form id="form_galeria">
+               <p:panel header="Fotos" styleClass="mb-5">
+                  <f:facet name="actions">
+                     <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'SINIESTRO_WRITE_ADJUNTAR_FOTOS')">
+                        <p:commandLink styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default flex justify-content-center align-items-center"
+                                       ajax="true" action="#{siniestrosView.abrirModalAdjuntarFotos()}"
+                                       oncomplete="Main.changeChooseLabel();" update="growl">
+                           <i class="fi fi-rr-add-image"/>
+                        </p:commandLink>
+                     </sec:authorize>
+                     <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'SINIESTRO_READ_VER_PANEL_FOTOS')">
+                        <p:commandLink styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default flex justify-content-center align-items-center mr-3"
+                                       ajax="true" action="#{siniestrosView.presentGallery()}"
+                                       update="form_galeria:galleria-siniestro"
+                                       oncomplete="PF('galleriaSiniestro').show()">
+                           <i class="fi fi-rr-play-alt"/>
+                        </p:commandLink>
+                     </sec:authorize>
+                  </f:facet>
+                  <p:outputPanel styleClass="grid" rendered="#{siniestrosView.siniestroFotoList != null and siniestrosView.siniestroFotoList.size() > 0}">
+                     <ui:repeat value="#{siniestrosView.siniestroFotoList}" var="siniestroFoto" varStatus="status">
+                        <p:outputPanel styleClass="col-12 md:col-4 lg:col-2">
+                           <p:graphicImage value="#{fileBean.getFile(siniestroFoto.rutaArchivo)}" alt="#{siniestroFoto.nombreArchivo}"
+                                           onclick="rc([{name: 'index', value: '#{status.index}'}])"
+                                           style="width: 100%; display: block; cursor: pointer;" stream="false" styleClass="border-round-2xl mb-3" />
+                           <div class="flex justify-content-center align-items-center">
+                              <p:commandLink value="Borrar" styleClass="text-sm text-center"
+                                             ajax="true" action="#{siniestrosView.borrarFoto(siniestroFoto.idSiniestroFoto)}">
+                                 <p:confirm header="Confirmación" message="¿Estás seguro que desear borrar la foto?"
+                                            icon="pi pi-exclamation-triangle"/>
+                              </p:commandLink>
+                           </div>
+                        </p:outputPanel>
+                     </ui:repeat>
+                  </p:outputPanel>
+                  <p:outputPanel styleClass="grid" rendered="#{siniestrosView.siniestroFotoList == null or siniestrosView.siniestroFotoList.size() == 0}">
+                     <p:outputPanel styleClass="field col-12">
+                        No se han registrado fotos del siniestro
+                     </p:outputPanel>
+                  </p:outputPanel>
+               </p:panel>
+               <p:galleria id="galleria-siniestro" widgetVar="galleriaSiniestro"
+                           value="#{siniestrosView.siniestroFotoList}" activeIndex="#{siniestrosView.activeIndex}"
+                           var="siniestroFoto" responsiveOptions="#{siniestrosView.responsiveOptionsGallery}"
+                           numVisible="10" circular="true" fullScreen="true" showItemNavigators="true"
+                           showThumbnails="false" style="max-width: 850px">
+                  <p:graphicImage value="#{fileBean.getFile(siniestroFoto.rutaArchivo)}" styleClass="w-full"
+                                  alt="#{siniestroFoto.nombreArchivo}" stream="false"/>
+               </p:galleria>
+            </h:form>
+         </p:outputPanel>
+      </sec:authorize>
+
+   </p:outputPanel>
+
+</ui:composition>

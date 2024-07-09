@@ -1,0 +1,267 @@
+<ui:composition template="../../WEB-INF/facelets/main_layout.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="jakarta.faces.facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="jakarta.faces.html"
+                xmlns:f="jakarta.faces.core"
+                xmlns:sec="https://joinfaces.org/security">
+
+<ui:define name="title">
+    #{rolView.title}
+</ui:define>
+
+<ui:define name="content">
+
+    <p:outputPanel id="container" styleClass="container-fluid">
+
+        <p:growl id="growl" showDetail="true" showSummary="true"
+                 skipDetailIfEqualsSummary="true" globalOnly="true"/>
+
+        <p:outputPanel id="panel_roles" rendered="#{rolView.showPanelPrincipal}">
+
+            <h:form id="form_breadcum" styleClass="mb-3">
+                <p:breadCrumb homeDisplay="text">
+                    <p:menuitem value="Inicio" ajax="false" action="#{menuSessionBean.goToHome()}"/>
+                    <p:menuitem value="Roles"/>
+                </p:breadCrumb>
+            </h:form>
+
+            <h:form id="form_toolbar" styleClass="mb-5">
+                <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'SEGURIDAD_ROLES_WRITE_NUEVO')">
+                    <p:toolbar>
+                        <p:toolbarGroup>
+                            <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'SEGURIDAD_ROLES_WRITE_NUEVO')">
+                                <p:commandButton value="Nuevo"
+                                                 action="#{rolView.nuevo()}"
+                                                 oncomplete="PF('formDialog').show()"
+                                                 update="form_dialog"
+                                                 styleClass="mr-4">
+                                    <p:resetInput target="form_dialog:dialogContent"/>
+                                </p:commandButton>
+                            </sec:authorize>
+                        </p:toolbarGroup>
+
+                        <p:toolbarGroup align="right">
+                        </p:toolbarGroup>
+                    </p:toolbar>
+                </sec:authorize>
+            </h:form>
+
+            <h:form id="form_filtros" styleClass="mb-5">
+
+                <p:panel header="Filtros" widgetVar="panelFiltros"
+                         toggleable="true" toggleSpeed="500">
+                    <p:outputPanel styleClass="grid formgrid mb-2">
+
+                        <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4 xl:col-3">
+                            <p:outputLabel for="@next" value="Nombre" styleClass="block"/>
+                            <p:inputText styleClass="block w-full" placeholder="Ingresa un nombre..."
+                                         value="#{rolView.rolFilter.nombre}"/>
+                            <span class="text-sm hidden"> </span>
+                        </p:outputPanel>
+
+                        <sec:authorize access="hasAuthority('ROLE_OWNER')">
+                            <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4 xl:col-3">
+                                <p:outputLabel for="@next" value="Estatus" styleClass="block"/>
+                                <p:selectOneMenu value="#{rolView.rolFilter.estatus}" styleClass="w-full">
+                                    <f:selectItem itemLabel="Todos" itemValue="#{null}"/>
+                                    <f:selectItems value="#{rolView.estatusRegistros}" var="estatus"
+                                                   itemValue="#{estatus}" itemLabel="#{estatus.label}"/>
+                                </p:selectOneMenu>
+                                <span class="text-sm hidden"> </span>
+                            </p:outputPanel>
+                        </sec:authorize>
+
+                    </p:outputPanel>
+
+                    <f:facet name="footer">
+                        <p:outputPanel styleClass="flex flex-row gap-4 justify-content-end">
+                            <p:commandButton value="Limpiar filtros" styleClass="ui-button-outlined"
+                                             ajax="true" action="#{rolView.limpiarFiltros()}"
+                                             update="form_filtros form_datatable"/>
+                            <p:commandButton value="Buscar" ajax="true" action="#{rolView.buscar()}"
+                                             update="form_datatable"/>
+                        </p:outputPanel>
+                    </f:facet>
+                </p:panel>
+
+            </h:form>
+
+            <h:form id="form_datatable" styleClass="mb-5">
+
+                <p:dataTable id="dtRoles"
+                             var="rol" value="#{rolView.roles}"
+                             rows="50" rowHover="true"
+                             rowKey="#{rol.idRol}" rowIndexVar="index"
+                             styleClass="dt-scrollable-x"
+                             scrollable="true"
+                             paginator="true" paginatorPosition="bottom"
+                             paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             currentPageReportTemplate="{startRecord}-{endRecord} de {totalRecords} registros"
+                             rowsPerPageTemplate="50,100,200,{ShowAll|'Todos'}">
+
+                    <f:facet name="header">
+                        Roles
+                    </f:facet>
+
+                    <p:column headerText="No.">
+                        <h:outputText value="#{index + 1}" />
+                    </p:column>
+
+                    <p:column headerText="Código" width="200">
+                        <h:outputText value="#{rol.codigo}"/>
+                    </p:column>
+
+                    <p:column headerText="Nombre" width="250">
+                        <h:outputText value="#{rol.nombre}"/>
+                    </p:column>
+
+                    <p:column headerText="Descripción" width="350">
+                        <h:outputText value="#{rol.descripcion}"/>
+                    </p:column>
+
+                    <sec:authorize access="hasAuthority('ROLE_OWNER')">
+
+                        <p:column headerText="Estatus" width="100">
+                            <h:outputText value="#{rol.estatus.label}">
+                            </h:outputText>
+                        </p:column>
+
+                        <p:column headerText="Fecha creación" width="150">
+                            <h:outputText value="#{rol.fechaCreacion}">
+                            </h:outputText>
+                        </p:column>
+
+                        <p:column headerText="Creado por" width="150">
+                            <h:outputText value="#{rol.creadoPor}">
+                            </h:outputText>
+                        </p:column>
+
+                        <p:column headerText="Fecha modificación" width="150">
+                            <h:outputText value="#{rol.fechaModificacion}">
+                            </h:outputText>
+                        </p:column>
+
+                        <p:column headerText="Modificado por" width="150">
+                            <h:outputText value="#{rol.modificadoPor}">
+                            </h:outputText>
+                        </p:column>
+
+                        <p:column headerText="Fecha borrado" width="150">
+                            <h:outputText value="#{rol.fechaBorrado}">
+                            </h:outputText>
+                        </p:column>
+
+                        <p:column headerText="Borrado por" width="150">
+                            <h:outputText value="#{rol.borradoPor}">
+                            </h:outputText>
+                        </p:column>
+
+                    </sec:authorize>
+
+                    <sec:authorize access="hasAnyAuthority('ROLE_OWNER','SEGURIDAD_ROLES_READ_CONFIGURAR_PERMISOS', 'SEGURIDAD_ROLES_WRITE_EDITAR', 'SEGURIDAD_ROLES_WRITE_ELIMINAR')">
+                        <p:column headerText="Acciones" width="120">
+
+                            <p:commandButton id="buttonOptions" type="button"
+                                             icon="fi fi-rr-menu-dots-vertical"
+                                             styleClass="rounded-button ui-button-outlined"
+                                             rendered="#{rol.estatus.label != 'Borrado'}"/>
+                            <p:menu overlay="true" trigger="buttonOptions" my="left top" at="left bottom" styleClass="w-16rem">
+
+                                <sec:authorize access="hasAnyAuthority('ROLE_OWNER')">
+                                    <p:menuitem value="Ver bitácora"
+                                                ajax="true" action="#{rolView.verBitacoraRol(rol)}"
+                                                update="container"/>
+                                </sec:authorize>
+
+                                <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'SEGURIDAD_ROLES_READ_CONFIGURAR_PERMISOS')">
+                                    <p:menuitem value="Configuración de Permisos"
+                                                action="#{rolView.verConfiguracionPermisos(rol)}"
+                                                ajax="true" update="container"/>
+                                </sec:authorize>
+
+                                <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'SEGURIDAD_ROLES_WRITE_EDITAR')">
+                                    <p:menuitem value="Editar"
+                                                action="#{rolView.editar(rol.idRol)}"
+                                                ajax="true" update="form_dialog"
+                                                oncomplete="PF('formDialog').show()">
+                                        <p:resetInput target="form_dialog:dialogContent"/>
+                                    </p:menuitem>
+                                </sec:authorize>
+
+                                <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'SEGURIDAD_ROLES_WRITE_ELIMINAR')">
+                                    <p:menuitem value="Eliminar"
+                                                ajax="true" action="#{rolView.eliminar(rol.idRol)}"
+                                                update="growl form_datatable">
+                                        <p:confirm header="Confirmación" message="¿Está seguro que desea eliminar el rol?" icon="pi pi-exclamation-triangle"/>
+                                    </p:menuitem>
+                                </sec:authorize>
+
+                            </p:menu>
+
+                        </p:column>
+                    </sec:authorize>
+
+                </p:dataTable>
+
+            </h:form>
+        </p:outputPanel>
+
+        <p:outputPanel id="panel_asignar_permisos" rendered="#{rolView.showConfigurarPermisos}">
+            <ui:include src="/views/seguridad/_roles_permisos.xhtml"/>
+        </p:outputPanel>
+
+        <p:outputPanel id="panel_bitacoras_roles" rendered="#{rolView.showPanelBitacoraRol}">
+            <ui:include src="/views/seguridad/_bitacora_rol.xhtml"/>
+        </p:outputPanel>
+
+    </p:outputPanel>
+
+    <h:form id="form_dialog">
+        <p:dialog header="#{rolView.formDialogTitle}" widgetVar="formDialog"
+                  minHeight="350" width="450"
+                  showEffect="fade" modal="true"
+                  closable="true" closeOnEscape="true"
+                  cache="false" responsive="true">
+            <p:outputPanel id="dialogContent" styleClass="formgrid grid" rendered="#{rolView.rolSelected != null}">
+
+                <p:outputPanel styleClass="field col-12">
+                    <p:outputLabel for="@next" value="Código" styleClass="block"/>
+                    <p:inputText styleClass="block w-full" required="true"
+                                 value="#{rolView.rolSelected.codigo}"/>
+                    <span class="text-sm">Código único para identificar un rol</span>
+                </p:outputPanel>
+
+                <p:outputPanel styleClass="field col-12">
+                    <p:outputLabel for="@next" value="Nombre" styleClass="block"/>
+                    <p:inputText styleClass="block w-full" required="true"
+                                 value="#{rolView.rolSelected.nombre}"/>
+                    <span class="text-sm hidden"> </span>
+                </p:outputPanel>
+
+                <p:outputPanel styleClass="field col-12">
+                    <p:outputLabel for="@next" value="Descripción" styleClass="block"/>
+                    <p:inputTextarea styleClass="block w-full" rows="3"
+                                 value="#{rolView.rolSelected.descripcion}"/>
+                    <span class="text-sm hidden"> </span>
+                </p:outputPanel>
+
+            </p:outputPanel>
+
+            <f:facet name="footer">
+
+                <p:commandButton value="Cancelar" onclick="PF('formDialog').hide()"
+                                 class="ui-button-outlined"/>
+                <p:commandButton value="Guardar"
+                                 action="#{rolView.guardar()}"
+                                 ajax="true" process="@form"
+                                 update="growl form_datatable"
+                                 validateClient="true"/>
+            </f:facet>
+        </p:dialog>
+    </h:form>
+
+
+</ui:define>
+
+</ui:composition>

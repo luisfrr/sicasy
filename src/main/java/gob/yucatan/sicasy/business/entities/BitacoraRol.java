@@ -1,9 +1,14 @@
 package gob.yucatan.sicasy.business.entities;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import gob.yucatan.sicasy.business.dtos.BitacoraCambios;
+import gob.yucatan.sicasy.utils.strings.JsonStringConverter;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Table(name = "bitacora_rol", schema = "sec")
@@ -36,4 +41,12 @@ public class BitacoraRol {
     @Column(name = "modificado_por", nullable = false)
     private String modificadoPor;
 
+    public List<BitacoraCambios> getBitacoraCambios() {
+        List<BitacoraCambios> cambiosList = new ArrayList<>();
+        if(cambios != null) {
+            TypeReference<List<BitacoraCambios>> typeRef = new TypeReference<>() {};
+            cambiosList = JsonStringConverter.convertToList(cambios, typeRef);
+        }
+        return cambiosList;
+    }
 }

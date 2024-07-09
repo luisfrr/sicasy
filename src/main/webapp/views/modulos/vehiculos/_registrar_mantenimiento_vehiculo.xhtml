@@ -1,0 +1,117 @@
+<ui:composition
+        xmlns="http://www.w3.org/1999/xhtml"
+        xmlns:h="http://xmlns.jcp.org/jsf/html"
+        xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+        xmlns:f="http://xmlns.jcp.org/jsf/core"
+        xmlns:p="http://primefaces.org/ui">
+
+   <h:form id="form_registrar_mantenimiento" enctype="multipart/form-data">
+
+      <p:dialog header="Registrar mantenimiento"
+                id="registro-mantenimiento-dialog" widgetVar="registroMantenimientoDialog"
+                height="450" width="800"
+                showEffect="fade" modal="true"
+                closable="false" closeOnEscape="false"
+                cache="false" responsive="true">
+
+         <p:outputPanel id="registro-mantenimiento-dialog-content" styleClass="formgrid grid">
+
+            <p:outputPanel styleClass="field col-12">
+               <p:outputLabel for="@next" value="No. Serie" styleClass="block"/>
+               <p:inputText styleClass="block w-full" readonly="true" value="#{vehiculoView.vehiculoSelected.noSerie}"/>
+               <span class="text-sm hidden"> </span>
+            </p:outputPanel>
+
+            <p:outputPanel styleClass="field col-12">
+               <p:outputLabel for="@next" value="Tipo de Mantenimiento" styleClass="block"/>
+               <p:selectOneMenu value="#{vehiculoView.mantenimientoVehiculo.tipoMantenimiento.idTipoMantenimiento}"
+                                styleClass="w-full mw-auto" required="true">
+                  <f:selectItem itemLabel="Seleccione uno..." itemValue="#{null}"/>
+                  <f:selectItems value="#{vehiculoView.tipoMantenimientoList}" var="tipo"
+                                 itemValue="#{tipo.idTipoMantenimiento}" itemLabel="#{tipo.nombre}"/>
+               </p:selectOneMenu>
+            </p:outputPanel>
+
+            <p:outputPanel styleClass="field col-12">
+               <p:outputLabel for="@next" value="Descripción" styleClass="block"/>
+               <p:inputTextarea styleClass="block w-full" rows="3"
+                                value="#{vehiculoView.mantenimientoVehiculo.descripcion}"/>
+               <span class="text-sm hidden"> </span>
+            </p:outputPanel>
+
+            <p:outputPanel styleClass="field col-12">
+               <p:outputLabel value="Fecha inicio " styleClass="block"/>
+               <p:calendar value="#{vehiculoView.mantenimientoVehiculo.fechaInicio}" id="id_calendar1"
+                           inputStyleClass="w-full"
+                           pattern="dd-MM-yyyy" locale="es">
+                  <p:ajax
+                          event="dateSelect" listener="#{vehiculoView.validateFechaInicioFinal}"
+                          update=":form_registrar_mantenimiento:id_message2 :form_registrar_mantenimiento:id_message :form_registrar_mantenimiento:id_calendar2"/>
+               </p:calendar>
+               <p:message
+                       id="id_message2"
+                       for="id_calendar1" />
+            </p:outputPanel>
+
+            <p:outputPanel styleClass="field col-12">
+               <p:outputLabel  value="Fecha final " styleClass="block"/>
+               <p:calendar  id="id_calendar2" value="#{vehiculoView.mantenimientoVehiculo.fechaFin}"
+                            inputStyleClass="w-full" disabled="#{vehiculoView.mantenimientoVehiculo.fechaInicio == null}"
+                            pattern="dd-MM-yyyy" locale="es">
+                  <p:ajax
+                          event="dateSelect" listener="#{vehiculoView.validateFechaInicioFinal}"
+                          update=":form_registrar_mantenimiento:id_message :form_registrar_mantenimiento:id_message2"/>
+               </p:calendar>
+               <p:message
+                       id="id_message"
+                       for="id_calendar2" />
+            </p:outputPanel>
+
+            <p:outputPanel styleClass="field col-12 mb-5" rendered="true">
+               <!--<p:fileUpload value="#{vehiculoView.fotoMantenimiento}" mode="simple" dragDropSupport="true"
+                             chooseButtonTitle="Elegir" chooseLabel="Elegir"
+                             cancelButtonTitle="Cancelar" cancelLabel="Cancelar"
+                             uploadButtonTitle="Subir" uploadLabel="Subir"
+                             multiple="true" update="growl" sizeLimit="10000000" fileLimit="5"
+                             fileLimitMessage="Has superado el número máximo de archivos"
+                             invalidFileMessage="Archivo no válido"
+                             invalidSizeMessage="Has superado el tamaño máximo por archivo"
+                             allowTypes="/(\.|\/)(jpe?g|png)$/"/>-->
+
+               <p:fileUpload value="#{vehiculoView.fotoMantenimiento}"
+                             sizeLimit="10000000"
+                             mode="simple" fileLimit="1"
+                             chooseButtonTitle="Elegir" chooseLabel="Elegir"
+                             cancelButtonTitle="Cancelar" cancelLabel="Cancelar"
+                             uploadButtonTitle="Subir" uploadLabel="Subir"
+                             fileLimitMessage="Has superado el número máximo de archivos"
+                             invalidFileMessage="Archivo no válido"
+                             invalidSizeMessage="Has superado el tamaño máximo por archivo"
+                             allowTypes="/(\.|\/)(jpe?g|png)$/"
+                             skinSimple="true"/>
+               <span class="text-sm">Sólo se permiten archivos .jpg, .jpeg y .png. Máximo 5 archivos</span>
+            </p:outputPanel>
+
+            <p:outputPanel styleClass="field col-12 mb-0">
+
+               <p:outputPanel styleClass="flex justify-content-end">
+                  <p:commandButton value="Cerrar" ajax="true" process="@this"
+                                   action="#{vehiculoView.cerrarModalRegistroMantenimiento()}"
+                                   styleClass="ui-button-outlined mr-4"/>
+
+                  <p:commandButton value="Guardar" id="bnt_saveRegistro"
+                                   action="#{vehiculoView.guardarMantenimientoVehiculo()}"
+                                   ajax="true" process="@form"
+                                   update="growl"
+                                   validateClient="true"/>
+               </p:outputPanel>
+
+            </p:outputPanel>
+
+         </p:outputPanel>
+
+      </p:dialog>
+
+   </h:form>
+
+</ui:composition>

@@ -1,0 +1,277 @@
+<ui:composition
+        xmlns="http://www.w3.org/1999/xhtml"
+        xmlns:h="http://xmlns.jcp.org/jsf/html"
+        xmlns:f="http://xmlns.jcp.org/jsf/core"
+        xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+        xmlns:p="http://primefaces.org/ui">
+
+   <h:form id="form_bitacoras">
+      <p:panel header="Datos del vehículo" widgetVar="panelVehiculo" styleClass="mb-5">
+         <p:outputPanel styleClass="formgrid grid mb-5">
+
+            <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4 xl:col-3">
+               <p:outputLabel for="@next" value="No. Serie" styleClass="block"/>
+               <p:inputText styleClass="block w-full" required="true" disabled="#{vehiculoView.readOnlyEditForm}"
+                            value="#{vehiculoView.vehiculoSelected.noSerie}"/>
+               <span class="text-sm hidden"> </span>
+            </p:outputPanel>
+
+            <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4 xl:col-2">
+               <p:outputLabel for="@next" value="Placa" styleClass="block"/>
+               <p:inputText styleClass="block w-full" required="true" disabled="#{vehiculoView.readOnlyEditForm}"
+                            value="#{vehiculoView.vehiculoSelected.placa}"/>
+               <span class="text-sm hidden"> </span>
+            </p:outputPanel>
+
+            <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4 xl:col-2">
+               <p:outputLabel for="@next" value="Marca" styleClass="block"/>
+               <p:inputText styleClass="block w-full" required="true"
+                            placeholder="Ej. Nissan" disabled="#{vehiculoView.readOnlyEditForm}"
+                            value="#{vehiculoView.vehiculoSelected.marca}"/>
+               <span class="text-sm hidden"> </span>
+            </p:outputPanel>
+
+            <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4 xl:col-3">
+               <p:outputLabel for="@next" value="Modelo" styleClass="block"/>
+               <p:inputText styleClass="block w-full" required="true"
+                            placeholder="Ej. Altima" disabled="#{vehiculoView.readOnlyEditForm}"
+                            value="#{vehiculoView.vehiculoSelected.modelo}"/>
+               <span class="text-sm hidden"> </span>
+            </p:outputPanel>
+
+            <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4 xl:col-2">
+               <p:outputLabel for="@next" value="Año" styleClass="block"/>
+               <p:inputNumber styleClass="block w-full" required="true"
+                              placeholder="Ej. 2022" disabled="#{vehiculoView.readOnlyEditForm}"
+                              value="#{vehiculoView.vehiculoSelected.anio}"/>
+               <span class="text-sm hidden"> </span>
+            </p:outputPanel>
+
+            <!-- separador de 5 elementos por fila -->
+
+            <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4 xl:col-3">
+               <p:outputLabel for="@next" value="Dependencia" styleClass="block"/>
+               <p:selectOneMenu value="#{vehiculoView.vehiculoSelected.dependencia.idDependencia}"
+                                styleClass="w-full mw-auto" required="true" disabled="#{vehiculoView.readOnlyEditForm}">
+                  <f:selectItem itemLabel="Seleccione uno..." itemValue="#{null}"/>
+                  <f:selectItems value="#{vehiculoView.dependenciaList}" var="dependencia"
+                                 itemValue="#{dependencia.idDependencia}" itemLabel="#{dependencia.abreviatura} - #{dependencia.nombre}"/>
+               </p:selectOneMenu>
+               <span class="text-sm hidden"> </span>
+            </p:outputPanel>
+
+            <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4 xl:col-2">
+               <p:outputLabel for="@next" value="Condición" styleClass="block"/>
+               <p:selectOneMenu value="#{vehiculoView.vehiculoSelected.condicionVehiculo.idCondicionVehiculo}"
+                                styleClass="w-full mw-auto" required="true" disabled="#{vehiculoView.readOnlyEditForm}">
+                  <f:selectItem itemLabel="Seleccione uno..." itemValue="#{null}"/>
+                  <f:selectItems value="#{vehiculoView.condicionVehiculoList}" var="condicionVehiculo"
+                                 itemValue="#{condicionVehiculo.idCondicionVehiculo}" itemLabel="#{condicionVehiculo.nombre}"/>
+               </p:selectOneMenu>
+               <span class="text-sm hidden"> </span>
+            </p:outputPanel>
+
+            <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4 xl:col-2">
+               <p:outputLabel for="@next" value="Licitación" styleClass="block"/>
+               <p:selectOneMenu value="#{vehiculoView.vehiculoSelected.licitacion.idLicitacion}"
+                                disabled="#{vehiculoView.readOnlyEditForm}"
+                                styleClass="w-full mw-auto">
+                  <f:selectItem itemLabel="Seleccione una..." itemValue="#{null}"/>
+                  <f:selectItems value="#{vehiculoView.licitacionFormList}" var="licitacion"
+                                 itemValue="#{licitacion.idLicitacion}" itemLabel="#{licitacion.numeroLicitacion}"/>
+                  <p:ajax event="change" listener="#{vehiculoView.onChangeLicitacionForm()}" update="tab_view_detalles:form_bitacoras"/>
+               </p:selectOneMenu>
+               <span class="text-sm hidden"> </span>
+            </p:outputPanel>
+
+            <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4 xl:col-3">
+               <p:outputLabel for="@next" value="Estatus" styleClass="block"/>
+               <p:inputText styleClass="block w-full" required="true"
+                            disabled="#{vehiculoView.readOnlyEditForm}"
+                            value="#{vehiculoView.vehiculoSelected.estatusVehiculo.descripcion}"/>
+               <span class="text-sm hidden"> </span>
+            </p:outputPanel>
+
+            <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4 xl:col-2">
+               <p:outputLabel for="@next" value="Anexo" styleClass="block"/>
+               <p:selectOneMenu value="#{vehiculoView.vehiculoSelected.anexo.idAnexo}"
+                                disabled="#{vehiculoView.readOnlyEditForm}"
+                                styleClass="w-full mw-auto">
+                  <f:selectItem itemLabel="Seleccione una..." itemValue="#{null}"/>
+                  <f:selectItems value="#{vehiculoView.anexoFormList}" var="anexo"
+                                 itemValue="#{anexo.idAnexo}" itemLabel="#{anexo.nombre}"/>
+               </p:selectOneMenu>
+               <span class="text-sm hidden"> </span>
+            </p:outputPanel>
+
+         </p:outputPanel>
+
+      </p:panel>
+   </h:form>
+
+   <h:form id="frm_bitacora_vehiculo" styleClass="mb-5">
+      <!--bitacora de actividades -->
+      <p:dataTable id="dt_bitacora_vehiculo"
+                   var="bitacora" value="#{vehiculoView.bitacoraVehiculoList}"
+                   rows="50" rowHover="true"
+                   rowKey="#{bitacora.idBitacoraVehiculo}" rowIndexVar="index"
+                   styleClass="dt-scrollable-x"
+                   scrollable="true"
+                   paginator="true" paginatorPosition="bottom"
+                   paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                   currentPageReportTemplate="{startRecord}-{endRecord} de {totalRecords} registros"
+                   rowsPerPageTemplate="50,100,200,{ShowAll|'Todos'}">
+
+         <f:facet name="header">
+            Bitácora de actividades
+         </f:facet>
+
+         <p:column headerText="No." width="50" >
+            <p:rowToggler />
+            <h:outputText value="#{index + 1}" styleClass="ml-2"/>
+         </p:column>
+
+         <p:column headerText="Actividad" width="250">
+            <h:outputText value="#{bitacora.accion}"/>
+         </p:column>
+
+         <p:column headerText="Fecha" width="80">
+            <h:outputText value="#{bitacora.fechaModificacion}"/>
+         </p:column>
+
+         <p:column headerText="Realizado por" width="100">
+            <h:outputText value="#{bitacora.modificadoPor}"/>
+         </p:column>
+
+         <!--<p:rowExpansion>
+            <p:dataTable id="dtcambios"
+                         var="cambios" value="#{bitacora.cambioSet}"
+                         rowKey="#{cambios.campo}"
+                         rowHover="true" rowIndexVar="num"
+                         styleClass="dt-scrollable"
+                         scrollable="true">
+
+               <p:column headerText="No." width="30">
+                  <h:outputText value="#{num + 1}" />
+               </p:column>
+
+               <p:column headerText="Campo" width="80">
+                  <h:outputText value="#{cambios.campo}"/>
+               </p:column>
+
+               <p:column headerText="Anterior" width="120">
+                  <h:outputText value="#{cambios.valorAnterior}"/>
+               </p:column>
+
+               <p:column headerText="Nuevo" width="120">
+                  <h:outputText value="#{cambios.valorNuevo}"/>
+               </p:column>
+
+            </p:dataTable>
+
+         </p:rowExpansion>-->
+
+      </p:dataTable>
+   </h:form>
+
+   <h:form id="frm_mantenimientos">
+      <!--seccion de registros de mantenimiento -->
+      <p:dataTable var="mantenimiento" value="#{vehiculoView.mantenimientoVehiculoList}"
+                   rows="50" rowHover="true" id="dt_mantenimiento"
+                   rowKey="#{mantenimiento.idMantenimiento}" rowIndexVar="index"
+                   styleClass="dt-scrollable-x"
+                   scrollable="true"
+                   paginator="true" paginatorPosition="bottom"
+                   paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                   currentPageReportTemplate="{startRecord}-{endRecord} de {totalRecords} registros"
+                   rowsPerPageTemplate="50,100,200,{ShowAll|'Todos'}">
+
+         <f:facet name="header">
+            Registros de mantenimiento
+         </f:facet>
+
+         <p:column headerText="No." width="40">
+            <h:outputText value="#{index + 1}" />
+         </p:column>
+
+         <p:column headerText="Fecha solicitud" width="150">
+            <h:outputText value="#{mantenimiento.fechaCreacion}"/>
+         </p:column>
+
+         <p:column headerText="Tipo mantenimiento" width="150">
+            <h:outputText value="#{mantenimiento.tipoMantenimiento.nombre}"/>
+         </p:column>
+
+         <p:column headerText="Descripción" width="150">
+            <h:outputText value="#{mantenimiento.descripcion}"/>
+         </p:column>
+
+         <p:column headerText="Fecha inicio" width="150">
+            <h:outputText value="#{mantenimiento.fechaInicio}"/>
+         </p:column>
+
+         <p:column headerText="Fecha fin" width="150">
+            <h:outputText value="#{mantenimiento.fechaFin}"/>
+         </p:column>
+
+         <p:column headerText="Acciones" width="120">
+
+            <p:commandButton id="buttonOptions" type="button"
+                             icon="fi fi-rr-menu-dots-vertical"
+                             styleClass="rounded-button ui-button-outlined"
+            />
+            <p:menu overlay="true" trigger="buttonOptions" my="left top" at="left bottom" styleClass="w-16rem">
+
+               <p:menuitem value="Eliminar mantenimiento" icon="fi fi-rr-trash"
+                           update="tab_view_detalles:form_confirm_dialog" action="#{vehiculoView.doEliminarMatenimiento(mantenimiento)}"
+                           oncomplete="PF('confirmDialog').show()"
+                           ajax="true"/>
+
+               <p:menuitem value="Editar mantenimiento" icon="fi fi-rr-pencil"
+                           update="growl tab_view_detalles:frm_mantenimientos:dt_mantenimiento"
+                           action="#{vehiculoView.abrirModalEditarMantenimiento(mantenimiento)}">
+               </p:menuitem>
+
+               <p:menuitem value="Adjuntar fotos" icon="fi fi-rr-add-image"
+                           action="#{vehiculoView.abrirModalFotosMantenimiento2(mantenimiento)}"
+                           update="growl dt_mantenimiento">
+               </p:menuitem>
+
+               <p:menuitem value="Ver fotos" icon="fi fi-rr-images"
+                           action="#{vehiculoView.abrirModalAdjuntaVerFotosMantenimiento(mantenimiento)}"
+                           update="growl dt_mantenimiento">
+               </p:menuitem>
+
+            </p:menu>
+
+         </p:column>
+
+      </p:dataTable>
+
+   </h:form>
+
+   <h:form id="form_confirm_dialog">
+      <p:dialog header="Aviso" widgetVar="confirmDialog"
+                showEffect="fade" modal="true"
+                closable="true" closeOnEscape="true"
+                cache="false" responsive="true">
+         <p:outputPanel>
+            <p:outputLabel styleClass="block mb-2" value="¿Está seguro que desea eliminar el registro?"/>
+
+         </p:outputPanel>
+
+         <f:facet name="footer">
+            <p:commandButton value="No" onclick="PF('confirmDialog').hide()"
+                             class="ui-button-outlined"/>
+            <p:commandButton value="Si"
+                             action="#{vehiculoView.eliminarMantenimiento()}"
+                             ajax="true"
+                             update="growl tab_view_detalles:frm_mantenimientos:dt_mantenimiento"
+                             validateClient="true"/>
+         </f:facet>
+      </p:dialog>
+   </h:form>
+
+
+
+</ui:composition>

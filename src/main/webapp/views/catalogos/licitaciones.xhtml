@@ -1,0 +1,412 @@
+<ui:composition template="../../WEB-INF/facelets/main_layout.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="jakarta.faces.facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="jakarta.faces.html"
+                xmlns:f="jakarta.faces.core"
+                xmlns:sec="https://joinfaces.org/security">
+
+    <ui:define name="title">
+        #{licitacionView.title}
+    </ui:define>
+
+    <ui:define name="content">
+
+        <p:outputPanel styleClass="container-fluid">
+
+            <p:growl id="growl" showDetail="true" showSummary="true" skipDetailIfEqualsSummary="true" globalOnly="true"/>
+
+            <h:form id="form_breadcum" styleClass="mb-5">
+                <p:breadCrumb homeDisplay="text">
+                    <p:menuitem value="Inicio" ajax="false" action="#{menuSessionBean.goToHome()}"/>
+                    <p:menuitem value="Catálogos"/>
+                    <p:menuitem value="Licitaciones"/>
+                </p:breadCrumb>
+            </h:form>
+
+            <h:form id="form_toolbar">
+                <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'CAT_LICITACION_WRITE_AGREGAR', 'CAT_LICITACION_WRITE_IMPORT', 'CAT_LICITACION_READ_EXPORTAR')">
+                    <p:toolbar styleClass="mb-5">
+                        <p:toolbarGroup>
+                            <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'CAT_LICITACION_WRITE_AGREGAR')">
+                                <p:commandButton value="Nuevo"
+                                                 action="#{licitacionView.agregarLicitacion()}"
+                                                 oncomplete="PF('formDialog').show()"
+                                                 update="form_dialog"
+                                                 styleClass="mr-4">
+                                    <p:resetInput target="form_dialog:dialogContent"/>
+                                </p:commandButton>
+                            </sec:authorize>
+                        </p:toolbarGroup>
+
+                        <p:toolbarGroup align="right">
+                            <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'CAT_LICITACION_WRITE_IMPORT')">
+                                <p:commandButton value="Importar" ajax="false" action="#{licitacionView.abrirModalImport()}"
+                                                 styleClass="ui-button-outlined mr-4">
+                                </p:commandButton>
+                            </sec:authorize>
+
+                            <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'CAT_LICITACION_READ_EXPORTAR')">
+                                <p:commandButton value="Exportar" ajax="false" onclick="PrimeFaces.monitorDownload(start, stop);"
+                                                 styleClass="ui-button-outlined">
+                                    <p:fileDownload value="#{fileDownloadBean.downloadFile(licitacionView.exportFileExcel())}"/>
+                                </p:commandButton>
+                            </sec:authorize>
+
+                        </p:toolbarGroup>
+                    </p:toolbar>
+                </sec:authorize>
+            </h:form>
+
+            <h:form id="form_filtros" styleClass="mb-5">
+
+                <p:panel header="Filtros" widgetVar="panelFiltros"
+                         toggleable="true" toggleSpeed="500">
+                    <p:outputPanel styleClass="grid formgrid mb-2">
+
+                        <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4 xl:col-3">
+                            <p:outputLabel for="@next" value="licitación" styleClass="block"/>
+                            <p:inputText styleClass="block w-full" placeholder="Buscar por número de licitación"
+                                         value="#{licitacionView.licitacionFilter.numeroLicitacion}"/>
+                            <span class="text-sm hidden"> </span>
+                        </p:outputPanel>
+
+                        <sec:authorize access="hasAuthority('ROLE_OWNER')">
+                            <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4 xl:col-3">
+                                <p:outputLabel for="@next" value="Estatus" styleClass="block"/>
+                                <p:selectOneMenu value="#{licitacionView.licitacionFilter.estatusRegistro}" styleClass="w-full">
+                                    <f:selectItem itemLabel="Todos" itemValue="#{null}"/>
+                                    <f:selectItems value="#{licitacionView.estatusRegistros}" var="estatus"
+                                                   itemValue="#{estatus}" itemLabel="#{estatus.label}"/>
+                                </p:selectOneMenu>
+                                <span class="text-sm hidden"> </span>
+                            </p:outputPanel>
+                        </sec:authorize>
+
+                    </p:outputPanel>
+
+                    <f:facet name="footer">
+                        <p:outputPanel styleClass="flex flex-row gap-4 justify-content-end">
+                            <p:commandButton value="Limpiar filtros" styleClass="ui-button-outlined"
+                                             ajax="true" action="#{licitacionView.limpiarFiltros()}"
+                                             update="form_filtros form_datatable"/>
+                            <p:commandButton value="Buscar" ajax="true" action="#{licitacionView.buscar()}"
+                                             update="form_datatable"/>
+                        </p:outputPanel>
+                    </f:facet>
+                </p:panel>
+
+            </h:form>
+
+            <h:form id="form_datatable" styleClass="mb-5">
+
+                <p:dataTable id="dtExample"
+                             var="licitacion" value="#{licitacionView.licitacionList}"
+                             rows="50"
+                             rowKey="#{licitacion.idLicitacion}" rowIndexVar="index"
+                             styleClass="dt-scrollable"
+                             scrollable="true"
+                             paginator="true" paginatorPosition="bottom"
+                             paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             currentPageReportTemplate="{startRecord}-{endRecord} de {totalRecords} registros"
+                             rowsPerPageTemplate="50,100,200,{ShowAll|'Todos'}">
+
+                    <f:facet name="header">
+                        Licitaciones
+                    </f:facet>
+
+                    <p:column headerText="No." width="20">
+                        <h:outputText value="#{index + 1}" />
+                    </p:column>
+
+                    <p:column headerText="Número licitación" width="90">
+                        <h:outputText value="#{licitacion.numeroLicitacion}"/>
+                    </p:column>
+
+                    <p:column headerText="Nombre" width="180">
+                        <h:outputText value="#{licitacion.nombre}"/>
+                    </p:column>
+
+                    <p:column headerText="Descripción" style="min-width: 15rem;">
+                        <h:outputText value="#{licitacion.descripcion}"/>
+                    </p:column>
+
+                    <p:column headerText="Fecha inicio" width="90">
+                        <h:outputText value="#{licitacion.fechaInicio}">
+                            <f:convertDateTime pattern="dd-MM-yyyy"/>
+                        </h:outputText>
+                    </p:column>
+
+                    <p:column headerText="Fecha final" width="90">
+                        <h:outputText value="#{licitacion.fechaFinal}">
+                            <f:convertDateTime pattern="dd-MM-yyyy"/>
+                        </h:outputText>
+                    </p:column>
+
+                    <sec:authorize access="hasAnyAuthority('ROLE_OWNER')">
+
+                        <p:column headerText="Estatus registro" width="150">
+                            <h:outputText value="#{licitacion.estatusRegistro.label}">
+                            </h:outputText>
+                        </p:column>
+
+                        <p:column headerText="Fecha creación" width="180">
+                            <h:outputText value="#{licitacion.fechaCreacion}">
+                                <f:convertDateTime pattern="dd/MM/yyyy HH:mm:ss a"/>
+                            </h:outputText>
+                        </p:column>
+
+                        <p:column headerText="Creado por" width="150">
+                            <h:outputText value="#{licitacion.creadoPor}">
+                            </h:outputText>
+                        </p:column>
+
+                        <p:column headerText="Fecha modificación" width="180">
+                            <h:outputText value="#{licitacion.fechaModificacion}">
+                                <f:convertDateTime pattern="dd/MM/yyyy HH:mm:ss a"/>
+                            </h:outputText>
+                        </p:column>
+
+                        <p:column headerText="Modificado por" width="150">
+                            <h:outputText value="#{licitacion.modificadoPor}">
+                            </h:outputText>
+                        </p:column>
+
+                        <p:column headerText="Fecha borrado" width="180">
+                            <h:outputText value="#{licitacion.fechaBorrado}">
+                                <f:convertDateTime pattern="dd/MM/yyyy HH:mm:ss a"/>
+                            </h:outputText>
+                        </p:column>
+
+                        <p:column headerText="Borrado por" width="150">
+                            <h:outputText value="#{licitacion.borradoPor}">
+                            </h:outputText>
+                        </p:column>
+
+                    </sec:authorize>
+
+                    <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'CAT_LICITACION_WRITE_EDITAR', 'CAT_LICITACION_READ_DESCARGAR_ARCHIVO', 'CAT_LICITACION_WRITE_ELIMINAR')">
+                        <p:column headerText="Acciones">
+                            <p:growl id="message" showDetail="true"/>
+
+                            <p:commandButton id="buttonOptions" type="button"
+                                             icon="fi fi-rr-menu-dots-vertical" styleClass="rounded-button ui-button-outlined" />
+                            <p:menu overlay="true" trigger="buttonOptions" my="left top" at="left bottom" >
+
+                                <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'CAT_LICITACION_WRITE_EDITAR')">
+                                    <p:menuitem value="Editar" icon="fi fi-rr-pencil"
+                                                action="#{licitacionView.editar(licitacion.idLicitacion)}"
+                                                ajax="true" update="form_dialog"
+                                                oncomplete="PF('formDialog').show()">
+                                        <p:resetInput target="form_dialog:dialogContent"/>
+                                    </p:menuitem>
+                                </sec:authorize>
+
+                                <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'CAT_LICITACION_READ_DESCARGAR_ARCHIVO')">
+                                    <p:menuitem value="Descargar archivo" ajax="false" onclick="PrimeFaces.monitorDownload(start, stop);"
+                                                disabled="#{licitacion.rutaArchivo == null}" icon="fi-rr-download">
+                                        <p:fileDownload value="#{fileDownloadBean.downloadFileByPath(licitacion.rutaArchivo)}" />
+                                    </p:menuitem>
+                                </sec:authorize>
+
+                                <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'CAT_LICITACION_WRITE_ELIMINAR')">
+                                    <p:menuitem value="Eliminar" icon="fi fi-rr-trash"
+                                                ajax="true" update="form_confirm_dialog"
+                                                oncomplete="PF('confirmDialog').show()"
+                                                action="#{licitacionView.doEliminar(licitacion.idLicitacion)}">
+                                    </p:menuitem>
+                                </sec:authorize>
+                            </p:menu>
+                        </p:column>
+                    </sec:authorize>
+
+                </p:dataTable>
+
+            </h:form>
+
+        </p:outputPanel>
+
+
+
+
+
+        <h:form id="form_confirm_dialog">
+            <p:dialog header="Aviso" widgetVar="confirmDialog"
+                    showEffect="fade" modal="true"
+                    closable="true" closeOnEscape="true"
+                    cache="false" responsive="true">
+                <p:outputPanel>
+                    <p:outputLabel styleClass="block mb-2" value="¿Está seguro que desea eliminar el registro?"/>
+
+                </p:outputPanel>
+
+                <f:facet name="footer">
+                    <p:commandButton value="No" onclick="PF('confirmDialog').hide()"
+                                     class="ui-button-outlined"/>
+                    <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'CAT_LICITACION_WRITE_ELIMINAR')">
+                        <p:commandButton value="Si"
+                                         action="#{licitacionView.eliminar()}"
+                                         ajax="true" process="@form"
+                                         update="growl form_datatable"
+                                         validateClient="true"/>
+                    </sec:authorize>
+                </f:facet>
+            </p:dialog>
+        </h:form>
+
+        <h:form id="form_dialog" enctype="multipart/form-data">
+            <p:dialog header="#{licitacionView.titleDialog}" widgetVar="formDialog"
+                      minHeight="350" width="450"
+                      showEffect="fade" modal="true"
+                      closable="true" closeOnEscape="true"
+                      cache="false" responsive="true">
+                <p:outputPanel id="dialogContent" styleClass="formgrid grid" rendered="#{licitacionView.licitacionSelected != null}">
+
+                    <p:outputPanel styleClass="field col-12">
+                        <p:outputLabel for="@next" value="Número licitación" styleClass="block "/>
+                        <p:inputText styleClass="block w-full" required="true"
+                                     value="#{licitacionView.licitacionSelected.numeroLicitacion}"/>
+                        <span class="text-sm hidden"> </span>
+                    </p:outputPanel>
+
+                    <p:outputPanel styleClass="field col-12">
+                        <p:outputLabel for="@next" value="Nombre" styleClass="block w-full"/>
+                        <p:inputText styleClass="block w-full" required="true"
+                                     value="#{licitacionView.licitacionSelected.nombre}"/>
+                        <span class="text-sm hidden"> </span>
+                    </p:outputPanel>
+
+                    <p:outputPanel styleClass="field col-12">
+                        <p:outputLabel for="@next" value="Descripción" styleClass="block"/>
+                        <p:inputTextarea styleClass="block w-full" rows="3"
+                                         value="#{licitacionView.licitacionSelected.descripcion}"/>
+                        <span class="text-sm hidden"> </span>
+                    </p:outputPanel>
+
+                    <p:outputPanel styleClass="field col-12">
+                        <p:outputLabel value="Fecha inicio " styleClass="block"/>
+                        <p:calendar value="#{licitacionView.licitacionSelected.fechaInicio}" id="id_calendar1"
+                                    inputStyleClass="w-full"
+                                    pattern="dd-MM-yyyy" locale="es">
+                            <p:ajax
+                                    event="dateSelect" listener="#{licitacionView.validateFechaInicioFinal}"
+                                    update=":form_dialog:id_message2 :form_dialog:id_message :form_dialog:id_calendar2"/>
+                        </p:calendar>
+                        <p:message
+                                id="id_message2"
+                                for="id_calendar1" />
+                    </p:outputPanel>
+
+                    <p:outputPanel styleClass="field col-12">
+                        <p:outputLabel  value="Fecha final " styleClass="block"/>
+                        <p:calendar  id="id_calendar2" value="#{licitacionView.licitacionSelected.fechaFinal}"
+                                     inputStyleClass="w-full" disabled="#{licitacionView.licitacionSelected.fechaInicio == null}"
+                                     pattern="dd-MM-yyyy" locale="es">
+                            <p:ajax
+                                    event="dateSelect" listener="#{licitacionView.validateFechaInicioFinal}"
+                                    update=":form_dialog:id_message :form_dialog:id_message2"/>
+                        </p:calendar>
+                        <p:message
+                                id="id_message"
+                                for="id_calendar2" />
+                    </p:outputPanel>
+
+                    <p:fileUpload value="#{licitacionView.file}"
+                                  sizeLimit="1000000"
+                                  mode="simple" fileLimit="1"
+                                  chooseButtonTitle="Elegir" chooseLabel="Elegir"
+                                  cancelButtonTitle="Cancelar" cancelLabel="Cancelar"
+                                  uploadButtonTitle="Subir" uploadLabel="Subir"
+                                  fileLimitMessage="Has superado el número máximo de archivos"
+                                  invalidFileMessage="Archivo no válido"
+                                  invalidSizeMessage="Has superado el tamaño máximo por archivo"
+                                  allowTypes="/(\.|\/)(pdf)$/" accept=".pdf"
+                                  skinSimple="true"/>
+
+                </p:outputPanel>
+
+                <f:facet name="footer">
+
+                    <p:commandButton value="Cancelar" onclick="PF('formDialog').hide()"
+                                     class="ui-button-outlined"/>
+
+
+                    <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'CAT_LICITACION_WRITE_AGREGAR', 'CAT_LICITACION_WRITE_EDITAR')">
+                        <p:commandButton value="Guardar" id="bnt_saveLicitacion"
+                                         action="#{licitacionView.guardarLicitacion()}"
+                                         ajax="true" process="@form" disabled="#{!licitacionView.fechaFinalValida}"
+                                         update="growl form_datatable"
+                                         validateClient="true"/>
+                    </sec:authorize>
+                </f:facet>
+            </p:dialog>
+        </h:form>
+
+        <h:form id="form_import">
+            <p:dialog widgetVar="formDialogImport" showEffect="fade" modal="true"
+                      height="350" width="850" header="Importación de datos"
+                      closable="true" closeOnEscape="true"
+                      cache="false" responsive="true">
+                <p:outputPanel id="import-dialog-content" styleClass="formgrid grid">
+
+                    <p:outputPanel styleClass="field col-12 mb-5" rendered="#{not licitacionView.showErrorImportacion}">
+                        <p:outputLabel for="@next" value="Importar layout" styleClass="block"/>
+                        <p:inputTextarea id="dropZoneLayout" widgetVar="dropZoneLayout"
+                                         styleClass="w-full dropzone mb-3" rows="5" required="true"
+                                         placeholder="Arrastra y suelta aquí el archivo de importación de licitaciones"
+                                         value="#{licitacionView.layoutFileUpload}" readonly="true"/>
+                        <span class="text-sm">
+                                    <p:link value="O haz clic aquí para elegir" onclick="PF('uploadLayout').show();return false"/>
+                                </span>
+                        <p:fileUpload widgetVar="uploadLayout" listener="#{licitacionView.importarLayout}"
+                                      fileLimit="1" fileLimitMessage="Solo se permite subir un archivo"
+                                      sizeLimit="50000000" allowTypes="/(\.|\/)(xlsx|)$/" dropZone="dropZoneLayout"
+                                      update="growl" style="display: none"/>
+                    </p:outputPanel>
+
+                    <p:outputPanel id="panel_acuseImport" styleClass="field col-12 mb-5" rendered="#{licitacionView.showErrorImportacion}">
+                        <p:dataTable id="dt_acuses" var="acuse" value="#{licitacionView.acuseImportacionList}"
+                                     rows="25" rowHover="true"
+                                     rowIndexVar="index"
+                                     styleClass="dt-scrollable-x"
+                                     scrollable="true" scrollHeight="230" size="small"
+                                     paginator="true" paginatorPosition="bottom"
+                                     paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                     currentPageReportTemplate="{startRecord}-{endRecord} de {totalRecords} registros"
+                                     rowsPerPageTemplate="25,100,200,{ShowAll|'Todos'}">
+                            <f:facet name="header">
+                                Se encontraron error al importar el layout
+                            </f:facet>
+
+                            <p:column headerText="Anexo" width="180">
+                                <h:outputText value="#{acuse.titulo}"/>
+                            </p:column>
+
+                            <p:column headerText="Error" style="min-width: 200px">
+                                <h:outputText value="#{acuse.mensaje}"/>
+                            </p:column>
+
+                        </p:dataTable>
+                    </p:outputPanel>
+
+                    <p:outputPanel styleClass="field col-12 mt-5 mb-0" rendered="#{not licitacionView.showErrorImportacion}">
+                        <p:outputPanel styleClass="flex justify-content-end">
+                            <p:commandButton value="Cancelar" ajax="true" process="@this"
+                                             action="#{licitacionView.cerrarModalImport()}"
+                                             styleClass="ui-button-outlined mr-4"/>
+                            <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'CAT_LICITACION_WRITE_IMPORT')">
+                                <p:commandButton value="Guardar" ajax="true" process="@form"
+                                                 action="#{licitacionView.guardarImportacion()}"
+                                                 update="growl :form_import:import-dialog-content"
+                                                 validateClient="true"/>
+                            </sec:authorize>
+                        </p:outputPanel>
+                    </p:outputPanel>
+
+                </p:outputPanel>
+            </p:dialog>
+        </h:form>
+
+    </ui:define>
+
+</ui:composition>

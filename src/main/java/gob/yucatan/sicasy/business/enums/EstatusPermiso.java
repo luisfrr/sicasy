@@ -5,7 +5,7 @@ import lombok.Getter;
 @Getter
 public enum EstatusPermiso {
 
-    BORRADO("Borrado"),
+    SIN_ASIGNAR("Sin asignar"),
     HABILITADO("Habilitado"),
     DESHABILITADO("Deshabilitado");
 

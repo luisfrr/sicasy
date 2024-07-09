@@ -1,32 +1,97 @@
 <ui:composition
         xmlns="http://www.w3.org/1999/xhtml"
-        xmlns:ui="jakarta.faces.facelets">
+        xmlns:ui="jakarta.faces.facelets"
+        xmlns:h="jakarta.faces.html"
+        xmlns:p="http://primefaces.org/ui"
+        xmlns:sec="https://joinfaces.org/security">
 
     <aside class="sidebar">
 
-        <div class="menu-container">
+        <h:form id="form_sidebar">
+            <div class="menu-container">
 
-            <div class="menu-item menu-item-active">
-                <div class="icon">
-                    <i class="fi fi-rr-home"/>
-                </div>
-                <span class="label">Inicio</span>
-            </div>
+                <p:commandLink styleClass="menu-item menu-item-active" ajax="false" action="#{menuSessionBean.goToHome()}">
+                    <div class="icon">
+                        <i class="fi fi-rr-home"/>
+                    </div>
+                    <span class="label">Inicio</span>
+                </p:commandLink>
 
-            <div class="menu-item">
-                <div class="icon">
-                    <i class="fi fi-rr-car-alt"/>
-                </div>
-                <span class="label">Vehículos</span>
-            </div>
+                <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'VEHICULOS_VIEW')">
+                    <p:commandLink styleClass="menu-item" ajax="false" action="#{menuSessionBean.goToVehiculos()}">
+                        <div class="icon">
+                            <i class="fi fi-rr-car-alt"/>
+                        </div>
+                        <span class="label">Vehículos</span>
+                    </p:commandLink>
+                </sec:authorize>
 
-            <div class="menu-item">
-                <div class="icon">
-                    <i class="fi fi-rr-shield"/>
-                </div>
-                <span class="label">Seguros</span>
+                <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'POLIZA_VIEW')">
+                    <p:commandLink styleClass="menu-item" ajax="false" action="#{menuSessionBean.goToPolizas()}">
+                        <div class="icon">
+                            <i class="fi fi-rr-compliance-document"/>
+                        </div>
+                        <span class="label">Pólizas</span>
+                    </p:commandLink>
+                </sec:authorize>
+
+                <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'SINIESTRO_VIEW')">
+                    <p:commandLink styleClass="menu-item" ajax="false" action="#{menuSessionBean.goToSiniestros()}">
+                        <div class="icon">
+                            <i class="fi fi-rr-car-crash"/>
+                        </div>
+                        <span class="label">Siniestros</span>
+                    </p:commandLink>
+                </sec:authorize>
+
+                <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'CATALOGO_ASEGURADORA_VIEW')">
+                    <p:commandLink styleClass="menu-item" ajax="false" action="#{menuSessionBean.goToAseguradoras()}">
+                        <div class="icon">
+                            <i class="fi fi-rr-shield"/>
+                        </div>
+                        <span class="label">Aseguradoras</span>
+                    </p:commandLink>
+                </sec:authorize>
+
+                <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'CATALOGO_LICITACION_VIEW')">
+                    <p:commandLink styleClass="menu-item" ajax="false" action="#{menuSessionBean.goToLicitaciones()}">
+                        <div class="icon">
+                            <i class="fi-rr-poll-h"/>
+                        </div>
+                        <span class="label">Licitaciones</span>
+                    </p:commandLink>
+                </sec:authorize>
+
+                <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'CATALOGO_ANEXO_VIEW')">
+                    <p:commandLink styleClass="menu-item" ajax="false" action="#{menuSessionBean.goToAnexos()}">
+                        <div class="icon">
+                            <i class="fi-rr-document-signed"/>
+                        </div>
+                        <span class="label">Anexos</span>
+                    </p:commandLink>
+                </sec:authorize>
+
+                <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'SEGURIDAD_ROLES_VIEW')">
+                    <p:commandLink styleClass="menu-item" ajax="false" action="#{menuSessionBean.goToRoles()}">
+                        <div class="icon">
+                            <i class="fi fi-rr-tags"/>
+                        </div>
+                        <span class="label">Roles</span>
+                    </p:commandLink>
+                </sec:authorize>
+
+                <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'SEGURIDAD_USUARIOS_VIEW')">
+                    <p:commandLink styleClass="menu-item" ajax="false" action="#{menuSessionBean.goToUsuarios()}">
+                        <div class="icon">
+                            <i class="fi fi-rr-users-alt"/>
+                        </div>
+                        <span class="label">Usuarios</span>
+                    </p:commandLink>
+                </sec:authorize>
+
             </div>
-        </div>
+        </h:form>
+
     </aside>
 
 </ui:composition>

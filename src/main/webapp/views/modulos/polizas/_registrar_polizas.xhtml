@@ -1,0 +1,174 @@
+<ui:composition
+        xmlns="http://www.w3.org/1999/xhtml"
+        xmlns:h="http://xmlns.jcp.org/jsf/html"
+        xmlns:f="http://xmlns.jcp.org/jsf/core"
+        xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+        xmlns:p="http://primefaces.org/ui"
+        xmlns:sec="https://joinfaces.org/security">
+
+   <p:dialog header="Registrar pólizas"
+             id="registrar-polizas-dialog" widgetVar="registrarPolizasDialog"
+             minHeight="400" width="800"
+             showEffect="fade" modal="true"
+             closable="true" closeOnEscape="true"
+             cache="false" responsive="true">
+      <p:outputPanel id="registrar-polizas-dialog-content" styleClass="formgrid grid">
+
+         <p:tabView id="tab-view" rendered="#{polizaView.showRegistrarPolizasDialog}">
+            <p:tab id="registro-individual" title="Registro individual">
+
+               <h:form id="individual-form" styleClass="formgrid grid">
+
+                  <p:outputPanel styleClass="field col-12 md:col-6">
+                     <p:outputLabel for="@next" value="Aseguradora" styleClass="block"/>
+                     <p:selectOneMenu value="#{polizaView.polizaForm.aseguradora.idAseguradora}"
+                                      styleClass="w-full mw-auto" required="true">
+                        <f:selectItem itemLabel="Seleccione uno..." itemValue="#{null}"/>
+                        <f:selectItems value="#{polizaView.aseguradoraList}" var="aseguradora"
+                                       itemValue="#{aseguradora.idAseguradora}" itemLabel="#{aseguradora.nombre}"/>
+                     </p:selectOneMenu>
+                     <span class="text-sm hidden"> </span>
+                  </p:outputPanel>
+
+                  <p:outputPanel styleClass="field col-12 md:col-6">
+                     <p:outputLabel for="@next" value="No. Póliza" styleClass="block"/>
+                     <p:inputText styleClass="block w-full" required="true"
+                                  value="#{polizaView.polizaForm.numeroPoliza}"/>
+                     <span class="text-sm hidden"> </span>
+                  </p:outputPanel>
+
+                  <p:outputPanel styleClass="field col-12 md:col-6">
+                     <p:outputLabel for="@next" styleClass="block" value="Fecha inicio"/>
+                     <p:datePicker value="#{polizaView.polizaForm.fechaInicioVigencia}"
+                                   placeholder="dd/MM/yyyy" pattern="dd/MM/yyyy"
+                                   monthNavigator="true" yearNavigator="true"
+                                   showWeek="true" locale="es" required="true"
+                                   styleClass="w-full"/>
+                  </p:outputPanel>
+
+                  <p:outputPanel styleClass="field col-12 md:col-6">
+                     <p:outputLabel for="@next" styleClass="block" value="Fecha fin"/>
+                     <p:datePicker value="#{polizaView.polizaForm.fechaFinVigencia}"
+                                   placeholder="dd/MM/yyyy" pattern="dd/MM/yyyy"
+                                   monthNavigator="true" yearNavigator="true"
+                                   showWeek="true" locale="es" required="true"
+                                   styleClass="w-full"/>
+                  </p:outputPanel>
+
+                  <p:outputPanel styleClass="field col-12 md:col-6">
+                     <p:outputLabel for="@next" value="Cobertura" styleClass="block"/>
+                     <p:selectOneMenu id="select_anexo" value="#{polizaView.polizaForm.tipoCobertura}"
+                                      styleClass="w-full mw-auto" required="true">
+                        <f:selectItem itemLabel="Selecciona uno..."
+                                      itemValue="#{null}"/>
+                        <f:selectItem itemLabel="RESPONSABILIDAD CIVIL"
+                                      itemValue="RESPONSABILIDAD CIVIL"/>
+                        <f:selectItem itemLabel="BÁSICA, INVALIDEZ TOTAL Y PERMANENTE"
+                                      itemValue="BÁSICA, INVALIDEZ TOTAL Y PERMANENTE"/>
+                        <f:selectItem itemLabel="INCENDIO, FH, RC"
+                                      itemValue="INCENDIO, FH, RC"/>
+                        <f:selectItem itemLabel="CASCO Y RESPONSABILIDAD CIVIL"
+                                      itemValue="CASCO Y RESPONSABILIDAD CIVIL"/>
+                        <f:selectItem itemLabel="EQUIPO DE CONTRATISTAS"
+                                      itemValue="EQUIPO DE CONTRATISTAS"/>
+                        <f:selectItem itemLabel="SEGURO EQUIPO ELECTRÓNICO"
+                                      itemValue="SEGURO EQUIPO ELECTRÓNICO"/>
+                        <f:selectItem itemLabel="AMPLIA"
+                                      itemValue="AMPLIA"/>
+                     </p:selectOneMenu>
+                     <span class="text-sm hidden"> </span>
+                  </p:outputPanel>
+
+                  <p:outputPanel styleClass="field col-12 md:col-6">
+                     <p:outputLabel for="@next" value="Beneficiario" styleClass="block"/>
+                     <p:inputText styleClass="block w-full"
+                                  value="#{polizaView.polizaForm.beneficiarioPreferente}"/>
+                     <span class="text-sm hidden"> </span>
+                  </p:outputPanel>
+
+                  <p:outputPanel styleClass="field col-12 mt-5 mb-0">
+
+                     <p:outputPanel styleClass="flex justify-content-end">
+                        <p:commandButton value="Cancelar" ajax="true" process="@this"
+                                         action="#{polizaView.cerrarRegistroPolizasDialog()}"
+                                         styleClass="ui-button-outlined mr-4"/>
+
+                        <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'POLIZA_WRITE_REGISTRAR_POLIZA')">
+                           <p:commandButton value="Guardar" ajax="true" process="@form"
+                                            action="#{polizaView.guardarRegistroPoliza()}"
+                                            update="growl @form form_datatable"
+                                            validateClient="true"/>
+                        </sec:authorize>
+
+                     </p:outputPanel>
+
+                  </p:outputPanel>
+
+               </h:form>
+
+            </p:tab>
+            <p:tab id="registro-layout" title="Importar layout">
+
+               <h:form id="layout-form" styleClass="formgrid grid">
+
+                  <p:outputPanel styleClass="field col-12 mb-5" rendered="#{not polizaView.showErrorImportacion}">
+                     <p:outputLabel for="@next" value="Importar layout" styleClass="block"/>
+                     <p:inputTextarea id="dropZoneLayout" widgetVar="dropZoneLayout"
+                                      styleClass="w-full dropzone mb-3" rows="6" required="true"
+                                      placeholder="Arrastra y suelta aquí el archivo de importación de vehículos"
+                                      value="#{polizaView.layoutFileUpload}" readonly="true"/>
+                     <span class="text-sm">
+                                    <p:link value="O haz clic aquí para elegir" onclick="PF('uploadLayout').show();return false"/>
+                                </span>
+                     <p:fileUpload widgetVar="uploadLayout" listener="#{polizaView.importarLayoutRegistroPolizas}"
+                                   fileLimit="1" fileLimitMessage="Solo se permite subir un archivo"
+                                   sizeLimit="50000000" allowTypes="/(\.|\/)(xlsx|)$/" dropZone="dropZoneLayout"
+                                   update="growl" style="display: none"/>
+                  </p:outputPanel>
+
+                  <p:outputPanel styleClass="field col-12 mb-5" rendered="#{polizaView.showErrorImportacion}">
+                     <p:dataTable var="acuse" value="#{polizaView.acuseImportacionList}"
+                                  rows="25" rowHover="true"
+                                  rowIndexVar="index"
+                                  styleClass="dt-scrollable-x"
+                                  scrollable="true" scrollHeight="230" size="small"
+                                  paginator="true" paginatorPosition="bottom"
+                                  paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                  currentPageReportTemplate="{startRecord}-{endRecord} de {totalRecords} registros"
+                                  rowsPerPageTemplate="25,100,200,{ShowAll|'Todos'}">
+                        <f:facet name="header">
+                           Se encontraron errores al importar el layout
+                        </f:facet>
+
+                        <p:column headerText="Registro" width="180">
+                           <h:outputText value="#{acuse.titulo}"/>
+                        </p:column>
+
+                        <p:column headerText="Error" style="min-width: 200px">
+                           <h:outputText value="#{acuse.mensaje}"/>
+                        </p:column>
+
+                     </p:dataTable>
+                  </p:outputPanel>
+
+                  <p:outputPanel styleClass="field col-12 mt-5 mb-0" rendered="#{not polizaView.showErrorImportacion}">
+                     <p:outputPanel styleClass="flex justify-content-end">
+                        <p:commandButton value="Cancelar" ajax="true" process="@this"
+                                         action="#{polizaView.cerrarRegistroPolizasDialog()}"
+                                         styleClass="ui-button-outlined mr-4"/>
+                        <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'POLIZA_WRITE_IMPORTAR_POLIZA')">
+                           <p:commandButton value="Guardar" ajax="true" process="@form"
+                                            action="#{polizaView.guardarLayoutRegistroPolizas()}"
+                                            update="growl @form form_datatable"
+                                            validateClient="true"/>
+                        </sec:authorize>
+
+                     </p:outputPanel>
+                  </p:outputPanel>
+               </h:form>
+            </p:tab>
+         </p:tabView>
+      </p:outputPanel>
+   </p:dialog>
+
+</ui:composition>

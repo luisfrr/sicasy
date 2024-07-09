@@ -1,6 +1,7 @@
 package gob.yucatan.sicasy.config;
 
 import gob.yucatan.sicasy.business.entities.Usuario;
+import gob.yucatan.sicasy.services.iface.IUsuarioPermisoService;
 import gob.yucatan.sicasy.services.iface.IUsuarioService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -9,10 +10,12 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
 import java.util.Optional;
 
 @Component
@@ -21,6 +24,7 @@ import java.util.Optional;
 public class CustomAuthenticationManager implements AuthenticationManager {
 
     private final IUsuarioService usuarioService;
+    private final IUsuarioPermisoService usuarioPermisoService;
     private final PasswordEncoder passwordEncoder;
 
     @Override
@@ -33,11 +37,15 @@ public class CustomAuthenticationManager implements AuthenticationManager {
         if(usuarioOptional.isPresent()) {
             Usuario usuario = usuarioOptional.get();
 
-            if(!passwordEncoder.matches(presentedPassword, usuario.getPassword()))
+            if(usuario.getCorreoConfirmado() == 0 || (usuario.getPassword() != null &&
+                    !passwordEncoder.matches(presentedPassword, usuario.getPassword())))
                 throw new BadCredentialsException("InvalidCredentials");
 
             if(!usuario.isEnabled())
                 throw new BadCredentialsException("UserAccountDisabled");
+
+            List<? extends GrantedAuthority> authorities = usuarioPermisoService.getAuthorities(usuario.getIdUsuario());
+            usuario.setAuthorities(authorities);
 
             log.info("Login success! - User: {}", usuario.getUsername());
             return createUsernamePasswordAuthenticationToken(usuario);

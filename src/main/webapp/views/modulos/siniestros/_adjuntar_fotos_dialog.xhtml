@@ -1,0 +1,49 @@
+<ui:composition
+        xmlns="http://www.w3.org/1999/xhtml"
+        xmlns:h="http://xmlns.jcp.org/jsf/html"
+        xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+        xmlns:p="http://primefaces.org/ui">
+
+   <h:form id="form_adjuntar_fotos">
+
+      <p:dialog header="Adjuntar fotos"
+                id="adjuntar-fotos-dialog" widgetVar="adjuntarFotosDialog"
+                height="450" width="800"
+                showEffect="fade" modal="true"
+                closable="false" closeOnEscape="false"
+                cache="false" responsive="true">
+
+         <p:outputPanel id="adjuntar-fotos-dialog-content" styleClass="formgrid grid"
+                        rendered="#{siniestrosView.showAdjuntarFotos}">
+
+            <p:outputPanel styleClass="field col-12 mb-5">
+               <p:fileUpload listener="#{siniestrosView.subirFotoSiniestro}" mode="advanced" dragDropSupport="true"
+                             chooseButtonTitle="Elegir" chooseLabel="Elegir"
+                             cancelButtonTitle="Cancelar" cancelLabel="Cancelar"
+                             uploadButtonTitle="Subir" uploadLabel="Subir"
+                             multiple="true" update="growl" sizeLimit="10000000" fileLimit="10"
+                             fileLimitMessage="Has superado el número máximo de archivos"
+                             invalidFileMessage="Archivo no válido"
+                             invalidSizeMessage="Has superado el tamaño máximo por archivo"
+                             accept=".jpg,.jpeg,.png">
+               </p:fileUpload>
+               <span class="text-sm">Sólo se permiten archivos .jpg, .jpeg y .png. Máximo 10 archivos</span>
+            </p:outputPanel>
+
+            <p:outputPanel styleClass="field col-12 mb-0">
+
+               <p:outputPanel styleClass="flex justify-content-end">
+                  <p:commandButton value="Cerrar" ajax="true" process="@this"
+                                   action="#{siniestrosView.cerrarModalAdjuntarFotos()}"
+                                   styleClass="ui-button-outlined"/>
+               </p:outputPanel>
+
+            </p:outputPanel>
+
+         </p:outputPanel>
+
+      </p:dialog>
+
+   </h:form>
+
+</ui:composition>

@@ -5,6 +5,8 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.Date;
+import java.util.Objects;
+import java.util.Set;
 
 @Entity
 @Table(name = "rol", schema = "sec")
@@ -29,6 +31,9 @@ public class Rol {
     @Column(name = "descripcion")
     private String descripcion;
 
+    @OneToMany(mappedBy = "rol")
+    private Set<UsuarioRol> usuarioRolSet;
+
     @Column(name = "estatus", nullable = false)
     @Enumerated(EnumType.ORDINAL)
     private EstatusRegistro estatus;
@@ -40,18 +45,35 @@ public class Rol {
     @Column(name = "creado_por", nullable = false, updatable = false)
     private String creadoPor;
 
-    @Column(name = "fecha_modificacion")
+    @Column(name = "fecha_modificacion", insertable = false)
     @Temporal(TemporalType.TIMESTAMP)
     private Date fechaModificacion;
 
-    @Column(name = "modificado_por")
+    @Column(name = "modificado_por", insertable = false)
     private String modificadoPor;
 
-    @Column(name = "fecha_borrado")
+    @Column(name = "fecha_borrado", insertable = false)
     @Temporal(TemporalType.TIMESTAMP)
     private Date fechaBorrado;
 
-    @Column(name = "borrado_por")
+    @Column(name = "borrado_por", insertable = false)
     private String borradoPor;
 
+
+    @Transient
+    private boolean leftJoinUsuarioRolSet;
+
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Rol rol = (Rol) o;
+        return Objects.equals(idRol, rol.idRol);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(idRol);
+    }
 }

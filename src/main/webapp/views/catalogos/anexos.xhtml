@@ -1,0 +1,443 @@
+<ui:composition template="../../WEB-INF/facelets/main_layout.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="jakarta.faces.facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="jakarta.faces.html"
+                xmlns:f="jakarta.faces.core"
+                xmlns:sec="https://joinfaces.org/security">
+
+    <ui:define name="title">
+        #{anexoView.title}
+    </ui:define>
+
+    <ui:define name="content">
+
+        <p:outputPanel styleClass="container-fluid">
+
+            <p:growl id="growl" showDetail="true" showSummary="true" skipDetailIfEqualsSummary="true" globalOnly="true"/>
+
+            <h:form id="form_breadcum">
+                <p:breadCrumb homeDisplay="text" styleClass="mb-5">
+                    <p:menuitem value="Inicio" ajax="false" action="#{menuSessionBean.goToHome()}"/>
+                    <p:menuitem value="Catálogos"/>
+                    <p:menuitem value="Anexos" ajax="false" action="#{menuSessionBean.goToAnexos()}"/>
+                </p:breadCrumb>
+            </h:form>
+
+            <h:form id="form_toolbar">
+                <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'CAT_ANEXO_WRITE_AGREGAR', 'CAT_ANEXO_WRITE_IMPORTAR', 'CAT_ANEXO_READ_EXPORTAR')">
+                    <p:toolbar styleClass="mb-5">
+                        <p:toolbarGroup>
+                            <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'CAT_ANEXO_WRITE_AGREGAR')">
+                                <p:commandButton value="Nuevo"
+                                                 action="#{anexoView.agregarAnexo()}"
+                                                 oncomplete="PF('formDialog').show()"
+                                                 update="form_dialog"
+                                                 styleClass="mr-4">
+                                    <p:resetInput target="form_dialog:dialogContent"/>
+                                </p:commandButton>
+                            </sec:authorize>
+                        </p:toolbarGroup>
+
+                        <p:toolbarGroup align="right">
+                            <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'CAT_ANEXO_WRITE_IMPORTAR')">
+                                <p:commandButton value="Importar" ajax="false" action="#{anexoView.abrirModalImport()}"
+                                                 styleClass="ui-button-outlined mr-4">
+                                </p:commandButton>
+                            </sec:authorize>
+
+                            <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'CAT_ANEXO_READ_EXPORTAR')">
+                                <p:commandButton value="Exportar" ajax="false" onclick="PrimeFaces.monitorDownload(start, stop);"
+                                                 styleClass="ui-button-outlined">
+                                    <p:fileDownload value="#{fileDownloadBean.downloadFile(anexoView.exportFileExcel())}"/>
+                                </p:commandButton>
+                            </sec:authorize>
+                        </p:toolbarGroup>
+                    </p:toolbar>
+                </sec:authorize>
+            </h:form>
+
+            <h:form id="form_filtros" styleClass="mb-5">
+
+                <p:panel header="Filtros" widgetVar="panelFiltros"
+                         toggleable="true" toggleSpeed="500">
+                    <p:outputPanel styleClass="grid formgrid mb-2">
+
+                        <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4 xl:col-3">
+                            <p:outputLabel for="@next" value="Anexo" styleClass="block"/>
+                            <p:inputText styleClass="block w-full" placeholder="Ingresa un nombre..."
+                                         value="#{anexoView.anexoFilter.nombre}"/>
+                        </p:outputPanel>
+
+                        <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4 xl:col-3">
+                            <p:outputLabel for="@next" value="Número de licitación" styleClass="block"/>
+                            <p:selectOneMenu styleClass="block w-full" value="#{anexoView.anexoFilter.licitacion.numeroLicitacion}" >
+                                <f:selectItem  itemValue="#{null}" itemLabel="----"/>
+                                <f:selectItems value="#{anexoView.licitacionesActivasList}" var="licitacion" itemLabel="#{licitacion.numeroLicitacion}"
+                                               itemValue="#{licitacion.numeroLicitacion}"/>
+                            </p:selectOneMenu>
+                        </p:outputPanel>
+
+                        <sec:authorize access="hasAuthority('ROLE_OWNER')">
+                            <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4 xl:col-3">
+                                <p:outputLabel for="@next" value="Estatus" styleClass="block"/>
+                                <p:selectOneMenu value="#{anexoView.anexoFilter.estatusRegistro}" styleClass="w-full">
+                                    <f:selectItem itemLabel="Todos" itemValue="#{null}"/>
+                                    <f:selectItems value="#{anexoView.estatusRegistros}" var="estatus"
+                                                   itemValue="#{estatus}" itemLabel="#{estatus.label}"/>
+                                </p:selectOneMenu>
+                                <span class="text-sm hidden"> </span>
+                            </p:outputPanel>
+                        </sec:authorize>
+
+
+                    </p:outputPanel>
+
+                    <f:facet name="footer">
+                        <p:outputPanel styleClass="flex flex-row gap-4 justify-content-end">
+                            <p:commandButton value="Limpiar filtros" styleClass="ui-button-outlined"
+                                             ajax="true" action="#{anexoView.limpiarFiltros()}"
+                                             update="form_filtros form_datatable"/>
+                            <p:commandButton value="Buscar" ajax="true" action="#{anexoView.buscar()}"
+                                             update="form_datatable"/>
+                        </p:outputPanel>
+                    </f:facet>
+                </p:panel>
+
+            </h:form>
+
+            <h:form id="form_datatable" styleClass="mb-5">
+
+                <p:dataTable id="dtExample"
+                             var="anexo" value="#{anexoView.anexoList}"
+                             rows="50"
+                             rowKey="#{anexo.idAnexo}" rowIndexVar="index"
+                             styleClass="dt-scrollable"
+                             scrollable="true"
+                             paginator="true" paginatorPosition="bottom"
+                             paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             currentPageReportTemplate="{startRecord}-{endRecord} de {totalRecords} registros"
+                             rowsPerPageTemplate="50,100,200,{ShowAll|'Todos'}">
+
+                    <f:facet name="header">
+                        Anexos
+                    </f:facet>
+
+                    <p:column headerText="No." width="20">
+                        <h:outputText value="#{index + 1}" />
+                    </p:column>
+
+                    <p:column headerText="Nombre" width="100">
+                        <h:outputText value="#{anexo.nombre}"/>
+                    </p:column>
+
+                    <p:column headerText="Número licitación" width="100">
+                        <h:outputText value="#{anexo.licitacion.numeroLicitacion}"/>
+                    </p:column>
+
+                    <p:column headerText="Descripción" width="250">
+                        <h:outputText value="#{anexo.descripcion}"/>
+                    </p:column>
+
+                    <p:column headerText="Fecha inicio" width="90">
+                        <h:outputText value="#{anexo.fechaInicio}">
+                            <f:convertDateTime pattern="dd-MM-yyyy" />
+                        </h:outputText>
+                    </p:column>
+
+                    <p:column headerText="Fecha final" width="110">
+                        <p:outputPanel styleClass="flex flex-row gap-1">
+                            <h:outputText value="#{anexo.fechaFinal}">
+                                <f:convertDateTime pattern="dd-MM-yyyy"/>
+                            </h:outputText>
+                            <p:badge severity="danger" rendered="false">
+                                <i class="pi pi-bell "/>
+                            </p:badge>
+                        </p:outputPanel>
+                    </p:column>
+
+                    <p:column headerText="Fecha firma" width="90">
+                        <h:outputText value="#{anexo.fechaFirma}">
+                            <f:convertDateTime pattern="dd-MM-yyyy"/>
+                        </h:outputText>
+                    </p:column>
+
+                    <sec:authorize access="hasAnyAuthority('ROLE_OWNER')">
+
+                        <p:column headerText="Estatus registro" width="150">
+                            <h:outputText value="#{anexo.estatusRegistro.label}">
+                            </h:outputText>
+                        </p:column>
+
+                        <p:column headerText="Fecha creación" width="180">
+                            <h:outputText value="#{anexo.fechaCreacion}">
+                                <f:convertDateTime pattern="dd/MM/yyyy HH:mm:ss a"/>
+                            </h:outputText>
+                        </p:column>
+
+                        <p:column headerText="Creado por" width="150">
+                            <h:outputText value="#{anexo.creadoPor}">
+                            </h:outputText>
+                        </p:column>
+
+                        <p:column headerText="Fecha modificación" width="180">
+                            <h:outputText value="#{anexo.fechaModificacion}">
+                                <f:convertDateTime pattern="dd/MM/yyyy HH:mm:ss a"/>
+                            </h:outputText>
+                        </p:column>
+
+                        <p:column headerText="Modificado por" width="150">
+                            <h:outputText value="#{anexo.modificadoPor}">
+                            </h:outputText>
+                        </p:column>
+
+                        <p:column headerText="Fecha borrado" width="180">
+                            <h:outputText value="#{anexo.fechaBorrado}">
+                                <f:convertDateTime pattern="dd/MM/yyyy HH:mm:ss a"/>
+                            </h:outputText>
+                        </p:column>
+
+                        <p:column headerText="Borrado por" width="150">
+                            <h:outputText value="#{anexo.borradoPor}">
+                            </h:outputText>
+                        </p:column>
+                        
+                    </sec:authorize>
+
+                    <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'CAT_ANEXO_WRITE_EDITAR', 'CAT_ANEXO_READ_DESCARGAR_ARCHIVO', 'CAT_ANEXO_WRITE_ELIMINAR')">
+                        <p:column headerText="Acciones">
+
+                            <p:growl id="message" showDetail="true"/>
+
+                            <p:commandButton id="buttonOptions" type="button"
+                                             icon="fi fi-rr-menu-dots-vertical" styleClass="rounded-button ui-button-outlined" />
+                            <p:menu overlay="true" trigger="buttonOptions" my="left top" at="left bottom" >
+
+                                <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'CAT_ANEXO_WRITE_EDITAR')">
+                                    <p:menuitem value="Editar"
+                                                action="#{anexoView.editar(anexo.idAnexo)}"
+                                                ajax="true" update="form_dialog"
+                                                oncomplete="PF('formDialog').show()">
+                                        <p:resetInput target="form_dialog:dialogContent"/>
+                                    </p:menuitem>
+                                </sec:authorize>
+                                <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'CAT_ANEXO_READ_DESCARGAR_ARCHIVO')">
+                                    <p:menuitem value="Descargar archivo" ajax="false" onclick="PrimeFaces.monitorDownload(start, stop);"
+                                                disabled="#{anexo.rutaArchivo == null}">
+                                        <p:fileDownload value="#{fileDownloadBean.downloadFileByPath(anexo.rutaArchivo)}" />
+                                    </p:menuitem>
+                                </sec:authorize>
+                                <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'CAT_ANEXO_WRITE_ELIMINAR')">
+                                    <p:menuitem value="Eliminar"
+                                                ajax="true" update="form_confirm_dialog"
+                                                oncomplete="PF('confirmDialog').show()"
+                                                action="#{anexoView.doEliminar(anexo.idAnexo)}">
+                                    </p:menuitem>
+                                </sec:authorize>
+                            </p:menu>
+
+                        </p:column>
+                    </sec:authorize>
+
+                </p:dataTable>
+
+            </h:form>
+
+        </p:outputPanel>
+
+
+
+        <h:form id="form_confirm_dialog">
+            <p:dialog header="Aviso" widgetVar="confirmDialog"
+                    showEffect="fade" modal="true"
+                    closable="true" closeOnEscape="true"
+                    cache="false" responsive="true">
+                <p:outputPanel>
+                    <p:outputLabel styleClass="block mb-2" value="¿Está seguro que desea eliminar el registro?"/>
+
+                </p:outputPanel>
+
+                <f:facet name="footer">
+                    <p:commandButton value="No" onclick="PF('confirmDialog').hide()"
+                                     class="ui-button-outlined"/>
+                    <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'CAT_ANEXO_WRITE_ELIMINAR')">
+                        <p:commandButton value="Si"
+                                         action="#{anexoView.eliminar()}"
+                                         ajax="true" process="@form"
+                                         update="growl form_datatable"
+                                         validateClient="true"/>
+                    </sec:authorize>
+                </f:facet>
+            </p:dialog>
+        </h:form>
+
+
+
+        <h:form id="form_dialog" enctype="multipart/form-data">
+            <p:dialog header="#{anexoView.titleDialog}" widgetVar="formDialog"
+                      minHeight="350" width="450"
+                      showEffect="fade" modal="true"
+                      closable="true" closeOnEscape="true"
+                      cache="false" responsive="true">
+                <p:outputPanel id="dialogContent" styleClass="formgrid grid" rendered="#{anexoView.anexoSelected != null}">
+
+                    <p:outputPanel styleClass="field col-12">
+                        <p:outputLabel for="@next" value="Nombre" styleClass="block"/>
+                        <p:inputText styleClass="block w-full" required="true"
+                                     value="#{anexoView.anexoSelected.nombre}"/>
+                        <span class="text-sm hidden"> </span>
+                    </p:outputPanel>
+
+                    <p:outputPanel styleClass="field col-12">
+                        <p:outputLabel for="@next" value="Número licitación" styleClass="block"/>
+                        <p:selectOneMenu  styleClass="block w-full" required="true"
+                                          value="#{anexoView.anexoSelected.licitacion.idLicitacion}">
+                            <f:selectItem  itemValue="#{null}" itemLabel="Seleccione uno..."/>
+                            <f:selectItems value="#{anexoView.licitacionesActivasList}" var="licitacion" itemLabel="#{licitacion.numeroLicitacion}"
+                                           itemValue="#{licitacion.idLicitacion}"/>
+                        </p:selectOneMenu>
+                        <span class="text-sm hidden"> </span>
+                    </p:outputPanel>
+
+                    <p:outputPanel styleClass="field col-12">
+                        <p:outputLabel for="@next" value="Descripción" styleClass="block"/>
+                        <p:inputTextarea styleClass="block w-full" rows="3"
+                                         value="#{anexoView.anexoSelected.descripcion}"/>
+                        <span class="text-sm hidden"> </span>
+                    </p:outputPanel>
+
+                    <p:outputPanel styleClass="field col-12">
+                        <p:outputLabel for="@next" styleClass="block" value="Fecha inicio "/>
+                        <p:calendar value="#{anexoView.anexoSelected.fechaInicio}" id="id_calendar1"
+                                    inputStyleClass="w-full"
+                                    pattern="dd-MM-yyyy" locale="es">
+                            <p:ajax
+                                    event="dateSelect" listener="#{anexoView.validateFechaInicioFinal}"
+                                    update=":form_dialog:id_message2 :form_dialog:id_message :form_dialog:id_calendar2 :form_dialog:id_calendar1"/>
+                        </p:calendar>
+                        <p:message
+                                id="id_message2"
+                                for="id_calendar1" />
+                    </p:outputPanel>
+
+                    <p:outputPanel styleClass="field col-12">
+                        <p:outputLabel for="@next" styleClass="block"  value="Fecha final "/>
+                        <p:calendar  value="#{anexoView.anexoSelected.fechaFinal}"
+                                     inputStyleClass="w-full" id="id_calendar2"
+                                     disabled="#{anexoView.anexoSelected.fechaInicio == null}"
+                                     pattern="dd-MM-yyyy" locale="es">
+                            <p:ajax
+                                    event="dateSelect" listener="#{anexoView.validateFechaInicioFinal}"
+                                    update=":form_dialog:id_message :form_dialog:id_message2 :form_dialog:id_calendar1 :form_dialog:id_calendar2"/>
+                        </p:calendar>
+                        <p:message
+                                id="id_message"
+                                for="id_calendar2" />
+                    </p:outputPanel>
+
+                    <p:outputPanel styleClass="field col-12">
+                        <p:outputLabel for="@next" styleClass="block"  value="Fecha firma "/>
+                        <p:calendar  value="#{anexoView.anexoSelected.fechaFirma}"
+                                     inputStyleClass="w-full"
+                                     pattern="dd-MM-yyyy" locale="es"/>
+                    </p:outputPanel>
+
+                    <p:fileUpload value="#{anexoView.anexoFile}" sizeLimit="1000000"
+                                  mode="simple" fileLimit="1"
+                                  chooseButtonTitle="Elegir" chooseLabel="Elegir"
+                                  cancelButtonTitle="Cancelar" cancelLabel="Cancelar"
+                                  uploadButtonTitle="Subir" uploadLabel="Subir"
+                                  fileLimitMessage="Has superado el número máximo de archivos"
+                                  invalidFileMessage="Archivo no válido"
+                                  invalidSizeMessage="Has superado el tamaño máximo por archivo"
+                                  allowTypes="/(\.|\/)(pdf)$/" accept=".pdf"
+                                  skinSimple="true"/>
+
+                </p:outputPanel>
+
+                <f:facet name="footer">
+
+                    <p:commandButton value="Cancelar" onclick="PF('formDialog').hide()"
+                                     class="ui-button-outlined"/>
+
+                    <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'CAT_ANEXO_WRITE_AGREGAR', 'CAT_ANEXO_WRITE_EDITAR')">
+                        <p:commandButton value="Guardar" id="btn_guardarAnexo"
+                                         action="#{anexoView.guardarAnexo()}"
+                                         ajax="true" process="@form" disabled="#{!anexoView.fechasValidadasCorrectas}"
+                                         update="growl form_datatable"
+                                         validateClient="true"/>
+                    </sec:authorize>
+
+                </f:facet>
+            </p:dialog>
+        </h:form>
+
+        <h:form id="form_import">
+            <p:dialog widgetVar="formDialogImport" showEffect="fade" modal="true"
+                      height="350" width="850" header="Importación de datos"
+                      closable="true" closeOnEscape="true"
+                      cache="false" responsive="true">
+                <p:outputPanel id="import-dialog-content" styleClass="formgrid grid">
+
+                    <p:outputPanel styleClass="field col-12 mb-5" rendered="#{not anexoView.showErrorImportacion}">
+                        <p:outputLabel for="@next" value="Importar layout" styleClass="block"/>
+                        <p:inputTextarea id="dropZoneLayout" widgetVar="dropZoneLayout"
+                                         styleClass="w-full dropzone mb-3" rows="5" required="true"
+                                         placeholder="Arrastra y suelta aquí el archivo de importación de anexos"
+                                         value="#{anexoView.layoutFileUpload}" readonly="true"/>
+                        <span class="text-sm">
+                                    <p:link value="O haz clic aquí para elegir" onclick="PF('uploadLayout').show();return false"/>
+                                </span>
+                        <p:fileUpload widgetVar="uploadLayout" listener="#{anexoView.importarLayout}"
+                                      fileLimit="1" fileLimitMessage="Solo se permite subir un archivo"
+                                      sizeLimit="50000000" allowTypes="/(\.|\/)(xlsx|)$/" dropZone="dropZoneLayout"
+                                      update="growl" style="display: none"/>
+                    </p:outputPanel>
+
+                    <p:outputPanel id="panel_acuseImport" styleClass="field col-12 mb-5" rendered="#{anexoView.showErrorImportacion}">
+                        <p:dataTable id="dt_acuses" var="acuse" value="#{anexoView.acuseImportacionList}"
+                                     rows="25" rowHover="true"
+                                     rowIndexVar="index"
+                                     styleClass="dt-scrollable-x"
+                                     scrollable="true" scrollHeight="230" size="small"
+                                     paginator="true" paginatorPosition="bottom"
+                                     paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                     currentPageReportTemplate="{startRecord}-{endRecord} de {totalRecords} registros"
+                                     rowsPerPageTemplate="25,100,200,{ShowAll|'Todos'}">
+                            <f:facet name="header">
+                                Se encontraron error al importar el layout
+                            </f:facet>
+
+                            <p:column headerText="Anexo" width="180">
+                                <h:outputText value="#{acuse.titulo}"/>
+                            </p:column>
+
+                            <p:column headerText="Error" style="min-width: 200px">
+                                <h:outputText value="#{acuse.mensaje}"/>
+                            </p:column>
+
+                        </p:dataTable>
+                    </p:outputPanel>
+
+                    <p:outputPanel styleClass="field col-12 mt-5 mb-0" rendered="#{not anexoView.showErrorImportacion}">
+                        <p:outputPanel styleClass="flex justify-content-end">
+                            <p:commandButton value="Cancelar" ajax="true" process="@this"
+                                             action="#{anexoView.cerrarModalImport()}"
+                                             styleClass="ui-button-outlined mr-4"/>
+                            <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'CAT_ANEXO_WRITE_IMPORTAR')">
+                                <p:commandButton value="Guardar" ajax="true" process="@form"
+                                                 action="#{anexoView.guardarImportacionAnexos()}"
+                                                 update="growl :form_import:import-dialog-content"
+                                                 validateClient="true"/>
+                            </sec:authorize>
+                        </p:outputPanel>
+                    </p:outputPanel>
+
+                </p:outputPanel>
+            </p:dialog>
+        </h:form>
+
+
+    </ui:define>
+
+</ui:composition>

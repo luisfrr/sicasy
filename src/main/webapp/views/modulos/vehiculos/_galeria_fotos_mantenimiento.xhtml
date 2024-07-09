@@ -1,0 +1,108 @@
+<ui:composition
+        xmlns="http://www.w3.org/1999/xhtml"
+        xmlns:h="http://xmlns.jcp.org/jsf/html"
+        xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+        xmlns:f="http://xmlns.jcp.org/jsf/core"
+        xmlns:p="http://primefaces.org/ui">
+
+   <h:form id="form_galeria_mantenimiento" enctype="multipart/form-data">
+      <p:dialog header="Fotos de los mantenimientos" widgetVar="galeriaFotosMantenimientoDialog" styleClass="mb-5"
+                showEffect="fade" modal="true"
+                height="300" width="600"
+                cache="false" responsive="true">
+
+         <p:remoteCommand name="rc" actionListener="#{vehiculoView.changeActiveIndex}" update="form_galeria_mantenimiento:galleria-mante"
+                          oncomplete="PF('galleriaSiniestro').show()" />
+
+         <p:panel header="Fotos" styleClass="mb-5">
+            <f:facet name="actions">
+               <p:commandLink styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default flex justify-content-center align-items-center"
+                              ajax="true"
+                              action="#{vehiculoView.abrirModalFotosMantenimiento2(vehiculoView.mantenimientoVehiculo)}"
+                              oncomplete="Main.changeChooseLabel();" update="growl">
+                  <i class="fi fi-rr-add-image"/>
+               </p:commandLink>
+               <p:commandLink styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default flex justify-content-center align-items-center mr-3"
+                              ajax="true" action="#{vehiculoView.presentGallery()}"
+                              update="form_galeria_mantenimiento:galleria-mante"
+                              oncomplete="PF('galleriaMantenimiento').show()">
+                  <i class="fi fi-rr-play-alt"/>
+               </p:commandLink>
+            </f:facet>
+            <p:outputPanel styleClass="grid" rendered="#{vehiculoView.mantenimientoFotoList != null and vehiculoView.mantenimientoFotoList.size() > 0}">
+               <ui:repeat value="#{vehiculoView.mantenimientoFotoList}" var="mantenimientoFoto" varStatus="status">
+                  <p:outputPanel styleClass="col-12 md:col-4 lg:col-2">
+                     <p:graphicImage value="#{fileBean.getFile(mantenimientoFoto.rutaArchivo)}" alt="#{mantenimientoFoto.nombreArchivo}"
+                                     onclick="rc([{name: 'index', value: '#{status.index}'}])"
+                                     style="width: 100%; display: block; cursor: pointer;" stream="false" styleClass="border-round-2xl mb-3" />
+                     <div class="flex justify-content-center align-items-center">
+                        <p:commandLink value="Borrar" styleClass="text-sm text-center"
+                                       ajax="true" action="#{vehiculoView.borrarFotoMantenimiento(mantenimientoFoto.idMantenimientoFoto)}">
+                           <p:confirm header="Confirmación" message="¿Estás seguro que desear borrar la foto?"
+                                      icon="pi pi-exclamation-triangle"/>
+                        </p:commandLink>
+                     </div>
+                  </p:outputPanel>
+               </ui:repeat>
+            </p:outputPanel>
+            <p:outputPanel styleClass="grid" rendered="#{vehiculoView.mantenimientoFotoList == null or vehiculoView.mantenimientoFotoList.size() == 0}">
+               <p:outputPanel styleClass="field col-12">
+                  No se han registrado fotos del mantenimiento
+               </p:outputPanel>
+            </p:outputPanel>
+         </p:panel>
+         <p:galleria id="galleria-mante" widgetVar="galleriaMantenimiento"
+                     value="#{vehiculoView.mantenimientoFotoList}" activeIndex="#{vehiculoView.activeIndex}"
+                     var="manteFoto" responsiveOptions="#{vehiculoView.responsiveOptionsGallery}"
+                     numVisible="10" circular="true" fullScreen="true" showItemNavigators="true"
+                     showThumbnails="false" style="max-width: 850px">
+            <p:graphicImage value="#{fileBean.getFile(manteFoto.rutaArchivo)}" styleClass="w-full"
+                            alt="#{manteFoto.nombreArchivo}" stream="false"/>
+         </p:galleria>
+
+
+      </p:dialog>
+   </h:form>
+
+   <h:form id="form_adjuntar_fotos-mantenimiento">
+
+      <p:dialog header="Adjuntar fotos"
+                id="adjuntar-fotos-dialog-mantenimiento" widgetVar="adjuntarFotosMantenimientoDialog"
+                height="450" width="800"
+                showEffect="fade" modal="true"
+                closable="false" closeOnEscape="false"
+                cache="false" responsive="true">
+
+         <p:outputPanel id="adjuntar-fotos-dialog-content" styleClass="formgrid grid">
+
+            <p:outputPanel styleClass="field col-12 mb-5">
+               <p:fileUpload listener="#{vehiculoView.subirFotoMantenimiento2}" mode="advanced" dragDropSupport="true"
+                             chooseButtonTitle="Elegir" chooseLabel="Elegir"
+                             cancelButtonTitle="Cancelar" cancelLabel="Cancelar"
+                             uploadButtonTitle="Subir" uploadLabel="Subir"
+                             multiple="true" update="growl" sizeLimit="10000000" fileLimit="10"
+                             fileLimitMessage="Has superado el número máximo de archivos"
+                             invalidFileMessage="Archivo no válido"
+                             invalidSizeMessage="Has superado el tamaño máximo por archivo"
+                             accept=".jpg,.jpeg,.png">
+               </p:fileUpload>
+               <span class="text-sm">Sólo se permiten archivos .jpg, .jpeg y .png. Máximo 10 archivos</span>
+            </p:outputPanel>
+
+            <p:outputPanel styleClass="field col-12 mb-0">
+
+               <p:outputPanel styleClass="flex justify-content-end">
+                  <p:commandButton value="Cerrar" ajax="true" process="@this"
+                                   action="#{vehiculoView.cerrarGaleriaFotosMantenimiento()}"
+                                   styleClass="ui-button-outlined"/>
+               </p:outputPanel>
+
+            </p:outputPanel>
+
+         </p:outputPanel>
+
+      </p:dialog>
+
+   </h:form>
+
+</ui:composition>

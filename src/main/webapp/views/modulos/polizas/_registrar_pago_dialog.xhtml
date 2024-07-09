@@ -1,0 +1,81 @@
+<ui:composition
+        xmlns="http://www.w3.org/1999/xhtml"
+        xmlns:h="http://xmlns.jcp.org/jsf/html"
+        xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+        xmlns:p="http://primefaces.org/ui"
+        xmlns:sec="https://joinfaces.org/security">
+
+   <p:dialog header="Registrar pago"
+             id="registrar-pago-dialog" widgetVar="registrarPagoDialog"
+             height="400" width="600"
+             showEffect="fade" modal="true"
+             closable="true" closeOnEscape="true"
+             cache="false" responsive="true">
+      <p:outputPanel id="registrar-pago-dialog-content" styleClass="formgrid grid">
+         <h:form id="registrar-pago-form" styleClass="formgrid grid"
+                 enctype="multipart/form-data"
+                 rendered="#{polizaView.showRegistrarPagoDialog}">
+
+            <p:outputPanel styleClass="field col-12 mb-5">
+               <p class="text-lg">¿Estás seguro que deseas registrar el pago de los incisos seleccionados?</p>
+            </p:outputPanel>
+
+            <p:outputPanel styleClass="field col-12 mb-5">
+               <p:outputLabel for="@next" value="Incisos seleccionados" styleClass="block"/>
+               <p:inputNumber value="#{polizaView.pagoInciso.subtotal}" styleClass="w-full mb-3"
+                              required="true" readonly="true"/>
+            </p:outputPanel>
+
+            <p:outputPanel styleClass="field col-12 mb-5">
+               <p:outputLabel for="@next" value="Saldos pendientes" styleClass="block"/>
+               <p:inputNumber value="#{polizaView.pagoInciso.saldoPendiente}" styleClass="w-full mb-3"
+                              required="true" readonly="true"/>
+            </p:outputPanel>
+
+            <p:outputPanel styleClass="field col-12 mb-5">
+               <p:selectBooleanCheckbox value="#{polizaView.pagoInciso.usarSaldoPendiente}"
+                                        disabled="#{polizaView.pagoInciso.saldoPendiente == 0}"
+                                        itemLabel="Usar saldo pendiente">
+                  <p:ajax update="growl registrar-pago-form:panel_total" listener="#{polizaView.usarSaldoPendiente}"/>
+               </p:selectBooleanCheckbox>
+            </p:outputPanel>
+
+            <p:outputPanel id="panel_total" styleClass="field col-12 mb-5">
+               <p:outputLabel for="@next" value="Total a pagar" styleClass="block"/>
+               <p:inputNumber value="#{polizaView.pagoInciso.total}" styleClass="w-full mb-3"
+                              required="true" readonly="true"/>
+            </p:outputPanel>
+
+            <p:outputPanel styleClass="field col-12 mb-5">
+               <p:outputLabel for="@next" value="Folio factura" styleClass="block"/>
+               <p:inputText value="#{polizaView.pagoInciso.folioFactura}" styleClass="w-full mb-3"
+                              required="true"/>
+            </p:outputPanel>
+
+            <p:outputPanel styleClass="field col-12 mb-5">
+               <p:outputLabel for="@next" value="Factura" styleClass="block"/>
+               <p:fileUpload value="#{polizaView.file}" mode="simple"
+                             chooseButtonTitle="Elegir"
+                             accept=".pdf" sizeLimit="10000000"
+                             skinSimple="true" required="true"/>
+               <p class="text-sm mt-2">Solo se acepta un archivo en formato PDF.</p>
+            </p:outputPanel>
+
+
+            <p:outputPanel styleClass="field col-12 mt-5 mb-0">
+               <p:outputPanel styleClass="flex justify-content-end">
+                  <p:commandButton value="Cancelar" ajax="true" process="@this"
+                                   action="#{polizaView.cerrarRegistrarPagoModal()}"
+                                   styleClass="ui-button-outlined mr-4"/>
+                  <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'POLIZA_WRITE_REGISTRAR_PAGO')">
+                     <p:commandButton value="Pagar" ajax="true" process="@form"
+                                      actionListener="#{polizaView.registrarPago()}"
+                                      update="growl" validateClient="true"/>
+                  </sec:authorize>
+               </p:outputPanel>
+            </p:outputPanel>
+         </h:form>
+      </p:outputPanel>
+   </p:dialog>
+
+</ui:composition>

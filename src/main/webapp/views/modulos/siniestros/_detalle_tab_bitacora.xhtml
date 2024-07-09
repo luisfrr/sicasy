@@ -1,0 +1,74 @@
+<ui:composition
+        xmlns="http://www.w3.org/1999/xhtml"
+        xmlns:h="http://xmlns.jcp.org/jsf/html"
+        xmlns:f="http://xmlns.jcp.org/jsf/core"
+        xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+        xmlns:p="http://primefaces.org/ui">
+
+   <h:form id="siniestro_bitacora_form">
+
+      <p:dataTable id="dt_bitacora_siniestro"
+                      var="bitacora" value="#{siniestrosView.siniestroBitacoraList}"
+                      rows="50" rowHover="true"
+                      rowKey="#{bitacora.idBitacoraSiniestro}" rowIndexVar="index"
+                      styleClass="dt-scrollable-x"
+                      scrollable="true"
+                      paginator="true" paginatorPosition="bottom"
+                      paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                      currentPageReportTemplate="{startRecord}-{endRecord} de {totalRecords} registros"
+                      rowsPerPageTemplate="50,100,200,{ShowAll|'Todos'}">
+
+            <f:facet name="header">
+               Bitácora de actividades
+            </f:facet>
+
+            <p:column headerText="No." width="50" >
+               <p:rowToggler />
+               <h:outputText value="#{index + 1}" styleClass="ml-2"/>
+            </p:column>
+
+            <p:column headerText="Actividad" width="250">
+               <h:outputText value="#{bitacora.accion}"/>
+            </p:column>
+
+            <p:column headerText="Fecha" width="80">
+               <h:outputText value="#{bitacora.fechaModificacion}"/>
+            </p:column>
+
+            <p:column headerText="Realizado por" width="100">
+               <h:outputText value="#{bitacora.modificadoPor}"/>
+            </p:column>
+
+            <p:rowExpansion>
+               <p:dataTable id="dtcambios"
+                            var="cambios" value="#{bitacora.bitacoraCambios}"
+                            rowKey="#{cambios.campo}"
+                            rowHover="true" rowIndexVar="num"
+                            styleClass="dt-scrollable"
+                            scrollable="true">
+
+                  <p:column headerText="No." width="30">
+                     <h:outputText value="#{num + 1}" />
+                  </p:column>
+
+                  <p:column headerText="Campo" width="80">
+                     <h:outputText value="#{cambios.campo}"/>
+                  </p:column>
+
+                  <p:column headerText="Anterior" width="120">
+                     <h:outputText value="#{cambios.valorAnterior}"/>
+                  </p:column>
+
+                  <p:column headerText="Nuevo" width="120">
+                     <h:outputText value="#{cambios.valorNuevo}"/>
+                  </p:column>
+
+               </p:dataTable>
+
+            </p:rowExpansion>
+
+         </p:dataTable>
+
+   </h:form>
+
+</ui:composition>
