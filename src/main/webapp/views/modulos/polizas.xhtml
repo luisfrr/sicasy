@@ -28,27 +28,34 @@
                     </p:breadCrumb>
                 </h:form>
 
-                <h:form id="form_toolbar" styleClass="mb-5">
-                    <p:toolbar>
-                        <p:toolbarGroup>
-                            <p:commandButton id="accionesPolizas" type="button" value="Acciones"
-                                             iconPos="right" icon="fi fi-rr-angle-small-down"/>
-                            <p:menu overlay="true" trigger="accionesPolizas" my="left top" at="left bottom">
-                                <p:menuitem value="Registrar pólizas" ajax="true" action="#{polizaView.abrirRegistroPolizasDialog()}"/>
-                                <p:menuitem value="Registrar endoso de alta" ajax="true" action="#{polizaView.abrirRegistroEndosoAltaDialog()}"/>
-                            </p:menu>
-                        </p:toolbarGroup>
-                        <p:toolbarGroup align="right">
-                            <p:commandButton id="exportarPolizas" type="button" value="Exportar"
-                                             iconPos="right" icon="fi fi-rr-angle-small-down"
-                                             styleClass="ui-button-outlined"/>
-                            <p:menu overlay="true" trigger="exportarPolizas" my="left top" at="left bottom">
-                                <p:menuitem value="Exportar pólizas"/>
-                                <p:menuitem value="Layout Registro de Pólizas"/>
-                                <p:menuitem value="Layout Endoso de Alta"/>
-                            </p:menu>
-                        </p:toolbarGroup>
-                    </p:toolbar>
+                <h:form id="form_toolbar">
+                    <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'POLIZA_WRITE_REGISTRAR_POLIZA', 'POLIZA_WRITE_IMPORTAR_POLIZA', 'POLIZA_WRITE_ENDOSO_ALTA', 'POLIZA_WRITE_IMPORTAR_ENDOSO_ALTA')">
+                        <p:toolbar styleClass="mb-5">
+                            <p:toolbarGroup>
+                                <p:commandButton id="accionesPolizas" type="button" value="Acciones"
+                                                 iconPos="right" icon="fi fi-rr-angle-small-down"/>
+                                <p:menu overlay="true" trigger="accionesPolizas" my="left top" at="left bottom">
+                                    <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'POLIZA_WRITE_REGISTRAR_POLIZA', 'POLIZA_WRITE_IMPORTAR_POLIZA')">
+                                        <p:menuitem value="Registrar pólizas" ajax="true" action="#{polizaView.abrirRegistroPolizasDialog()}"/>
+                                    </sec:authorize>
+
+                                    <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'POLIZA_WRITE_ENDOSO_ALTA', 'POLIZA_WRITE_IMPORTAR_ENDOSO_ALTA')">
+                                        <p:menuitem value="Registrar endoso de alta" ajax="true" action="#{polizaView.abrirRegistroEndosoAltaDialog()}"/>
+                                    </sec:authorize>
+                                </p:menu>
+                            </p:toolbarGroup>
+                            <p:toolbarGroup align="right">
+                                <p:commandButton id="exportarPolizas" type="button" value="Exportar"
+                                                 iconPos="right" icon="fi fi-rr-angle-small-down"
+                                                 styleClass="ui-button-outlined"/>
+                                <p:menu overlay="true" trigger="exportarPolizas" my="left top" at="left bottom">
+                                    <p:menuitem value="Exportar pólizas"/>
+                                    <p:menuitem value="Layout Registro de Pólizas"/>
+                                    <p:menuitem value="Layout Endoso de Alta"/>
+                                </p:menu>
+                            </p:toolbarGroup>
+                        </p:toolbar>
+                    </sec:authorize>
                 </h:form>
 
                 <h:form id="form_filtros" styleClass="mb-5">
@@ -95,9 +102,13 @@
                         <f:facet name="header">
                             Pólizas
                         </f:facet>
-                        <p:ajax event="rowSelect" listener="#{polizaView.verIncisos()}"/>
-                        <p:ajax event="rowUnselect" listener="#{polizaView.limpiarIncisos()}"/>
-                        <p:ajax event="toggleSelect" listener="#{polizaView.verIncisos()}"/>
+
+                        <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'POLIZA_READ_VER_INCISOS')">
+                            <p:ajax event="rowSelect" listener="#{polizaView.verIncisos()}"/>
+                            <p:ajax event="toggleSelect" listener="#{polizaView.verIncisos()}"/>
+                            <p:ajax event="rowUnselect" listener="#{polizaView.limpiarIncisos()}"/>
+                        </sec:authorize>
+
                         <p:column headerText="No." width="40">
                             <h:outputText value="#{index + 1}" />
                         </p:column>
@@ -136,22 +147,77 @@
                         <p:column headerText="Total incisos" width="120" styleClass="text-center">
                             <h:outputText value="#{poliza.totalIncisos}"/>
                         </p:column>
-                        <p:column headerText="Acciones" width="150">
-                            <p:commandButton id="dtAccionesPolizas" type="button"
-                                             icon="fi fi-rr-menu-dots-vertical" styleClass="rounded-button ui-button-outlined" />
-                            <p:menu overlay="true" trigger="dtAccionesPolizas" my="left top" at="left bottom">
-                                <p:menuitem value="Exportar incisos"/>
-                                <p:menuitem value="Adjuntar póliza" ajax="true" action="#{polizaView.abrirAdjuntarPolizaDialog(poliza.idPoliza)}"
-                                            oncomplete="Main.changeChooseLabel();" update="growl form_datatable"/>
-                                <p:menuitem value="Descargar póliza" ajax="false" onclick="PrimeFaces.monitorDownload(start, stop);"
-                                            disabled="#{poliza.rutaArchivo == null}">
-                                    <p:fileDownload value="#{fileDownloadBean.downloadFileByPath(poliza.rutaArchivo)}" />
-                                </p:menuitem>
-                                <p:menuitem value="Eliminar" ajax="true" action="#{polizaView.eliminarPoliza(poliza.idPoliza)}" disabled="#{poliza.totalIncisos > 0}">
-                                    <p:confirm header="Confirmación" message="¿Está seguro que desea eliminar la póliza?" icon="pi pi-exclamation-triangle"/>
-                                </p:menuitem>
-                            </p:menu>
-                        </p:column>
+
+                        <sec:authorize access="hasAnyAuthority('ROLE_OWNER')">
+
+                            <p:column headerText="Estatus registro" width="150">
+                                <h:outputText value="#{poliza.estatusRegistro.label}">
+                                </h:outputText>
+                            </p:column>
+
+                            <p:column headerText="Fecha creación" width="180">
+                                <h:outputText value="#{poliza.fechaCreacion}">
+                                    <f:convertDateTime pattern="dd/MM/yyyy HH:mm:ss a"/>
+                                </h:outputText>
+                            </p:column>
+
+                            <p:column headerText="Creado por" width="150">
+                                <h:outputText value="#{poliza.creadoPor}">
+                                </h:outputText>
+                            </p:column>
+
+                            <p:column headerText="Fecha modificación" width="180">
+                                <h:outputText value="#{poliza.fechaModificacion}">
+                                    <f:convertDateTime pattern="dd/MM/yyyy HH:mm:ss a"/>
+                                </h:outputText>
+                            </p:column>
+
+                            <p:column headerText="Modificado por" width="150">
+                                <h:outputText value="#{poliza.modificadoPor}">
+                                </h:outputText>
+                            </p:column>
+
+                            <p:column headerText="Fecha borrado" width="180">
+                                <h:outputText value="#{poliza.fechaBorrado}">
+                                    <f:convertDateTime pattern="dd/MM/yyyy HH:mm:ss a"/>
+                                </h:outputText>
+                            </p:column>
+
+                            <p:column headerText="Borrado por" width="150">
+                                <h:outputText value="#{poliza.borradoPor}">
+                                </h:outputText>
+                            </p:column>
+
+                        </sec:authorize>
+
+                        <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'POLIZA_WRITE_ADJUNTAR_POLIZA', 'POLIZA_READ_DESCARGAR_POLIZA', 'POLIZA_WRITE_ELIMINAR')">
+                            <p:column headerText="Acciones" width="150">
+                                <p:commandButton id="dtAccionesPolizas" type="button"
+                                                 icon="fi fi-rr-menu-dots-vertical" styleClass="rounded-button ui-button-outlined" />
+                                <p:menu overlay="true" trigger="dtAccionesPolizas" my="left top" at="left bottom">
+                                    <p:menuitem value="Exportar incisos"/>
+
+                                    <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'POLIZA_WRITE_ADJUNTAR_POLIZA')">
+                                        <p:menuitem value="Adjuntar póliza" ajax="true" action="#{polizaView.abrirAdjuntarPolizaDialog(poliza.idPoliza)}"
+                                                    oncomplete="Main.changeChooseLabel();" update="growl form_datatable"/>
+                                    </sec:authorize>
+
+                                    <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'POLIZA_READ_DESCARGAR_POLIZA')">
+                                        <p:menuitem value="Descargar póliza" ajax="false" onclick="PrimeFaces.monitorDownload(start, stop);"
+                                                    disabled="#{poliza.rutaArchivo == null}">
+                                            <p:fileDownload value="#{fileDownloadBean.downloadFileByPath(poliza.rutaArchivo)}" />
+                                        </p:menuitem>
+                                    </sec:authorize>
+
+                                    <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'POLIZA_WRITE_ELIMINAR')">
+                                        <p:menuitem value="Eliminar" ajax="true" action="#{polizaView.eliminarPoliza(poliza.idPoliza)}" disabled="#{poliza.totalIncisos > 0}">
+                                            <p:confirm header="Confirmación" message="¿Está seguro que desea eliminar la póliza?" icon="pi pi-exclamation-triangle"/>
+                                        </p:menuitem>
+                                    </sec:authorize>
+
+                                </p:menu>
+                            </p:column>
+                        </sec:authorize>
                     </p:dataTable>
                 </h:form>
 
@@ -174,23 +240,36 @@
                                     Incisos
                                 </div>
                                 <div class="flex justify-content-end">
-                                    <p:commandButton id="accionesIncisos" type="button" value="Acciones"
-                                                     iconPos="right" icon="fi fi-rr-angle-small-down"/>
-                                    <p:menu overlay="true" trigger="accionesIncisos" my="left top" at="left bottom">
-                                        <p:menuitem value="Solicitar pago" ajax="true" action="#{polizaView.solicitarPagoIncisos()}">
-                                            <p:confirm header="Confirmación" message="¿Estás seguro que deseas solicitar el pago de los incisos seleccionados?" icon="pi pi-exclamation-triangle"/>
-                                        </p:menuitem>
-                                        <p:menuitem value="Registrar pago" ajax="true" action="#{polizaView.abrirRegistrarPagoModal()}"/>
-                                        <p:menuitem value="Rechazar solicitud" ajax="true" action="#{polizaView.abrirRechazarSolicitudModal()}"/>
-                                    </p:menu>
+                                    <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'POLIZA_WRITE_SOLICITAR_PAGO_INCISO', 'POLIZA_WRITE_REGISTRAR_PAGO', 'POLIZA_WRITE_RECHAZAR_SOLICITUD')">
+                                        <p:commandButton id="accionesIncisos" type="button" value="Acciones"
+                                                         iconPos="right" icon="fi fi-rr-angle-small-down"/>
+                                        <p:menu overlay="true" trigger="accionesIncisos" my="left top" at="left bottom">
+                                            <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'POLIZA_WRITE_SOLICITAR_PAGO_INCISO')">
+                                                <p:menuitem value="Solicitar pago" ajax="true" action="#{polizaView.solicitarPagoIncisos()}">
+                                                    <p:confirm header="Confirmación" message="¿Estás seguro que deseas solicitar el pago de los incisos seleccionados?" icon="pi pi-exclamation-triangle"/>
+                                                </p:menuitem>
+                                            </sec:authorize>
+
+                                            <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'POLIZA_WRITE_REGISTRAR_PAGO')">
+                                                <p:menuitem value="Registrar pago" ajax="true" action="#{polizaView.abrirRegistrarPagoModal()}"/>
+                                            </sec:authorize>
+
+                                            <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'POLIZA_WRITE_RECHAZAR_SOLICITUD')">
+                                                <p:menuitem value="Rechazar solicitud" ajax="true" action="#{polizaView.abrirRechazarSolicitudModal()}"/>
+                                            </sec:authorize>
+
+                                        </p:menu>
+                                    </sec:authorize>
                                 </div>
                             </div>
                         </f:facet>
+
                         <p:ajax event="rowSelect" update="form_toolbar"/>
                         <p:ajax event="rowUnselect" update="form_toolbar"/>
                         <p:ajax event="rowSelectCheckbox" update="form_toolbar"/>
                         <p:ajax event="rowUnselectCheckbox" update="form_toolbar"/>
                         <p:ajax event="toggleSelect" update="form_toolbar"/>
+
                         <p:column selectionMode="multiple" style="width:16px;text-align:center"/>
                         <p:column headerText="No." width="40">
                             <h:outputText value="#{index + 1}" />
@@ -240,18 +319,72 @@
                             <h:outputText value="#{inciso.observaciones}"/>
                         </p:column>
 
-                        <p:column headerText="Acciones" width="150">
-                            <p:commandButton id="dtAccionesIncisos" type="button"
-                                             icon="fi fi-rr-menu-dots-vertical" styleClass="rounded-button ui-button-outlined" />
-                            <p:menu overlay="true" trigger="dtAccionesIncisos" my="left top" at="left bottom">
-                                <p:menuitem value="Editar" ajax="true" action="#{polizaView.abrirEditarIncisoModal(inciso.idInciso)}"
-                                            disabled="#{inciso.estatusInciso.idEstatusInciso != polizaView.ESTATUS_INCISO_REGISTRADA or inciso.tieneNotaCredito == 1}"/>
-                                <p:menuitem value="Endoso de modificación" disabled="#{inciso.estatusInciso.idEstatusInciso != polizaView.ESTATUS_INCISO_PAGADA}"
-                                            ajax="true" action="#{polizaView.abrirEndosoModificacionModal(inciso.idInciso)}"/>
-                                <p:menuitem value="Endoso de baja" disabled="#{inciso.estatusInciso.idEstatusInciso != polizaView.ESTATUS_INCISO_PAGADA}"
-                                            ajax="true" action="#{polizaView.abrirEndosoBajaModal(inciso.idInciso)}"/>
-                            </p:menu>
-                        </p:column>
+                        <sec:authorize access="hasAnyAuthority('ROLE_OWNER')">
+
+                            <p:column headerText="Estatus registro" width="150">
+                                <h:outputText value="#{inciso.estatusRegistro.label}">
+                                </h:outputText>
+                            </p:column>
+
+                            <p:column headerText="Fecha creación" width="180">
+                                <h:outputText value="#{inciso.fechaCreacion}">
+                                    <f:convertDateTime pattern="dd/MM/yyyy HH:mm:ss a"/>
+                                </h:outputText>
+                            </p:column>
+
+                            <p:column headerText="Creado por" width="150">
+                                <h:outputText value="#{inciso.creadoPor}">
+                                </h:outputText>
+                            </p:column>
+
+                            <p:column headerText="Fecha modificación" width="180">
+                                <h:outputText value="#{inciso.fechaModificacion}">
+                                    <f:convertDateTime pattern="dd/MM/yyyy HH:mm:ss a"/>
+                                </h:outputText>
+                            </p:column>
+
+                            <p:column headerText="Modificado por" width="150">
+                                <h:outputText value="#{inciso.modificadoPor}">
+                                </h:outputText>
+                            </p:column>
+
+                            <p:column headerText="Fecha borrado" width="180">
+                                <h:outputText value="#{inciso.fechaBorrado}">
+                                    <f:convertDateTime pattern="dd/MM/yyyy HH:mm:ss a"/>
+                                </h:outputText>
+                            </p:column>
+
+                            <p:column headerText="Borrado por" width="150">
+                                <h:outputText value="#{inciso.borradoPor}">
+                                </h:outputText>
+                            </p:column>
+
+                        </sec:authorize>
+
+                        <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'POLIZA_WRITE_EDITAR_INCISO', 'POLIZA_WRITE_ENDOSO_MODIFICACION', 'POLIZA_WRITE_ENDOSO_BAJA')">
+                            <p:column headerText="Acciones" width="150">
+                                <p:commandButton id="dtAccionesIncisos" type="button"
+                                                 icon="fi fi-rr-menu-dots-vertical" styleClass="rounded-button ui-button-outlined" />
+                                <p:menu overlay="true" trigger="dtAccionesIncisos" my="left top" at="left bottom">
+                                    <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'POLIZA_WRITE_EDITAR_INCISO')">
+                                        <p:menuitem value="Editar" ajax="true" action="#{polizaView.abrirEditarIncisoModal(inciso.idInciso)}"
+                                                    disabled="#{inciso.estatusInciso.idEstatusInciso != polizaView.ESTATUS_INCISO_REGISTRADA or inciso.tieneNotaCredito == 1}"/>
+                                    </sec:authorize>
+
+                                    <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'POLIZA_WRITE_ENDOSO_MODIFICACION')">
+                                        <p:menuitem value="Endoso de modificación" disabled="#{inciso.estatusInciso.idEstatusInciso != polizaView.ESTATUS_INCISO_PAGADA}"
+                                                    ajax="true" action="#{polizaView.abrirEndosoModificacionModal(inciso.idInciso)}"/>
+                                    </sec:authorize>
+
+                                    <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'POLIZA_WRITE_ENDOSO_BAJA')">
+                                        <p:menuitem value="Endoso de baja" disabled="#{inciso.estatusInciso.idEstatusInciso != polizaView.ESTATUS_INCISO_PAGADA}"
+                                                    ajax="true" action="#{polizaView.abrirEndosoBajaModal(inciso.idInciso)}"/>
+                                    </sec:authorize>
+
+                                </p:menu>
+                            </p:column>
+                        </sec:authorize>
+
                     </p:dataTable>
                 </h:form>
 
@@ -265,7 +398,7 @@
 
             <ui:include src="/views/modulos/polizas/_rechazar_solicitud_dialog.xhtml"/>
 
-            <ui:include src="/views/modulos/polizas/_editar_incisos_dialog.xhtml"/>
+            <ui:include src="/views/modulos/polizas/_editar_incisos_dialog.xhtml"/> <!--Aqui -->
 
             <ui:include src="/views/modulos/polizas/_registrar_pago_dialog.xhtml"/>
 

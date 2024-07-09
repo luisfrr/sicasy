@@ -127,10 +127,13 @@
                         <p:commandButton value="Cancelar" ajax="true" process="@this"
                                          action="#{polizaView.cerrarRegistroEndosoAltaDialog()}"
                                          styleClass="ui-button-outlined mr-4"/>
-                        <p:commandButton value="Guardar" ajax="true" process="@form"
-                                         action="#{polizaView.guardarEndosoAlta()}"
-                                         update="growl @form form_datatable"
-                                         validateClient="true"/>
+                        <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'POLIZA_WRITE_ENDOSO_ALTA')">
+                           <p:commandButton value="Guardar" ajax="true" process="@form"
+                                            action="#{polizaView.guardarEndosoAlta()}"
+                                            update="growl @form form_datatable"
+                                            validateClient="true"/>
+                        </sec:authorize>
+
                      </p:outputPanel>
 
                   </p:outputPanel>
@@ -185,10 +188,13 @@
                         <p:commandButton value="Cancelar" ajax="true" process="@this"
                                          action="#{polizaView.cerrarRegistroEndosoAltaDialog()}"
                                          styleClass="ui-button-outlined mr-4"/>
-                        <p:commandButton value="Guardar" ajax="true" process="@form"
-                                         action="#{polizaView.guardarLayoutEndosoAlta()}"
-                                         update="growl @form form_datatable form_datatable_incisos"
-                                         validateClient="true"/>
+                        <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'POLIZA_WRITE_IMPORTAR_ENDOSO_ALTA')">
+                           <p:commandButton value="Guardar" ajax="true" process="@form"
+                                            action="#{polizaView.guardarLayoutEndosoAlta()}"
+                                            update="growl @form form_datatable form_datatable_incisos"
+                                            validateClient="true"/>
+                        </sec:authorize>
+
                      </p:outputPanel>
                   </p:outputPanel>
                </h:form>

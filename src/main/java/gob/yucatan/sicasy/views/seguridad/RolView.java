@@ -35,19 +35,7 @@ import java.util.*;
 @PreAuthorize("hasAnyAuthority('ROLE_OWNER', 'SEGURIDAD_ROLES_VIEW')")
 public class RolView {
 
-    private @Getter String title;
-    private @Getter String formDialogTitle;
-    private @Getter Rol rolSelected;
-    private @Getter Rol rolFilter;
-    private @Getter List<Rol> roles;
-    private @Getter boolean showConfigurarPermisos;
-    private @Getter boolean showPanelPrincipal;
-    private @Getter boolean showPanelBitacoraRol;
-    private @Getter Permiso permisoFilter;
-    private @Getter List<RolPermiso> rolPermisoList;
-    private @Getter List<BitacoraRol> bitacoraRolList;
-    private @Getter EstatusRegistro[] estatusRegistros;
-
+    // Inyección de dependencias
     private final IRolService rolService;
     private final UserSessionBean userSessionBean;
     private final IPermisoScannerService permisoScannerService;
@@ -55,9 +43,26 @@ public class RolView {
     private final IRolPermisoService rolPermisoService;
     private final IBitacoraRolService bitacoraRolService;
 
+    // Variables Generales
+    private @Getter String title;
+    private @Getter String formDialogTitle;
+    private @Getter Rol rolSelected;
+    private @Getter Rol rolFilter;
+    private @Getter List<Rol> roles;
+    private @Getter Permiso permisoFilter;
+    private @Getter List<RolPermiso> rolPermisoList;
+    private @Getter List<BitacoraRol> bitacoraRolList;
+    private @Getter EstatusRegistro[] estatusRegistros;
+
+    // Variables para renderizar
+    private @Getter boolean showConfigurarPermisos;
+    private @Getter boolean showPanelPrincipal;
+    private @Getter boolean showPanelBitacoraRol;
+
+
     @PostConstruct
     public void init() {
-        log.info("Init RolView");
+        log.info("PostConstruct - RolView");
         this.title = "Roles";
 
         this.estatusRegistros = EstatusRegistro.values();
@@ -70,7 +75,7 @@ public class RolView {
     }
 
     public void limpiarFiltros() {
-        log.info("limpiarFiltros RolView");
+        log.info("limpiarFiltros - RolView");
 
         // Se inicializan los filtros
         this.rolFilter = new Rol();
@@ -84,7 +89,7 @@ public class RolView {
     }
 
     public void buscar() {
-        log.info("buscar RolView");
+        log.info("buscar - RolView");
         this.roles = rolService.findAllDynamic(this.rolFilter);
     }
 
@@ -92,7 +97,7 @@ public class RolView {
             nombre = "Nuevo rol", descripcion = "Acción que permite agregar un nuevo rol")
     @PreAuthorize("hasAnyAuthority('ROLE_OWNER', 'SEGURIDAD_ROLES_WRITE_NUEVO')")
     public void nuevo() {
-        log.info("nuevo RolView");
+        log.info("nuevo - RolView");
         formDialogTitle = "Nuevo Rol";
         this.rolSelected = new Rol();
     }
@@ -101,7 +106,7 @@ public class RolView {
             nombre = "Editar rol", descripcion = "Acción que permite editar la información de un rol")
     @PreAuthorize("hasAnyAuthority('ROLE_OWNER', 'SEGURIDAD_ROLES_WRITE_EDITAR')")
     public void editar(Long id) {
-        log.info("editar RolView");
+        log.info("editar - RolView");
         Optional<Rol> rolOptional = rolService.findById(id);
 
         if(rolOptional.isEmpty()) {
@@ -116,7 +121,7 @@ public class RolView {
 
     @PreAuthorize("hasAnyAuthority('ROLE_OWNER', 'SEGURIDAD_ROLES_WRITE_NUEVO', 'SEGURIDAD_ROLES_WRITE_EDITAR')")
     public void guardar() {
-        log.info("guardar RolView");
+        log.info("guardar - RolView");
         try {
             if(this.rolSelected != null) {
                 // IdRol diferente de null es una edicion
@@ -154,7 +159,7 @@ public class RolView {
             nombre = "Eliminar rol", descripcion = "Acción que permite borrar un rol")
     @PreAuthorize("hasAnyAuthority('ROLE_OWNER', 'SEGURIDAD_ROLES_WRITE_ELIMINAR')")
     public void eliminar(Long id) {
-        log.info("eliminar RolView");
+        log.info("eliminar - RolView");
         try {
             rolService.delete(Rol.builder()
                     .idRol(id)
@@ -180,6 +185,7 @@ public class RolView {
             nombre = "Ver Configuración de Permisos", descripcion = "Permite ver el botón que abre el configurador de permisos.")
     @PreAuthorize("hasAnyAuthority('ROLE_OWNER', 'SEGURIDAD_ROLES_READ_CONFIGURAR_PERMISOS')")
     public void verConfiguracionPermisos(Rol rol) {
+        log.info("verConfiguracionPermisos - RolView");
         this.rolSelected = rol;
         this.showConfigurarPermisos = true;
         this.showPanelPrincipal = false;
@@ -187,6 +193,7 @@ public class RolView {
     }
 
     public void verBitacoraRol(Rol rol){
+        log.info("verBitacoraRol - RolView");
         this.rolSelected = rol;
 
         // recupera la bitacora de cambios del rol para la tabla
@@ -198,11 +205,11 @@ public class RolView {
         this.showPanelBitacoraRol = true;
         this.showConfigurarPermisos = false;
         this.showPanelPrincipal = false;
-        // podria buscar la informacion de bitacoras del rol selecionado
-
+        // podria buscar la información de bitacoras del rol selecionado
     }
 
     public void regresar() {
+        log.info("regresar - RolView");
         this.rolSelected = null;
         this.showConfigurarPermisos = false;
         this.showPanelPrincipal = true;
@@ -215,13 +222,14 @@ public class RolView {
         this.showPanelPrincipal = true;
     }
 
+
     public void buscarPermisos() {
-        log.info("buscarPermisos RolView");
+        log.info("buscarPermisos - RolView");
         this.rolPermisoList = rolPermisoService.findByRol(this.rolSelected);
     }
 
     public void limpiarFiltrosPermisos() {
-        log.info("limpiarFiltrosPermisos RolView");
+        log.info("limpiarFiltrosPermisos - RolView");
         this.permisoFilter = new Permiso();
         this.rolPermisoList = new ArrayList<>();
     }
@@ -230,7 +238,7 @@ public class RolView {
             nombre = "Asignar permiso", descripcion = "Acción que permite habilitar, deshabilitar un permiso al rol seleccionado.")
     @PreAuthorize("hasAnyAuthority('ROLE_OWNER', 'SEGURIDAD_ROLES_WRITE_ASIGNAR_PERMISOS')")
     public void asignarPermiso(RolPermiso rolPermiso) {
-        log.info("asignarPermiso RolView");
+        log.info("asignarPermiso - RolView");
         try {
             rolPermisoService.asignarPermiso(rolPermiso, userSessionBean.getUserName());
             this.buscarPermisos();
@@ -245,7 +253,7 @@ public class RolView {
             nombre = "Actualizar permisos", descripcion = "Acción que permite buscar y actualizar los permisos del sistema.")
     @PreAuthorize("hasAnyAuthority('ROLE_OWNER', 'SEGURIDAD_ROLES_WRITE_ACTUALIZAR_PERMISOS')")
     public void actualizarPermisos() {
-        log.info("actualizarPermisos RolView");
+        log.info("actualizarPermisos - RolView");
         List<Permiso> permisos = permisoScannerService.getPermisos("gob.yucatan.sicasy",
                 userSessionBean.getUserName());
         permisoService.updateAll(permisos);

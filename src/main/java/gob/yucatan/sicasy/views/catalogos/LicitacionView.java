@@ -1,6 +1,7 @@
 package gob.yucatan.sicasy.views.catalogos;
 
 import gob.yucatan.sicasy.business.annotations.ConfigPermiso;
+import gob.yucatan.sicasy.business.annotations.ConfigPermisoArray;
 import gob.yucatan.sicasy.business.dtos.AcuseImportacion;
 import gob.yucatan.sicasy.business.entities.Anexo;
 import gob.yucatan.sicasy.business.entities.Licitacion;
@@ -35,6 +36,7 @@ import org.primefaces.event.SelectEvent;
 import org.primefaces.model.file.UploadedFile;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -44,12 +46,23 @@ import java.util.*;
 @Scope("view")
 @RequiredArgsConstructor
 @Slf4j
-@ConfigPermiso(tipo = TipoPermiso.VIEW, codigo = "CATALOGO_LICITACION_VIEW", nombre = "Catálogo de Licitaciones")
+@ConfigPermiso(tipo = TipoPermiso.VIEW, codigo = "CAT_LICITACION_VIEW",
+        nombre = "Catálogo de Licitaciones",
+        url = "/views/catalogos/licitaciones.faces")
+@PreAuthorize("hasAnyAuthority('ROLE_OWNER', 'CAT_LICITACION_VIEW')")
 public class LicitacionView {
 
+    // Constantes
     @Value("${app.files.folder.licitaciones}")
     private @Getter String FOLDER_LICITACION;
 
+    // Inyección de dependencias
+    private final ILicitacionService licitacionService;
+    private final IAnexoService anexoService;
+    private final UserSessionBean userSessionBean;
+    private final IGeneratorExcelFile generatorExcelFile;
+
+    // Variables Generales
     private @Getter String title;
     private @Getter String titleDialog;
     private @Getter Boolean fechaFinalValida;
@@ -59,19 +72,16 @@ public class LicitacionView {
     private @Getter @Setter List<Licitacion> licitacionImportList;
     private @Getter EstatusRegistro[] estatusRegistros;
     private @Getter @Setter UploadedFile file;
-    private @Getter boolean showErrorImportacion;
     private @Getter String layoutFileUpload;
     private @Getter @Setter List<AcuseImportacion> acuseImportacionList;
 
-    private final ILicitacionService licitacionService;
-    private final IAnexoService anexoService;
-    private final UserSessionBean userSessionBean;
-    private final IGeneratorExcelFile generatorExcelFile;
+    // Variables para renderizar
+    private @Getter boolean showErrorImportacion;
 
 
     @PostConstruct
     public void init(){
-        log.info("Inicializando Licitaciones View");
+        log.info("PostConstruct - LicitacionView");
         this.title = "Licitaciones";
 
         this.licitacionSelected = null;
@@ -81,29 +91,37 @@ public class LicitacionView {
 
     }
 
-    public void limpiarFiltros(){
-        log.info("Limpiando filtros");
+    @ConfigPermisoArray({
+            @ConfigPermiso(tipo = TipoPermiso.READ, codigo = "CAT_LICITACION_READ_DESCARGAR_ARCHIVO", orden = 1,
+                    nombre = "Descargar archivo", descripcion = "Permite descargar el archivo de  la licitación."),
+    })
+    public void limpiarFiltros() {
+        log.info("limpiarFiltros - LicitacionView");
         this.licitacionFilter = new Licitacion();
         this.licitacionFilter.setEstatusRegistro(EstatusRegistro.ACTIVO);
         this.buscar();
     }
 
-    public void buscar(){
-        log.info("Buscando Licitaciones");
+    public void buscar() {
+        log.info("buscar - LicitacionView");
         this.licitacionList = licitacionService.findAllDynamic(this.licitacionFilter).stream()
                 .sorted(Comparator.comparing(Licitacion:: getNumeroLicitacion))
                 .toList();
     }
 
-    public void agregarLicitacion(){
-        log.info("Agregando licitacion nueva");
+    @ConfigPermiso(tipo = TipoPermiso.WRITE, codigo = "CAT_LICITACION_WRITE_AGREGAR", orden = 1,
+            nombre = "Agregar", descripcion = "Acción que permite agregar una nueva licitación")
+    @PreAuthorize("hasAnyAuthority('ROLE_OWNER', 'CAT_LICITACION_WRITE_AGREGAR')")
+    public void agregarLicitacion() {
+        log.info("agregarLicitacion - LicitacionView");
         this.titleDialog = "Agregar Licitación";
         this.licitacionSelected = new Licitacion();
 
     }
 
+    @PreAuthorize("hasAnyAuthority('ROLE_OWNER', 'CAT_LICITACION_WRITE_AGREGAR', 'CAT_LICITACION_WRITE_EDITAR')")
     public void guardarLicitacion(){
-        log.info("Guardando licitacion");
+        log.info("guardarLicitacion - LicitacionView");
 
         try {
             if (this.licitacionSelected != null) {
@@ -129,7 +147,7 @@ public class LicitacionView {
                     // id null, entonces se inserta nuevo en BD
 
                     Optional<Licitacion> optLicitacion = licitacionService.findByNumeroLicitacion(licitacionSelected.getNumeroLicitacion());
-                    if (optLicitacion.isEmpty()){ // checar si no existe una licitacion con ese numero de licitacion existente y activa
+                    if (optLicitacion.isEmpty()){ // checar si no existe una licitacion con ese número de licitacion existente y activa
                         this.licitacionSelected.setCreadoPor(userSessionBean.getUserName());
                         this.licitacionSelected.setFechaCreacion(new Date());
 
@@ -147,7 +165,7 @@ public class LicitacionView {
                         this.buscar();
                         this.licitacionSelected  = null;
                     }else {
-                        // si encontramos algun dato ya existente entonces indicamos la observacion
+                        // si encontramos algún dato ya existente entonces indicamos la observacion
                         FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_WARN,
                                 "Atención", "Ya existe una licitación con ese numero de licitación guardado!");
                         FacesContext.getCurrentInstance().addMessage(null, msg);
@@ -172,8 +190,11 @@ public class LicitacionView {
 
     }
 
+    @ConfigPermiso(tipo = TipoPermiso.WRITE, codigo = "CAT_LICITACION_WRITE_EDITAR", orden = 2,
+            nombre = "Editar", descripcion = "Acción que permite editar la información de una licitación")
+    @PreAuthorize("hasAnyAuthority('ROLE_OWNER', 'CAT_LICITACION_WRITE_EDITAR')")
     public void editar(Integer id) {
-        log.info("editar");
+        log.info("editar - LicitacionView");
         Optional<Licitacion> licitacionOptional = licitacionService.findById(id);
 
         if(licitacionOptional.isEmpty()) {
@@ -187,15 +208,19 @@ public class LicitacionView {
         }
     }
 
+    @ConfigPermiso(tipo = TipoPermiso.WRITE, codigo = "CAT_LICITACION_WRITE_ELIMINAR", orden = 3,
+            nombre = "Eliminar", descripcion = "Acción que permite eliminar un registro de licitación")
+    @PreAuthorize("hasAnyAuthority('ROLE_OWNER', 'CAT_LICITACION_WRITE_ELIMINAR')")
     public void doEliminar(Integer id) {
-        log.info("prepare to eliminar");
+        log.info("doEliminar - LicitacionView");
         Optional<Licitacion> licitacionOptional = licitacionService.findById(id);
         this.licitacionSelected = licitacionOptional.orElse(null);
 
     }
 
+    @PreAuthorize("hasAnyAuthority('ROLE_OWNER', 'CAT_LICITACION_WRITE_ELIMINAR')")
     public void eliminar() {
-        log.info("eliminar licitacion");
+        log.info("eliminar - LicitacionView");
 
         if(this.licitacionSelected == null) {
             FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_ERROR,
@@ -232,12 +257,12 @@ public class LicitacionView {
     }
 
     public void validateFechaInicioFinal(SelectEvent event){
-        log.info("validando fecha final" );
+        log.info("validateFechaInicioFinal - LicitacionView");
 
         if (this.licitacionSelected.getFechaInicio() != null && this.licitacionSelected.getFechaFinal() != null){
 
             if (this.licitacionSelected.getFechaInicio().after(this.licitacionSelected.getFechaFinal())){
-                // la fecha inicio no puede estar dspues de la fecha final
+                // la fecha de inicio no puede estar dspues de la fecha final
                 this.fechaFinalValida = false;
                 FacesContext.getCurrentInstance().addMessage(event.getComponent().getClientId(),
                         new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Fecha selecionada inválida."));
@@ -250,8 +275,11 @@ public class LicitacionView {
 
     }
 
+    @ConfigPermiso(tipo = TipoPermiso.READ, codigo = "CAT_LICITACION_READ_EXPORTAR", orden = 1,
+            nombre = "Eliminar", descripcion = "Acción que permite exportar los registros de licitación en un archivo Excel.")
+    @PreAuthorize("hasAnyAuthority('ROLE_OWNER', 'CAT_LICITACION_READ_EXPORTAR')")
     public ExportFile exportFileExcel() throws IOException {
-        log.info("exportFileExcel");
+        log.info("exportFileExcel - LicitacionView");
         List<ExcelCell> cellList = new ArrayList<>();
 
         XSSFWorkbook workbook = generatorExcelFile.createWorkbook();
@@ -297,7 +325,11 @@ public class LicitacionView {
 
     }
 
-    public void abrirModalImport(){
+    @ConfigPermiso(tipo = TipoPermiso.WRITE, codigo = "CAT_LICITACION_WRITE_IMPORT", orden = 4,
+            nombre = "Eliminar", descripcion = "Acción que permite exportar los registros de licitación en un archivo Excel.")
+    @PreAuthorize("hasAnyAuthority('ROLE_OWNER', 'CAT_LICITACION_WRITE_IMPORT')")
+    public void abrirModalImport() {
+        log.info("abrirModalImport - LicitacionView");
         this.layoutFileUpload = null;
         this.showErrorImportacion = false;
         this.acuseImportacionList = null;
@@ -305,11 +337,14 @@ public class LicitacionView {
     }
 
     public void cerrarModalImport() {
+        log.info("cerrarModalImport - LicitacionView");
         this.licitacionSelected = null;
         PrimeFaces.current().executeScript("PF('formDialogImport').hide()");
     }
 
+    @PreAuthorize("hasAnyAuthority('ROLE_OWNER', 'CAT_LICITACION_WRITE_IMPORT')")
     public void importarLayout(FileUploadEvent event) throws IOException {
+        log.info("importarLayout - LicitacionView");
         UploadedFile file = event.getFile();
         String fileName = file.getFileName();
         byte[] fileContent = file.getContent();
@@ -335,8 +370,9 @@ public class LicitacionView {
         }
     }
 
+    @PreAuthorize("hasAnyAuthority('ROLE_OWNER', 'CAT_LICITACION_WRITE_IMPORT')")
     public void guardarImportacion(){
-        log.info("guardar importacion");
+        log.info("guardarImportacion - LicitacionView");
         try {
             if(this.licitacionImportList != null) {
 

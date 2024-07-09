@@ -24,29 +24,38 @@
                 </p:breadCrumb>
             </h:form>
 
-            <h:form id="form_toolbar" styleClass="mb-5">
-                <p:toolbar>
-                    <p:toolbarGroup>
-                        <p:commandButton value="Nuevo"
-                                         action="#{licitacionView.agregarLicitacion()}"
-                                         oncomplete="PF('formDialog').show()"
-                                         update="form_dialog"
-                                         styleClass="mr-4">
-                            <p:resetInput target="form_dialog:dialogContent"/>
-                        </p:commandButton>
-                    </p:toolbarGroup>
+            <h:form id="form_toolbar">
+                <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'CAT_LICITACION_WRITE_AGREGAR', 'CAT_LICITACION_WRITE_IMPORT', 'CAT_LICITACION_READ_EXPORTAR')">
+                    <p:toolbar styleClass="mb-5">
+                        <p:toolbarGroup>
+                            <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'CAT_LICITACION_WRITE_AGREGAR')">
+                                <p:commandButton value="Nuevo"
+                                                 action="#{licitacionView.agregarLicitacion()}"
+                                                 oncomplete="PF('formDialog').show()"
+                                                 update="form_dialog"
+                                                 styleClass="mr-4">
+                                    <p:resetInput target="form_dialog:dialogContent"/>
+                                </p:commandButton>
+                            </sec:authorize>
+                        </p:toolbarGroup>
 
-                    <p:toolbarGroup align="right">
-                        <p:commandButton value="Importar" ajax="false" action="#{licitacionView.abrirModalImport()}"
-                                         styleClass="ui-button-outlined mr-4">
-                        </p:commandButton>
+                        <p:toolbarGroup align="right">
+                            <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'CAT_LICITACION_WRITE_IMPORT')">
+                                <p:commandButton value="Importar" ajax="false" action="#{licitacionView.abrirModalImport()}"
+                                                 styleClass="ui-button-outlined mr-4">
+                                </p:commandButton>
+                            </sec:authorize>
 
-                        <p:commandButton value="Exportar" ajax="false" onclick="PrimeFaces.monitorDownload(start, stop);"
-                                         styleClass="ui-button-outlined">
-                            <p:fileDownload value="#{fileDownloadBean.downloadFile(licitacionView.exportFileExcel())}"/>
-                        </p:commandButton>
-                    </p:toolbarGroup>
-                </p:toolbar>
+                            <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'CAT_LICITACION_READ_EXPORTAR')">
+                                <p:commandButton value="Exportar" ajax="false" onclick="PrimeFaces.monitorDownload(start, stop);"
+                                                 styleClass="ui-button-outlined">
+                                    <p:fileDownload value="#{fileDownloadBean.downloadFile(licitacionView.exportFileExcel())}"/>
+                                </p:commandButton>
+                            </sec:authorize>
+
+                        </p:toolbarGroup>
+                    </p:toolbar>
+                </sec:authorize>
             </h:form>
 
             <h:form id="form_filtros" styleClass="mb-5">
@@ -114,11 +123,11 @@
                         <h:outputText value="#{licitacion.numeroLicitacion}"/>
                     </p:column>
 
-                    <p:column headerText="Nombre" width="80">
+                    <p:column headerText="Nombre" width="180">
                         <h:outputText value="#{licitacion.nombre}"/>
                     </p:column>
 
-                    <p:column headerText="Descripción" width="250">
+                    <p:column headerText="Descripción" style="min-width: 15rem;">
                         <h:outputText value="#{licitacion.descripcion}"/>
                     </p:column>
 
@@ -134,72 +143,82 @@
                         </h:outputText>
                     </p:column>
 
-                    <p:column headerText="Estatus" width="60">
-                        <h:outputText value="#{licitacion.estatusRegistro.label}"/>
-                    </p:column>
-
                     <sec:authorize access="hasAnyAuthority('ROLE_OWNER')">
 
-                        <p:column headerText="Fecha creación">
-                            <h:outputText value="#{licitacion.fechaCreacion}">
+                        <p:column headerText="Estatus registro" width="150">
+                            <h:outputText value="#{licitacion.estatusRegistro.label}">
                             </h:outputText>
                         </p:column>
 
-                        <p:column headerText="Creado por">
+                        <p:column headerText="Fecha creación" width="180">
+                            <h:outputText value="#{licitacion.fechaCreacion}">
+                                <f:convertDateTime pattern="dd/MM/yyyy HH:mm:ss a"/>
+                            </h:outputText>
+                        </p:column>
+
+                        <p:column headerText="Creado por" width="150">
                             <h:outputText value="#{licitacion.creadoPor}">
                             </h:outputText>
                         </p:column>
 
-                        <p:column headerText="Fecha modificación">
+                        <p:column headerText="Fecha modificación" width="180">
                             <h:outputText value="#{licitacion.fechaModificacion}">
+                                <f:convertDateTime pattern="dd/MM/yyyy HH:mm:ss a"/>
                             </h:outputText>
                         </p:column>
 
-                        <p:column headerText="Modificado por">
+                        <p:column headerText="Modificado por" width="150">
                             <h:outputText value="#{licitacion.modificadoPor}">
                             </h:outputText>
                         </p:column>
 
-                        <p:column headerText="Fecha borrado">
+                        <p:column headerText="Fecha borrado" width="180">
                             <h:outputText value="#{licitacion.fechaBorrado}">
+                                <f:convertDateTime pattern="dd/MM/yyyy HH:mm:ss a"/>
                             </h:outputText>
                         </p:column>
 
-                        <p:column headerText="Borrado por">
+                        <p:column headerText="Borrado por" width="150">
                             <h:outputText value="#{licitacion.borradoPor}">
                             </h:outputText>
                         </p:column>
+
                     </sec:authorize>
 
-                    <p:column headerText="Acciones">
+                    <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'CAT_LICITACION_WRITE_EDITAR', 'CAT_LICITACION_READ_DESCARGAR_ARCHIVO', 'CAT_LICITACION_WRITE_ELIMINAR')">
+                        <p:column headerText="Acciones">
+                            <p:growl id="message" showDetail="true"/>
 
-                        <p:growl id="message" showDetail="true"/>
+                            <p:commandButton id="buttonOptions" type="button"
+                                             icon="fi fi-rr-menu-dots-vertical" styleClass="rounded-button ui-button-outlined" />
+                            <p:menu overlay="true" trigger="buttonOptions" my="left top" at="left bottom" >
 
-                        <p:commandButton id="buttonOptions" type="button"
-                                         icon="fi fi-rr-menu-dots-vertical" styleClass="rounded-button ui-button-outlined" />
-                        <p:menu overlay="true" trigger="buttonOptions" my="left top" at="left bottom" >
+                                <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'CAT_LICITACION_WRITE_EDITAR')">
+                                    <p:menuitem value="Editar" icon="fi fi-rr-pencil"
+                                                action="#{licitacionView.editar(licitacion.idLicitacion)}"
+                                                ajax="true" update="form_dialog"
+                                                oncomplete="PF('formDialog').show()">
+                                        <p:resetInput target="form_dialog:dialogContent"/>
+                                    </p:menuitem>
+                                </sec:authorize>
 
-                            <p:menuitem value="Editar" icon="fi fi-rr-pencil"
-                                        action="#{licitacionView.editar(licitacion.idLicitacion)}"
-                                        ajax="true" update="form_dialog"
-                                        oncomplete="PF('formDialog').show()">
-                                <p:resetInput target="form_dialog:dialogContent"/>
-                            </p:menuitem>
+                                <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'CAT_LICITACION_READ_DESCARGAR_ARCHIVO')">
+                                    <p:menuitem value="Descargar archivo" ajax="false" onclick="PrimeFaces.monitorDownload(start, stop);"
+                                                disabled="#{licitacion.rutaArchivo == null}" icon="fi-rr-download">
+                                        <p:fileDownload value="#{fileDownloadBean.downloadFileByPath(licitacion.rutaArchivo)}" />
+                                    </p:menuitem>
+                                </sec:authorize>
 
-                            <p:menuitem value="Descargar archivo" ajax="false" onclick="PrimeFaces.monitorDownload(start, stop);"
-                                        disabled="#{licitacion.rutaArchivo == null}" icon="fi-rr-download">
-                                <p:fileDownload value="#{fileDownloadBean.downloadFileByPath(licitacion.rutaArchivo)}" />
-                            </p:menuitem>
-
-                            <p:menuitem value="Eliminar" icon="fi fi-rr-trash"
-                                        ajax="true" update="form_confirm_dialog"
-                                        oncomplete="PF('confirmDialog').show()"
-                                        action="#{licitacionView.doEliminar(licitacion.idLicitacion)}">
-                            </p:menuitem>
-
-                        </p:menu>
-
-                    </p:column>
+                                <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'CAT_LICITACION_WRITE_ELIMINAR')">
+                                    <p:menuitem value="Eliminar" icon="fi fi-rr-trash"
+                                                ajax="true" update="form_confirm_dialog"
+                                                oncomplete="PF('confirmDialog').show()"
+                                                action="#{licitacionView.doEliminar(licitacion.idLicitacion)}">
+                                    </p:menuitem>
+                                </sec:authorize>
+                            </p:menu>
+                        </p:column>
+                    </sec:authorize>
 
                 </p:dataTable>
 
@@ -224,11 +243,13 @@
                 <f:facet name="footer">
                     <p:commandButton value="No" onclick="PF('confirmDialog').hide()"
                                      class="ui-button-outlined"/>
-                    <p:commandButton value="Si"
-                                     action="#{licitacionView.eliminar()}"
-                                     ajax="true" process="@form"
-                                     update="growl form_datatable"
-                                     validateClient="true"/>
+                    <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'CAT_LICITACION_WRITE_ELIMINAR')">
+                        <p:commandButton value="Si"
+                                         action="#{licitacionView.eliminar()}"
+                                         ajax="true" process="@form"
+                                         update="growl form_datatable"
+                                         validateClient="true"/>
+                    </sec:authorize>
                 </f:facet>
             </p:dialog>
         </h:form>
@@ -309,11 +330,14 @@
                     <p:commandButton value="Cancelar" onclick="PF('formDialog').hide()"
                                      class="ui-button-outlined"/>
 
-                    <p:commandButton value="Guardar" id="bnt_saveLicitacion"
-                                     action="#{licitacionView.guardarLicitacion()}"
-                                     ajax="true" process="@form" disabled="#{!licitacionView.fechaFinalValida}"
-                                     update="growl form_datatable"
-                                     validateClient="true"/>
+
+                    <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'CAT_LICITACION_WRITE_AGREGAR', 'CAT_LICITACION_WRITE_EDITAR')">
+                        <p:commandButton value="Guardar" id="bnt_saveLicitacion"
+                                         action="#{licitacionView.guardarLicitacion()}"
+                                         ajax="true" process="@form" disabled="#{!licitacionView.fechaFinalValida}"
+                                         update="growl form_datatable"
+                                         validateClient="true"/>
+                    </sec:authorize>
                 </f:facet>
             </p:dialog>
         </h:form>
@@ -370,10 +394,12 @@
                             <p:commandButton value="Cancelar" ajax="true" process="@this"
                                              action="#{licitacionView.cerrarModalImport()}"
                                              styleClass="ui-button-outlined mr-4"/>
-                            <p:commandButton value="Guardar" ajax="true" process="@form"
-                                             action="#{licitacionView.guardarImportacion()}"
-                                             update="growl :form_import:import-dialog-content"
-                                             validateClient="true"/>
+                            <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'CAT_LICITACION_WRITE_IMPORT')">
+                                <p:commandButton value="Guardar" ajax="true" process="@form"
+                                                 action="#{licitacionView.guardarImportacion()}"
+                                                 update="growl :form_import:import-dialog-content"
+                                                 validateClient="true"/>
+                            </sec:authorize>
                         </p:outputPanel>
                     </p:outputPanel>
 

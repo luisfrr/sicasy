@@ -16,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.primefaces.PrimeFaces;
 import org.springframework.context.annotation.Scope;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
@@ -26,9 +27,17 @@ import java.util.Optional;
 @Scope("view")
 @RequiredArgsConstructor
 @Slf4j
-@ConfigPermiso(tipo = TipoPermiso.VIEW, codigo = "CATALOGO_ASEGURADORA_VIEW", nombre = "Catálogo de Aseguradoras")
+@ConfigPermiso(tipo = TipoPermiso.VIEW, codigo = "CAT_ASEGURADORA_VIEW",
+        nombre = "Catálogo de Aseguradoras",
+        url = "/views/catalogos/aseguradoras.faces")
+@PreAuthorize("hasAnyAuthority('ROLE_OWNER', 'CAT_ASEGURADORA_VIEW')")
 public class AseguradoraView {
 
+    // Inyección de dependencias
+    private final IAseguradoraService  aseguradoraService;
+    private final UserSessionBean userSessionBean;
+
+    // Variables Generales
     private @Getter String title;
     private @Getter String titleDialog;
     private @Getter Aseguradora aseguradoraSelected;
@@ -36,42 +45,42 @@ public class AseguradoraView {
     private @Getter List<Aseguradora> aseguradorasList;
     private @Getter EstatusRegistro[] estatusRegistros;
 
-    private final IAseguradoraService  aseguradoraService;
-    private final UserSessionBean userSessionBean;
 
     @PostConstruct
     public void init(){
-        log.info("Inicializando seguradora");
+        log.info("PostConstruct - AseguradoraView");
         this.title = "Aseguradoras";
 
         this.aseguradoraSelected = null;
         this.estatusRegistros = EstatusRegistro.values();
         this.limpiarFiltros();
-
     }
 
     public void limpiarFiltros(){
-        log.info("Limpiando filtros");
+        log.info("limpiarFiltros - AseguradoraView");
         this.aseguradoraFiltroHelper = new Aseguradora();
         this.aseguradoraFiltroHelper.setEstatus(EstatusRegistro.ACTIVO);
         this.buscar();
     }
 
     public void buscar(){
-        log.info("Buscando aseguradoras");
+        log.info("buscar - AseguradoraView");
         this.aseguradorasList = aseguradoraService.findAllDynamic(this.aseguradoraFiltroHelper);
     }
 
-    public void agregarAseguradora(){
-        log.info("Agregando aseguradora");
+    @ConfigPermiso(tipo = TipoPermiso.WRITE, codigo = "CAT_ASEGURADORA_WRITE_AGREGAR", orden = 1,
+            nombre = "Agregar", descripcion = "Acción que permite agregar una nueva aseguradora")
+    @PreAuthorize("hasAnyAuthority('ROLE_OWNER', 'CAT_ASEGURADORA_WRITE_AGREGAR')")
+    public void agregarAseguradora() {
+        log.info("agregarAseguradora - AseguradoraView");
         this.titleDialog = "Agregar Aseguradora";
         this.aseguradoraSelected = new Aseguradora();
 
     }
 
+    @PreAuthorize("hasAnyAuthority('ROLE_OWNER', 'CAT_ASEGURADORA_WRITE_AGREGAR', 'CAT_ASEGURADORA_WRITE_EDITAR')")
     public void guardarAseguradora(){
-        log.info("Guardando aseguradora");
-
+        log.info("guardarAseguradora - AseguradoraView");
         try {
             if (this.aseguradoraSelected != null) {
                 if (this.aseguradoraSelected.getIdAseguradora() != null){
@@ -108,8 +117,11 @@ public class AseguradoraView {
 
     }
 
+    @ConfigPermiso(tipo = TipoPermiso.WRITE, codigo = "CAT_ASEGURADORA_WRITE_EDITAR", orden = 2,
+            nombre = "Editar", descripcion = "Acción que permite editar la información de una aseguradora")
+    @PreAuthorize("hasAnyAuthority('ROLE_OWNER', 'CAT_ASEGURADORA_WRITE_EDITAR')")
     public void editar(Integer id) {
-        log.info("editar");
+        log.info("editar - AseguradoraView");
         Optional<Aseguradora> aseguradoraOptional = aseguradoraService.findById(id);
 
         if(aseguradoraOptional.isEmpty()) {
@@ -123,16 +135,19 @@ public class AseguradoraView {
         }
     }
 
+    @ConfigPermiso(tipo = TipoPermiso.WRITE, codigo = "CAT_ASEGURADORA_WRITE_ELIMINAR", orden = 3,
+            nombre = "Eliminar", descripcion = "Acción que permite eliminar un registro de aseguradora")
+    @PreAuthorize("hasAnyAuthority('ROLE_OWNER', 'CAT_ASEGURADORA_WRITE_ELIMINAR')")
     public void doEliminar(Integer id) {
-        log.info("prepare to eliminar");
+        log.info("doEliminar - AseguradoraView");
         Optional<Aseguradora> aseguradoraOptional = aseguradoraService.findById(id);
         this.aseguradoraSelected = aseguradoraOptional.orElse(null);
 
     }
 
+    @PreAuthorize("hasAnyAuthority('ROLE_OWNER', 'CAT_ASEGURADORA_WRITE_ELIMINAR')")
    public void eliminar() {
-        log.info("eliminar aseguradora");
-
+        log.info("eliminar - AseguradoraView");
         if(this.aseguradoraSelected == null) {
             FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_ERROR,
                     "Error", "No se ha encontrado la información de esta Aseguradora.");
@@ -146,9 +161,7 @@ public class AseguradoraView {
             this.aseguradoraSelected = null;
             this.limpiarFiltros();
         }
-
        PrimeFaces.current().executeScript("PF('confirmDialog').hide();");
-
    }
 
 

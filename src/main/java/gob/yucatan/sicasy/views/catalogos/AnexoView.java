@@ -1,6 +1,7 @@
 package gob.yucatan.sicasy.views.catalogos;
 
 import gob.yucatan.sicasy.business.annotations.ConfigPermiso;
+import gob.yucatan.sicasy.business.annotations.ConfigPermisoArray;
 import gob.yucatan.sicasy.business.dtos.AcuseImportacion;
 import gob.yucatan.sicasy.business.entities.Anexo;
 import gob.yucatan.sicasy.business.entities.Licitacion;
@@ -35,6 +36,7 @@ import org.primefaces.event.SelectEvent;
 import org.primefaces.model.file.UploadedFile;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
 import java.io.*;
@@ -44,16 +46,26 @@ import java.util.*;
 @Scope("view")
 @RequiredArgsConstructor
 @Slf4j
-@ConfigPermiso(tipo = TipoPermiso.VIEW, codigo = "CATALOGO_ANEXO_VIEW", nombre = "Catálogo de Anexos")
+@ConfigPermiso(tipo = TipoPermiso.VIEW, codigo = "CAT_ANEXO_VIEW",
+        nombre = "Catálogo de Anexos",
+        url = "/views/catalogos/anexos.faces")
+@PreAuthorize("hasAnyAuthority('ROLE_OWNER', 'CAT_ANEXO_VIEW')")
 public class AnexoView implements Serializable {
 
+    // Constantes
     @Value("${app.files.folder.anexos}")
     private @Getter String FOLDER_ANEXO;
 
+    // Inyección de dependencias
+    private final IAnexoService anexoService;
+    private final ILicitacionService licitacionService;
+    private final UserSessionBean userSessionBean;
+    private final IGeneratorExcelFile generatorExcelFile;
+
+    // Variables Generales
     private @Getter String title;
     private @Getter String titleDialog;
     private @Getter Boolean fechasValidadasCorrectas;
-
     private @Getter Anexo anexoFilter;
     private @Getter Anexo anexoSelected;
     private @Getter List<Anexo> anexoList;
@@ -61,19 +73,16 @@ public class AnexoView implements Serializable {
     private @Getter EstatusRegistro[] estatusRegistros;
     private @Getter List<Licitacion> licitacionesActivasList;
     private @Getter @Setter UploadedFile anexoFile;
-    private @Getter boolean showErrorImportacion;
     private @Getter String layoutFileUpload;
     private @Getter @Setter List<AcuseImportacion> acuseImportacionList;
 
-    private final IAnexoService anexoService;
-    private final ILicitacionService licitacionService;
-    private final UserSessionBean userSessionBean;
-    private final IGeneratorExcelFile generatorExcelFile;
+    // Variables para renderizar
+    private @Getter boolean showErrorImportacion;
+
 
     @PostConstruct
     public void init(){
-        log.info("Inicializando Anexos View");
-
+        log.info("PostConstruct - AnexoView");
         this.title = "Anexos";
         this.anexoSelected = null;
         this.fechasValidadasCorrectas = true;
@@ -82,8 +91,12 @@ public class AnexoView implements Serializable {
         this.limpiarFiltros();
     }
 
+    @ConfigPermisoArray({
+            @ConfigPermiso(tipo = TipoPermiso.READ, codigo = "CAT_ANEXO_READ_DESCARGAR_ARCHIVO", orden = 1,
+                    nombre = "Descargar archivo", descripcion = "Permite descargar el archivo del anexo."),
+    })
     public void limpiarFiltros(){
-        log.info("Limpiando filtros");
+        log.info("limpiarFiltros - AnexoView");
         this.anexoFilter = new Anexo();
         this.anexoFilter.setLicitacion(new Licitacion());
         this.anexoFilter.setEstatusRegistro(EstatusRegistro.ACTIVO);
@@ -93,21 +106,23 @@ public class AnexoView implements Serializable {
     }
 
     public void buscar(){
-        log.info("Buscando Anexos");
+        log.info("buscar - AnexoView");
         this.anexoList = anexoService.findAllDynamic(this.anexoFilter);
     }
 
-    public void agregarAnexo(){
-        log.info("Agregando Anexo");
+    @ConfigPermiso(tipo = TipoPermiso.WRITE, codigo = "CAT_ANEXO_WRITE_AGREGAR", orden = 1,
+            nombre = "Agregar", descripcion = "Acción que permite agregar un nuevo anexo")
+    @PreAuthorize("hasAnyAuthority('ROLE_OWNER', 'CAT_ANEXO_WRITE_AGREGAR')")
+    public void agregarAnexo() {
+        log.info("agregarAnexo - AnexoView");
         this.titleDialog = "Agregar Anexo";
         this.anexoSelected = new Anexo();
         this.anexoSelected.setLicitacion(new Licitacion());
-
     }
 
-    public void guardarAnexo(){
-        log.info("Guardando anexo");
-
+    @PreAuthorize("hasAnyAuthority('ROLE_OWNER', 'CAT_ANEXO_WRITE_AGREGAR', 'CAT_ANEXO_WRITE_EDITAR')")
+    public void guardarAnexo() {
+        log.info("guardarAnexo - AnexoView");
         try {
             if (this.anexoSelected != null) {
                 if (this.anexoSelected.getIdAnexo() != null){
@@ -147,7 +162,7 @@ public class AnexoView implements Serializable {
                         this.buscar();
                         this.anexoSelected  = null;
                     }else {
-                        // mostrar mensaje de advertencia que no se puede guardar la informacion
+                        // mostrar mensaje de advertencia que no se puede guardar la información
                         FacesContext.getCurrentInstance().addMessage(null,
                                 new FacesMessage(FacesMessage.SEVERITY_WARN, "Advertencia", "El Anexo ya se encuentra registrado con la licitación selecionada."));
 
@@ -171,8 +186,11 @@ public class AnexoView implements Serializable {
 
     }
 
+    @ConfigPermiso(tipo = TipoPermiso.WRITE, codigo = "CAT_ANEXO_WRITE_EDITAR", orden = 2,
+            nombre = "Editar", descripcion = "Acción que permite editar la información de un anexo")
+    @PreAuthorize("hasAnyAuthority('ROLE_OWNER', 'CAT_ANEXO_WRITE_EDITAR')")
     public void editar(Long id) {
-        log.info("editar");
+        log.info("editar - AnexoView");
         Optional<Anexo> anexoOptional = anexoService.findById(id);
 
         if(anexoOptional.isEmpty()) {
@@ -186,15 +204,19 @@ public class AnexoView implements Serializable {
         }
     }
 
+    @ConfigPermiso(tipo = TipoPermiso.WRITE, codigo = "CAT_ANEXO_WRITE_ELIMINAR", orden = 3,
+            nombre = "Eliminar", descripcion = "Acción que permite eliminar el registro de un anexo")
+    @PreAuthorize("hasAnyAuthority('ROLE_OWNER', 'CAT_ANEXO_WRITE_ELIMINAR')")
     public void doEliminar(Long id) {
-        log.info("prepare to eliminar");
+        log.info("doEliminar - AnexoView");
         Optional<Anexo> anexoOptional = anexoService.findById(id);
         this.anexoSelected = anexoOptional.orElse(null);
 
     }
 
+    @PreAuthorize("hasAnyAuthority('ROLE_OWNER', 'CAT_ANEXO_WRITE_ELIMINAR')")
     public void eliminar() {
-        log.info("eliminar Anexo");
+        log.info("eliminar - AnexoView");
 
         if(this.anexoSelected == null) {
             FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_ERROR,
@@ -216,8 +238,11 @@ public class AnexoView implements Serializable {
 
     }
 
+    @ConfigPermiso(tipo = TipoPermiso.READ, codigo = "CAT_ANEXO_READ_EXPORTAR", orden = 1,
+            nombre = "Exportar", descripcion = "Acción que permite exportar los registros de anexos en un archivo Excel")
+    @PreAuthorize("hasAnyAuthority('ROLE_OWNER', 'CAT_ANEXO_READ_EXPORTAR')")
     public ExportFile exportFileExcel() throws IOException {
-        log.info("exportFileExcel anexo");
+        log.info("exportFileExcel - AnexoView");
         List<ExcelCell> cellList = new ArrayList<>();
 
         XSSFWorkbook workbook = generatorExcelFile.createWorkbook();
@@ -262,13 +287,13 @@ public class AnexoView implements Serializable {
         return generatorExcelFile.createExcelFile(workbook, excelDataSheet);
     }
 
-    public void validateFechaInicioFinal(SelectEvent event){
-        log.info("validando fecha final" );
+    public void validateFechaInicioFinal(SelectEvent event) {
+        log.info("validateFechaInicioFinal - AnexoView");
 
         if (this.anexoSelected.getFechaInicio() != null && this.anexoSelected.getFechaFinal() != null){
 
             if (this.anexoSelected.getFechaInicio().after(this.anexoSelected.getFechaFinal())){
-                // la fecha inicio no puede estar dspues de la fecha final
+                // la fecha de inicio no puede estar dspues de la fecha final
                 this.fechasValidadasCorrectas = false;
                 FacesContext.getCurrentInstance().addMessage(event.getComponent().getClientId(),
                         new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Fecha selecionada inválida."));
@@ -282,7 +307,7 @@ public class AnexoView implements Serializable {
     }
 
     private Boolean validatePuedeGuardarNewAnexo(){
-
+        log.info("validatePuedeGuardarNewAnexo - AnexoView");
         if (this.anexoSelected != null && this.anexoSelected.getIdAnexo() == null &&
                 this.anexoSelected.getNombre() != null) {
             List<Anexo> anexosResult;
@@ -304,7 +329,7 @@ public class AnexoView implements Serializable {
             Licitacion licitacionSearch = licitacionService.findById(this.anexoSelected.getLicitacion().getIdLicitacion()).orElse(null);
 
             if(anexo.isPresent() && anexo.get().getEstatusRegistro().equals(EstatusRegistro.ACTIVO)) {
-                // si existe el anexo y esta activo, revisar si tiene alguna licitacion activa vinculada
+                // si existe el anexo y está activo, revisar si tiene alguna licitacion activa vinculada
                 return anexo.get().getLicitacion() == null || licitacionSearch == null
                         || !anexo.get().getLicitacion().getNumeroLicitacion()
                         .equals(licitacionSearch.getNumeroLicitacion())
@@ -316,7 +341,11 @@ public class AnexoView implements Serializable {
         return true;
     }
 
+    @ConfigPermiso(tipo = TipoPermiso.READ, codigo = "CAT_ANEXO_WRITE_IMPORTAR", orden = 4,
+            nombre = "Importar", descripcion = "Acción que permite importar la información de anexos")
+    @PreAuthorize("hasAnyAuthority('ROLE_OWNER', 'CAT_ANEXO_WRITE_IMPORTAR')")
     public void abrirModalImport(){
+        log.info("abrirModalImport - AnexoView");
         this.layoutFileUpload = null;
         this.showErrorImportacion = false;
         this.acuseImportacionList = null;
@@ -325,12 +354,15 @@ public class AnexoView implements Serializable {
     }
 
     public void cerrarModalImport() {
+        log.info("cerrarModalImport - AnexoView");
         this.anexoSelected = null;
         //PrimeFaces.current().ajax().update("import-dialog-content");
         PrimeFaces.current().executeScript("PF('formDialogImport').hide()");
     }
 
+    @PreAuthorize("hasAnyAuthority('ROLE_OWNER', 'CAT_ANEXO_WRITE_IMPORTAR')")
     public void importarLayout(FileUploadEvent event) throws IOException {
+        log.info("importarLayout - AnexoView");
         UploadedFile file = event.getFile();
         String fileName = file.getFileName();
         byte[] fileContent = file.getContent();
@@ -360,8 +392,9 @@ public class AnexoView implements Serializable {
         }
     }
 
+    @PreAuthorize("hasAnyAuthority('ROLE_OWNER', 'CAT_ANEXO_WRITE_IMPORTAR')")
     public void guardarImportacionAnexos(){
-        log.info("guardar importacion");
+        log.info("guardarImportacionAnexos - AnexoView");
         try {
             if(this.anexoImportList != null) {
 

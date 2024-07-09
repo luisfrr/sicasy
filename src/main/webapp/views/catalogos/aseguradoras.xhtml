@@ -24,23 +24,27 @@
                 </p:breadCrumb>
             </h:form>
 
-            <h:form id="form_toolbar" styleClass="mb-5">
-                <p:toolbar>
-                    <p:toolbarGroup>
-                        <p:commandButton value="Nuevo"
-                                         action="#{aseguradoraView.agregarAseguradora()}"
-                                         oncomplete="PF('formDialog').show()"
-                                         update="form_dialog"
-                                         styleClass="mr-4">
-                            <p:resetInput target="form_dialog:dialogContent"/>
-                        </p:commandButton>
-                    </p:toolbarGroup>
+            <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'CAT_ASEGURADORA_WRITE_AGREGAR')">
+                <h:form id="form_toolbar">
+                    <p:toolbar styleClass="mb-5">
+                        <p:toolbarGroup>
+                            <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'CAT_ASEGURADORA_WRITE_AGREGAR')">
+                                <p:commandButton value="Nuevo"
+                                                 action="#{aseguradoraView.agregarAseguradora()}"
+                                                 oncomplete="PF('formDialog').show()"
+                                                 update="form_dialog"
+                                                 styleClass="mr-4">
+                                    <p:resetInput target="form_dialog:dialogContent"/>
+                                </p:commandButton>
+                            </sec:authorize>
+                        </p:toolbarGroup>
 
-                    <p:toolbarGroup align="right">
-                        <p:commandButton value="Exportar" styleClass="ui-button-outlined" rendered="false"/>
-                    </p:toolbarGroup>
-                </p:toolbar>
-            </h:form>
+                        <p:toolbarGroup align="right">
+                            <p:commandButton value="Exportar" styleClass="ui-button-outlined" rendered="false"/>
+                        </p:toolbarGroup>
+                    </p:toolbar>
+                </h:form>
+            </sec:authorize>
 
             <h:form id="form_filtros" styleClass="mb-5">
 
@@ -103,80 +107,90 @@
                         <h:outputText value="#{index + 1}" />
                     </p:column>
 
-                    <p:column headerText="Nombre">
+                    <p:column headerText="Nombre" width="180">
                         <h:outputText value="#{aseguradora.nombre}"/>
                     </p:column>
 
-                    <p:column headerText="Descripción">
+                    <p:column headerText="Descripción" style="min-width: 15rem;">
                         <h:outputText value="#{aseguradora.descripcion}"/>
                     </p:column>
 
-                    <p:column headerText="Representante">
+                    <p:column headerText="Representante" width="180">
                         <h:outputText value="#{aseguradora.representante}"/>
-                    </p:column>
-
-                    <p:column headerText="Estatus">
-                        <h:outputText value="#{aseguradora.estatus.label}"/>
                     </p:column>
 
                     <sec:authorize access="hasAnyAuthority('ROLE_OWNER')">
 
-                        <p:column headerText="Fecha creación">
-                            <h:outputText value="#{aseguradora.fechaCreacion}">
+                        <p:column headerText="Estatus registro" width="150">
+                            <h:outputText value="#{aseguradora.estatus.label}">
                             </h:outputText>
                         </p:column>
 
-                        <p:column headerText="Creado por">
+                        <p:column headerText="Fecha creación" width="180">
+                            <h:outputText value="#{aseguradora.fechaCreacion}">
+                                <f:convertDateTime pattern="dd/MM/yyyy HH:mm:ss a"/>
+                            </h:outputText>
+                        </p:column>
+
+                        <p:column headerText="Creado por" width="150">
                             <h:outputText value="#{aseguradora.creadoPor}">
                             </h:outputText>
                         </p:column>
 
-                        <p:column headerText="Fecha modificación">
+                        <p:column headerText="Fecha modificación" width="180">
                             <h:outputText value="#{aseguradora.fechaModificacion}">
+                                <f:convertDateTime pattern="dd/MM/yyyy HH:mm:ss a"/>
                             </h:outputText>
                         </p:column>
 
-                        <p:column headerText="Modificado por">
+                        <p:column headerText="Modificado por" width="150">
                             <h:outputText value="#{aseguradora.modificadoPor}">
                             </h:outputText>
                         </p:column>
 
-                        <p:column headerText="Fecha borrado">
+                        <p:column headerText="Fecha borrado" width="180">
                             <h:outputText value="#{aseguradora.fechaBorrado}">
+                                <f:convertDateTime pattern="dd/MM/yyyy HH:mm:ss a"/>
                             </h:outputText>
                         </p:column>
 
-                        <p:column headerText="Borrado por">
+                        <p:column headerText="Borrado por" width="150">
                             <h:outputText value="#{aseguradora.borradoPor}">
                             </h:outputText>
                         </p:column>
+
                     </sec:authorize>
 
-                    <p:column headerText="Acciones">
+                    <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'CAT_ASEGURADORA_WRITE_EDITAR', 'CAT_ASEGURADORA_WRITE_ELIMINAR')">
+                        <p:column headerText="Acciones">
 
-                        <p:growl id="message" showDetail="true"/>
+                            <p:growl id="message" showDetail="true"/>
 
-                        <p:commandButton id="buttonOptions" type="button"
-                                         icon="fi fi-rr-menu-dots-vertical" styleClass="rounded-button ui-button-outlined" />
-                        <p:menu overlay="true" trigger="buttonOptions" my="left top" at="left bottom" >
+                            <p:commandButton id="buttonOptions" type="button"
+                                             icon="fi fi-rr-menu-dots-vertical" styleClass="rounded-button ui-button-outlined" />
+                            <p:menu overlay="true" trigger="buttonOptions" my="left top" at="left bottom" >
 
-                            <p:menuitem value="Editar" icon="fi fi-rr-pencil"
-                                        action="#{aseguradoraView.editar(aseguradora.idAseguradora)}"
-                                        ajax="true" update="form_dialog"
-                                        oncomplete="PF('formDialog').show()">
-                                <p:resetInput target="form_dialog:dialogContent"/>
-                            </p:menuitem>
+                                <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'CAT_ASEGURADORA_WRITE_EDITAR')">
+                                    <p:menuitem value="Editar"
+                                                action="#{aseguradoraView.editar(aseguradora.idAseguradora)}"
+                                                ajax="true" update="form_dialog"
+                                                oncomplete="PF('formDialog').show()">
+                                        <p:resetInput target="form_dialog:dialogContent"/>
+                                    </p:menuitem>
+                                </sec:authorize>
 
-                            <p:menuitem value="Eliminar" icon="fi fi-rr-trash"
-                                        ajax="true" update="form_confirm_dialog"
-                                        oncomplete="PF('confirmDialog').show()"
-                                        action="#{aseguradoraView.doEliminar(aseguradora.idAseguradora)}">
-                            </p:menuitem>
+                                <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'CAT_ASEGURADORA_WRITE_ELIMINAR')">
+                                    <p:menuitem value="Eliminar"
+                                                ajax="true" update="form_confirm_dialog"
+                                                oncomplete="PF('confirmDialog').show()"
+                                                action="#{aseguradoraView.doEliminar(aseguradora.idAseguradora)}">
+                                    </p:menuitem>
+                                </sec:authorize>
 
+                            </p:menu>
 
-                        </p:menu>
-
-                    </p:column>
+                        </p:column>
+                    </sec:authorize>
 
                 </p:dataTable>
 
@@ -201,11 +215,13 @@
                 <f:facet name="footer">
                     <p:commandButton value="No" onclick="PF('confirmDialog').hide()"
                                      class="ui-button-outlined"/>
-                    <p:commandButton value="Si"
-                                     action="#{aseguradoraView.eliminar()}"
-                                     ajax="true" process="@form"
-                                     update="growl form_datatable"
-                                     validateClient="true"/>
+                    <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'CAT_ASEGURADORA_WRITE_ELIMINAR')">
+                        <p:commandButton value="Si"
+                                         action="#{aseguradoraView.eliminar()}"
+                                         ajax="true" process="@form"
+                                         update="growl form_datatable"
+                                         validateClient="true"/>
+                    </sec:authorize>
                 </f:facet>
             </p:dialog>
         </h:form>
@@ -248,11 +264,14 @@
 
                     <p:commandButton value="Cancelar" onclick="PF('formDialog').hide()"
                                      class="ui-button-outlined"/>
-                    <p:commandButton value="Guardar"
-                                     action="#{aseguradoraView.guardarAseguradora()}"
-                                     ajax="true" process="@form"
-                                     update="growl form_datatable"
-                                     validateClient="true"/>
+                    <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'CAT_ASEGURADORA_WRITE_AGREGAR', 'CAT_ASEGURADORA_WRITE_EDITAR')">
+                        <p:commandButton value="Guardar"
+                                         action="#{aseguradoraView.guardarAseguradora()}"
+                                         ajax="true" process="@form"
+                                         update="growl form_datatable"
+                                         validateClient="true"/>
+                    </sec:authorize>
+
                 </f:facet>
             </p:dialog>
         </h:form>

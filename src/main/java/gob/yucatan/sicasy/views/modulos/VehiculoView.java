@@ -52,18 +52,32 @@ import java.util.*;
 @PreAuthorize("hasAnyAuthority('ROLE_OWNER', 'VEHICULOS_VIEW')")
 public class VehiculoView implements Serializable {
 
+    // Constantes
     @Value("${app.files.folder.layouts.importar-vehiculo}")
     private @Getter String LAYOUT_VEHICULOS;
-
     @Value("${app.files.folder.vehiculos}")
     private @Getter String FOLDER_VEHICULOS;
-
     private @Getter final Integer ACCION_RECHAZAR_SOLICITUD = 3;
     private @Getter final Integer ACCION_CANCELAR_SOLICITUD = 4;
     private @Getter final Integer ACCION_SOLICITAR_BAJA = 5;
     private @Getter final Integer ACCION_SOLICITAR_MODIFICACION = 6;
 
-    // Generales
+    // Inyección de dependencias
+    private final UserSessionBean userSessionBean;
+    private final IVehiculoService vehiculoService;
+    private final IDependenciaService dependenciaService;
+    private final ICondicionVehiculoService condicionVehiculoService;
+    private final IEstatusVehiculoService estatusVehiculoService;
+    private final ILicitacionService licitacionService;
+    private final IAnexoService anexoService;
+    private final IVehiculoFotoService vehiculoFotoService;
+    private final IGeneratorExcelFile generatorExcelFile;
+    private final ITipoMantenimientoService tipoMantenimientoService;
+    private final IMantenimientoService mantenimientoService;
+    private final IMantenimientoFotoService mantenimientoFotoService;
+    private final IBitacoraVehiculoService bitacoraVehiculoService;
+
+    // Variables Generales
     private @Getter String title;
     private @Getter @Setter List<Vehiculo> vehiculoList;
     private @Getter @Setter List<Vehiculo> vehiculoSelectedList;
@@ -120,24 +134,10 @@ public class VehiculoView implements Serializable {
     private @Getter boolean showAdjuntarFotos;
     private @Getter Vehiculo vehiculoFotoSelected;
 
-    private final UserSessionBean userSessionBean;
-    private final IVehiculoService vehiculoService;
-    private final IDependenciaService dependenciaService;
-    private final ICondicionVehiculoService condicionVehiculoService;
-    private final IEstatusVehiculoService estatusVehiculoService;
-    private final ILicitacionService licitacionService;
-    private final IAnexoService anexoService;
-    private final IVehiculoFotoService vehiculoFotoService;
-    private final IGeneratorExcelFile generatorExcelFile;
-    private final ITipoMantenimientoService tipoMantenimientoService;
-    private final IMantenimientoService mantenimientoService;
-    private final IMantenimientoFotoService mantenimientoFotoService;
-    private final IBitacoraVehiculoService bitacoraVehiculoService;
-
 
     @PostConstruct
     public void init() {
-        log.info("Inicializando VehiculoView");
+        log.info("PostConstruct - VehiculoView");
         this.title = "Vehículo";
         this.loadResponsiveOptionsGallery();
         this.getPermisosFiltroEstatus();
@@ -150,7 +150,7 @@ public class VehiculoView implements Serializable {
     }
 
     public void limpiarFiltros() {
-        log.info("limpiar filtros de vehiculos");
+        log.info("limpiarFiltros - VehiculoView");
         this.vehiculoSelected = null;
         this.mantenimientoVehiculo = new Mantenimiento();
         this.mantenimientoVehiculo.setTipoMantenimiento(new TipoMantenimiento());
@@ -189,7 +189,7 @@ public class VehiculoView implements Serializable {
     }
 
     public void buscar() {
-        log.info("buscar vehiculos");
+        log.info("buscar - VehiculoView");
         this.vehiculoList = vehiculoService.findAllDynamic(this.vehiculoFilter);
         PrimeFaces.current().ajax().update("form_datatable");
     }
@@ -202,7 +202,7 @@ public class VehiculoView implements Serializable {
     })
     @PreAuthorize("hasAnyAuthority('ROLE_OWNER', 'VEHICULOS_WRITE_REGISTRO_INDIVIDUAL', 'VEHICULOS_WRITE_REGISTRO_LAYOUT')")
     public void abrirModalRegistroVehiculo() {
-        log.info("abrir modal registro vehiculo");
+        log.info("abrirModalRegistroVehiculo - VehiculoView");
         this.showNuevoFormDialog = true;
         this.vehiculoSelected = new Vehiculo();
         this.vehiculoSelected.setDependencia(new Dependencia());
@@ -224,7 +224,7 @@ public class VehiculoView implements Serializable {
     }
 
     public void cerrarModalRegistroVehiculo() {
-        log.info("cerrar modal registro vehiculo");
+        log.info("cerrarModalRegistroVehiculo - VehiculoView");
         this.showNuevoFormDialog = false;
         this.vehiculoSelected = null;
         PrimeFaces.current().ajax().update("registrar-vehiculo-dialog-content");
@@ -233,7 +233,7 @@ public class VehiculoView implements Serializable {
 
     @PreAuthorize("hasAnyAuthority('ROLE_OWNER', 'VEHICULOS_WRITE_REGISTRO_INDIVIDUAL')")
     public void guardarNuevoVehiculo() {
-        log.info("guardar nuevo vehiculo");
+        log.info("guardarNuevoVehiculo - VehiculoView");
         try {
             if(this.vehiculoSelected != null) {
                 this.vehiculoSelected.setCreadoPor(userSessionBean.getUserName());
@@ -259,7 +259,7 @@ public class VehiculoView implements Serializable {
 
     @PreAuthorize("hasAnyAuthority('ROLE_OWNER', 'VEHICULOS_WRITE_REGISTRO_LAYOUT')")
     public void guardarImportacionVehiculo() {
-        log.info("guardar importacion vehiculo");
+        log.info("guardarImportacionVehiculo - VehiculoView");
         try {
             if(this.vehiculoSelected != null && this.vehiculoImportList != null) {
                 this.acuseImportacionList = vehiculoService.importar(this.vehiculoImportList,
@@ -295,6 +295,7 @@ public class VehiculoView implements Serializable {
             nombre = "Obtener layout de importación", descripcion = "Permite descargar el layout de importación de vehículos.")
     @PreAuthorize("hasAnyAuthority('ROLE_OWNER', 'VEHICULOS_WRITE_REGISTRO_LAYOUT')")
     public void importarLayout(FileUploadEvent event) throws IOException {
+        log.info("importarLayout - VehiculoView");
         UploadedFile file = event.getFile();
         String fileName = file.getFileName();
         byte[] fileContent = file.getContent();
@@ -342,7 +343,7 @@ public class VehiculoView implements Serializable {
             nombre = "Solicitar autorización", descripcion = "Permite cambiar de estado REGISTRADO a POR AUTORIZAR los vehículos seleccionados.")
     @PreAuthorize("hasAnyAuthority('ROLE_OWNER', 'VEHICULOS_WRITE_SOLICITAR_AUTORIZACION')")
     public void solicitarAutorizacion() {
-        log.info("Solicitando autorizacion");
+        log.info("solicitarAutorizacion - VehiculoView");
         try {
             List<Long> idVehiculoSelectedList = this.getIdVehiculoSelectedList();
             vehiculoService.solicitarAutorizacion(idVehiculoSelectedList, userSessionBean.getUserName());
@@ -358,7 +359,7 @@ public class VehiculoView implements Serializable {
             nombre = "Autorizar solicitud", descripcion = "Permite cambiar de estado POR AUTORIZAR a ACTIVO los vehículos seleccionados.")
     @PreAuthorize("hasAnyAuthority('ROLE_OWNER', 'VEHICULOS_WRITE_AUTORIZAR_SOLICITUD')")
     public void autorizarSolicitud() {
-        log.info("Autorizando solicitud");
+        log.info("autorizarSolicitud - VehiculoView");
         try {
             List<Long> idVehiculoSelectedList =  this.getIdVehiculoSelectedList();
             vehiculoService.autorizarSolicitud(idVehiculoSelectedList, userSessionBean.getUserName());
@@ -382,7 +383,7 @@ public class VehiculoView implements Serializable {
     })
     @PreAuthorize("hasAnyAuthority('ROLE_OWNER', 'VEHICULOS_WRITE_RECHAZAR_SOLICITUD', 'VEHICULOS_WRITE_CANCELAR_SOLICITUD', 'VEHICULOS_WRITE_SOLICITAR_BAJA', 'VEHICULOS_WRITE_SOLICITAR_MODIFICACION')")
     public void abrirConfirmEstatusDialog(Integer confirmAccion) {
-        log.info("Abrir Confirm Estatus");
+        log.info("abrirConfirmEstatusDialog - VehiculoView");
         this.showConfirmEstatus = true;
         this.confirmAccion = confirmAccion;
         this.confirmMotivo = "";
@@ -403,7 +404,7 @@ public class VehiculoView implements Serializable {
 
     @PreAuthorize("hasAnyAuthority('ROLE_OWNER', 'VEHICULOS_WRITE_RECHAZAR_SOLICITUD', 'VEHICULOS_WRITE_CANCELAR_SOLICITUD', 'VEHICULOS_WRITE_SOLICITAR_BAJA', 'VEHICULOS_WRITE_SOLICITAR_MODIFICACION')")
     public void confirmarEstatusDialog() {
-        log.info("confirmar estatus dialog");
+        log.info("confirmarEstatusDialog - VehiculoView");
         try {
             List<Long> idVehiculoSelectedList =  this.getIdVehiculoSelectedList();
 
@@ -436,7 +437,7 @@ public class VehiculoView implements Serializable {
     }
 
     public void cerrarConfirmEstatusDialog() {
-        log.info("Cerrar Confirm Estatus");
+        log.info("cerrarConfirmEstatusDialog - VehiculoView");
         this.showConfirmEstatus = false;
         this.confirmAccion = null;
         this.confirmMotivo = "";
@@ -450,7 +451,7 @@ public class VehiculoView implements Serializable {
             nombre = "Ver detalle del vehículo", descripcion = "Permite ver el detalle la información del vehículo, se accede al panel de edición y bitácoras.")
     @PreAuthorize("hasAnyAuthority('ROLE_OWNER', 'VEHICULOS_WRITE_VER_DETALLE')")
     public void verDetalle(Vehiculo vehiculo) {
-        log.info("ver detalle vehiculos");
+        log.info("verDetalle - VehiculoView");
         this.vehiculoSelected = vehiculoService.findFullById(vehiculo.getIdVehiculo());
         this.showVehiculosPanel = false;
         this.showDetailsPanel = true;
@@ -467,7 +468,7 @@ public class VehiculoView implements Serializable {
     }
 
     public void regresar() {
-        log.info("regresar vehiculos");
+        log.info("regresar - VehiculoView");
         this.vehiculoSelected = null;
         this.showVehiculosPanel = true;
         this.showDetailsPanel = false;
@@ -478,6 +479,7 @@ public class VehiculoView implements Serializable {
             nombre = "Editar vehículo", descripcion = "Permite editar la información del vehículo.")
     @PreAuthorize("hasAnyAuthority('ROLE_OWNER', 'VEHICULOS_WRITE_EDITAR_VEHICULO')")
     public void permitirEditar() {
+        log.info("permitirEditar - VehiculoView");
         this.readOnlyEditForm = false;
         PrimeFaces.current().ajax().update("tab_view_detalles:form_editar_vehiculo");
     }
@@ -490,6 +492,7 @@ public class VehiculoView implements Serializable {
 
     @PreAuthorize("hasAnyAuthority('ROLE_OWNER', 'VEHICULOS_WRITE_EDITAR_VEHICULO')")
     public void guardarEdicion() {
+        log.info("guardarEdicion - VehiculoView");
         try {
             this.vehiculoSelected.setModificadoPor(userSessionBean.getUserName());
             vehiculoService.editar(this.vehiculoSelected);
@@ -508,7 +511,7 @@ public class VehiculoView implements Serializable {
             nombre = "Adjuntar fotos", descripcion = "Permite adjuntar fotos del vehículo.")
     @PreAuthorize("hasAnyAuthority('ROLE_OWNER', 'VEHICULOS_WRITE_REGISTRAR_MANTENIMIENTO')")
     public void abrirModalRegistroMantenimiento(Long idVehiculo) {
-        log.info("abrir modal registro mantenimiento");
+        log.info("abrirModalRegistroMantenimiento - VehiculoView");
         this.vehiculoSelected = vehiculoService.findById(idVehiculo);
         this.mantenimientoVehiculo = new Mantenimiento();
         this.mantenimientoVehiculo.setVehiculo(vehiculoSelected);
@@ -518,7 +521,7 @@ public class VehiculoView implements Serializable {
     }
 
     public void cerrarModalRegistroMantenimiento(){
-        log.info("cerrar modal registro mantenimiento");
+        log.info("cerrarModalRegistroMantenimiento - VehiculoView");
         this.vehiculoSelected = null;
         PrimeFaces.current().ajax().update("form_registrar_mantenimiento", "growl");
         PrimeFaces.current().executeScript("PF('registroMantenimientoDialog').hide();");
@@ -526,6 +529,7 @@ public class VehiculoView implements Serializable {
     }
 
     public void abrirModalFotosMantenimiento2(Mantenimiento mantenimiento){
+        log.info("abrirModalFotosMantenimiento2 - VehiculoView");
         this.mantenimientoVehiculo = mantenimiento;
 
         PrimeFaces.current().ajax().update("form_adjuntar_fotos-mantenimiento", "growl");
@@ -533,6 +537,7 @@ public class VehiculoView implements Serializable {
     }
 
     public void abrirModalAdjuntaVerFotosMantenimiento(Mantenimiento mantenimiento){
+        log.info("abrirModalAdjuntaVerFotosMantenimiento - VehiculoView");
         this.mantenimientoVehiculo = mantenimiento;
 
         this.mantenimientoFotoList = mantenimientoFotoService.getFotosMantenimientos(mantenimientoVehiculo.getIdMantenimiento());
@@ -542,25 +547,27 @@ public class VehiculoView implements Serializable {
         PrimeFaces.current().executeScript("PF('galeriaFotosMantenimientoDialog').show();");
     }
 
-    public void cerrarGaleriaFotosMantenimiento(){ //
+    public void cerrarGaleriaFotosMantenimiento() { //
+        log.info("cerrarGaleriaFotosMantenimiento - VehiculoView");
         this.vehiculoSelected = null;
         PrimeFaces.current().ajax().update("form_adjuntar_fotos-mantenimiento form_galeria_mantenimiento", "growl");
         PrimeFaces.current().executeScript("PF('adjuntarFotosMantenimientoDialog').hide();");
     }
 
     public void abrirModalEditarMantenimiento(Mantenimiento mantenimiento) {
+        log.info("abrirModalEditarMantenimiento - VehiculoView");
         this.mantenimientoVehiculo = mantenimiento;
         PrimeFaces.current().ajax().update("form_registrar_mantenimiento", "growl");
         PrimeFaces.current().executeScript("PF('registroMantenimientoDialog').show();");
     }
 
     public void doEliminarMatenimiento(Mantenimiento mantenimiento) {
-        log.info("prepare to eliminar");
+        log.info("doEliminarMatenimiento - VehiculoView");
         this.mantenimientoVehiculo = mantenimiento;
     }
 
     public void eliminarMantenimiento(){
-
+        log.info("eliminarMantenimiento - VehiculoView");
         this.mantenimientoVehiculo.setBorradoPor(userSessionBean.getUserName());
         this.mantenimientoVehiculo.setFechaBorrado(new Date());
         this.mantenimientoVehiculo.setEstatus(EstatusRegistro.BORRADO);
@@ -580,7 +587,7 @@ public class VehiculoView implements Serializable {
     }
 
     public void guardarMantenimientoVehiculo(){
-
+        log.info("guardarMantenimientoVehiculo - VehiculoView");
         try{
             if(this.mantenimientoVehiculo.getTipoMantenimiento().getIdTipoMantenimiento() != null &&
                 this.mantenimientoVehiculo.getDescripcion() != null && !this.mantenimientoVehiculo.getDescripcion()
@@ -636,12 +643,11 @@ public class VehiculoView implements Serializable {
     }
 
     public void validateFechaInicioFinal(SelectEvent event){
-        log.info("validando fecha final" );
-
+        log.info("validateFechaInicioFinal - VehiculoView");
         if (this.mantenimientoVehiculo.getFechaInicio() != null && this.mantenimientoVehiculo.getFechaFin() != null){
 
             if (this.mantenimientoVehiculo.getFechaInicio().after(this.mantenimientoVehiculo.getFechaFin())){
-                // la fecha inicio no puede estar dspues de la fecha final
+                // la fecha de inicio no puede estar dspues de la fecha final
                 this.fechaFinalValida = false;
                 FacesContext.getCurrentInstance().addMessage(event.getComponent().getClientId(),
                         new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Fecha selecionada inválida."));
@@ -661,7 +667,7 @@ public class VehiculoView implements Serializable {
             nombre = "Adjuntar fotos", descripcion = "Permite adjuntar fotos del vehículo.")
     @PreAuthorize("hasAnyAuthority('ROLE_OWNER', 'VEHICULOS_WRITE_ADJUNTAR_FOTOS')")
     public void abrirModalAdjuntarFotos(Long idVehiculo) {
-        log.info("abrir modal adjuntar fotos");
+        log.info("abrirModalAdjuntarFotos - VehiculoView");
         this.showAdjuntarFotos = true;
         this.vehiculoFotoSelected = vehiculoService.findById(idVehiculo);
         PrimeFaces.current().ajax().update("form_adjuntar_fotos", "growl");
@@ -669,7 +675,7 @@ public class VehiculoView implements Serializable {
     }
 
     public void cerrarModalAdjuntarFotos() {
-        log.info("cerrar modal adjuntar fotos");
+        log.info("cerrarModalAdjuntarFotos - VehiculoView");
         this.showAdjuntarFotos = false;
         this.vehiculoFotoSelected = null;
         PrimeFaces.current().ajax().update("form_adjuntar_fotos");
@@ -677,6 +683,7 @@ public class VehiculoView implements Serializable {
     }
 
     public void subirFotoMantenimiento2(FileUploadEvent event) {
+        log.info("subirFotoMantenimiento2 - VehiculoView");
         String fileName = event.getFile().getFileName();
         try {
             if(this.mantenimientoVehiculo != null) {
@@ -707,7 +714,7 @@ public class VehiculoView implements Serializable {
     }
 
     public void subirFotoMantenimiento(){
-        log.info("subirFotoMantenimiento");
+        log.info("subirFotoMantenimiento - VehiculoView");
         String fileName = ""; // event.getFile().getFileName();
         fileName = fotoMantenimiento.getFileName();
         try {
@@ -738,7 +745,7 @@ public class VehiculoView implements Serializable {
     }
 
     public void subirFotoVehiculo(FileUploadEvent event) {
-        log.info("subir foto vehiculo");
+        log.info("subirFotoVehiculo - VehiculoView");
         String fileName = event.getFile().getFileName();
         try {
             if(this.vehiculoFotoSelected != null) {
@@ -773,7 +780,7 @@ public class VehiculoView implements Serializable {
             nombre = "Borrar foto", descripcion = "Permite borrar fotos del vehículo.")
     @PreAuthorize("hasAnyAuthority('ROLE_OWNER', 'VEHICULOS_WRITE_BORRAR_FOTOS')")
     public void borrarFoto(Long vehiculoFotoId) {
-        log.info("borrar foto");
+        log.info("borrarFoto - VehiculoView");
         try {
             vehiculoFotoService.borrarFoto(vehiculoFotoId, userSessionBean.getUserName());
             this.vehiculoFotoList = vehiculoFotoService.getVehiculoFotos(this.vehiculoFotoSelected.getIdVehiculo());
@@ -785,8 +792,7 @@ public class VehiculoView implements Serializable {
     }
 
     public void borrarFotoMantenimiento(Long idMantenimientoFoto){
-        log.info("borrar foto mantenimiento");
-
+        log.info("borrarFotoMantenimiento - VehiculoView");
         try {
             mantenimientoFotoService.borrarFoto(idMantenimientoFoto, userSessionBean.getUserName());
             this.mantenimientoFotoList = mantenimientoFotoService.getFotosMantenimientos(this.mantenimientoVehiculo.getIdMantenimiento());
@@ -801,7 +807,7 @@ public class VehiculoView implements Serializable {
             nombre = "Exportar", descripcion = "Permite exportar en Excel el listado de vehículos.")
     @PreAuthorize("hasAnyAuthority('ROLE_OWNER', 'VEHICULOS_READ_EXPORTAR_VEHICULOS')")
     public ExportFile exportarVehiculos() throws IOException {
-
+        log.info("exportarVehiculos - VehiculoView");
         if(this.vehiculoList != null && !this.vehiculoList.isEmpty()) {
 
             List<ExcelCell> cellList = new ArrayList<>();

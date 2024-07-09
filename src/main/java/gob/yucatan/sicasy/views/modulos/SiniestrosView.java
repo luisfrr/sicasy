@@ -40,15 +40,9 @@ import java.util.Map;
 @PreAuthorize("hasAnyAuthority('ROLE_OWNER', 'SINIESTRO_VIEW')")
 public class SiniestrosView implements Serializable {
 
-    // Servicios/Beans
-    private final UserSessionBean userSessionBean;
-    private final ISiniestroService siniestroService;
-    private final IEstatusSiniestroService estatusSiniestroService;
-    private final IVehiculoService vehiculoService;
-    private final ISiniestroFotoService siniestroFotoService;
-    private final IBitacoraSiniestroService bitacoraSiniestroService;
-
     // Constantes
+    @Value("${app.files.folder.siniestros}")
+    private @Getter String FOLDER_SINIESTROS;
     private final @Getter String SINIESTRO_RESPONSABLE_ASEGURADO = "ASEGURADO";
     private final @Getter String SINIESTRO_RESPONSABLE_TERCEROS = "TERCEROS";
     private final @Getter Integer ESTATUS_SINIESTRO_REGISTRADO = 1;
@@ -58,8 +52,13 @@ public class SiniestrosView implements Serializable {
     private final @Getter String DEDUCIBLE_DEDUCIBLE = "DEDUCIBLE";
     private final @Getter String DEDUCIBLE_PERDIDA_TOTAL = "PERDIDA TOTAL";
 
-    @Value("${app.files.folder.siniestros}")
-    private @Getter String FOLDER_SINIESTROS;
+    // Inyección de dependencias
+    private final UserSessionBean userSessionBean;
+    private final ISiniestroService siniestroService;
+    private final IEstatusSiniestroService estatusSiniestroService;
+    private final IVehiculoService vehiculoService;
+    private final ISiniestroFotoService siniestroFotoService;
+    private final IBitacoraSiniestroService bitacoraSiniestroService;
 
     // Variables Generales
     private @Getter String title;
@@ -74,8 +73,6 @@ public class SiniestrosView implements Serializable {
     private @Getter @Setter List<SiniestroFoto> siniestroFotoList;
     private @Getter List<ResponsiveOption> responsiveOptionsGallery;
     private @Getter int activeIndex = 0;
-
-    // Variables selects
     private @Getter List<EstatusSiniestro> estatusSiniestroList;
     private @Getter List<String> tipoDeducibleList;
 

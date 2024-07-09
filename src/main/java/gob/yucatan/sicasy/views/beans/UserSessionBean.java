@@ -14,6 +14,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 import java.io.Serializable;
+import java.util.Arrays;
 import java.util.Collection;
 
 @Getter
@@ -62,6 +63,13 @@ public class UserSessionBean implements Serializable {
 
     public boolean userHasAuthority(String authority) {
         return this.authorities.stream().anyMatch(g -> g.getAuthority().equals(authority));
+    }
+
+    public String getFirstName() {
+        if(this.fullName != null) {
+            return Arrays.stream(this.fullName.split(" ")).findFirst().orElse("");
+        } else
+            return "";
     }
 
 }

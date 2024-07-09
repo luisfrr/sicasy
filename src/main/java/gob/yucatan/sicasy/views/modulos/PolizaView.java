@@ -1,6 +1,7 @@
 package gob.yucatan.sicasy.views.modulos;
 
 import gob.yucatan.sicasy.business.annotations.ConfigPermiso;
+import gob.yucatan.sicasy.business.annotations.ConfigPermisoArray;
 import gob.yucatan.sicasy.business.dtos.AcuseImportacion;
 import gob.yucatan.sicasy.business.dtos.EndosoBaja;
 import gob.yucatan.sicasy.business.dtos.EndosoModificacion;
@@ -42,26 +43,32 @@ import java.util.Objects;
 @RequiredArgsConstructor
 @Slf4j
 @ConfigPermiso(tipo = TipoPermiso.VIEW, codigo = "POLIZA_VIEW",
-        nombre = "Módulo de Pólizas e Incisos", descripcion = "Permite ver y filtrar la información de las pólizas e incisos.",
-        url = "/views/modulos/vehiculos.faces")
+        nombre = "Módulo de Pólizas e Incisos",
+        descripcion = "Permite ver y filtrar la información de las pólizas e incisos.",
+        url = "/views/modulos/polizas.faces")
 @PreAuthorize("hasAnyAuthority('ROLE_OWNER', 'POLIZA_VIEW')")
 public class PolizaView implements Serializable {
 
+    // Constantes
     @Value("${app.files.folder.layouts.importar-vehiculo}")
     private @Getter String LAYOUT_POLIZAS;
-
     @Value("${app.files.folder.polizas_facturas}")
     private @Getter String LAYOUT_POLIZAS_FACTURAS;
-
     @Value("${app.files.folder.polizas}")
     private @Getter String FOLDER_POLIZAS;
-
     private @Getter final Integer ESTATUS_INCISO_REGISTRADA = 1;
     private @Getter final Integer ESTATUS_INCISO_EN_PROCESO_PAGO = 2;
     private @Getter final Integer ESTATUS_INCISO_PAGADA = 3;
     private @Getter final Integer ESTATUS_INCISO_BAJA = 4;
 
-    // Generales
+    // Inyección de dependencias
+    private final UserSessionBean userSessionBean;
+    private final IPolizaService polizaService;
+    private final IAseguradoraService aseguradoraService;
+    private final IIncisoService incisoService;
+    private final IVehiculoService vehiculoService;
+
+    // Variables Generales
     private @Getter String title;
     private @Getter @Setter Poliza polizaFilter;
     private @Getter @Setter Poliza polizaForm;
@@ -75,7 +82,16 @@ public class PolizaView implements Serializable {
     private @Getter @Setter PagoInciso pagoInciso;
     private @Getter @Setter EndosoModificacion endosoModificacion;
     private @Getter @Setter EndosoBaja endosoBaja;
+    private @Getter List<Aseguradora> aseguradoraList;
+    private @Getter List<Poliza> polizaFormList;
+    private @Getter String informacionVehiculo;
+    private @Getter @Setter List<AcuseImportacion> acuseImportacionList;
+    private @Getter @Setter String layoutFileUpload;
+    private @Getter @Setter List<Poliza> importPolizaList;
+    private @Getter @Setter List<Inciso> importIncisoList;
+    private @Getter @Setter UploadedFile file;
 
+    // Variables para renderizar
     private @Getter boolean showPanelPolizas;
     private @Getter boolean showRegistrarPolizasDialog;
     private @Getter boolean showAdjuntarPolizaDialog;
@@ -85,34 +101,18 @@ public class PolizaView implements Serializable {
     private @Getter boolean showRegistrarPagoDialog;
     private @Getter boolean showEndosoModificacionDialog;
     private @Getter boolean showEndosoBajaDialog;
-
-    private @Getter List<Aseguradora> aseguradoraList;
-    private @Getter List<Poliza> polizaFormList;
-    private @Getter String informacionVehiculo;
-
     private @Getter boolean showErrorImportacion;
-    private @Getter @Setter List<AcuseImportacion> acuseImportacionList;
-    private @Getter @Setter String layoutFileUpload;
-    private @Getter @Setter List<Poliza> importPolizaList;
-    private @Getter @Setter List<Inciso> importIncisoList;
-    private @Getter @Setter UploadedFile file;
-
-
-    private final UserSessionBean userSessionBean;
-    private final IPolizaService polizaService;
-    private final IAseguradoraService aseguradoraService;
-    private final IIncisoService incisoService;
-    private final IVehiculoService vehiculoService;
 
 
     @PostConstruct
     public void init() {
+        log.info("PostConstruct - PolizaView");
         this.title = "Pólizas";
         this.limpiarFiltros();
     }
 
     public void limpiarFiltros() {
-        log.info("limpiar filtros de polizas");
+        log.info("limpiarFiltros - PolizaView");
         this.polizaFilter = new Poliza();
         this.polizaFilter.setAseguradora(new Aseguradora());
 
@@ -134,14 +134,21 @@ public class PolizaView implements Serializable {
         PrimeFaces.current().ajax().update("form_filtros", "form_datatable");
     }
 
+    @ConfigPermisoArray({
+            @ConfigPermiso(tipo = TipoPermiso.READ, codigo = "POLIZA_READ_DESCARGAR_POLIZA", orden = 2,
+                    nombre = "Descargar póliza", descripcion = "Permite descargar la póliza en formato PDF"),
+    })
     public void buscar() {
-        log.info("buscar grupos polizas");
+        log.info("buscar - PolizaView");
         this.polizaList = polizaService.findAll(this.polizaFilter);
         PrimeFaces.current().ajax().update("form_datatable");
     }
 
+    @ConfigPermiso(tipo = TipoPermiso.READ, codigo = "POLIZA_READ_VER_INCISOS", orden = 1,
+            nombre = "Ver incisos", descripcion = "Acción que permite visualizar los incisos de una póliza")
+    @PreAuthorize("hasAnyAuthority('ROLE_OWNER', 'POLIZA_READ_VER_INCISOS')")
     public void verIncisos() {
-        log.info("ver incisos polizas");
+        log.info("verIncisos - PolizaView");
         if(this.polizaSelected != null) {
             this.polizaSelected = polizaService.findById(this.polizaSelected.getIdPoliza());
             if(this.polizaSelected.getIdPoliza() != null) {
@@ -154,13 +161,14 @@ public class PolizaView implements Serializable {
     }
 
     public void limpiarIncisos() {
-        log.info("limpiar incisos polizas");
+        log.info("limpiarIncisos - PolizaView");
         this.incisoList = new ArrayList<>();
         PrimeFaces.current().ajax().update("form_datatable_incisos");
     }
 
+    @PreAuthorize("hasAnyAuthority('ROLE_OWNER', 'POLIZA_WRITE_REGISTRAR_POLIZA', 'POLIZA_WRITE_IMPORTAR_POLIZA')")
     public void abrirRegistroPolizasDialog() {
-        log.info("abrir registro polizas dialog");
+        log.info("abrirRegistroPolizasDialog - PolizaView");
         this.showRegistrarPolizasDialog = true;
         this.polizaForm = new Poliza();
         this.polizaForm.setAseguradora(new Aseguradora());
@@ -173,7 +181,7 @@ public class PolizaView implements Serializable {
     }
 
     public void cerrarRegistroPolizasDialog() {
-        log.info("cerrar registro polizas dialog");
+        log.info("cerrarRegistroPolizasDialog - PolizaView");
         this.showRegistrarPolizasDialog = false;
         this.polizaForm = null;
         this.acuseImportacionList = new ArrayList<>();
@@ -184,8 +192,11 @@ public class PolizaView implements Serializable {
         PrimeFaces.current().executeScript("PF('registrarPolizasDialog').hide()");
     }
 
+    @ConfigPermiso(tipo = TipoPermiso.WRITE, codigo = "POLIZA_WRITE_REGISTRAR_POLIZA", orden = 1,
+            nombre = "Registrar póliza", descripcion = "Acción que permite registrar una nueva póliza")
+    @PreAuthorize("hasAnyAuthority('ROLE_OWNER', 'POLIZA_WRITE_REGISTRAR_POLIZA')")
     public void guardarRegistroPoliza() {
-        log.info("guardar registro poliza");
+        log.info("guardarRegistroPoliza - PolizaView");
         try {
             if(this.polizaForm != null) {
                 this.polizaForm.setCreadoPor(userSessionBean.getUserName());
@@ -209,8 +220,11 @@ public class PolizaView implements Serializable {
         }
     }
 
+    @ConfigPermiso(tipo = TipoPermiso.WRITE, codigo = "POLIZA_WRITE_IMPORTAR_POLIZA", orden = 2,
+            nombre = "Importar pólizas", descripcion = "Acción que permite importar nuevos registros de pólizas")
+    @PreAuthorize("hasAnyAuthority('ROLE_OWNER', 'POLIZA_WRITE_IMPORTAR_POLIZA')")
     public void importarLayoutRegistroPolizas(FileUploadEvent event) {
-        log.info("importar layout registro polizas");
+        log.info("importarLayoutRegistroPolizas - PolizaView");
         UploadedFile file = event.getFile();
         String fileName = file.getFileName();
         byte[] fileContent = file.getContent();
@@ -245,8 +259,9 @@ public class PolizaView implements Serializable {
         }
     }
 
+    @PreAuthorize("hasAnyAuthority('ROLE_OWNER', 'POLIZA_WRITE_IMPORTAR_POLIZA')")
     public void guardarLayoutRegistroPolizas() {
-        log.info("guardar layout registro polizas");
+        log.info("guardarLayoutRegistroPolizas - PolizaView");
         try {
             if(this.importPolizaList != null) {
                 this.acuseImportacionList = polizaService.importarLayoutRegistro(this.importPolizaList,
@@ -278,8 +293,11 @@ public class PolizaView implements Serializable {
         }
     }
 
+    @ConfigPermiso(tipo = TipoPermiso.WRITE, codigo = "POLIZA_WRITE_ELIMINAR", orden = 3,
+            nombre = "Eliminar póliza", descripcion = "Acción que permite eliminar el registro de una póliza")
+    @PreAuthorize("hasAnyAuthority('ROLE_OWNER', 'POLIZA_WRITE_ELIMINAR')")
     public void eliminarPoliza(Long polizaId) {
-        log.info("eliminar poliza");
+        log.info("eliminarPoliza - PolizaView");
         try {
             polizaService.borrar(polizaId, userSessionBean.getUserName());
 
@@ -300,8 +318,11 @@ public class PolizaView implements Serializable {
         }
     }
 
+    @ConfigPermiso(tipo = TipoPermiso.WRITE, codigo = "POLIZA_WRITE_ADJUNTAR_POLIZA", orden = 4,
+            nombre = "Adjuntar póliza", descripcion = "Acción que permite adjuntar el archivo de la póliza en formato PDF")
+    @PreAuthorize("hasAnyAuthority('ROLE_OWNER', 'POLIZA_WRITE_ADJUNTAR_POLIZA')")
     public void abrirAdjuntarPolizaDialog(Long idPoliza) {
-        log.info("abrir modal adjuntar poliza");
+        log.info("abrirAdjuntarPolizaDialog - PolizaView");
         this.showAdjuntarPolizaDialog = true;
         this.polizaForm = polizaService.findById(idPoliza);
         PrimeFaces.current().ajax().update("form_adjuntar_poliza", "form_datatable", "growl");
@@ -309,15 +330,16 @@ public class PolizaView implements Serializable {
     }
 
     public void cerrarAdjuntarPolizaDialog() {
-        log.info("cerrar modal adjuntar poliza");
+        log.info("cerrarAdjuntarPolizaDialog - PolizaView");
         this.showAdjuntarPolizaDialog = false;
         this.polizaForm = null;
         PrimeFaces.current().ajax().update("form_adjuntar_poliza", "form_datatable");
         PrimeFaces.current().executeScript("PF('adjuntarPolizaDialog').hide();");
     }
 
+    @PreAuthorize("hasAnyAuthority('ROLE_OWNER', 'POLIZA_WRITE_ADJUNTAR_POLIZA')")
     public void adjuntarPoliza(FileUploadEvent event) {
-        log.info("adjuntar poliza");
+        log.info("adjuntarPoliza - PolizaView");
         String fileName = event.getFile().getFileName();
         try {
             if(this.polizaForm != null) {
@@ -343,8 +365,9 @@ public class PolizaView implements Serializable {
         }
     }
 
+    @PreAuthorize("hasAnyAuthority('ROLE_OWNER', 'POLIZA_WRITE_ENDOSO_ALTA', 'POLIZA_WRITE_IMPORTAR_ENDOSO_ALTA')")
     public void abrirRegistroEndosoAltaDialog() {
-        log.info("abrir modal registrar endoso de alta");
+        log.info("abrirRegistroEndosoAltaDialog - PolizaView");
         this.showRegistrarEndosoAltaDialog = true;
         this.incisoForm = new Inciso();
         this.incisoForm.setPoliza(new Poliza());
@@ -360,7 +383,7 @@ public class PolizaView implements Serializable {
     }
 
     public void cerrarRegistroEndosoAltaDialog() {
-        log.info("cerrar modal registrar endoso de alta");
+        log.info("cerrarRegistroEndosoAltaDialog - PolizaView");
         this.showRegistrarEndosoAltaDialog = false;
         this.incisoForm = null;
         this.acuseImportacionList = new ArrayList<>();
@@ -372,8 +395,11 @@ public class PolizaView implements Serializable {
         PrimeFaces.current().executeScript("PF('registrarEndosoAltaDialog').hide();");
     }
 
+    @ConfigPermiso(tipo = TipoPermiso.WRITE, codigo = "POLIZA_WRITE_ENDOSO_ALTA", orden = 5,
+            nombre = "Endoso de alta", descripcion = "Acción que permite registar un endoso de alta")
+    @PreAuthorize("hasAnyAuthority('ROLE_OWNER', 'POLIZA_WRITE_ENDOSO_ALTA')")
     public void guardarEndosoAlta() {
-        log.info("guardar endoso de alta");
+        log.info("guardarEndosoAlta - PolizaView");
         try {
             if(this.incisoForm != null) {
                 incisoService.generarEndosoAlta(this.incisoForm, userSessionBean.getUserName());
@@ -397,13 +423,12 @@ public class PolizaView implements Serializable {
     }
 
     public void buscarVehiculo(String noSerie) {
-        log.info("buscar vehiculos");
+        log.info("buscarVehiculo - PolizaView");
         try {
             if(noSerie != null) {
 
                 Vehiculo vehiculo = vehiculoService.findByNoSerie(noSerie);
 
-                // TODO: Validar si lo hace bien. poliza vigente
                 if(vehiculo.getIncisoVigente() != null) {
                     Messages.addWarn("El vehículo tiene una póliza vigente.");
                     this.informacionVehiculo = "";
@@ -426,8 +451,11 @@ public class PolizaView implements Serializable {
         }
     }
 
+    @ConfigPermiso(tipo = TipoPermiso.WRITE, codigo = "POLIZA_WRITE_IMPORTAR_ENDOSO_ALTA", orden = 6,
+            nombre = "Importar endoso de alta", descripcion = "Acción que permite importar registros de endoso de alta")
+    @PreAuthorize("hasAnyAuthority('ROLE_OWNER', 'POLIZA_WRITE_IMPORTAR_ENDOSO_ALTA')")
     public void importarLayoutEndosoAlta(FileUploadEvent event) {
-        log.info("importar layout endoso alta");
+        log.info("importarLayoutEndosoAlta - PolizaView");
         UploadedFile file = event.getFile();
         String fileName = file.getFileName();
         byte[] fileContent = file.getContent();
@@ -465,8 +493,9 @@ public class PolizaView implements Serializable {
         }
     }
 
+    @PreAuthorize("hasAnyAuthority('ROLE_OWNER', 'POLIZA_WRITE_IMPORTAR_ENDOSO_ALTA')")
     public void guardarLayoutEndosoAlta() {
-        log.info("guardar layout endoso alta");
+        log.info("guardarLayoutEndosoAlta - PolizaView");
         try {
             if(this.importIncisoList != null) {
                 this.acuseImportacionList = incisoService.importarEndosoAlta(this.importIncisoList,
@@ -499,8 +528,11 @@ public class PolizaView implements Serializable {
         }
     }
 
+    @ConfigPermiso(tipo = TipoPermiso.WRITE, codigo = "POLIZA_WRITE_SOLICITAR_PAGO_INCISO", orden = 7,
+            nombre = "Solicitar pago de incisos", descripcion = "Acción que permite solicitar el pago de los incisos seleccionados")
+    @PreAuthorize("hasAnyAuthority('ROLE_OWNER', 'POLIZA_WRITE_SOLICITAR_PAGO_INCISO')")
     public void solicitarPagoIncisos() {
-        log.info("solicitar pago incisos");
+        log.info("solicitarPagoIncisos - PolizaView");
         try {
             if(this.incisoSelectedList != null) {
                 incisoService.solicitarPago(this.incisoSelectedList, userSessionBean.getUserName());
@@ -525,8 +557,11 @@ public class PolizaView implements Serializable {
         }
     }
 
+    @ConfigPermiso(tipo = TipoPermiso.WRITE, codigo = "POLIZA_WRITE_RECHAZAR_SOLICITUD", orden = 8,
+            nombre = "Rechazar solicitud", descripcion = "Acción que permite rechazar la solicitud de pago de incisos.")
+    @PreAuthorize("hasAnyAuthority('ROLE_OWNER', 'POLIZA_WRITE_RECHAZAR_SOLICITUD')")
     public void abrirRechazarSolicitudModal() {
-        log.info("abrir rechazar solicitud modal");
+        log.info("abrirRechazarSolicitudModal - PolizaView");
         this.showRechazarSolicitudDialog = true;
         this.motivoRechazoSolicitud = "";
 
@@ -548,15 +583,16 @@ public class PolizaView implements Serializable {
     }
 
     public void cerrarRechazarSolicitudModal() {
-        log.info("cerrar rechazar solicitud modal");
+        log.info("cerrarRechazarSolicitudModal - PolizaView");
         this.showRechazarSolicitudDialog = false;
         this.motivoRechazoSolicitud = "";
         PrimeFaces.current().ajax().update("rechazar-solicitud-dialog-content", "growl");
         PrimeFaces.current().executeScript("PF('rechazarSolicitudDialog').hide();");
     }
 
+    @PreAuthorize("hasAnyAuthority('ROLE_OWNER', 'POLIZA_WRITE_RECHAZAR_SOLICITUD')")
     public void rechazarSolicitudIncisos() {
-        log.info("rechazar solicitud incisos");
+        log.info("rechazarSolicitudIncisos - PolizaView");
         try {
             if(this.incisoSelectedList != null && !this.motivoRechazoSolicitud.isEmpty()) {
                 incisoService.rechazarSolicitud(this.incisoSelectedList, this.motivoRechazoSolicitud,
@@ -583,8 +619,11 @@ public class PolizaView implements Serializable {
         }
     }
 
+    @ConfigPermiso(tipo = TipoPermiso.WRITE, codigo = "POLIZA_WRITE_EDITAR_INCISO", orden = 9,
+            nombre = "Editar inciso", descripcion = "Acción que permite editar la información de un inciso.")
+    @PreAuthorize("hasAnyAuthority('ROLE_OWNER', 'POLIZA_WRITE_EDITAR_INCISO')")
     public void abrirEditarIncisoModal(Long idInciso) {
-        log.info("abrir editar inciso modal");
+        log.info("abrirEditarIncisoModal - PolizaView");
         try {
             this.showEditarIncisoDialog = true;
             this.incisoForm = incisoService.findById(idInciso);
@@ -604,15 +643,16 @@ public class PolizaView implements Serializable {
     }
 
     public void cerrarEditarIncisoModal() {
-        log.info("cerrar editar inciso modal");
+        log.info("cerrarEditarIncisoModal - PolizaView");
         this.showEditarIncisoDialog = false;
         this.incisoForm = null;
         PrimeFaces.current().ajax().update("editar-inciso-dialog-content", "growl");
         PrimeFaces.current().executeScript("PF('editarIncisoDialog').hide();");
     }
 
+    @PreAuthorize("hasAnyAuthority('ROLE_OWNER', 'POLIZA_WRITE_EDITAR_INCISO')")
     public void editarInciso() {
-        log.info("editar inciso");
+        log.info("editarInciso - PolizaView");
         try {
             if(this.incisoForm != null) {
                 incisoService.editar(this.incisoForm, userSessionBean.getUserName());
@@ -635,8 +675,11 @@ public class PolizaView implements Serializable {
         }
     }
 
+    @ConfigPermiso(tipo = TipoPermiso.WRITE, codigo = "POLIZA_WRITE_REGISTRAR_PAGO", orden = 9,
+            nombre = "Registrar pago", descripcion = "Acción que permite registrar el pago de los incisos seleccionados.")
+    @PreAuthorize("hasAnyAuthority('ROLE_OWNER', 'POLIZA_WRITE_REGISTRAR_PAGO')")
     public void abrirRegistrarPagoModal() {
-        log.info("abrir registrar pago modal");
+        log.info("abrirRegistrarPagoModal - PolizaView");
         try {
             this.showRegistrarPagoDialog = true;
             this.file = null;
@@ -672,7 +715,7 @@ public class PolizaView implements Serializable {
     }
 
     public void cerrarRegistrarPagoModal() {
-        log.info("cerrar registrar pago modal");
+        log.info("cerrarRegistrarPagoModal - PolizaView");
         this.showRegistrarPagoDialog = false;
         this.pagoInciso = null;
         this.file = null;
@@ -681,7 +724,7 @@ public class PolizaView implements Serializable {
     }
 
     public void usarSaldoPendiente() {
-        log.info("usar saldo pendiente");
+        log.info("usarSaldoPendiente - PolizaView");
         if(this.pagoInciso != null) {
             // Se recalcula el saldo
             if(this.pagoInciso.isUsarSaldoPendiente()) {
@@ -698,9 +741,9 @@ public class PolizaView implements Serializable {
         }
     }
 
+    @PreAuthorize("hasAnyAuthority('ROLE_OWNER', 'POLIZA_WRITE_REGISTRAR_PAGO')")
     public void registrarPago() {
-        log.info("registrar pago");
-
+        log.info("registrarPago - PolizaView");
         try {
             UploadedFile file = this.file;
             String fileName = file.getFileName();
@@ -734,8 +777,11 @@ public class PolizaView implements Serializable {
         }
     }
 
+    @ConfigPermiso(tipo = TipoPermiso.WRITE, codigo = "POLIZA_WRITE_ENDOSO_MODIFICACION", orden = 10,
+            nombre = "Endoso de modificación", descripcion = "Acción que permite registrar el endoso de modificación de un inciso.")
+    @PreAuthorize("hasAnyAuthority('ROLE_OWNER', 'POLIZA_WRITE_ENDOSO_MODIFICACION')")
     public void abrirEndosoModificacionModal(Long idInciso) {
-        log.info("abrir endoso modificacion modal");
+        log.info("abrirEndosoModificacionModal - PolizaView");
         try {
             this.showEndosoModificacionDialog = true;
             this.file = null;
@@ -770,7 +816,7 @@ public class PolizaView implements Serializable {
     }
 
     public void cerrarEndosoModificacionModal() {
-        log.info("cerrar endoso modificacion modal");
+        log.info("cerrarEndosoModificacionModal - PolizaView");
         this.showEndosoModificacionDialog = false;
         this.endosoModificacion = null;
         this.file = null;
@@ -779,8 +825,9 @@ public class PolizaView implements Serializable {
         PrimeFaces.current().executeScript("PF('endosoModificacionDialog').hide();");
     }
 
+    @PreAuthorize("hasAnyAuthority('ROLE_OWNER', 'POLIZA_WRITE_ENDOSO_MODIFICACION')")
     public void guardarEndosoModificacion() {
-        log.info("guardar endoso modificacion");
+        log.info("guardarEndosoModificacion - PolizaView");
         try {
             incisoService.generarEndosoModificacion(this.endosoModificacion, userSessionBean.getUserName());
             this.buscar();
@@ -801,8 +848,11 @@ public class PolizaView implements Serializable {
         }
     }
 
+    @ConfigPermiso(tipo = TipoPermiso.WRITE, codigo = "POLIZA_WRITE_ENDOSO_BAJA", orden = 11,
+            nombre = "Endoso de baja", descripcion = "Acción que permite registrar el endoso de baja de un inciso.")
+    @PreAuthorize("hasAnyAuthority('ROLE_OWNER', 'POLIZA_WRITE_ENDOSO_BAJA')")
     public void abrirEndosoBajaModal(Long idInciso) {
-        log.info("abrir endoso baja modal");
+        log.info("abrirEndosoBajaModal - PolizaView");
         try {
             this.showEndosoBajaDialog = true;
             this.file = null;
@@ -834,7 +884,7 @@ public class PolizaView implements Serializable {
     }
 
     public void cerrarEndosoBajaModal() {
-        log.info("cerrar endoso baja modal");
+        log.info("cerrarEndosoBajaModal - PolizaView");
         this.showEndosoBajaDialog = false;
         this.endosoBaja = null;
         this.file = null;
@@ -843,8 +893,9 @@ public class PolizaView implements Serializable {
         PrimeFaces.current().executeScript("PF('endosoBajaDialog').hide();");
     }
 
+    @PreAuthorize("hasAnyAuthority('ROLE_OWNER', 'POLIZA_WRITE_ENDOSO_BAJA')")
     public void guardarEndosoBaja() {
-        log.info("guardar endoso baja");
+        log.info("guardarEndosoBaja - PolizaView");
         try {
             incisoService.generarEndosoBaja(this.endosoBaja, userSessionBean.getUserName());
             this.buscar();
