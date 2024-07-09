@@ -1,6 +1,7 @@
 package gob.yucatan.sicasy.views.modulos;
 
 import gob.yucatan.sicasy.business.annotations.ConfigPermiso;
+import gob.yucatan.sicasy.business.annotations.ConfigPermisoArray;
 import gob.yucatan.sicasy.business.entities.*;
 import gob.yucatan.sicasy.business.enums.TipoPermiso;
 import gob.yucatan.sicasy.business.exceptions.BadRequestException;
@@ -92,6 +93,10 @@ public class SiniestrosView implements Serializable {
         this.loadResponsiveOptionsGallery();
     }
 
+    @ConfigPermisoArray({
+            @ConfigPermiso(tipo = TipoPermiso.READ, codigo = "SINIESTRO_READ_VER_BITACORA", orden = 3,
+                    nombre = "Ver bitacora", descripcion = "Permite visualizar la bitácora de un siniestro."),
+    })
     public void limpiarFiltros() {
         log.info("limpiarFiltros - SiniestrosView");
         this.siniestroSelected = null;
@@ -118,10 +123,16 @@ public class SiniestrosView implements Serializable {
         PrimeFaces.current().ajax().update("form_datatable");
     }
 
+    @ConfigPermiso(tipo = TipoPermiso.READ, codigo = "SINIESTRO_READ_EXPORTAR", orden = 1,
+            nombre = "Exportar siniestros", descripcion = "Acción que permite exportar los registros de siniestros en un archivo Excel.")
+    @PreAuthorize("hasAnyAuthority('ROLE_OWNER', 'SINIESTRO_WRITE_REGISTRO_SINIESTRO')")
     public ExportFile exportarSiniestros() {
         return null;
     }
 
+    @ConfigPermiso(tipo = TipoPermiso.WRITE, codigo = "SINIESTRO_WRITE_REGISTRAR_SINIESTRO", orden = 1,
+            nombre = "Registrar siniestro", descripcion = "Acción que permite registrar un nuevo siniestro.")
+    @PreAuthorize("hasAnyAuthority('ROLE_OWNER', 'SINIESTRO_WRITE_REGISTRO_SINIESTRO')")
     public void abrirRegistroSiniestroDialog() {
         log.info("abrirRegistroSiniestroDialog - SiniestrosView");
         this.showNuevoSiniestroDialog = true;
@@ -139,6 +150,7 @@ public class SiniestrosView implements Serializable {
         PrimeFaces.current().executeScript("PF('registrarSiniestroDialog').hide()");
     }
 
+    @PreAuthorize("hasAnyAuthority('ROLE_OWNER', 'SINIESTRO_WRITE_REGISTRO_SINIESTRO')")
     public void guardarRegistroSiniestro() {
         log.info("guardarRegistroPoliza - SiniestrosView");
         try {
@@ -195,6 +207,9 @@ public class SiniestrosView implements Serializable {
         }
     }
 
+    @ConfigPermiso(tipo = TipoPermiso.WRITE, codigo = "SINIESTRO_WRITE_SOLICITAR_PAGO_DEDUCIBLE", orden = 2,
+            nombre = "Solicitar pago de deducible", descripcion = "Acción que permite solicitar el pago de deducible de los registros seleccionados que requieren pago de deducible.")
+    @PreAuthorize("hasAnyAuthority('ROLE_OWNER', 'SINIESTRO_WRITE_SOLICITAR_PAGO_DEDUCIBLE')")
     public void solicitarPagoDeducible() {
         log.info("solicitarPagoDeducible - SiniestrosView");
         try {
@@ -208,6 +223,9 @@ public class SiniestrosView implements Serializable {
         }
     }
 
+    @ConfigPermiso(tipo = TipoPermiso.WRITE, codigo = "SINIESTRO_WRITE_AUTORIZAR_PAGO_DEDUCIBLE", orden = 3,
+            nombre = "Autorizar pago de deducible", descripcion = "Acción que permite autorizar el pago de deducible de los registros seleccionados.")
+    @PreAuthorize("hasAnyAuthority('ROLE_OWNER', 'SINIESTRO_WRITE_AUTORIZAR_PAGO_DEDUCIBLE')")
     public void autorizarPagoDeducible() {
         log.info("autorizarPagoDeducible - SiniestrosView");
         try {
@@ -221,6 +239,9 @@ public class SiniestrosView implements Serializable {
         }
     }
 
+    @ConfigPermiso(tipo = TipoPermiso.WRITE, codigo = "SINIESTRO_WRITE_FINALIZAR_REGISTRO", orden = 4,
+            nombre = "Finalizar registro", descripcion = "Acción que permite finalizar el registro de los siniestros seleccionados que no requieren pago de deducible.")
+    @PreAuthorize("hasAnyAuthority('ROLE_OWNER', 'SINIESTRO_WRITE_FINALIZAR_REGISTRO')")
     public void finalizarRegistro() {
         log.info("finalizarRegistro - SiniestrosView");
         try {
@@ -234,6 +255,9 @@ public class SiniestrosView implements Serializable {
         }
     }
 
+    @ConfigPermiso(tipo = TipoPermiso.WRITE, codigo = "SINIESTRO_WRITE_RECHAZAR_SOLICITUD", orden = 5,
+            nombre = "Finalizar registro", descripcion = "Acción que permite rechazar la solicitud de pago de deducible de los registros seleccionados.")
+    @PreAuthorize("hasAnyAuthority('ROLE_OWNER', 'SINIESTRO_WRITE_RECHAZAR_SOLICITUD')")
     public void abrirRechazarSolicitudDialog() {
         log.info("abrirRechazarSolicitudDialog - SiniestrosView");
         this.showRechazarSolicitudDialog = true;
@@ -250,6 +274,7 @@ public class SiniestrosView implements Serializable {
         PrimeFaces.current().executeScript("PF('rechazarSolicitudDialog').hide()");
     }
 
+    @PreAuthorize("hasAnyAuthority('ROLE_OWNER', 'SINIESTRO_WRITE_RECHAZAR_SOLICITUD')")
     public void rechazarSolicitud() {
         log.info("rechazarSolicitud - SiniestrosView");
         try {
@@ -275,6 +300,9 @@ public class SiniestrosView implements Serializable {
         }
     }
 
+    @ConfigPermiso(tipo = TipoPermiso.WRITE, codigo = "SINIESTRO_WRITE_VER_DETALLE", orden = 2,
+            nombre = "Ver detalle", descripcion = "Acción que permite visualizar la información del siniestro.")
+    @PreAuthorize("hasAnyAuthority('ROLE_OWNER', 'SINIESTRO_WRITE_VER_DETALLE')")
     public void verDetalle(Siniestro siniestro) {
         log.info("verDetalle - SiniestrosView");
         try {
@@ -292,6 +320,9 @@ public class SiniestrosView implements Serializable {
         }
     }
 
+    @ConfigPermiso(tipo = TipoPermiso.WRITE, codigo = "SINIESTRO_WRITE_EDITAR", orden = 3,
+            nombre = "Editar", descripcion = "Acción que permite editar la información del siniestro.")
+    @PreAuthorize("hasAnyAuthority('ROLE_OWNER', 'SINIESTRO_WRITE_EDITAR')")
     public void permitirEditar() {
         log.info("permitirEditar - SiniestrosView");
         this.readOnlyEditForm = false;
@@ -305,6 +336,7 @@ public class SiniestrosView implements Serializable {
         PrimeFaces.current().ajax().update("tab_view_detalles:edit_siniestro_form");
     }
 
+    @PreAuthorize("hasAnyAuthority('ROLE_OWNER', 'SINIESTRO_WRITE_EDITAR')")
     public void guardarEdicion() {
         log.info("guardarEdicion - SiniestrosView");
         try {
@@ -320,6 +352,9 @@ public class SiniestrosView implements Serializable {
         }
     }
 
+    @ConfigPermiso(tipo = TipoPermiso.WRITE, codigo = "SINIESTRO_WRITE_ADJUNTAR_FOTOS", orden = 4,
+            nombre = "Adjuntar fotos", descripcion = "Acción que permite adjuntar fotos del siniestro.")
+    @PreAuthorize("hasAnyAuthority('ROLE_OWNER', 'SINIESTRO_WRITE_ADJUNTAR_FOTOS')")
     public void abrirModalAdjuntarFotos() {
         log.info("abrirModalAdjuntarFotos - SiniestrosView");
         this.showAdjuntarFotos = true;
@@ -334,6 +369,7 @@ public class SiniestrosView implements Serializable {
         PrimeFaces.current().executeScript("PF('adjuntarFotosDialog').hide();");
     }
 
+    @PreAuthorize("hasAnyAuthority('ROLE_OWNER', 'SINIESTRO_WRITE_ADJUNTAR_FOTOS')")
     public void subirFotoSiniestro(FileUploadEvent event) {
         log.info("subirFotoSiniestro - SiniestrosView");
         String fileName = event.getFile().getFileName();
@@ -365,6 +401,9 @@ public class SiniestrosView implements Serializable {
         }
     }
 
+    @ConfigPermiso(tipo = TipoPermiso.WRITE, codigo = "SINIESTRO_WRITE_BORRAR_FOTOS", orden = 5,
+            nombre = "Editar", descripcion = "Acción que permite adjuntar fotos del siniestro.")
+    @PreAuthorize("hasAnyAuthority('ROLE_OWNER', 'SINIESTRO_WRITE_BORRAR_FOTOS')")
     public void borrarFoto(Long idSiniestroFoto) {
         log.info("borrarFoto - SiniestrosView");
         try {
@@ -384,6 +423,9 @@ public class SiniestrosView implements Serializable {
         log.info("activeIndex {}", this.activeIndex);
     }
 
+    @ConfigPermiso(tipo = TipoPermiso.READ, codigo = "SINIESTRO_READ_VER_PANEL_FOTOS", orden = 2,
+            nombre = "Editar", descripcion = "Visualizar el panel de fotos donde se encuentra la galeria de fotos del siniestros y las acciones para adjuntar fotos y borrarlas.")
+    @PreAuthorize("hasAnyAuthority('ROLE_OWNER', 'SINIESTRO_READ_VER_PANEL_FOTOS')")
     public void presentGallery() {
         log.info("presentGallery - SiniestrosView");
         this.activeIndex = 0;

@@ -249,10 +249,12 @@
                   <p:commandButton value="Cancelar" ajax="true" process="@this"
                                    action="#{siniestrosView.cerrarRegistroSiniestroDialog()}"
                                    styleClass="ui-button-outlined mr-4"/>
-                  <p:commandButton value="Guardar" ajax="true" process="@form"
-                                   action="#{siniestrosView.guardarRegistroSiniestro()}"
-                                   update="growl @form form_datatable"
-                                   validateClient="true"/>
+                  <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'SINIESTRO_WRITE_REGISTRO_SINIESTRO')">
+                     <p:commandButton value="Guardar" ajax="true" process="@form"
+                                      action="#{siniestrosView.guardarRegistroSiniestro()}"
+                                      update="growl @form form_datatable"
+                                      validateClient="true"/>
+                  </sec:authorize>
                </p:outputPanel>
 
             </p:outputPanel>

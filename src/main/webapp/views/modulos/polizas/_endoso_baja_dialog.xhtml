@@ -3,7 +3,8 @@
         xmlns:h="http://xmlns.jcp.org/jsf/html"
         xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
         xmlns:f="http://xmlns.jcp.org/jsf/core"
-        xmlns:p="http://primefaces.org/ui">
+        xmlns:p="http://primefaces.org/ui"
+        xmlns:sec="https://joinfaces.org/security">
 
    <p:dialog header="Endoso de baja"
              id="endoso-baja-dialog" widgetVar="endosoBajaDialog"
@@ -135,9 +136,11 @@
                   <p:commandButton value="Cancelar" ajax="true" process="@this"
                                    action="#{polizaView.cerrarEndosoBajaModal()}"
                                    styleClass="ui-button-outlined mr-4"/>
-                  <p:commandButton value="Guardar" ajax="true" process="@form"
-                                   action="#{polizaView.guardarEndosoBaja()}"
-                                   update="growl" validateClient="true"/>
+                  <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'POLIZA_WRITE_ENDOSO_BAJA')">
+                     <p:commandButton value="Guardar" ajax="true" process="@form"
+                                      action="#{polizaView.guardarEndosoBaja()}"
+                                      update="growl" validateClient="true"/>
+                  </sec:authorize>
                </p:outputPanel>
             </p:outputPanel>
          </h:form>

@@ -156,9 +156,11 @@
                   <p:commandButton value="Cancelar" ajax="true" process="@this"
                                    action="#{polizaView.cerrarEndosoModificacionModal()}"
                                    styleClass="ui-button-outlined mr-4"/>
-                  <p:commandButton value="Guardar" ajax="true" process="@form"
-                                   action="#{polizaView.guardarEndosoModificacion()}"
-                                   update="growl" validateClient="true"/>
+                  <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'POLIZA_WRITE_ENDOSO_MODIFICACION')">
+                     <p:commandButton value="Guardar" ajax="true" process="@form"
+                                      action="#{polizaView.guardarEndosoModificacion()}"
+                                      update="growl" validateClient="true"/>
+                  </sec:authorize>
                </p:outputPanel>
             </p:outputPanel>
          </h:form>

@@ -3,7 +3,8 @@
         xmlns:h="http://xmlns.jcp.org/jsf/html"
         xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
         xmlns:p="http://primefaces.org/ui"
-        xmlns:f="http://xmlns.jcp.org/jsf/core">
+        xmlns:f="http://xmlns.jcp.org/jsf/core"
+        xmlns:sec="https://joinfaces.org/security">
 
    <p:dialog header="Editar inciso"
              id="editar-inciso-dialog" widgetVar="editarIncisoDialog"
@@ -98,9 +99,12 @@
                   <p:commandButton value="Cancelar" ajax="true" process="@this"
                                    action="#{polizaView.cerrarEditarIncisoModal()}"
                                    styleClass="ui-button-outlined mr-4"/>
-                  <p:commandButton value="Guardar" ajax="true" process="@form"
-                                   action="#{polizaView.editarInciso()}"
-                                   update="growl" validateClient="true"/>
+                  <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'POLIZA_WRITE_EDITAR_INCISO')">
+                     <p:commandButton value="Guardar" ajax="true" process="@form"
+                                      action="#{polizaView.editarInciso()}"
+                                      update="growl" validateClient="true"/>
+                  </sec:authorize>
+
                </p:outputPanel>
             </p:outputPanel>
          </h:form>

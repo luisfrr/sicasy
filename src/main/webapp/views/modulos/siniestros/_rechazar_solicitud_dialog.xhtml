@@ -2,7 +2,8 @@
         xmlns="http://www.w3.org/1999/xhtml"
         xmlns:h="http://xmlns.jcp.org/jsf/html"
         xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
-        xmlns:p="http://primefaces.org/ui">
+        xmlns:p="http://primefaces.org/ui"
+        xmlns:sec="https://joinfaces.org/security">
 
    <p:dialog header="Confirmación"
              id="rechazar-solicitud-dialog" widgetVar="rechazarSolicitudDialog"
@@ -31,9 +32,12 @@
                   <p:commandButton value="No" ajax="true" process="@this"
                                    action="#{siniestrosView.cerrarRechazarSolicitudDialog()}"
                                    styleClass="ui-button-outlined mr-5"/>
-                  <p:commandButton value="Sí" ajax="true" process="@form"
-                                   action="#{siniestrosView.rechazarSolicitud()}"
-                                   validateClient="true"/>
+                  <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'SINIESTRO_WRITE_RECHAZAR_SOLICITUD')">
+                     <p:commandButton value="Sí" ajax="true" process="@form"
+                                      action="#{siniestrosView.rechazarSolicitud()}"
+                                      validateClient="true"/>
+                  </sec:authorize>
+
                </p:outputPanel>
 
             </p:outputPanel>

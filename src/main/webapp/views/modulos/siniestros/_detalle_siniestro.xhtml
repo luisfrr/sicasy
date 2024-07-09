@@ -1,9 +1,9 @@
 <ui:composition
         xmlns="http://www.w3.org/1999/xhtml"
         xmlns:h="http://xmlns.jcp.org/jsf/html"
-        xmlns:f="http://xmlns.jcp.org/jsf/core"
         xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
-        xmlns:p="http://primefaces.org/ui">
+        xmlns:p="http://primefaces.org/ui"
+        xmlns:sec="https://joinfaces.org/security">
 
    <p:outputPanel id="panel_detalle" rendered="#{siniestrosView.showDetalleSiniestroPanel}">
 
@@ -19,9 +19,12 @@
          <p:tab id="tab_detalle_siniestro" title="Información del siniestro">
             <ui:include src="/views/modulos/siniestros/_detalle_tab_siniestro.xhtml"/>
          </p:tab>
-         <p:tab id="tab_bitacora" title="Bitácora">
-            <ui:include src="/views/modulos/siniestros/_detalle_tab_bitacora.xhtml"/>
-         </p:tab>
+         <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'SINIESTRO_READ_VER_BITACORA')">
+            <p:tab id="tab_bitacora" title="Bitácora">
+               <ui:include src="/views/modulos/siniestros/_detalle_tab_bitacora.xhtml"/>
+            </p:tab>
+         </sec:authorize>
+
       </p:tabView>
    </p:outputPanel>
 </ui:composition>

@@ -27,37 +27,54 @@
             </h:form>
 
             <h:form id="form_toolbar" styleClass="mb-5">
-                <p:toolbar>
-                    <p:toolbarGroup>
-                        <p:commandButton id="btn_acciones_siniestros" type="button" value="Acciones"
-                                         iconPos="right" icon="fi fi-rr-angle-small-down"/>
-                        <p:menu overlay="true" trigger="btn_acciones_siniestros" my="left top" at="left bottom" maxHeight="250">
-                            <p:menuitem value="Registrar siniestro" ajax="true" action="#{siniestrosView.abrirRegistroSiniestroDialog()}"/>
-                            <p:menuitem value="Solicitar pago de deducible" ajax="true" action="#{siniestrosView.solicitarPagoDeducible()}">
-                                <p:confirm header="Confirmación" message="¿Está seguro que desea solicitar el pago de deducible de los registros seleccionados?" icon="pi pi-exclamation-triangle"/>
-                            </p:menuitem>
-                            <p:menuitem value="Autorizar solicitud" ajax="true" action="#{siniestrosView.autorizarPagoDeducible()}">
-                                <p:confirm header="Confirmación" message="¿Está seguro que desea autorizar el pago de deducible de los registros seleccionados?" icon="pi pi-exclamation-triangle"/>
-                            </p:menuitem>
-                            <p:menuitem value="Rechazar solicitud" ajax="true"
-                                        action="#{siniestrosView.abrirRechazarSolicitudDialog()}">
-                                <p:resetInput target="rechazar-solicitud-dialog"/>
-                            </p:menuitem>
-                            <p:menuitem value="Finalizar registro" ajax="true" action="#{siniestrosView.finalizarRegistro()}">
-                                <p:confirm header="Confirmación" message="¿Está seguro que desea finalizar el registro de los siniestros seleccionados?" icon="pi pi-exclamation-triangle"/>
-                            </p:menuitem>
-                        </p:menu>
-                    </p:toolbarGroup>
-                    <p:toolbarGroup align="right">
-                        <p:commandButton id="btn_exportar_siniestros" type="button" value="Exportar"
-                                         iconPos="right" icon="fi fi-rr-angle-small-down" styleClass="ui-button-outlined"/>
-                        <p:menu overlay="true" trigger="btn_exportar_siniestros" my="left top" at="left bottom" maxHeight="250">
-                            <p:menuitem value="Exportar vehículos" ajax="false" onclick="PrimeFaces.monitorDownload(start, stop);">
-                                <p:fileDownload value="#{fileDownloadBean.downloadFile(siniestrosView.exportarSiniestros())}"/>
-                            </p:menuitem>
-                        </p:menu>
-                    </p:toolbarGroup>
-                </p:toolbar>
+                <sec:authorize access="hasAnyAuthority('ROLE_OWNER', '', '', '', '', '', '')">
+                    <p:toolbar>
+                        <p:toolbarGroup>
+                            <p:commandButton id="btn_acciones_siniestros" type="button" value="Acciones"
+                                             iconPos="right" icon="fi fi-rr-angle-small-down"/>
+                            <p:menu overlay="true" trigger="btn_acciones_siniestros" my="left top" at="left bottom" maxHeight="250">
+                                <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'SINIESTRO_WRITE_REGISTRO_SINIESTRO')">
+                                    <p:menuitem value="Registrar siniestro" ajax="true" action="#{siniestrosView.abrirRegistroSiniestroDialog()}"/>
+                                </sec:authorize>
+                                <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'SINIESTRO_WRITE_SOLICITAR_PAGO_DEDUCIBLE')">
+                                    <p:menuitem value="Solicitar pago de deducible" ajax="true" action="#{siniestrosView.solicitarPagoDeducible()}">
+                                        <p:confirm header="Confirmación" message="¿Está seguro que desea solicitar el pago de deducible de los registros seleccionados?" icon="pi pi-exclamation-triangle"/>
+                                    </p:menuitem>
+                                </sec:authorize>
+                                <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'SINIESTRO_WRITE_AUTORIZAR_PAGO_DEDUCIBLE')">
+                                    <p:menuitem value="Autorizar solicitud" ajax="true" action="#{siniestrosView.autorizarPagoDeducible()}">
+                                        <p:confirm header="Confirmación" message="¿Está seguro que desea autorizar el pago de deducible de los registros seleccionados?" icon="pi pi-exclamation-triangle"/>
+                                    </p:menuitem>
+                                </sec:authorize>
+                                <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'SINIESTRO_WRITE_RECHAZAR_SOLICITUD')">
+                                    <p:menuitem value="Rechazar solicitud" ajax="true"
+                                                action="#{siniestrosView.abrirRechazarSolicitudDialog()}">
+                                        <p:resetInput target="rechazar-solicitud-dialog"/>
+                                    </p:menuitem>
+                                </sec:authorize>
+                                <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'SINIESTRO_WRITE_FINALIZAR_REGISTRO')">
+                                    <p:menuitem value="Finalizar registro" ajax="true" action="#{siniestrosView.finalizarRegistro()}">
+                                        <p:confirm header="Confirmación" message="¿Está seguro que desea finalizar el registro de los siniestros seleccionados?" icon="pi pi-exclamation-triangle"/>
+                                    </p:menuitem>
+                                </sec:authorize>
+                            </p:menu>
+                        </p:toolbarGroup>
+                        <p:toolbarGroup align="right">
+                            <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'SINIESTRO_READ_EXPORTAR')">
+                                <p:commandButton id="btn_exportar_siniestros" type="button" value="Exportar"
+                                                 iconPos="right" icon="fi fi-rr-angle-small-down" styleClass="ui-button-outlined"/>
+                                <p:menu overlay="true" trigger="btn_exportar_siniestros" my="left top" at="left bottom" maxHeight="250">
+                                    <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'SINIESTRO_READ_EXPORTAR')">
+                                        <p:menuitem value="Exportar vehículos" ajax="false" onclick="PrimeFaces.monitorDownload(start, stop);">
+                                            <p:fileDownload value="#{fileDownloadBean.downloadFile(siniestrosView.exportarSiniestros())}"/>
+                                        </p:menuitem>
+                                    </sec:authorize>
+                                </p:menu>
+                            </sec:authorize>
+
+                        </p:toolbarGroup>
+                    </p:toolbar>
+                </sec:authorize>
             </h:form>
 
             <h:form id="form_filtros" styleClass="mb-5">
@@ -386,7 +403,7 @@
 
                     </sec:authorize>
 
-                    <sec:authorize access="hasAnyAuthority('ROLE_OWNER','VEHICULOS_WRITE_VER_DETALLE', 'VEHICULOS_WRITE_REGISTRAR_MANTENIMIENTO', 'VEHICULOS_WRITE_ADJUNTAR_FOTOS')">
+                    <sec:authorize access="hasAnyAuthority('ROLE_OWNER','SINIESTRO_WRITE_VER_DETALLE')">
                         <p:column headerText="Acciones" width="120">
 
                             <p:commandButton id="buttonOptions" type="button"
@@ -394,11 +411,11 @@
                                              styleClass="rounded-button ui-button-outlined"
                                              rendered="#{siniestro.estatusRegistro.label != 'Borrado'}"/>
                             <p:menu overlay="true" trigger="buttonOptions" my="left top" at="left bottom" styleClass="w-16rem">
-
-                                <p:menuitem value="Ver detalle"
-                                            action="#{siniestrosView.verDetalle(siniestro)}"
-                                            ajax="true" update="container"/>
-
+                                <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'SINIESTRO_WRITE_VER_DETALLE')">
+                                    <p:menuitem value="Ver detalle"
+                                                action="#{siniestrosView.verDetalle(siniestro)}"
+                                                ajax="true" update="container"/>
+                                </sec:authorize>
                             </p:menu>
 
                         </p:column>
