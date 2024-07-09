@@ -19,9 +19,11 @@
         <h:form styleClass="w-full flex flex-column gap-4 justify-content-center"
                 prependId="false">
             <p:inputText placeholder="Usuario" id="username" styleClass="w-full" required="true"/>
-            <p:password placeholder="Contraseña" id="password" styleClass="w-full" required="true"/>
+            <p:password placeholder="Contraseña" id="password" styleClass="w-full mb-4" required="true"/>
 
-            <div class="flex justify-content-center">
+            <p:captcha required="true" theme="light" language="es"/>
+
+            <div class="flex justify-content-center mt-4">
                 <p:commandButton value="Continuar" ajax="false" validateClient="true"/>
             </div>
 
