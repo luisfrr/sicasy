@@ -53,7 +53,7 @@ public class PolizaView implements Serializable {
     @Value("${app.files.folder.layouts.importar-vehiculo}")
     private @Getter String LAYOUT_POLIZAS;
     @Value("${app.files.folder.polizas_facturas}")
-    private @Getter String LAYOUT_POLIZAS_FACTURAS;
+    private @Getter String FOLDER_POLIZAS_FACTURAS;
     @Value("${app.files.folder.polizas}")
     private @Getter String FOLDER_POLIZAS;
     private @Getter final Integer ESTATUS_INCISO_REGISTRADA = 1;
@@ -748,7 +748,7 @@ public class PolizaView implements Serializable {
             UploadedFile file = this.file;
             String fileName = file.getFileName();
             byte[] fileContent = file.getContent();
-            String filePath = SaveFile.importFileToPath(fileContent, fileName, LAYOUT_POLIZAS_FACTURAS);
+            String filePath = SaveFile.importFileToPath(fileContent, fileName, FOLDER_POLIZAS_FACTURAS);
             this.pagoInciso.setNombreArchivo(fileName);
             this.pagoInciso.setRutaArchivo(filePath);
         } catch (Exception e) {

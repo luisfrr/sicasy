@@ -5,9 +5,7 @@
       xmlns:h="jakarta.faces.html"
       xmlns:f="jakarta.faces.core"
       xmlns:ui="jakarta.faces.facelets"
-      xmlns:p="http://primefaces.org/ui"
-      xmlns:pe="http://primefaces.org/ui/extensions"
-      xmlns:sec="https://joinfaces.org/security">
+      xmlns:p="http://primefaces.org/ui">
 <f:view contentType="text/html;charset=UTF-8" encoding="UTF-8">
 
     <h:head>
@@ -34,16 +32,6 @@
     <h:body>
 
         <script type="text/javascript">
-            //<![CDATA[
-            function start() {
-                PF('statusDialog').show();
-            }
-
-            function stop() {
-                PF('statusDialog').hide();
-            }
-            //]]>
-
             PrimeFaces.locales['es'] = {
                 closeText: 'Cerrar',
                 prevText: 'Anterior',
@@ -72,19 +60,29 @@
             }
         </script>
 
-        <p:dialog widgetVar="statusDialog" modal="true" draggable="false" rendered="false"
-                  closable="false" resizable="false" showHeader="false" styleClass="status-dialog">
-            <div class="flex align-items-center justify-content-center">
-                <div>
-                    <i class="pi pi-spin pi-spinner loading-icon text-3xl" aria-hidden="true"> </i>
-                </div>
-            </div>
-        </p:dialog>
-
         <div class="wrapper menu-overlay">
             <ui:include src="/WEB-INF/facelets/topbar_layout.xhtml"/>
             <ui:include src="/WEB-INF/facelets/sidebar_layout.xhtml"/>
             <div class="main-content">
+                <script type="text/javascript">
+                    //<![CDATA[
+                    function start() {
+                        PF('statusDialog').show();
+                    }
+
+                    function stop() {
+                        PF('statusDialog').hide();
+                    }
+                    //]]>
+                </script>
+                <p:dialog modal="true" widgetVar="statusDialog" draggable="false" closable="false"
+                          resizable="false">
+                    <div class="flex flex-column justify-content-center align-items-center">
+                        <i class="pi pi-spinner pi-spin mb-3" style="font-size:3rem"/>
+                        <p class="text-center">Espere un momento...</p>
+                    </div>
+                </p:dialog>
+
                 <ui:insert name="content"/>
             </div>
             <p:confirmDialog global="true" showEffect="fade" hideEffect="fade" responsive="true" width="350">

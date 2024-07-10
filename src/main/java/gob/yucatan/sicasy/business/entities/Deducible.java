@@ -80,6 +80,9 @@ public class Deducible implements Cloneable, Serializable {
     @Column(name = "ruta_archivo_factura", nullable = false)
     private String rutaArchivoFactura;
 
+    @OneToOne(optional=false, mappedBy="deducible")
+    public Siniestro siniestro;
+
     @Column(name = "estatus_registro", nullable = false)
     @Enumerated(EnumType.ORDINAL)
     private EstatusRegistro estatusRegistro;

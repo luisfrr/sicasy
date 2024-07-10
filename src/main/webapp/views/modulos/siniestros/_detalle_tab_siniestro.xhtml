@@ -316,7 +316,7 @@
 
    <p:outputPanel styleClass="grid">
       <p:outputPanel styleClass="col-12 md:col-6 mb-5">
-         <h:form id="deducible_form">
+         <h:form id="deducible_form" enctype="multipart/form-data">
             <p:panel header="Deducible" widgetVar="panelDeducible" styleClass="mb-5">
                <p:outputPanel styleClass="grid" rendered="#{siniestrosView.siniestroSelected.deducible.idDeducible == null and siniestrosView.siniestroSelected.estatusSiniestro.idEstatusSiniestro == siniestrosView.ESTATUS_SINIESTRO_REGISTRADO and siniestrosView.siniestroSelected.requierePagoDeducible()}">
                   <p:outputPanel styleClass="col-12">
@@ -369,6 +369,26 @@
                      <p:inputText value="#{siniestrosView.siniestroSelected.deducible.folioFacturaDeducible}"
                                   required="true" styleClass="w-full"/>
                      <span class="text-sm hidden"> </span>
+                  </p:outputPanel>
+                  <p:outputPanel styleClass="field col-12 md:col-6">
+                     <p:outputLabel for="@next" value="Factura" styleClass="block"/>
+                     <p:fileUpload value="#{siniestrosView.file}" mode="simple"
+                                   chooseButtonTitle="Elegir"
+                                   accept=".pdf" sizeLimit="10000000"
+                                   skinSimple="true" required="true"/>
+                     <p class="text-sm mt-2">Solo se acepta un archivo en formato PDF.</p>
+                  </p:outputPanel>
+
+                  <p:outputPanel styleClass="field col-12 mt-5 mb-0">
+                     <p:outputPanel styleClass="flex justify-content-end">
+                        <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'SINIESTRO_WRITE_GUARDAR_PAGO_DEDUCIBLE')">
+                           <p:commandButton value="Guardar" ajax="true" process="@form"
+                                            action="#{siniestrosView.guardarPagoDeducible()}"
+                                            update="growl" validateClient="true">
+                              <p:confirm header="Confirmación" message="¿Está seguro que desea guardar la información del pago de deducible?" icon="pi pi-exclamation-triangle"/>
+                           </p:commandButton>
+                        </sec:authorize>
+                     </p:outputPanel>
                   </p:outputPanel>
                </p:outputPanel>
             </p:panel>
