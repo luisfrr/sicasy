@@ -344,6 +344,7 @@
                   <p:outputPanel styleClass="field col-12 md:col-6">
                      <p:outputLabel for="@next" value="Valor factura" styleClass="block"/>
                      <p:inputNumber value="#{siniestrosView.siniestroSelected.deducible.vehiculoValorFactura}"
+                                    disabled="#{siniestrosView.siniestroSelected.estatusSiniestro.idEstatusSiniestro == siniestrosView.ESTATUS_SINIESTRO_FINALIZADO}"
                                     readonly="true" required="true" styleClass="w-full">
                         <f:convertNumber pattern="#0.00" />
                      </p:inputNumber>
@@ -352,6 +353,7 @@
                   <p:outputPanel styleClass="field col-12 md:col-6">
                      <p:outputLabel for="@next" value="Valor actual" styleClass="block"/>
                      <p:inputNumber value="#{siniestrosView.siniestroSelected.deducible.valorActual}"
+                                    disabled="#{siniestrosView.siniestroSelected.estatusSiniestro.idEstatusSiniestro == siniestrosView.ESTATUS_SINIESTRO_FINALIZADO}"
                                     required="true" styleClass="w-full">
                         <f:convertNumber pattern="#0.00" />
                      </p:inputNumber>
@@ -360,6 +362,7 @@
                   <p:outputPanel styleClass="field col-12 md:col-6">
                      <p:outputLabel for="@next" value="Costo total deducible" styleClass="block"/>
                      <p:inputNumber value="#{siniestrosView.siniestroSelected.deducible.costoTotalDeducible}"
+                                    disabled="#{siniestrosView.siniestroSelected.estatusSiniestro.idEstatusSiniestro == siniestrosView.ESTATUS_SINIESTRO_FINALIZADO}"
                                     required="true" styleClass="w-full">
                         <f:convertNumber pattern="#0.00" />
                      </p:inputNumber>
@@ -368,6 +371,7 @@
                   <p:outputPanel styleClass="field col-12 md:col-6">
                      <p:outputLabel for="@next" value="Folio factura" styleClass="block"/>
                      <p:inputText value="#{siniestrosView.siniestroSelected.deducible.folioFacturaDeducible}"
+                                  disabled="#{siniestrosView.siniestroSelected.estatusSiniestro.idEstatusSiniestro == siniestrosView.ESTATUS_SINIESTRO_FINALIZADO}"
                                   required="true" styleClass="w-full"/>
                      <span class="text-sm hidden"> </span>
                   </p:outputPanel>

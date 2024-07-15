@@ -20,7 +20,7 @@ import java.util.List;
 
 public class ImportExcelFile<T> {
 
-    public List<T> processExcelFile(byte[] fileContent, Class<T> type, List<ConfigHeaderExcelModel> headers) throws IOException {
+    public List<T> processExcelFile(byte[] fileContent, Class<T> type, List<ConfigHeaderExcelModel> headers) {
         List<T> entityList = new ArrayList<>();
         try (InputStream is = new ByteArrayInputStream(fileContent)) {
             Workbook workbook = WorkbookFactory.create(is);
