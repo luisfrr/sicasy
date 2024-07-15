@@ -112,7 +112,7 @@ public class SiniestroServiceImpl implements ISiniestroService {
                     .vehiculoValorFactura(siniestro.getVehiculo().getMontoFactura())
                     .polizaNumero(siniestro.getInciso() != null ? siniestro.getInciso().getPoliza().getNumeroPoliza() : null)
                     .polizaAseguradora(siniestro.getInciso() != null ? siniestro.getInciso().getPoliza().getAseguradora().getNombre() : null)
-                    .incisoNumero(siniestro.getInciso() != null ? siniestro.getInciso().getInciso() : null)
+                    .incisoNumero(siniestro.getInciso() != null ? siniestro.getInciso().getNumeroInciso() : null)
                     .incisoTipoCobertura(siniestro.getInciso() != null ? siniestro.getInciso().getTipoCobertura() : null)
                     .incisoFechaInicioVigencia(siniestro.getInciso() != null ? siniestro.getInciso().getFechaInicioVigencia() : null)
                     .incisoFechaFinVigencia(siniestro.getInciso() != null ? siniestro.getInciso().getFechaFinVigencia() : null)
@@ -189,6 +189,7 @@ public class SiniestroServiceImpl implements ISiniestroService {
     }
 
     @Override
+    @Transactional
     public void editar(Siniestro siniestro, String userName) {
 
         Siniestro siniestroAnterior = siniestroRepository.findById(siniestro.getIdSiniestro())
@@ -201,6 +202,12 @@ public class SiniestroServiceImpl implements ISiniestroService {
 
         siniestro.setModificadoPor(userName);
         siniestro.setFechaModificacion(new Date());
+
+        if (siniestro.getDeducible() == null ||
+                siniestro.getDeducible().getIdDeducible() == null ||
+                siniestro.getDeducible().getIdDeducible() == 0) {
+            siniestro.setDeducible(null);
+        }
 
         bitacoraSiniestroService.guardarBitacora("Editar registro", siniestroAnterior, siniestro, userName);
         siniestroRepository.save(siniestro);

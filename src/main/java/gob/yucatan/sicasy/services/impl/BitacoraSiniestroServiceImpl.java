@@ -99,7 +99,7 @@ public class BitacoraSiniestroServiceImpl implements IBitacoraSiniestroService {
                             case Siniestro_.VEHICULO -> siniestroNuevo.getVehiculo().getNoSerie();
                             case Siniestro_.INCISO -> String.format("Póliza: %s | Inciso: %s",
                                     siniestroNuevo.getInciso().getPoliza().getNumeroPoliza(),
-                                    siniestroNuevo.getInciso().getInciso());
+                                    siniestroNuevo.getInciso().getNumeroInciso());
                             case Siniestro_.ESTATUS_SINIESTRO -> siniestroNuevo.getEstatusSiniestro().getNombre();
                             default -> campo.get(siniestroNuevo);
                         };
@@ -129,10 +129,10 @@ public class BitacoraSiniestroServiceImpl implements IBitacoraSiniestroService {
                             case Siniestro_.INCISO -> {
                                 valorAnterior = String.format("Póliza: %s | Inciso: %s",
                                         siniestroAnterior.getInciso().getPoliza().getNumeroPoliza(),
-                                        siniestroAnterior.getInciso().getInciso());
+                                        siniestroAnterior.getInciso().getNumeroInciso());
                                 valorNuevo = String.format("Póliza: %s | Inciso: %s",
                                         siniestroNuevo.getInciso().getPoliza().getNumeroPoliza(),
-                                        siniestroNuevo.getInciso().getInciso());
+                                        siniestroNuevo.getInciso().getNumeroInciso());
                             }
                             case Siniestro_.ESTATUS_SINIESTRO -> {
                                 valorAnterior = siniestroAnterior.getEstatusSiniestro().getNombre();

@@ -101,6 +101,8 @@ public class SiniestrosView implements Serializable {
     @ConfigPermisoArray({
             @ConfigPermiso(tipo = TipoPermiso.READ, codigo = "SINIESTRO_READ_VER_BITACORA", orden = 3,
                     nombre = "Ver bitacora", descripcion = "Permite visualizar la bitácora de un siniestro."),
+            @ConfigPermiso(tipo = TipoPermiso.WRITE, codigo = "SINIESTRO_WRITE_DESCARGAR_FACTURA_DEDUCIBLE", orden = 11,
+                    nombre = "Descargar factura de deducible", descripcion = "Permite descargar la factura del pago de deducible."),
     })
     public void limpiarFiltros() {
         log.info("limpiarFiltros - SiniestrosView");
@@ -228,7 +230,7 @@ public class SiniestrosView implements Serializable {
         }
     }
 
-    @ConfigPermiso(tipo = TipoPermiso.WRITE, codigo = "SINIESTRO_WRITE_AUTORIZAR_PAGO_DEDUCIBLE", orden = 6,
+    @ConfigPermiso(tipo = TipoPermiso.WRITE, codigo = "SINIESTRO_WRITE_AUTORIZAR_PAGO_DEDUCIBLE", orden = 7,
             nombre = "Autorizar pago de deducible", descripcion = "Acción que permite autorizar el pago de deducible de los registros seleccionados.")
     @PreAuthorize("hasAnyAuthority('ROLE_OWNER', 'SINIESTRO_WRITE_AUTORIZAR_PAGO_DEDUCIBLE')")
     public void autorizarPagoDeducible() {
@@ -352,7 +354,13 @@ public class SiniestrosView implements Serializable {
             PrimeFaces.current().ajax().update("tab_view_detalles:edit_siniestro_form", "growl");
         } catch (Exception e) {
             log.error("Error al guardar la información del siniestro", e);
-            Messages.addError(e.getMessage());
+
+            if(e instanceof BadRequestException) {
+                Messages.addError(e.getMessage());
+            } else {
+                Messages.addError("No se ha logrado guardar la información del siniestro.");
+            }
+
             PrimeFaces.current().ajax().update("tab_view_detalles:edit_siniestro_form", "growl");
         }
     }
@@ -444,24 +452,32 @@ public class SiniestrosView implements Serializable {
         try {
             if(this.siniestroSelected != null && this.siniestroSelected.getDeducible() != null) {
 
-                try {
-                    UploadedFile file = this.file;
-                    String fileName = file.getFileName();
-                    byte[] fileContent = file.getContent();
-                    String filePath = SaveFile.importFileToPath(fileContent, fileName, FOLDER_SINIESTROS_DEDUCIBLES);
-                    this.siniestroSelected.getDeducible().setNombreArchivoFactura(fileName);
-                    this.siniestroSelected.getDeducible().setRutaArchivoFactura(filePath);
+                if(this.file != null) {
+                    try {
+                        UploadedFile file = this.file;
+                        String fileName = file.getFileName();
+                        byte[] fileContent = file.getContent();
+                        String filePath = SaveFile.importFileToPath(fileContent, fileName, FOLDER_SINIESTROS_DEDUCIBLES);
+                        this.siniestroSelected.getDeducible().setNombreArchivoFactura(fileName);
+                        this.siniestroSelected.getDeducible().setRutaArchivoFactura(filePath);
 
-                } catch (Exception e) {
-                    log.error("Ocurrio un error al subir la factura.", e);
-                    Messages.addError("Ocurrió un error al subir la factura. Intente nuevamente, si el problema persiste contacte a soporte.");
-                    return;
+                    } catch (Exception e) {
+                        log.error("Ocurrio un error al subir la factura.", e);
+                        Messages.addError("Ocurrió un error al subir la factura. Intente nuevamente, si el problema persiste contacte a soporte.");
+                        return;
+                    }
+                } else {
+                    if(this.siniestroSelected.getDeducible().getRutaArchivoFactura() == null) {
+                        Messages.addError("Se debe subir el archivo de la factura.");
+                        return;
+                    }
                 }
-
 
                 try {
                     this.siniestroSelected.getDeducible().setSiniestro(this.siniestroSelected);
-                    deducibleService.update(this.siniestroSelected.getDeducible(), userSessionBean.getUserName());
+                    deducibleService.update(this.siniestroSelected,
+                            this.siniestroSelected.getDeducible(),
+                            userSessionBean.getUserName());
                     this.siniestroSelected = siniestroService.findById(this.getSiniestroSelected().getIdSiniestro());
                     PrimeFaces.current().ajax().update("deducible_form");
                     Messages.addInfo("Se ha registrado correctamente el pago.");

@@ -112,7 +112,7 @@
                              var="anexo" value="#{anexoView.anexoList}"
                              rows="50"
                              rowKey="#{anexo.idAnexo}" rowIndexVar="index"
-                             styleClass="dt-scrollable"
+                             styleClass="dt-scrollable-x"
                              scrollable="true"
                              paginator="true" paginatorPosition="bottom"
                              paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
@@ -123,15 +123,15 @@
                         Anexos
                     </f:facet>
 
-                    <p:column headerText="No." width="20">
+                    <p:column headerText="No." width="50">
                         <h:outputText value="#{index + 1}" />
                     </p:column>
 
-                    <p:column headerText="Nombre" width="100">
+                    <p:column headerText="Anexo" width="150">
                         <h:outputText value="#{anexo.nombre}"/>
                     </p:column>
 
-                    <p:column headerText="Número licitación" width="100">
+                    <p:column headerText="Número licitación" width="150">
                         <h:outputText value="#{anexo.licitacion.numeroLicitacion}"/>
                     </p:column>
 
@@ -205,7 +205,7 @@
                     </sec:authorize>
 
                     <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'CAT_ANEXO_WRITE_EDITAR', 'CAT_ANEXO_READ_DESCARGAR_ARCHIVO', 'CAT_ANEXO_WRITE_ELIMINAR')">
-                        <p:column headerText="Acciones">
+                        <p:column headerText="Acciones" width="150">
 
                             <p:growl id="message" showDetail="true"/>
 
@@ -275,7 +275,7 @@
 
         <h:form id="form_dialog" enctype="multipart/form-data">
             <p:dialog header="#{anexoView.titleDialog}" widgetVar="formDialog"
-                      minHeight="350" width="450"
+                      height="400" width="450"
                       showEffect="fade" modal="true"
                       closable="true" closeOnEscape="true"
                       cache="false" responsive="true">
@@ -342,16 +342,21 @@
                                      pattern="dd-MM-yyyy" locale="es"/>
                     </p:outputPanel>
 
-                    <p:fileUpload value="#{anexoView.anexoFile}" sizeLimit="1000000"
-                                  mode="simple" fileLimit="1"
-                                  chooseButtonTitle="Elegir" chooseLabel="Elegir"
-                                  cancelButtonTitle="Cancelar" cancelLabel="Cancelar"
-                                  uploadButtonTitle="Subir" uploadLabel="Subir"
-                                  fileLimitMessage="Has superado el número máximo de archivos"
-                                  invalidFileMessage="Archivo no válido"
-                                  invalidSizeMessage="Has superado el tamaño máximo por archivo"
-                                  allowTypes="/(\.|\/)(pdf)$/" accept=".pdf"
-                                  skinSimple="true"/>
+                    <p:outputPanel styleClass="field col-12">
+                        <p:outputLabel for="@next" styleClass="block"  value="Archivo anexo"/>
+                        <p:fileUpload value="#{anexoView.anexoFile}" sizeLimit="1000000"
+                                      mode="simple" fileLimit="1"
+                                      chooseButtonTitle="Elegir" chooseLabel="Elegir"
+                                      cancelButtonTitle="Cancelar" cancelLabel="Cancelar"
+                                      uploadButtonTitle="Subir" uploadLabel="Subir"
+                                      fileLimitMessage="Has superado el número máximo de archivos"
+                                      invalidFileMessage="Archivo no válido"
+                                      invalidSizeMessage="Has superado el tamaño máximo por archivo"
+                                      allowTypes="/(\.|\/)(pdf)$/" accept=".pdf"
+                                      skinSimple="true"/>
+                    </p:outputPanel>
+
+
 
                 </p:outputPanel>
 
@@ -390,7 +395,7 @@
                                 </span>
                         <p:fileUpload widgetVar="uploadLayout" listener="#{anexoView.importarLayout}"
                                       fileLimit="1" fileLimitMessage="Solo se permite subir un archivo"
-                                      sizeLimit="50000000" allowTypes="/(\.|\/)(xlsx|)$/" dropZone="dropZoneLayout"
+                                      sizeLimit="50000000" allowTypes="/(\.|\/)(xlsx|)$/" accept=".xlsx" dropZone="dropZoneLayout"
                                       update="growl" style="display: none"/>
                     </p:outputPanel>
 

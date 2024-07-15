@@ -44,7 +44,7 @@
                   <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4">
                      <p:outputLabel for="@next" value="Inciso" styleClass="block"/>
                      <p:inputText styleClass="block w-full" required="true"
-                                  value="#{polizaView.incisoForm.inciso}"/>
+                                  value="#{polizaView.incisoForm.numeroInciso}"/>
                      <span class="text-sm hidden"> </span>
                   </p:outputPanel>
 
@@ -154,7 +154,7 @@
                                 </span>
                      <p:fileUpload widgetVar="uploadLayout" listener="#{polizaView.importarLayoutEndosoAlta}"
                                    fileLimit="1" fileLimitMessage="Solo se permite subir un archivo"
-                                   sizeLimit="50000000" allowTypes="/(\.|\/)(xlsx|)$/" dropZone="dropZoneLayout"
+                                   sizeLimit="50000000" allowTypes="/(\.|\/)(xlsx|)$/" accept=".xlsx" dropZone="dropZoneLayout"
                                    update="growl" style="display: none"/>
                   </p:outputPanel>
 

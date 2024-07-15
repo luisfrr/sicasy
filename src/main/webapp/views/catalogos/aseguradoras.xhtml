@@ -103,7 +103,7 @@
                         Aseguradoras
                     </f:facet>
 
-                    <p:column headerText="No.">
+                    <p:column headerText="No." width="50">
                         <h:outputText value="#{index + 1}" />
                     </p:column>
 
@@ -111,11 +111,11 @@
                         <h:outputText value="#{aseguradora.nombre}"/>
                     </p:column>
 
-                    <p:column headerText="Descripción" style="min-width: 15rem;">
+                    <p:column headerText="Descripción" width="350">
                         <h:outputText value="#{aseguradora.descripcion}"/>
                     </p:column>
 
-                    <p:column headerText="Representante" width="180">
+                    <p:column headerText="Representante" width="250">
                         <h:outputText value="#{aseguradora.representante}"/>
                     </p:column>
 
@@ -162,7 +162,7 @@
                     </sec:authorize>
 
                     <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'CAT_ASEGURADORA_WRITE_EDITAR', 'CAT_ASEGURADORA_WRITE_ELIMINAR')">
-                        <p:column headerText="Acciones">
+                        <p:column headerText="Acciones" width="150">
 
                             <p:growl id="message" showDetail="true"/>
 

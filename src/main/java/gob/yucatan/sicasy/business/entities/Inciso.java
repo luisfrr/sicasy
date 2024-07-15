@@ -28,8 +28,8 @@ public class Inciso implements Cloneable, Serializable {
     @JoinColumn(name = "poliza_id", nullable = false)
     private Poliza poliza;
 
-    @Column(name = "inciso", nullable = false)
-    private String inciso;
+    @Column(name = "numero_inciso", nullable = false)
+    private String numeroInciso;
 
     @ManyToOne
     @JoinColumn(name = "vehiculo_id", nullable = false)
@@ -51,10 +51,10 @@ public class Inciso implements Cloneable, Serializable {
     @JoinColumn(name = "estatus_inciso_id", nullable = false)
     private EstatusInciso estatusInciso;
 
-    @Column(name = "costo")
+    @Column(name = "costo_poliza")
     private Double costo;
 
-    @Column(name = "saldo")
+    @Column(name = "saldo_poliza")
     private Double saldo;
 
     @Column(name = "frecuencia_pago")
@@ -132,12 +132,12 @@ public class Inciso implements Cloneable, Serializable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Inciso inciso1 = (Inciso) o;
-        return Objects.equals(poliza, inciso1.poliza) && Objects.equals(inciso, inciso1.inciso) && Objects.equals(vehiculo, inciso1.vehiculo) && estatusRegistro == inciso1.estatusRegistro;
+        return Objects.equals(poliza, inciso1.poliza) && Objects.equals(numeroInciso, inciso1.numeroInciso) && Objects.equals(vehiculo, inciso1.vehiculo) && estatusRegistro == inciso1.estatusRegistro;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(poliza, inciso, vehiculo, estatusRegistro);
+        return Objects.hash(poliza, numeroInciso, vehiculo, estatusRegistro);
     }
 
     @Override

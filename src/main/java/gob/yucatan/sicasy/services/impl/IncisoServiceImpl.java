@@ -89,7 +89,7 @@ public class IncisoServiceImpl implements IIncisoService {
         if(inciso.getIncisoList() != null && !inciso.getIncisoList().isEmpty()){
             specification.add(new SearchCriteria(SearchOperation.IN,
                     inciso.getIncisoList(),
-                    Inciso_.INCISO));
+                    Inciso_.NUMERO_INCISO));
         }
 
         if(inciso.getVehiculoNoSerieList() != null && !inciso.getVehiculoNoSerieList().isEmpty()){
@@ -148,7 +148,7 @@ public class IncisoServiceImpl implements IIncisoService {
         if(poliza.getEstatusRegistro() == EstatusRegistro.BORRADO)
             throw new NotFoundException("No se ha logrado obtener la póliza.");
 
-        if(inciso.getInciso() == null || inciso.getInciso().isEmpty())
+        if(inciso.getNumeroInciso() == null || inciso.getNumeroInciso().isEmpty())
             throw new BadRequestException("El campo Inciso es obligatorio");
 
         if(inciso.getVehiculo() == null || inciso.getVehiculo().getNoSerie() == null)
@@ -162,12 +162,12 @@ public class IncisoServiceImpl implements IIncisoService {
                     inciso.getVehiculo().getNoSerie() +
                     " ya tiene una póliza con un inciso vigente." +
                     " No. póliza: " + vehiculo.getIncisoVigente().getPoliza().getNumeroPoliza() +
-                    ". Inciso: " + vehiculo.getIncisoVigente().getInciso());
+                    ". Inciso: " + vehiculo.getIncisoVigente().getNumeroInciso());
         }
 
         validateIncisoPoliza(inciso, poliza);
 
-        if(incisoRepository.existsByIdPolizaAndIncisoAndIdVehiculo(poliza.getIdPoliza(), inciso.getInciso(), inciso.getVehiculo().getIdVehiculo()))
+        if(incisoRepository.existsByIdPolizaAndIncisoAndIdVehiculo(poliza.getIdPoliza(), inciso.getNumeroInciso(), inciso.getVehiculo().getIdVehiculo()))
             throw new BadRequestException("La póliza ya existe.");
 
         // Se agrega el saldo
@@ -426,7 +426,7 @@ public class IncisoServiceImpl implements IIncisoService {
 
         MovimientoPoliza movimientoPoliza = MovimientoPoliza.builder()
                 .poliza(incisoModificacion.getPoliza())
-                .movimiento("Endoso de modificación: Inciso " + incisoModificacion.getInciso())
+                .movimiento("Endoso de modificación: Inciso " + incisoModificacion.getNumeroInciso())
                 .folioFactura(endosoModificacion.getFolioFactura())
                 .nombreArchivoFactura(endosoModificacion.getNombreArchivoFactura())
                 .rutaArchivoFactura(endosoModificacion.getRutaArchivoFactura())
@@ -469,7 +469,7 @@ public class IncisoServiceImpl implements IIncisoService {
 
         MovimientoPoliza movimientoPoliza = MovimientoPoliza.builder()
                 .poliza(incisoBaja.getPoliza())
-                .movimiento("Endoso de baja: Inciso " + incisoBaja.getInciso())
+                .movimiento("Endoso de baja: Inciso " + incisoBaja.getNumeroInciso())
                 .folioFactura(endosoBaja.getFolioFactura())
                 .nombreArchivoFactura(endosoBaja.getNombreArchivoFactura())
                 .rutaArchivoFactura(endosoBaja.getRutaArchivoFactura())
@@ -505,7 +505,7 @@ public class IncisoServiceImpl implements IIncisoService {
 
         Inciso incisoFilter = Inciso.builder()
                 .idPolizaList(polizaDbList.stream().map(Poliza::getIdPoliza).distinct().toList())
-                .incisoList(incisos.stream().map(Inciso::getInciso).toList())
+                .incisoList(incisos.stream().map(Inciso::getNumeroInciso).toList())
                 .vehiculoNoSerieList(incisos.stream().map(Inciso::getVehiculoNoSerie).distinct().toList())
                 .estatusRegistro(EstatusRegistro.ACTIVO)
                 .build();
@@ -526,7 +526,7 @@ public class IncisoServiceImpl implements IIncisoService {
                                 && Objects.equals(p.getNumeroPoliza(), inciso.getPolizaNoPoliza()))
                         .findFirst().orElseThrow(() -> new BadRequestException("No se ha encontrado la información de la póliza"));
 
-                if(inciso.getInciso() == null || inciso.getInciso().isEmpty())
+                if(inciso.getNumeroInciso() == null || inciso.getNumeroInciso().isEmpty())
                     throw new BadRequestException("El campo Inciso es obligatorio");
 
                 if(inciso.getVehiculoNoSerie() == null || inciso.getVehiculoNoSerie().isEmpty())
@@ -542,14 +542,14 @@ public class IncisoServiceImpl implements IIncisoService {
                             inciso.getVehiculoNoSerie() +
                             " ya tiene una póliza con un inciso vigente." +
                             " No. póliza: " + vehiculo.getIncisoVigente().getPoliza().getNumeroPoliza() +
-                            ". Inciso: " + vehiculo.getIncisoVigente().getInciso());
+                            ". Inciso: " + vehiculo.getIncisoVigente().getNumeroInciso());
                 }
 
                 inciso.setVehiculo(vehiculo);
                 validateIncisoPoliza(inciso, poliza);
 
                 if(incisoDbList.stream().anyMatch(i -> Objects.equals(i.getPoliza().getIdPoliza(), poliza.getIdPoliza())
-                        && Objects.equals(i.getInciso(), inciso.getInciso())
+                        && Objects.equals(i.getNumeroInciso(), inciso.getNumeroInciso())
                         && Objects.equals(i.getVehiculo().getNoSerie(), inciso.getVehiculoNoSerie()))) {
                     throw new BadRequestException("La póliza ya existe.");
                 }
@@ -559,7 +559,7 @@ public class IncisoServiceImpl implements IIncisoService {
 
             } catch (Exception e) {
                 acuseImportacionList.add(AcuseImportacion.builder()
-                        .titulo(inciso.getInciso())
+                        .titulo(inciso.getNumeroInciso())
                         .mensaje(e.getMessage())
                         .error(1)
                         .build());
@@ -570,7 +570,7 @@ public class IncisoServiceImpl implements IIncisoService {
         List<Inciso> incisosDuplicados = encontrarDuplicados(incisos);
         if(!incisosDuplicados.isEmpty()) {
             incisosDuplicados.forEach(poliza -> acuseImportacionList.add(AcuseImportacion.builder()
-                    .titulo(poliza.getInciso())
+                    .titulo(poliza.getNumeroInciso())
                     .mensaje("El inciso está duplicada en este layout.")
                     .error(1)
                     .build()));

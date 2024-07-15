@@ -468,7 +468,7 @@ public class PolizaView implements Serializable {
                 List<ConfigHeaderExcelModel> list = new ArrayList<>();
                 list.add(ConfigHeaderExcelModel.builder().header("ASEGURADORA").fieldName("polizaIdAseguradora").columnIndex(0).build());
                 list.add(ConfigHeaderExcelModel.builder().header("NO. PÓLIZA").fieldName("polizaNoPoliza").columnIndex(1).build());
-                list.add(ConfigHeaderExcelModel.builder().header("INCISO").fieldName("inciso").columnIndex(2).build());
+                list.add(ConfigHeaderExcelModel.builder().header("INCISO").fieldName("numeroInciso").columnIndex(2).build());
                 list.add(ConfigHeaderExcelModel.builder().header("NO. SERIE VEHÍCULO").fieldName("vehiculoNoSerie").columnIndex(3).build());
                 list.add(ConfigHeaderExcelModel.builder().header("FECHA INICIO VIGENCIA").fieldName("fechaInicioVigencia").columnIndex(4).dateFormat("dd/MM/yyyy").build());
                 list.add(ConfigHeaderExcelModel.builder().header("FECHA FIN VIGENCIA").fieldName("fechaFinVigencia").columnIndex(5).dateFormat("dd/MM/yyyy").build());
