@@ -3,10 +3,12 @@ package gob.yucatan.sicasy.business.entities;
 import gob.yucatan.sicasy.business.enums.EstatusRegistro;
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.extern.slf4j.Slf4j;
+import org.hibernate.Hibernate;
 
 import java.io.Serializable;
-import java.time.LocalDate;
 import java.util.*;
+
 
 @Entity
 @Table(name = "poliza")
@@ -15,6 +17,7 @@ import java.util.*;
 @Getter
 @Setter
 @Builder
+@Slf4j
 public class Poliza implements Cloneable, Serializable {
 
     @Id
@@ -123,7 +126,15 @@ public class Poliza implements Cloneable, Serializable {
         try {
             Poliza clone = (Poliza) super.clone();
             clone.aseguradora = this.aseguradora != null ? this.aseguradora.clone() : null;
-            clone.incisoSet = new HashSet<>(this.incisoSet);
+
+            // Verificar si incisoSet está inicializada
+            if (Hibernate.isInitialized(this.incisoSet)) {
+                clone.incisoSet = new HashSet<>(this.incisoSet);
+            } else {
+                clone.incisoSet = null; // O manejar de otra manera si es necesario
+            }
+
+
             return clone;
         } catch (CloneNotSupportedException e) {
             throw new AssertionError();

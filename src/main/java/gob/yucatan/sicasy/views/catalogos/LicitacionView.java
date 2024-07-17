@@ -313,7 +313,6 @@ public class LicitacionView {
         ExcelDataSheet excelDataSheet = ExcelDataSheet.builder()
                 .data(this.licitacionList)
                 .cells(cellList)
-                .title("Licitaciones")
                 .sheetName("DATA")
                 .filename("Licitaciones")
                 .autoFilter(true)

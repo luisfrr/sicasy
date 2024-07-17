@@ -51,7 +51,7 @@ public class Deducible implements Cloneable, Serializable {
     @Column(name = "inciso_numero", nullable = false)
     private String incisoNumero;
 
-    @Column(name = "inciso_tipo_cobertura", nullable = false)
+    @Column(name = "inciso_tipo_cobertura")
     private String incisoTipoCobertura;
 
     @Column(name = "inciso_fecha_inicio_vigencia", nullable = false)
@@ -79,6 +79,9 @@ public class Deducible implements Cloneable, Serializable {
 
     @Column(name = "ruta_archivo_factura", nullable = false)
     private String rutaArchivoFactura;
+
+    @OneToOne(optional=false, mappedBy="deducible")
+    public Siniestro siniestro;
 
     @Column(name = "estatus_registro", nullable = false)
     @Enumerated(EnumType.ORDINAL)

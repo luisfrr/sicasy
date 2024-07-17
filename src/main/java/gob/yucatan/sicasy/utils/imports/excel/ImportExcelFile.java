@@ -1,8 +1,8 @@
 package gob.yucatan.sicasy.utils.imports.excel;
 
+import gob.yucatan.sicasy.business.exceptions.BadRequestException;
 import gob.yucatan.sicasy.utils.date.DateFormatUtil;
 import gob.yucatan.sicasy.utils.numbers.DoubleUtil;
-import org.apache.coyote.BadRequestException;
 import org.apache.poi.ss.usermodel.*;
 import org.springframework.util.StringUtils;
 
@@ -20,7 +20,7 @@ import java.util.List;
 
 public class ImportExcelFile<T> {
 
-    public List<T> processExcelFile(byte[] fileContent, Class<T> type, List<ConfigHeaderExcelModel> headers) throws IOException {
+    public List<T> processExcelFile(byte[] fileContent, Class<T> type, List<ConfigHeaderExcelModel> headers) {
         List<T> entityList = new ArrayList<>();
         try (InputStream is = new ByteArrayInputStream(fileContent)) {
             Workbook workbook = WorkbookFactory.create(is);

@@ -103,7 +103,7 @@ public class Siniestro implements Cloneable, Serializable {
     @Column(name = "costo_multa")
     private Double costoMulta;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne
     @JoinColumn(name="deducible_id")
     private Deducible deducible;
 

@@ -13,9 +13,9 @@ public interface IIncisoRepository extends JpaRepository<Inciso, Long>, JpaSpeci
 
     @Query("""
             select (count(i) > 0) from Inciso i
-            where i.poliza.idPoliza = ?1 and i.inciso = ?2 and i.vehiculo.idVehiculo = ?3
+            where i.poliza.idPoliza = ?1 and i.numeroInciso = ?2 and i.vehiculo.idVehiculo = ?3
             and i.vehiculo.estatusRegistro = 1 and i.poliza.estatusRegistro = 1 and i.estatusRegistro = 1""")
-    boolean existsByIdPolizaAndIncisoAndIdVehiculo(Long idPoliza, String inciso, Long idVehiculo);
+    boolean existsByIdPolizaAndIncisoAndIdVehiculo(Long idPoliza, String numeroInciso, Long idVehiculo);
 
     @Query("select i from Inciso i where i.idInciso in ?1")
     List<Inciso> findByIdIncisoIn(Collection<Long> idIncisos);

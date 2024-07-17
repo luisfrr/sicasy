@@ -119,7 +119,7 @@
                         <h:outputText value="#{index + 1}" />
                     </p:column>
 
-                    <p:column headerText="Número licitación" width="90">
+                    <p:column headerText="Número licitación" width="180">
                         <h:outputText value="#{licitacion.numeroLicitacion}"/>
                     </p:column>
 
@@ -186,7 +186,7 @@
                     </sec:authorize>
 
                     <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'CAT_LICITACION_WRITE_EDITAR', 'CAT_LICITACION_READ_DESCARGAR_ARCHIVO', 'CAT_LICITACION_WRITE_ELIMINAR')">
-                        <p:column headerText="Acciones">
+                        <p:column headerText="Acciones" width="150">
                             <p:growl id="message" showDetail="true"/>
 
                             <p:commandButton id="buttonOptions" type="button"
@@ -256,7 +256,7 @@
 
         <h:form id="form_dialog" enctype="multipart/form-data">
             <p:dialog header="#{licitacionView.titleDialog}" widgetVar="formDialog"
-                      minHeight="350" width="450"
+                      height="450" width="450"
                       showEffect="fade" modal="true"
                       closable="true" closeOnEscape="true"
                       cache="false" responsive="true">
@@ -311,17 +311,20 @@
                                 for="id_calendar2" />
                     </p:outputPanel>
 
-                    <p:fileUpload value="#{licitacionView.file}"
-                                  sizeLimit="1000000"
-                                  mode="simple" fileLimit="1"
-                                  chooseButtonTitle="Elegir" chooseLabel="Elegir"
-                                  cancelButtonTitle="Cancelar" cancelLabel="Cancelar"
-                                  uploadButtonTitle="Subir" uploadLabel="Subir"
-                                  fileLimitMessage="Has superado el número máximo de archivos"
-                                  invalidFileMessage="Archivo no válido"
-                                  invalidSizeMessage="Has superado el tamaño máximo por archivo"
-                                  allowTypes="/(\.|\/)(pdf)$/" accept=".pdf"
-                                  skinSimple="true"/>
+                    <p:outputPanel styleClass="field col-12">
+                        <p:outputLabel for="@next" value="Archivo licitación" styleClass="block"/>
+                        <p:fileUpload value="#{licitacionView.file}"
+                                      sizeLimit="1000000"
+                                      mode="simple" fileLimit="1"
+                                      chooseButtonTitle="Elegir" chooseLabel="Elegir"
+                                      cancelButtonTitle="Cancelar" cancelLabel="Cancelar"
+                                      uploadButtonTitle="Subir" uploadLabel="Subir"
+                                      fileLimitMessage="Has superado el número máximo de archivos"
+                                      invalidFileMessage="Archivo no válido"
+                                      invalidSizeMessage="Has superado el tamaño máximo por archivo"
+                                      allowTypes="/(\.|\/)(pdf)$/" accept=".pdf"
+                                      skinSimple="true"/>
+                    </p:outputPanel>
 
                 </p:outputPanel>
 
@@ -360,7 +363,7 @@
                                 </span>
                         <p:fileUpload widgetVar="uploadLayout" listener="#{licitacionView.importarLayout}"
                                       fileLimit="1" fileLimitMessage="Solo se permite subir un archivo"
-                                      sizeLimit="50000000" allowTypes="/(\.|\/)(xlsx|)$/" dropZone="dropZoneLayout"
+                                      sizeLimit="50000000" accept=".xlsx" dropZone="dropZoneLayout"
                                       update="growl" style="display: none"/>
                     </p:outputPanel>
 

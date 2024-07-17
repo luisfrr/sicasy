@@ -53,7 +53,7 @@ public class PolizaView implements Serializable {
     @Value("${app.files.folder.layouts.importar-vehiculo}")
     private @Getter String LAYOUT_POLIZAS;
     @Value("${app.files.folder.polizas_facturas}")
-    private @Getter String LAYOUT_POLIZAS_FACTURAS;
+    private @Getter String FOLDER_POLIZAS_FACTURAS;
     @Value("${app.files.folder.polizas}")
     private @Getter String FOLDER_POLIZAS;
     private @Getter final Integer ESTATUS_INCISO_REGISTRADA = 1;
@@ -468,7 +468,7 @@ public class PolizaView implements Serializable {
                 List<ConfigHeaderExcelModel> list = new ArrayList<>();
                 list.add(ConfigHeaderExcelModel.builder().header("ASEGURADORA").fieldName("polizaIdAseguradora").columnIndex(0).build());
                 list.add(ConfigHeaderExcelModel.builder().header("NO. PÓLIZA").fieldName("polizaNoPoliza").columnIndex(1).build());
-                list.add(ConfigHeaderExcelModel.builder().header("INCISO").fieldName("inciso").columnIndex(2).build());
+                list.add(ConfigHeaderExcelModel.builder().header("INCISO").fieldName("numeroInciso").columnIndex(2).build());
                 list.add(ConfigHeaderExcelModel.builder().header("NO. SERIE VEHÍCULO").fieldName("vehiculoNoSerie").columnIndex(3).build());
                 list.add(ConfigHeaderExcelModel.builder().header("FECHA INICIO VIGENCIA").fieldName("fechaInicioVigencia").columnIndex(4).dateFormat("dd/MM/yyyy").build());
                 list.add(ConfigHeaderExcelModel.builder().header("FECHA FIN VIGENCIA").fieldName("fechaFinVigencia").columnIndex(5).dateFormat("dd/MM/yyyy").build());
@@ -748,7 +748,7 @@ public class PolizaView implements Serializable {
             UploadedFile file = this.file;
             String fileName = file.getFileName();
             byte[] fileContent = file.getContent();
-            String filePath = SaveFile.importFileToPath(fileContent, fileName, LAYOUT_POLIZAS_FACTURAS);
+            String filePath = SaveFile.importFileToPath(fileContent, fileName, FOLDER_POLIZAS_FACTURAS);
             this.pagoInciso.setNombreArchivo(fileName);
             this.pagoInciso.setRutaArchivo(filePath);
         } catch (Exception e) {
