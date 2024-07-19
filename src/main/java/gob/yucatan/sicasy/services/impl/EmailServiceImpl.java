@@ -28,6 +28,9 @@ public class EmailServiceImpl implements IEmailService {
     @Value("${app.url}")
     private String appUrl;
 
+    @Value("{mail.from}")
+    private String from;
+
     private final JavaMailSender emailSender;
     private final IEmailTemplateService emailTemplateService;
 
@@ -38,7 +41,7 @@ public class EmailServiceImpl implements IEmailService {
 
         try {
             helper.setTo(to);
-            helper.setFrom("sicasy-no-reply@outlook.com");
+            helper.setFrom(from);
             helper.setSubject(subject);
             helper.setText(body, true); // true para habilitar HTML
 
@@ -57,7 +60,7 @@ public class EmailServiceImpl implements IEmailService {
             String body = buildBodyMessage(templateMessage.getEmailTemplate(), templateMessage.getDataTemplate());
 
             helper.setTo(templateMessage.getTo());
-            helper.setFrom("sicasy-no-reply@outlook.com");
+            helper.setFrom(from);
             helper.setSubject(templateMessage.getSubject());
             helper.setText(body, true); // true para habilitar HTML
 
