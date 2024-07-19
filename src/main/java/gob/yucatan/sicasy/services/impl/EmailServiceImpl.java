@@ -28,7 +28,7 @@ public class EmailServiceImpl implements IEmailService {
     @Value("${app.url}")
     private String appUrl;
 
-    @Value("{mail.from}")
+    @Value("${mail.from}")
     private String from;
 
     private final JavaMailSender emailSender;
