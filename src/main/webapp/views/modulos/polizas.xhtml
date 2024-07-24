@@ -29,7 +29,7 @@
                 </h:form>
 
                 <h:form id="form_toolbar">
-                    <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'POLIZA_WRITE_REGISTRAR_POLIZA', 'POLIZA_WRITE_IMPORTAR_POLIZA', 'POLIZA_WRITE_ENDOSO_ALTA', 'POLIZA_WRITE_IMPORTAR_ENDOSO_ALTA')">
+                    <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'POLIZA_WRITE_REGISTRAR_POLIZA', 'POLIZA_WRITE_IMPORTAR_POLIZA', 'POLIZA_WRITE_ENDOSO_ALTA', 'POLIZA_WRITE_IMPORTAR_ENDOSO_ALTA', 'POLIZA_READ_EXPORTAR_POLIZAS', 'POLIZA_READ_EXPORTAR_LAYOUT_REGISTRO_POLIZA', 'POLIZA_READ_EXPORTAR_LAYOUT_ENDOSO_ALTA')">
                         <p:toolbar styleClass="mb-5">
                             <p:toolbarGroup>
                                 <p:commandButton id="accionesPolizas" type="button" value="Acciones"
@@ -45,14 +45,28 @@
                                 </p:menu>
                             </p:toolbarGroup>
                             <p:toolbarGroup align="right">
-                                <p:commandButton id="exportarPolizas" type="button" value="Exportar"
-                                                 iconPos="right" icon="fi fi-rr-angle-small-down"
-                                                 styleClass="ui-button-outlined"/>
-                                <p:menu overlay="true" trigger="exportarPolizas" my="left top" at="left bottom">
-                                    <p:menuitem value="Exportar pólizas"/>
-                                    <p:menuitem value="Layout Registro de Pólizas"/>
-                                    <p:menuitem value="Layout Endoso de Alta"/>
-                                </p:menu>
+                                <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'POLIZA_READ_EXPORTAR_POLIZAS', 'POLIZA_READ_EXPORTAR_LAYOUT_REGISTRO_POLIZA', 'POLIZA_READ_EXPORTAR_LAYOUT_ENDOSO_ALTA')">
+                                    <p:commandButton id="btn_exportar_polizas" type="button" value="Exportar"
+                                                     iconPos="right" icon="fi fi-rr-angle-small-down" styleClass="ui-button-outlined"/>
+                                    <p:menu overlay="true" trigger="btn_exportar_polizas" my="left top" at="left bottom" maxHeight="250">
+                                        <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'POLIZA_READ_EXPORTAR_POLIZAS')">
+                                            <p:menuitem value="Exportar registros" ajax="false" onclick="PrimeFaces.monitorDownload(start, stop);"
+                                                        disabled="#{polizaView.polizaList == null or polizaView.polizaList.size() == 0}">
+                                                <p:fileDownload value="#{fileDownloadBean.downloadFile(polizaView.exportarPolizas())}"/>
+                                            </p:menuitem>
+                                        </sec:authorize>
+                                        <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'POLIZA_READ_EXPORTAR_LAYOUT_REGISTRO_POLIZA')">
+                                            <p:menuitem value="Layout Registro de Pólizas" ajax="false" onclick="PrimeFaces.monitorDownload(start, stop);">
+                                                <p:fileDownload value="#{fileDownloadBean.downloadFileByPath(polizaView.LAYOUT_REGISTRO_POLIZA)}"/>
+                                            </p:menuitem>
+                                        </sec:authorize>
+                                        <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'POLIZA_READ_EXPORTAR_LAYOUT_ENDOSO_ALTA')">
+                                            <p:menuitem value="Layout Endoso de Alta" ajax="false" onclick="PrimeFaces.monitorDownload(start, stop);">
+                                                <p:fileDownload value="#{fileDownloadBean.downloadFileByPath(polizaView.LAYOUT_ENDOSO_ALTA)}"/>
+                                            </p:menuitem>
+                                        </sec:authorize>
+                                    </p:menu>
+                                </sec:authorize>
                             </p:toolbarGroup>
                         </p:toolbar>
                     </sec:authorize>
@@ -77,9 +91,9 @@
                             <p:outputPanel styleClass="flex flex-row gap-4 justify-content-end">
                                 <p:commandButton value="Limpiar filtros" styleClass="ui-button-outlined"
                                                  ajax="true" action="#{polizaView.limpiarFiltros()}"
-                                                 update="form_filtros form_datatable"/>
+                                                 update="form_filtros form_datatable form_toolbar"/>
                                 <p:commandButton value="Buscar" ajax="true" action="#{polizaView.buscar()}"
-                                                 update="form_datatable"/>
+                                                 update="form_datatable form_toolbar"/>
                             </p:outputPanel>
                         </f:facet>
                     </p:panel>
@@ -190,12 +204,16 @@
 
                         </sec:authorize>
 
-                        <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'POLIZA_WRITE_ADJUNTAR_POLIZA', 'POLIZA_READ_DESCARGAR_POLIZA', 'POLIZA_WRITE_ELIMINAR')">
+                        <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'POLIZA_READ_EXPORTAR_POLIZA_INCISO', 'POLIZA_WRITE_ADJUNTAR_POLIZA', 'POLIZA_READ_DESCARGAR_POLIZA', 'POLIZA_WRITE_ELIMINAR')">
                             <p:column headerText="Acciones" width="150">
                                 <p:commandButton id="dtAccionesPolizas" type="button"
                                                  icon="fi fi-rr-menu-dots-vertical" styleClass="rounded-button ui-button-outlined" />
                                 <p:menu overlay="true" trigger="dtAccionesPolizas" my="left top" at="left bottom">
-                                    <p:menuitem value="Exportar incisos"/>
+                                    <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'POLIZA_READ_EXPORTAR_POLIZA_INCISO')">
+                                        <p:menuitem value="Exportar incisos" ajax="false" onclick="PrimeFaces.monitorDownload(start, stop);">
+                                            <p:fileDownload value="#{fileDownloadBean.downloadFile(polizaView.exportarIncisos(poliza))}"/>
+                                        </p:menuitem>
+                                    </sec:authorize>
 
                                     <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'POLIZA_WRITE_ADJUNTAR_POLIZA')">
                                         <p:menuitem value="Adjuntar póliza" ajax="true" action="#{polizaView.abrirAdjuntarPolizaDialog(poliza.idPoliza)}"

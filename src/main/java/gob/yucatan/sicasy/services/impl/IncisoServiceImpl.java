@@ -37,7 +37,6 @@ public class IncisoServiceImpl implements IIncisoService {
     private final Integer ESTATUS_INCISO_BAJA = 4;
 
     private final Integer ACCION_SOLICITAR_PAGO = 1;
-    private final Integer ACCION_AUTORIZAR_PAGO = 2;
     private final Integer ACCION_RECHAZAR_PAGO = 3;
 
     private final IIncisoRepository incisoRepository;
@@ -114,6 +113,15 @@ public class IncisoServiceImpl implements IIncisoService {
     public List<Inciso> findByIdPoliza(Long idPoliza) {
         Inciso inciso = Inciso.builder()
                 .poliza(Poliza.builder().idPoliza(idPoliza).build())
+                .estatusRegistro(EstatusRegistro.ACTIVO)
+                .build();
+        return this.findAllDynamic(inciso);
+    }
+
+    @Override
+    public List<Inciso> findByIdPolizaList(List<Long> idPoliza) {
+        Inciso inciso = Inciso.builder()
+                .idPolizaList(idPoliza)
                 .estatusRegistro(EstatusRegistro.ACTIVO)
                 .build();
         return this.findAllDynamic(inciso);
@@ -658,6 +666,7 @@ public class IncisoServiceImpl implements IIncisoService {
             String accionStr = "";
 
             // Si la accion es solicitar pago
+            Integer ACCION_AUTORIZAR_PAGO = 2;
             if(Objects.equals(accion, ACCION_SOLICITAR_PAGO)) {
                 accionStr = "Solicitar pago";
                 // El estatus actual debe ser REGISTADO, si no entonces marca error
