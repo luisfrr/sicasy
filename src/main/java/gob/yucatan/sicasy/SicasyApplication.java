@@ -28,7 +28,7 @@ public class SicasyApplication implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
-        String passwordEncoded = passwordEncoder.encode("12345678");
+        String passwordEncoded = passwordEncoder.encode("sicasySaF.5");
         log.info(passwordEncoded);
 
         try {
