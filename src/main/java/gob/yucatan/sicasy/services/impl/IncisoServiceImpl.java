@@ -662,7 +662,6 @@ public class IncisoServiceImpl implements IIncisoService {
             // Se obtiene el estatus actual de todos los vehiculas a actualizar
             Integer estatusActual = distinctEstatusIncisos.getFirst();
 
-            boolean cancelado = false;
             String accionStr = "";
 
             // Si la accion es solicitar pago

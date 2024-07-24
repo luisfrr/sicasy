@@ -113,7 +113,6 @@ public class PolizaView implements Serializable {
     private @Getter boolean showEndosoModificacionDialog;
     private @Getter boolean showEndosoBajaDialog;
     private @Getter boolean showErrorImportacion;
-    private Long idPoliza;
 
 
     @PostConstruct
@@ -1026,7 +1025,7 @@ public class PolizaView implements Serializable {
         }
     }
 
-    public List<ExcelCell> getExcelCell(XSSFWorkbook workbook) throws IOException {
+    public List<ExcelCell> getExcelCell(XSSFWorkbook workbook) {
         log.info("getExcelCell - PolizaView");
 
         List<ExcelCell> cellList = new ArrayList<>();
