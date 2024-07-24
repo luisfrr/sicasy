@@ -104,7 +104,7 @@
                         Roles
                     </f:facet>
 
-                    <p:column headerText="No.">
+                    <p:column headerText="No." width="50">
                         <h:outputText value="#{index + 1}" />
                     </p:column>
 
@@ -116,19 +116,20 @@
                         <h:outputText value="#{rol.nombre}"/>
                     </p:column>
 
-                    <p:column headerText="Descripción" width="350">
+                    <p:column headerText="Descripción" width="350" style="min-width: 350px">
                         <h:outputText value="#{rol.descripcion}"/>
                     </p:column>
 
                     <sec:authorize access="hasAuthority('ROLE_OWNER')">
 
-                        <p:column headerText="Estatus" width="100">
+                        <p:column headerText="Estatus registro" width="100">
                             <h:outputText value="#{rol.estatus.label}">
                             </h:outputText>
                         </p:column>
 
-                        <p:column headerText="Fecha creación" width="150">
+                        <p:column headerText="Fecha creación" width="180">
                             <h:outputText value="#{rol.fechaCreacion}">
+                                <f:convertDateTime pattern="dd/MM/yyyy HH:mm a"/>
                             </h:outputText>
                         </p:column>
 
@@ -137,8 +138,9 @@
                             </h:outputText>
                         </p:column>
 
-                        <p:column headerText="Fecha modificación" width="150">
+                        <p:column headerText="Fecha modificación" width="180">
                             <h:outputText value="#{rol.fechaModificacion}">
+                                <f:convertDateTime pattern="dd/MM/yyyy HH:mm a"/>
                             </h:outputText>
                         </p:column>
 
@@ -147,8 +149,9 @@
                             </h:outputText>
                         </p:column>
 
-                        <p:column headerText="Fecha borrado" width="150">
+                        <p:column headerText="Fecha borrado" width="180">
                             <h:outputText value="#{rol.fechaBorrado}">
+                                <f:convertDateTime pattern="dd/MM/yyyy HH:mm a"/>
                             </h:outputText>
                         </p:column>
 
@@ -225,18 +228,19 @@
                   cache="false" responsive="true">
             <p:outputPanel id="dialogContent" styleClass="formgrid grid" rendered="#{rolView.rolSelected != null}">
 
-                <p:outputPanel styleClass="field col-12">
+                <p:outputPanel styleClass="field col-12" rendered="false">
                     <p:outputLabel for="@next" value="Código" styleClass="block"/>
                     <p:inputText styleClass="block w-full" required="true"
-                                 value="#{rolView.rolSelected.codigo}"/>
-                    <span class="text-sm">Código único para identificar un rol</span>
+                                 value="#{rolView.rolSelected.codigo}"
+                                 onkeyup="this.value = this.value.replace(/\s/g, '')"/>
+                    <span class="text-sm">Código único para identificar un rol. No se permiten espacios en blanco.</span>
                 </p:outputPanel>
 
                 <p:outputPanel styleClass="field col-12">
                     <p:outputLabel for="@next" value="Nombre" styleClass="block"/>
                     <p:inputText styleClass="block w-full" required="true"
                                  value="#{rolView.rolSelected.nombre}"/>
-                    <span class="text-sm hidden"> </span>
+                    <span class="text-sm">Ingresa un nombre único</span>
                 </p:outputPanel>
 
                 <p:outputPanel styleClass="field col-12">

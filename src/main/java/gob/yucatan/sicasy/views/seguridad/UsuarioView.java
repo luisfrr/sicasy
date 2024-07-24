@@ -36,8 +36,6 @@ public class UsuarioView implements Serializable {
     // Inyección de dependencias
     private final IUsuarioService usuarioService;
     private final UserSessionBean userSessionBean;
-    private final IPermisoScannerService permisoScannerService;
-    private final IPermisoService permisoService;
     private final IUsuarioPermisoService usuarioPermisoService;
     private final IRolService rolService;
     private final IBitacoraUsuarioService bitacoraUsuarioService;
@@ -281,6 +279,7 @@ public class UsuarioView implements Serializable {
         this.showConfigurarPermisos = true;
         this.showPanelPrincipal = false;
         this.limpiarFiltrosPermisos();
+        this.buscarPermisos();
     }
 
 //    @ConfigPermiso(tipo = TipoPermiso.READ, codigo = "SEGURIDAD_USUARIOS_READ_VER_BITACORA_USUARIO",
@@ -292,7 +291,7 @@ public class UsuarioView implements Serializable {
 
         // buscar bitacora de usuario
         this.bitacoraUsuarioList = bitacoraUsuarioService.findByUsuarioId(usuario.getIdUsuario())
-                .stream().sorted(Comparator.comparing(BitacoraUsuario::getFechaModificacion))
+                .stream().sorted(Comparator.comparing(BitacoraUsuario::getFechaModificacion).reversed())
                 .toList();
 
         this.showPanelPrincipal = false;
@@ -309,7 +308,7 @@ public class UsuarioView implements Serializable {
 
     public void buscarPermisos() {
         log.info("buscarPermisos - UsuarioView");
-        this.usuarioPermisoList = usuarioPermisoService.findByUsuario(this.usuarioSelected);
+        this.usuarioPermisoList = usuarioPermisoService.findByUsuario(this.usuarioSelected, this.permisoFilter);
     }
 
     public void limpiarFiltrosPermisos() {
@@ -333,16 +332,4 @@ public class UsuarioView implements Serializable {
         }
     }
 
-    @ConfigPermiso(tipo = TipoPermiso.WRITE, codigo = "SEGURIDAD_USUARIOS_WRITE_ACTUALIZAR_PERMISOS",
-            nombre = "Actualizar permisos", descripcion = "Acción que permite buscar y actualizar los permisos del sistema.")
-    @PreAuthorize("hasAnyAuthority('ROLE_OWNER', 'SEGURIDAD_USUARIOS_WRITE_ACTUALIZAR_PERMISOS')")
-    public void actualizarPermisos() {
-        log.info("actualizarPermisos - UsuarioView");
-        List<Permiso> permisos = permisoScannerService.getPermisos("gob.yucatan.sicasy",
-                userSessionBean.getUserName());
-        permisoService.updateAll(permisos);
-        log.info("Permisos: {}", permisos.size());
-        this.buscarPermisos();
-        Messages.addInfo("Se ha actualizado el listado de permisos.");
-    }
 }

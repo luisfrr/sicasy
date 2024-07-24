@@ -21,27 +21,15 @@
                 <p:outputPanel styleClass="grid formgrid mb-2" style="width: 80%;">
 
                     <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4 xl:col-3">
-                        <p:outputLabel for="@next" value="CODIGO" styleClass="block"/>
+                        <p:outputLabel for="@next" value="Código" styleClass="block"/>
                         <p:inputText styleClass="block w-full" readonly="true"
                                      value="#{rolView.rolSelected.codigo}"/>
                     </p:outputPanel>
 
                     <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4 xl:col-3">
-                        <p:outputLabel for="@next" value="NOMBRE" styleClass="block"/>
+                        <p:outputLabel for="@next" value="Nombre" styleClass="block"/>
                         <p:inputText styleClass="block w-full" readonly="true"
                                      value="#{rolView.rolSelected.nombre}"/>
-                    </p:outputPanel>
-
-                    <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4 xl:col-3">
-                        <p:outputLabel for="@next" value="DESCRIPCION" styleClass="block"/>
-                        <p:inputText styleClass="block w-full" readonly="true"
-                                     value="#{rolView.rolSelected.descripcion}"/>
-                    </p:outputPanel>
-
-                    <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4 xl:col-3">
-                        <p:outputLabel for="@next" value="ESTATUS" styleClass="block"/>
-                        <p:inputText styleClass="block w-full" readonly="true"
-                                     value="#{rolView.rolSelected.estatus.label}"/>
                     </p:outputPanel>
 
                 </p:outputPanel>
@@ -76,8 +64,10 @@
                     <h:outputText value="#{bitacora.accion}"/>
                 </p:column>
 
-                <p:column headerText="Fecha" width="80">
-                    <h:outputText value="#{bitacora.fechaModificacion}"/>
+                <p:column headerText="Fecha" width="180">
+                    <h:outputText value="#{bitacora.fechaModificacion}">
+                        <f:convertDateTime pattern="dd/MM/yyyy HH:mm a"/>
+                    </h:outputText>
                 </p:column>
 
                 <p:column headerText="Realizado por" width="100">

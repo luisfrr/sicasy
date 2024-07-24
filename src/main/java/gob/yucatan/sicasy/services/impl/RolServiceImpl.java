@@ -61,6 +61,18 @@ public class RolServiceImpl implements IRolService {
     @Override
     @Transactional
     public void save(Rol rol) {
+
+        if(rol.getNombre() != null && !rol.getNombre().isEmpty()) {
+            // Se agrega validación si ya existe un rol con el mismo nombre
+            boolean existsByNombre = rolRepository.existsByNombreAndEstatus(rol.getNombre(), EstatusRegistro.ACTIVO);
+            if(existsByNombre)
+                throw new BadRequestException("Ya existe un rol con el nombre: " + rol.getNombre());
+
+            // Se agrega el código de acuerdo al nombre
+            String codigoRol = "ROLE_" + rol.getNombre().replace(" ", "_").toUpperCase();
+            rol.setCodigo(codigoRol);
+        }
+
         rol.setEstatus(EstatusRegistro.ACTIVO);
         rol.setFechaCreacion(new Date());
         Rol rolSaved = rolRepository.save(rol);
@@ -109,6 +121,17 @@ public class RolServiceImpl implements IRolService {
         if(rolOptional.isEmpty())
             throw new NotFoundException("Rol no encontrado");
 
+        if(rol.getNombre() != null && !rol.getNombre().isEmpty()) {
+            // Se agrega validación si ya existe un rol con el mismo nombre
+            boolean existsByNombre = rolRepository.existsByNombreAndEstatusAndIdRolNot(rol.getNombre(), EstatusRegistro.ACTIVO, rol.getIdRol());
+            if(existsByNombre)
+                throw new BadRequestException("Ya existe un rol con el nombre: " + rol.getNombre());
+
+            // Se agrega el código de acuerdo al nombre
+            String codigoRol = "ROLE_" + rol.getNombre().replace(" ", "_").toUpperCase();
+            rol.setCodigo(codigoRol);
+        }
+
         Rol rolToUpdate = rolOptional.get();
 
         // Se guarda en la bitacora
@@ -120,6 +143,8 @@ public class RolServiceImpl implements IRolService {
         rolToUpdate.setDescripcion(rol.getDescripcion());
         rolToUpdate.setFechaModificacion(new Date());
         rolToUpdate.setModificadoPor(rol.getModificadoPor());
+
+        rolRepository.save(rolToUpdate);
     }
 
 }

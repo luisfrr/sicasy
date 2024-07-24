@@ -37,23 +37,6 @@
       </p:outputPanel>
    </h:form>
 
-   <h:form id="form_toolbar_permisos" styleClass="mb-5">
-      <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'SEGURIDAD_USUARIOS_WRITE_ACTUALIZAR_PERMISOS')">
-         <p:toolbar>
-            <p:toolbarGroup>
-            </p:toolbarGroup>
-
-            <p:toolbarGroup align="right">
-               <p:commandButton value="Actualizar Permisos"
-                                ajax="true" action="#{usuarioView.actualizarPermisos()}"
-                                update="form_datatable_permisos"
-                                oncomplete="triStateCheckbox();"
-                                styleClass="ui-button-outlined" />
-            </p:toolbarGroup>
-         </p:toolbar>
-      </sec:authorize>
-   </h:form>
-
    <h:form id="form_filtros_permisos" styleClass="mb-5">
       <p:panel header="Filtros" widgetVar="panelFiltros"
                toggleable="true" toggleSpeed="500">

@@ -327,13 +327,14 @@
 
                     <sec:authorize access="hasAuthority('ROLE_OWNER')">
 
-                        <p:column headerText="Estatus" width="150">
+                        <p:column headerText="Estatus registro" width="150">
                             <h:outputText value="#{vehiculo.estatusRegistro.label}">
                             </h:outputText>
                         </p:column>
 
                         <p:column headerText="Fecha creación" width="150">
                             <h:outputText value="#{vehiculo.fechaCreacion}">
+                                <f:convertDateTime pattern="dd/MM/yyyy HH:mm:ss a"/>
                             </h:outputText>
                         </p:column>
 
@@ -344,6 +345,7 @@
 
                         <p:column headerText="Fecha modificación" width="150">
                             <h:outputText value="#{vehiculo.fechaModificacion}">
+                                <f:convertDateTime pattern="dd/MM/yyyy HH:mm:ss a"/>
                             </h:outputText>
                         </p:column>
 
@@ -354,6 +356,7 @@
 
                         <p:column headerText="Fecha borrado" width="150">
                             <h:outputText value="#{vehiculo.fechaBorrado}">
+                                <f:convertDateTime pattern="dd/MM/yyyy HH:mm:ss a"/>
                             </h:outputText>
                         </p:column>
 
