@@ -27,7 +27,7 @@
             </h:form>
 
             <h:form id="form_toolbar" styleClass="mb-5">
-                <sec:authorize access="hasAnyAuthority('ROLE_OWNER', '', '', '', '', '', '')">
+                <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'SINIESTRO_WRITE_REGISTRO_SINIESTRO', 'SINIESTRO_WRITE_SOLICITAR_PAGO_DEDUCIBLE', 'SINIESTRO_WRITE_AUTORIZAR_PAGO_DEDUCIBLE', 'SINIESTRO_WRITE_RECHAZAR_SOLICITUD', 'SINIESTRO_WRITE_FINALIZAR_REGISTRO', 'SINIESTRO_READ_EXPORTAR')">
                     <p:toolbar>
                         <p:toolbarGroup>
                             <p:commandButton id="btn_acciones_siniestros" type="button" value="Acciones"
