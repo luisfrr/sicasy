@@ -1,7 +1,6 @@
 package gob.yucatan.sicasy;
 
 import gob.yucatan.sicasy.business.entities.Permiso;
-import gob.yucatan.sicasy.repository.iface.IPermisoRepository;
 import gob.yucatan.sicasy.services.iface.IPermisoScannerService;
 import gob.yucatan.sicasy.services.iface.IPermisoService;
 import lombok.RequiredArgsConstructor;
