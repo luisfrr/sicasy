@@ -27,7 +27,7 @@
             </h:form>
 
             <h:form id="form_toolbar" styleClass="mb-5">
-                <sec:authorize access="hasAnyAuthority('ROLE_OWNER', '', '', '', '', '', '')">
+                <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'SINIESTRO_WRITE_REGISTRO_SINIESTRO', 'SINIESTRO_WRITE_SOLICITAR_PAGO_DEDUCIBLE', 'SINIESTRO_WRITE_AUTORIZAR_PAGO_DEDUCIBLE', 'SINIESTRO_WRITE_RECHAZAR_SOLICITUD', 'SINIESTRO_WRITE_FINALIZAR_REGISTRO', 'SINIESTRO_READ_EXPORTAR')">
                     <p:toolbar>
                         <p:toolbarGroup>
                             <p:commandButton id="btn_acciones_siniestros" type="button" value="Acciones"
@@ -65,7 +65,8 @@
                                                  iconPos="right" icon="fi fi-rr-angle-small-down" styleClass="ui-button-outlined"/>
                                 <p:menu overlay="true" trigger="btn_exportar_siniestros" my="left top" at="left bottom" maxHeight="250">
                                     <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'SINIESTRO_READ_EXPORTAR')">
-                                        <p:menuitem value="Exportar vehículos" ajax="false" onclick="PrimeFaces.monitorDownload(start, stop);">
+                                        <p:menuitem value="Exportar siniestros" ajax="false" onclick="PrimeFaces.monitorDownload(start, stop);"
+                                                    disabled="#{siniestrosView.siniestroList == null or siniestrosView.siniestroList.size() == 0}">
                                             <p:fileDownload value="#{fileDownloadBean.downloadFile(siniestrosView.exportarSiniestros())}"/>
                                         </p:menuitem>
                                     </sec:authorize>
@@ -162,9 +163,9 @@
                         <p:outputPanel styleClass="flex flex-row gap-4 justify-content-end">
                             <p:commandButton value="Limpiar filtros" styleClass="ui-button-outlined"
                                              ajax="true" action="#{siniestrosView.limpiarFiltros()}"
-                                             update="form_filtros form_datatable"/>
+                                             update="form_filtros form_datatable form_toolbar"/>
                             <p:commandButton value="Buscar" ajax="true" action="#{siniestrosView.buscar()}"
-                                             update="form_datatable"/>
+                                             update="form_datatable form_toolbar"/>
                         </p:outputPanel>
                     </f:facet>
                 </p:panel>

@@ -12,6 +12,7 @@ public interface IIncisoService {
 
     List<Inciso> findAllDynamic(Inciso inciso);
     List<Inciso> findByIdPoliza(Long idPoliza);
+    List<Inciso> findByIdPolizaList(List<Long> idPoliza);
     List<Inciso> findByIdVehiculo(Long idVehiculo);
     Inciso findById(Long id);
 

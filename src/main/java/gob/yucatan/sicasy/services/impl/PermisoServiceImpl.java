@@ -1,6 +1,9 @@
 package gob.yucatan.sicasy.services.impl;
 
 import gob.yucatan.sicasy.business.entities.Permiso;
+import gob.yucatan.sicasy.business.entities.Permiso_;
+import gob.yucatan.sicasy.repository.criteria.SearchCriteria;
+import gob.yucatan.sicasy.repository.criteria.SearchOperation;
 import gob.yucatan.sicasy.repository.criteria.SearchSpecification;
 import gob.yucatan.sicasy.repository.iface.IPermisoRepository;
 import gob.yucatan.sicasy.services.iface.IPermisoService;
@@ -21,6 +24,19 @@ public class PermisoServiceImpl implements IPermisoService {
     @Override
     public List<Permiso> findAllDynamic(Permiso permiso) {
         SearchSpecification<Permiso> specification = new SearchSpecification<>();
+
+        if(permiso.getNombre() != null && !permiso.getNombre().isEmpty()){
+            specification.add(new SearchCriteria(SearchOperation.MATCH,
+                    permiso.getNombre(),
+                    Permiso_.NOMBRE));
+        }
+
+        if(permiso.getEstatus() != null){
+            specification.add(new SearchCriteria(SearchOperation.EQUAL,
+                    permiso.getEstatus(),
+                    Permiso_.ESTATUS));
+        }
+
         return permisoRepository.findAll(specification);
     }
 

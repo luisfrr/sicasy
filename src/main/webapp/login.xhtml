@@ -10,6 +10,16 @@
 
 <ui:define name="content">
 
+    <script>
+        function callbackCaptcha(response) {
+            // Aquí puedes realizar cualquier lógica adicional que necesites
+            const captchaValid = (response !== null);
+            if(captchaValid) {
+                PF('btnLogin').enable();
+            }
+        }
+    </script>
+
     <p:outputPanel styleClass="card card-login m-4">
 
         <h5 class="text-center uppercase m-0">#{appBean.appName}</h5>
@@ -21,10 +31,14 @@
             <p:inputText placeholder="Usuario" id="username" styleClass="w-full" required="true"/>
             <p:password placeholder="Contraseña" id="password" styleClass="w-full mb-4" required="true"/>
 
-            <p:captcha required="true" theme="light" language="es" rendered="false"/>
+            <p:captcha required="true" theme="light" language="es"
+                       value="#{loginView.captcha}" callback="callbackCaptcha"
+                       valueChangeListener="#{loginView.onChangeCaptcha()}"/>
 
             <div class="flex justify-content-center mt-4">
-                <p:commandButton value="Continuar" ajax="false" validateClient="true"/>
+                <p:commandButton id="btnLogin" widgetVar="btnLogin" value="Continuar"
+                                 ajax="false" validateClient="true"
+                                 disabled="#{not loginView.captcha}"/>
             </div>
 
         </h:form>

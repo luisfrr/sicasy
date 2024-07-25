@@ -54,11 +54,12 @@ public class UsuarioPermisoServiceImpl implements IUsuarioPermisoService {
     }
 
     @Override
-    public List<UsuarioPermiso> findByUsuario(Usuario usuario) {
+    public List<UsuarioPermiso> findByUsuario(Usuario usuario, Permiso permisoFilter) {
 
         // Se buscan todos los permisos activos de la aplicacion
         List<Permiso> permisoList = permisoService.findAllDynamic(Permiso.builder()
                 .estatus(EstatusRegistro.ACTIVO)
+                .nombre(permisoFilter.getNombre())
                 .build());
 
         // Se buscan todos los permisos que tiene asignado el usuario

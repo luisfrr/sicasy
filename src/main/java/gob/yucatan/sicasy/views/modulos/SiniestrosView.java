@@ -8,6 +8,8 @@ import gob.yucatan.sicasy.business.exceptions.BadRequestException;
 import gob.yucatan.sicasy.business.exceptions.NotFoundException;
 import gob.yucatan.sicasy.services.iface.*;
 import gob.yucatan.sicasy.utils.export.ExportFile;
+import gob.yucatan.sicasy.utils.export.excel.models.*;
+import gob.yucatan.sicasy.utils.export.excel.services.iface.IGeneratorExcelFile;
 import gob.yucatan.sicasy.utils.imports.excel.SaveFile;
 import gob.yucatan.sicasy.views.beans.Messages;
 import gob.yucatan.sicasy.views.beans.UserSessionBean;
@@ -17,6 +19,10 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.poi.ss.usermodel.HorizontalAlignment;
+import org.apache.poi.ss.usermodel.VerticalAlignment;
+import org.apache.poi.xssf.usermodel.XSSFCellStyle;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.primefaces.PrimeFaces;
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.model.ResponsiveOption;
@@ -26,6 +32,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
@@ -64,6 +71,7 @@ public class SiniestrosView implements Serializable {
     private final ISiniestroFotoService siniestroFotoService;
     private final IBitacoraSiniestroService bitacoraSiniestroService;
     private final IDeducibleService deducibleService;
+    private final IGeneratorExcelFile generatorExcelFile;
 
     // Variables Generales
     private @Getter String title;
@@ -133,8 +141,104 @@ public class SiniestrosView implements Serializable {
     @ConfigPermiso(tipo = TipoPermiso.READ, codigo = "SINIESTRO_READ_EXPORTAR", orden = 1,
             nombre = "Exportar siniestros", descripcion = "Acción que permite exportar los registros de siniestros en un archivo Excel.")
     @PreAuthorize("hasAnyAuthority('ROLE_OWNER', 'SINIESTRO_WRITE_REGISTRO_SINIESTRO')")
-    public ExportFile exportarSiniestros() {
-        return null;
+    public ExportFile exportarSiniestros() throws IOException {
+        log.info("exportarSiniestros - SiniestrosView");
+        if(this.siniestroList != null && !this.siniestroList.isEmpty()) {
+
+            List<ExcelCell> cellList = new ArrayList<>();
+
+            XSSFWorkbook workbook = generatorExcelFile.createWorkbook();
+
+            XSSFCellStyle centerTopStyle = generatorExcelFile.createCellStyle(CreateCellStyle.builder()
+                    .workbook(workbook)
+                    .fontSize(12)
+                    .fontColor(ExcelFontColor.BLACK)
+                    .horizontalAlignment(HorizontalAlignment.CENTER)
+                    .verticalAlignment(VerticalAlignment.TOP)
+                    .backgroundColor(ExcelBackgroundColor.NO_BG_COLOR)
+                    .dataFormat("0")
+                    .build());
+
+            XSSFCellStyle centerFloatTopStyle = generatorExcelFile.createCellStyle(CreateCellStyle.builder()
+                    .workbook(workbook)
+                    .fontSize(12)
+                    .fontColor(ExcelFontColor.BLACK)
+                    .horizontalAlignment(HorizontalAlignment.CENTER)
+                    .verticalAlignment(VerticalAlignment.TOP)
+                    .backgroundColor(ExcelBackgroundColor.NO_BG_COLOR)
+                    .dataFormat("0.00")
+                    .build());
+
+            XSSFCellStyle centerDateTopStyle = generatorExcelFile.createCellStyle(CreateCellStyle.builder()
+                    .workbook(workbook)
+                    .fontSize(12)
+                    .fontColor(ExcelFontColor.BLACK)
+                    .horizontalAlignment(HorizontalAlignment.CENTER)
+                    .verticalAlignment(VerticalAlignment.TOP)
+                    .backgroundColor(ExcelBackgroundColor.NO_BG_COLOR)
+                    .dataFormat("dd/MM/yyyy hh:mm")
+                    .build());
+
+            XSSFCellStyle leftTopStyle = generatorExcelFile.createCellStyle(CreateCellStyle.builder()
+                    .workbook(workbook)
+                    .fontSize(12)
+                    .fontColor(ExcelFontColor.BLACK)
+                    .horizontalAlignment(HorizontalAlignment.LEFT)
+                    .verticalAlignment(VerticalAlignment.TOP)
+                    .backgroundColor(ExcelBackgroundColor.NO_BG_COLOR)
+                    .isWrapText(true)
+                    .build());
+
+            cellList.add(ExcelCell.builder().columnName("ID").propertyExpression(Siniestro_.ID_SINIESTRO).cellStyle(centerTopStyle).cellAutoSize(true).build());
+            cellList.add(ExcelCell.builder().columnName("NO. SINIESTRO").propertyExpression(Siniestro_.NO_SINIESTRO_ASEGURADORA).cellStyle(leftTopStyle).cellAutoSize(true).build());
+            cellList.add(ExcelCell.builder().columnName("NO. SINIESTRO SAF").propertyExpression(Siniestro_.NO_SINIESTRO_SA_F).cellStyle(leftTopStyle).cellAutoSize(true).build());
+            cellList.add(ExcelCell.builder().columnName("FECHA SINIESTRO").propertyExpression(Siniestro_.FECHA_SINIESTRO).cellStyle(centerDateTopStyle).cellAutoSize(true).build());
+            cellList.add(ExcelCell.builder().columnName("RESPONSABLE").propertyExpression(Siniestro_.RESPONSABLE).cellStyle(leftTopStyle).cellAutoSize(true).build());
+            cellList.add(ExcelCell.builder().columnName("AJUSTADOR").propertyExpression(Siniestro_.AJUSTADOR_ASEGURADORA).cellStyle(leftTopStyle).cellAutoSize(true).build());
+            cellList.add(ExcelCell.builder().columnName("AJUSTADOR SAF").propertyExpression(Siniestro_.AJUSTADOR_SA_F).cellStyle(leftTopStyle).cellAutoSize(true).build());
+            cellList.add(ExcelCell.builder().columnName("CAUSA").propertyExpression(Siniestro_.CAUSA).cellStyle(leftTopStyle).cellAutoSize(true).build());
+            cellList.add(ExcelCell.builder().columnName("NO. SERIE").propertyExpression(String.join(".", Siniestro_.VEHICULO, Vehiculo_.NO_SERIE)).cellStyle(leftTopStyle).cellAutoSize(true).build());
+            cellList.add(ExcelCell.builder().columnName("MARCA").propertyExpression(String.join(".", Siniestro_.VEHICULO, Vehiculo_.MARCA)).cellStyle(leftTopStyle).cellAutoSize(true).build());
+            cellList.add(ExcelCell.builder().columnName("MODELO").propertyExpression(String.join(".", Siniestro_.VEHICULO, Vehiculo_.MODELO)).cellStyle(leftTopStyle).cellAutoSize(true).build());
+            cellList.add(ExcelCell.builder().columnName("AÑO").propertyExpression(String.join(".", Siniestro_.VEHICULO, Vehiculo_.ANIO)).cellStyle(leftTopStyle).cellAutoSize(true).build());
+            cellList.add(ExcelCell.builder().columnName("REPORTA").propertyExpression(Siniestro_.REPORTA).cellStyle(leftTopStyle).cellAutoSize(true).build());
+            cellList.add(ExcelCell.builder().columnName("FECHA REPORTE").propertyExpression(Siniestro_.FECHA_REPORTE).cellStyle(centerDateTopStyle).cellAutoSize(true).build());
+            cellList.add(ExcelCell.builder().columnName("DECLARACIÓN").propertyExpression(Siniestro_.DECLARACION_SINIESTRO).cellStyle(leftTopStyle).cellAutoSize(true).build());
+            cellList.add(ExcelCell.builder().columnName("CONDUCTOR").propertyExpression(Siniestro_.CONDUCTOR).cellStyle(leftTopStyle).cellAutoSize(true).build());
+            cellList.add(ExcelCell.builder().columnName("NO. LICENCIA").propertyExpression(Siniestro_.NO_LICENCIA).cellStyle(leftTopStyle).cellAutoSize(true).build());
+            cellList.add(ExcelCell.builder().columnName("TIPO LICENCIA").propertyExpression(Siniestro_.TIPO_LICENCIA).cellStyle(leftTopStyle).cellAutoSize(true).build());
+            cellList.add(ExcelCell.builder().columnName("VENCIMIENTO LICENCIA").propertyExpression(Siniestro_.VENCIMIENTO_LICENCIA).cellStyle(centerDateTopStyle).cellAutoSize(true).build());
+            cellList.add(ExcelCell.builder().columnName("DAÑO VÍA PÚBLICA").propertyExpression(Siniestro_.DANIO_VIA_PUBLICA + " == 1 ? 'Sí' : 'No'").cellStyle(centerTopStyle).cellAutoSize(true).build());
+            cellList.add(ExcelCell.builder().columnName("CORRALÓN").propertyExpression(Siniestro_.CORRALON + " == 1 ? 'Sí' : 'No'").cellStyle(centerTopStyle).cellAutoSize(true).build());
+            cellList.add(ExcelCell.builder().columnName("MULTA").propertyExpression(Siniestro_.MULTA_VEHICULO + " == 1 ? 'Sí' : 'No'").cellStyle(centerTopStyle).cellAutoSize(true).build());
+            cellList.add(ExcelCell.builder().columnName("ESTADO").propertyExpression(Siniestro_.ESTADO).cellStyle(leftTopStyle).cellAutoSize(true).build());
+            cellList.add(ExcelCell.builder().columnName("MUNICIPIO").propertyExpression(Siniestro_.MUNICIPIO).cellStyle(leftTopStyle).cellAutoSize(true).build());
+            cellList.add(ExcelCell.builder().columnName("LOCALIDAD").propertyExpression(Siniestro_.LOCALIDAD).cellStyle(leftTopStyle).cellAutoSize(true).build());
+            cellList.add(ExcelCell.builder().columnName("ESTATUS SINIESTRO").propertyExpression(String.join(".", Siniestro_.ESTATUS_SINIESTRO, EstatusSiniestro_.NOMBRE)).cellStyle(leftTopStyle).cellAutoSize(true).build());
+            cellList.add(ExcelCell.builder().columnName("OBSERVACIONES").propertyExpression(Siniestro_.OBSERVACIONES).cellStyle(leftTopStyle).cellAutoSize(true).build());
+            cellList.add(ExcelCell.builder().columnName("PERDIDA TOTAL").propertyExpression(Siniestro_.PERDIDA_TOTAL + " == 1 ? 'Sí' : 'No'").cellStyle(centerTopStyle).cellAutoSize(true).build());
+            cellList.add(ExcelCell.builder().columnName("REQUIERE PAGO DE DEDUCIBLE").propertyExpression("requierePagoDeducible() ? 'Sí' : 'No'").cellStyle(centerTopStyle).cellAutoSize(true).build());
+            cellList.add(ExcelCell.builder().columnName("VEHÍCULO VALOR FACTURA").propertyExpression("requierePagoDeducible() ? deducible.vehiculoValorFactura : ''").cellStyle(leftTopStyle).cellAutoSize(true).build());
+            cellList.add(ExcelCell.builder().columnName("VEHÍCULO VALOR ACTUAL").propertyExpression("requierePagoDeducible() ? deducible.valorActual : ''").cellStyle(leftTopStyle).cellAutoSize(true).build());
+            cellList.add(ExcelCell.builder().columnName("PÓLIZA").propertyExpression("requierePagoDeducible() ? deducible.polizaNumero : ''").cellStyle(leftTopStyle).cellAutoSize(true).build());
+            cellList.add(ExcelCell.builder().columnName("INCISO").propertyExpression("requierePagoDeducible() ? deducible.incisoNumero : ''").cellStyle(leftTopStyle).cellAutoSize(true).build());
+            cellList.add(ExcelCell.builder().columnName("TIPO DEDUCIBLE").propertyExpression("requierePagoDeducible() ? (deducible.tienePolizaVigente == 1 ? 'Sí' : 'No')  : ''").cellStyle(leftTopStyle).cellAutoSize(true).build());
+            cellList.add(ExcelCell.builder().columnName("COSTO TOTAL DEDUCIBLE").propertyExpression("requierePagoDeducible() ? deducible.costoTotalDeducible : ''").cellStyle(centerFloatTopStyle).cellAutoSize(true).build());
+
+            ExcelDataSheet excelDataSheet = ExcelDataSheet.builder()
+                    .data(this.siniestroList)
+                    .cells(cellList)
+                    .sheetName("SINIESTRO")
+                    .filename("siniestros")
+                    .autoFilter(true)
+                    .agregarFechaGeneracion(true)
+                    .appName("SICASY")
+                    .build();
+
+            return generatorExcelFile.createExcelFile(workbook, excelDataSheet);
+        }
+
+        return new ExportFile();
     }
 
     @ConfigPermiso(tipo = TipoPermiso.WRITE, codigo = "SINIESTRO_WRITE_REGISTRAR_SINIESTRO", orden = 1,

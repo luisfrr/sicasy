@@ -44,7 +44,7 @@
                     </p:commandLink>
                 </sec:authorize>
 
-                <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'CATALOGO_ASEGURADORA_VIEW')">
+                <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'CAT_ASEGURADORA_VIEW')">
                     <p:commandLink styleClass="menu-item" ajax="false" action="#{menuSessionBean.goToAseguradoras()}">
                         <div class="icon">
                             <i class="fi fi-rr-shield"/>
@@ -53,7 +53,7 @@
                     </p:commandLink>
                 </sec:authorize>
 
-                <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'CATALOGO_LICITACION_VIEW')">
+                <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'CAT_LICITACION_VIEW')">
                     <p:commandLink styleClass="menu-item" ajax="false" action="#{menuSessionBean.goToLicitaciones()}">
                         <div class="icon">
                             <i class="fi-rr-poll-h"/>
@@ -62,7 +62,7 @@
                     </p:commandLink>
                 </sec:authorize>
 
-                <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'CATALOGO_ANEXO_VIEW')">
+                <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'CAT_ANEXO_VIEW')">
                     <p:commandLink styleClass="menu-item" ajax="false" action="#{menuSessionBean.goToAnexos()}">
                         <div class="icon">
                             <i class="fi-rr-document-signed"/>

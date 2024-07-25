@@ -14,6 +14,9 @@ import gob.yucatan.sicasy.services.iface.IAseguradoraService;
 import gob.yucatan.sicasy.services.iface.IIncisoService;
 import gob.yucatan.sicasy.services.iface.IPolizaService;
 import gob.yucatan.sicasy.services.iface.IVehiculoService;
+import gob.yucatan.sicasy.utils.export.ExportFile;
+import gob.yucatan.sicasy.utils.export.excel.models.*;
+import gob.yucatan.sicasy.utils.export.excel.services.iface.IGeneratorExcelFile;
 import gob.yucatan.sicasy.utils.imports.excel.ConfigHeaderExcelModel;
 import gob.yucatan.sicasy.utils.imports.excel.ImportExcelFile;
 import gob.yucatan.sicasy.utils.imports.excel.SaveFile;
@@ -24,6 +27,10 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.poi.ss.usermodel.HorizontalAlignment;
+import org.apache.poi.ss.usermodel.VerticalAlignment;
+import org.apache.poi.xssf.usermodel.XSSFCellStyle;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.primefaces.PrimeFaces;
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.model.file.UploadedFile;
@@ -32,6 +39,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
@@ -50,8 +58,10 @@ import java.util.Objects;
 public class PolizaView implements Serializable {
 
     // Constantes
-    @Value("${app.files.folder.layouts.importar-vehiculo}")
-    private @Getter String LAYOUT_POLIZAS;
+    @Value("${app.files.folder.layouts.importar-registro-poliza}")
+    private @Getter String LAYOUT_REGISTRO_POLIZA;
+    @Value("${app.files.folder.layouts.importar-endoso-alta}")
+    private @Getter String LAYOUT_ENDOSO_ALTA;
     @Value("${app.files.folder.polizas_facturas}")
     private @Getter String FOLDER_POLIZAS_FACTURAS;
     @Value("${app.files.folder.polizas}")
@@ -67,6 +77,7 @@ public class PolizaView implements Serializable {
     private final IAseguradoraService aseguradoraService;
     private final IIncisoService incisoService;
     private final IVehiculoService vehiculoService;
+    private final IGeneratorExcelFile generatorExcelFile;
 
     // Variables Generales
     private @Getter String title;
@@ -137,11 +148,16 @@ public class PolizaView implements Serializable {
     @ConfigPermisoArray({
             @ConfigPermiso(tipo = TipoPermiso.READ, codigo = "POLIZA_READ_DESCARGAR_POLIZA", orden = 2,
                     nombre = "Descargar póliza", descripcion = "Permite descargar la póliza en formato PDF"),
+            @ConfigPermiso(tipo = TipoPermiso.READ, codigo = "POLIZA_READ_EXPORTAR_LAYOUT_REGISTRO_POLIZA", orden = 5,
+                    nombre = "Exportar layout registro póliza", descripcion = "Permite exportar el layout de registro de pólizas"),
+            @ConfigPermiso(tipo = TipoPermiso.READ, codigo = "POLIZA_READ_EXPORTAR_LAYOUT_ENDOSO_ALTA", orden = 6,
+                    nombre = "Exportar layout endoso alta", descripcion = "Permite exportar el layout de endoso de alta"),
     })
     public void buscar() {
         log.info("buscar - PolizaView");
         this.polizaList = polizaService.findAll(this.polizaFilter);
-        PrimeFaces.current().ajax().update("form_datatable");
+        this.incisoList = new ArrayList<>();
+        PrimeFaces.current().ajax().update("form_datatable", "form_datatable_incisos");
     }
 
     @ConfigPermiso(tipo = TipoPermiso.READ, codigo = "POLIZA_READ_VER_INCISOS", orden = 1,
@@ -916,6 +932,70 @@ public class PolizaView implements Serializable {
         }
     }
 
+    @ConfigPermiso(tipo = TipoPermiso.READ, codigo = "POLIZA_READ_EXPORTAR_POLIZAS", orden = 3,
+            nombre = "Exportar pólizas", descripcion = "Acción que permite descargar los registros de las pólizas filtradas en un formato Excel.")
+    @PreAuthorize("hasAnyAuthority('ROLE_OWNER', 'POLIZA_READ_EXPORTAR_POLIZAS')")
+    public ExportFile exportarPolizas() throws IOException {
+        log.info("exportarPolizas - PolizaView");
+
+        if(this.polizaList != null && !this.polizaList.isEmpty()) {
+
+            XSSFWorkbook workbook = generatorExcelFile.createWorkbook();
+
+            List<Long> idPolizaList = this.polizaList.stream()
+                    .map(Poliza::getIdPoliza)
+                    .toList();
+            List<Inciso> incisos = incisoService.findByIdPolizaList(idPolizaList);
+
+            List<ExcelCell> cellList = this.getExcelCell(workbook);
+
+            ExcelDataSheet excelDataSheet = ExcelDataSheet.builder()
+                    .data(incisos)
+                    .cells(cellList)
+                    .sheetName("POLIZAS")
+                    .filename("polizas")
+                    .autoFilter(true)
+                    .agregarFechaGeneracion(true)
+                    .appName("SICASY")
+                    .build();
+
+            return generatorExcelFile.createExcelFile(workbook, excelDataSheet);
+        }
+
+        return new ExportFile();
+    }
+
+    @ConfigPermiso(tipo = TipoPermiso.READ, codigo = "POLIZA_READ_EXPORTAR_POLIZA_INCISO", orden = 4,
+            nombre = "Exportar incisos de una póliza", descripcion = "Acción que permite descargar los registros de los incisos de una póliza seleccionada en un formato Excel.")
+    @PreAuthorize("hasAnyAuthority('ROLE_OWNER', 'POLIZA_READ_EXPORTAR_POLIZA_INCISO')")
+    public ExportFile exportarIncisos(Poliza poliza) throws IOException {
+        log.info("exportarIncisos - PolizaView");
+
+        if(this.polizaList != null && !this.polizaList.isEmpty()) {
+
+            XSSFWorkbook workbook = generatorExcelFile.createWorkbook();
+
+            List<Inciso> incisos = incisoService.findByIdPoliza(poliza.getIdPoliza());
+
+            List<ExcelCell> cellList = this.getExcelCell(workbook);
+
+            ExcelDataSheet excelDataSheet = ExcelDataSheet.builder()
+                    .data(incisos)
+                    .cells(cellList)
+                    .sheetName("POLIZAS")
+                    .filename("polizas")
+                    .autoFilter(true)
+                    .agregarFechaGeneracion(true)
+                    .appName("SICASY")
+                    .build();
+
+            return generatorExcelFile.createExcelFile(workbook, excelDataSheet);
+        }
+
+        return new ExportFile();
+    }
+
+
     //region events
 
     public void onChangeAseguradoraForm() {
@@ -943,6 +1023,70 @@ public class PolizaView implements Serializable {
         else {
             this.polizaFormList = new ArrayList<>();
         }
+    }
+
+    public List<ExcelCell> getExcelCell(XSSFWorkbook workbook) {
+        log.info("getExcelCell - PolizaView");
+
+        List<ExcelCell> cellList = new ArrayList<>();
+
+        XSSFCellStyle centerTopStyle = generatorExcelFile.createCellStyle(CreateCellStyle.builder()
+                .workbook(workbook)
+                .fontSize(12)
+                .fontColor(ExcelFontColor.BLACK)
+                .horizontalAlignment(HorizontalAlignment.CENTER)
+                .verticalAlignment(VerticalAlignment.TOP)
+                .backgroundColor(ExcelBackgroundColor.NO_BG_COLOR)
+                .dataFormat("0")
+                .build());
+
+        XSSFCellStyle centerFloatTopStyle = generatorExcelFile.createCellStyle(CreateCellStyle.builder()
+                .workbook(workbook)
+                .fontSize(12)
+                .fontColor(ExcelFontColor.BLACK)
+                .horizontalAlignment(HorizontalAlignment.CENTER)
+                .verticalAlignment(VerticalAlignment.TOP)
+                .backgroundColor(ExcelBackgroundColor.NO_BG_COLOR)
+                .dataFormat("0.00")
+                .build());
+
+        XSSFCellStyle centerDateTopStyle = generatorExcelFile.createCellStyle(CreateCellStyle.builder()
+                .workbook(workbook)
+                .fontSize(12)
+                .fontColor(ExcelFontColor.BLACK)
+                .horizontalAlignment(HorizontalAlignment.CENTER)
+                .verticalAlignment(VerticalAlignment.TOP)
+                .backgroundColor(ExcelBackgroundColor.NO_BG_COLOR)
+                .dataFormat("dd/MM/yyyy")
+                .build());
+
+        XSSFCellStyle leftTopStyle = generatorExcelFile.createCellStyle(CreateCellStyle.builder()
+                .workbook(workbook)
+                .fontSize(12)
+                .fontColor(ExcelFontColor.BLACK)
+                .horizontalAlignment(HorizontalAlignment.LEFT)
+                .verticalAlignment(VerticalAlignment.TOP)
+                .backgroundColor(ExcelBackgroundColor.NO_BG_COLOR)
+                .isWrapText(true)
+                .build());
+
+        cellList.add(ExcelCell.builder().columnName("ID").propertyExpression("idInciso").cellStyle(centerTopStyle).cellAutoSize(true).build());
+        cellList.add(ExcelCell.builder().columnName("ASEGURADORA").propertyExpression("poliza.aseguradora.nombre").cellStyle(leftTopStyle).cellAutoSize(true).build());
+        cellList.add(ExcelCell.builder().columnName("PÓLIZA").propertyExpression("poliza.numeroPoliza").cellStyle(centerTopStyle).cellAutoSize(true).build());
+        cellList.add(ExcelCell.builder().columnName("INCISO").propertyExpression("numeroInciso").cellStyle(centerTopStyle).cellAutoSize(true).build());
+        cellList.add(ExcelCell.builder().columnName("NO. SERIE").propertyExpression("vehiculo.noSerie").cellStyle(leftTopStyle).cellAutoSize(true).build());
+        cellList.add(ExcelCell.builder().columnName("FECHA INICIO").propertyExpression("fechaInicioVigencia").cellStyle(centerDateTopStyle).cellAutoSize(true).build());
+        cellList.add(ExcelCell.builder().columnName("FECHA FIN").propertyExpression("fechaFinVigencia").cellStyle(centerDateTopStyle).cellAutoSize(true).build());
+        cellList.add(ExcelCell.builder().columnName("COSTO").propertyExpression("costo").cellStyle(centerFloatTopStyle).cellAutoSize(true).build());
+        cellList.add(ExcelCell.builder().columnName("SALDO").propertyExpression("saldo").cellStyle(centerFloatTopStyle).cellAutoSize(true).build());
+        cellList.add(ExcelCell.builder().columnName("FRECUENCIA PAGO").propertyExpression("frecuenciaPago").cellStyle(centerFloatTopStyle).cellAutoSize(true).build());
+        cellList.add(ExcelCell.builder().columnName("BAJA PENDIENTE").propertyExpression("bajaPendienteSiniestro == 1 ? 'Sí' : 'No'").cellStyle(centerTopStyle).cellAutoSize(true).build());
+        cellList.add(ExcelCell.builder().columnName("TIENE NOTA DE CRÉDITO").propertyExpression("tieneNotaCredito == 1 ? 'Sí' : 'No'").cellStyle(centerTopStyle).cellAutoSize(true).build());
+        cellList.add(ExcelCell.builder().columnName("INCISO PAGO").propertyExpression("incisoPagado == 1 ? 'Sí' : 'No'").cellStyle(centerTopStyle).cellAutoSize(true).build());
+        cellList.add(ExcelCell.builder().columnName("ESTATUS").propertyExpression("estatusInciso.nombre").cellStyle(centerTopStyle).cellAutoSize(true).build());
+        cellList.add(ExcelCell.builder().columnName("OBSERVACIONES").propertyExpression("observaciones").cellStyle(centerTopStyle).cellAutoSize(true).build());
+
+        return cellList;
     }
 
     //endregion private methods

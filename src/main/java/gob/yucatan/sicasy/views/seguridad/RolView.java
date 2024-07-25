@@ -38,8 +38,6 @@ public class RolView {
     // Inyección de dependencias
     private final IRolService rolService;
     private final UserSessionBean userSessionBean;
-    private final IPermisoScannerService permisoScannerService;
-    private final IPermisoService permisoService;
     private final IRolPermisoService rolPermisoService;
     private final IBitacoraRolService bitacoraRolService;
 
@@ -190,6 +188,7 @@ public class RolView {
         this.showConfigurarPermisos = true;
         this.showPanelPrincipal = false;
         this.limpiarFiltrosPermisos();
+        this.buscarPermisos();
     }
 
     public void verBitacoraRol(Rol rol){
@@ -198,7 +197,7 @@ public class RolView {
 
         // recupera la bitacora de cambios del rol para la tabla
         this.bitacoraRolList = bitacoraRolService.findByRolId(rol.getIdRol())
-                .stream().sorted(Comparator.comparing(BitacoraRol::getFechaModificacion))
+                .stream().sorted(Comparator.comparing(BitacoraRol::getFechaModificacion).reversed())
                 .toList();
         log.info("bitacoraRolList: {}", bitacoraRolList.size());
 
@@ -216,16 +215,9 @@ public class RolView {
         this.limpiarFiltrosPermisos();
     }
 
-    public void regresarBitacoras(){
-        this.rolSelected = null;
-        this.showPanelBitacoraRol = false;
-        this.showPanelPrincipal = true;
-    }
-
-
     public void buscarPermisos() {
         log.info("buscarPermisos - RolView");
-        this.rolPermisoList = rolPermisoService.findByRol(this.rolSelected);
+        this.rolPermisoList = rolPermisoService.findByRol(this.rolSelected, this.permisoFilter);
     }
 
     public void limpiarFiltrosPermisos() {
@@ -247,19 +239,6 @@ public class RolView {
             log.error("Ocurrio un error al guardar el permiso del rol.", e);
             Messages.addError("Ocurrió un error. Intente de nuevo, si el problema persiste contacte al administrador.");
         }
-    }
-
-    @ConfigPermiso(tipo = TipoPermiso.WRITE, codigo = "SEGURIDAD_ROLES_WRITE_ACTUALIZAR_PERMISOS",
-            nombre = "Actualizar permisos", descripcion = "Acción que permite buscar y actualizar los permisos del sistema.")
-    @PreAuthorize("hasAnyAuthority('ROLE_OWNER', 'SEGURIDAD_ROLES_WRITE_ACTUALIZAR_PERMISOS')")
-    public void actualizarPermisos() {
-        log.info("actualizarPermisos - RolView");
-        List<Permiso> permisos = permisoScannerService.getPermisos("gob.yucatan.sicasy",
-                userSessionBean.getUserName());
-        permisoService.updateAll(permisos);
-        log.info("Permisos: {}", permisos.size());
-        this.buscarPermisos();
-        Messages.addInfo("Se ha actualizado el listado de permisos.");
     }
 
 }

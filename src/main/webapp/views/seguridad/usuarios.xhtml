@@ -158,8 +158,9 @@
 
                         <sec:authorize access="hasAuthority('ROLE_OWNER')">
 
-                            <p:column headerText="Fecha creación" width="150">
+                            <p:column headerText="Fecha creación" width="180">
                                 <h:outputText value="#{usuario.fechaCreacion}">
+                                    <f:convertDateTime pattern="dd/MM/yyyy HH:mm a"/>
                                 </h:outputText>
                             </p:column>
 
@@ -168,8 +169,9 @@
                                 </h:outputText>
                             </p:column>
 
-                            <p:column headerText="Fecha modificación" width="150">
+                            <p:column headerText="Fecha modificación" width="180">
                                 <h:outputText value="#{usuario.fechaModificacion}">
+                                    <f:convertDateTime pattern="dd/MM/yyyy HH:mm a"/>
                                 </h:outputText>
                             </p:column>
 
@@ -178,8 +180,9 @@
                                 </h:outputText>
                             </p:column>
 
-                            <p:column headerText="Fecha borrado" width="150">
+                            <p:column headerText="Fecha borrado" width="180">
                                 <h:outputText value="#{usuario.fechaBorrado}">
+                                    <f:convertDateTime pattern="dd/MM/yyyy HH:mm a"/>
                                 </h:outputText>
                             </p:column>
 
