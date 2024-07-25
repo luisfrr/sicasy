@@ -3,36 +3,56 @@ package gob.yucatan.sicasy.utils.strings;
 import lombok.extern.slf4j.Slf4j;
 
 import java.lang.reflect.Field;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 @Slf4j
 public class ReservedWordsReplace {
 
     private static final Set<String> RESERVED_WORDS = new HashSet<>(Arrays.asList(
-            // Java reserved words
-            "abstract", "continue", "for", "new", "switch", "assert", "default", "goto", "package", "synchronized",
-            "boolean", "do", "if", "private", "this", "break", "double", "implements", "protected", "throw",
-            "byte", "else", "import", "public", "throws", "case", "enum", "instanceof", "return", "transient",
-            "catch", "extends", "int", "short", "try", "char", "final", "interface", "static", "void",
-            "class", "finally", "long", "strictfp", "volatile", "const", "float", "native", "super", "while",
-            // PostgreSQL reserved words
-            "ALL", "ANALYSE", "ANALYZE", "AND", "ANY", "ARRAY", "AS", "ASC", "ASYMMETRIC", "AUTHORIZATION", "BINARY", "BOTH",
-            "CASE", "CAST", "CHECK", "COLLATE", "COLUMN", "CONCURRENTLY", "CONSTRAINT", "CREATE", "CROSS", "CURRENT_CATALOG",
-            "CURRENT_DATE", "CURRENT_ROLE", "CURRENT_TIME", "CURRENT_TIMESTAMP", "CURRENT_USER", "DEFAULT", "DEFERRABLE", "DESC",
-            "DISTINCT", "DO", "ELSE", "END", "EXCEPT", "FALSE", "FETCH", "FOR", "FOREIGN", "FREEZE", "FROM", "FULL", "GRANT",
-            "GROUP", "HAVING", "ILIKE", "IN", "INITIALLY", "INNER", "INTERSECT", "INTO", "IS", "ISNULL", "JOIN", "LATERAL",
-            "LEADING", "LEFT", "LIKE", "LIMIT", "LOCALTIME", "LOCALTIMESTAMP", "NATURAL", "NOT", "NULL", "OFFSET", "ON",
-            "ONLY", "OR", "ORDER", "OUTER", "OVERLAPS", "PLACING", "PRIMARY", "REFERENCES", "RETURNING", "RIGHT", "SELECT",
-            "SESSION_USER", "SIMILAR", "SOME", "SYMMETRIC", "TABLE", "THEN", "TO", "TRAILING", "TRUE", "UNION", "UNIQUE",
-            "USER", "USING", "VARIADIC", "VERBOSE", "WHEN", "WHERE", "WINDOW", "WITH", "CHECKPOINT", "CLOSE", "CLUSTER", "COMMENT",
-            "COPY", "DISCARD", "EXECUTE", "EXPLAIN", "LISTEN", "LOAD", "LOCK", "MOVE", "NOTIFY", "PREPARE", "REASSIGN", "REINDEX",
-            "RESET", "REVOKE", "RULE", "SAVEPOINT", "SECURITY", "SET", "SHOW", "START", "TRUNCATE", "UNLISTEN", "VACUUM",
-            // Programming symbols
-            "+", "-", "*", "/", "%", "=", "==", "!=", "<", ">", "<=", ">=", "&&", "||", "!", "&", "|", "^", "~", "<<", ">>", ">>>",
-            "++", "--", "->", "::", "?", ":", ".", ",", ";", "(", ")", "{", "}", "[", "]"
+            "create", "insert", "update", "delete", "drop", "alter", "select", "union",
+            "grant", "truncate", "between", "or", "jquery", "javascript"
     ));
+
+    private static final Map<String, String> SYMBOLS_TO_HTML = new HashMap<>();
+    static {
+        SYMBOLS_TO_HTML.put("+", "&plus;");
+        SYMBOLS_TO_HTML.put("-", "&minus;");
+        SYMBOLS_TO_HTML.put("*", "&ast;");
+        SYMBOLS_TO_HTML.put("/", "&sol;");
+        SYMBOLS_TO_HTML.put("%", "&percnt;");
+        SYMBOLS_TO_HTML.put("=", "&equals;");
+        SYMBOLS_TO_HTML.put("==", "&equals;&equals;");
+        SYMBOLS_TO_HTML.put("!=", "&excl;&equals;");
+        SYMBOLS_TO_HTML.put("<", "&lt;");
+        SYMBOLS_TO_HTML.put(">", "&gt;");
+        SYMBOLS_TO_HTML.put("<=", "&lt;&equals;");
+        SYMBOLS_TO_HTML.put(">=", "&gt;&equals;");
+        SYMBOLS_TO_HTML.put("&&", "&amp;&amp;");
+        SYMBOLS_TO_HTML.put("||", "&vert;&vert;");
+        SYMBOLS_TO_HTML.put("!", "&excl;");
+        SYMBOLS_TO_HTML.put("&", "&amp;");
+        SYMBOLS_TO_HTML.put("|", "&vert;");
+        SYMBOLS_TO_HTML.put("^", "&circ;");
+        SYMBOLS_TO_HTML.put("~", "&tilde;");
+        SYMBOLS_TO_HTML.put("<<", "&lt;&lt;");
+        SYMBOLS_TO_HTML.put(">>", "&gt;&gt;");
+        SYMBOLS_TO_HTML.put(">>>", "&gt;&gt;&gt;");
+        SYMBOLS_TO_HTML.put("++", "&plus;&plus;");
+        SYMBOLS_TO_HTML.put("--", "&minus;&minus;");
+        SYMBOLS_TO_HTML.put("->", "&minus;&gt;");
+        SYMBOLS_TO_HTML.put("::", "&colon;&colon;");
+        SYMBOLS_TO_HTML.put("?", "&quest;");
+        SYMBOLS_TO_HTML.put(":", "&colon;");
+        SYMBOLS_TO_HTML.put(".", "&period;");
+        SYMBOLS_TO_HTML.put(",", "&comma;");
+        SYMBOLS_TO_HTML.put(";", "&semi;");
+        SYMBOLS_TO_HTML.put("(", "&lpar;");
+        SYMBOLS_TO_HTML.put(")", "&rpar;");
+        SYMBOLS_TO_HTML.put("{", "&lcub;");
+        SYMBOLS_TO_HTML.put("}", "&rcub;");
+        SYMBOLS_TO_HTML.put("[", "&lsqb;");
+        SYMBOLS_TO_HTML.put("]", "&rsqb;");
+    }
 
     public static void processEntity(Object entity) {
         Field[] fields = entity.getClass().getDeclaredFields();
@@ -42,23 +62,26 @@ public class ReservedWordsReplace {
                 try {
                     String value = (String) field.get(entity);
                     if (value != null) {
-                        String newValue = replaceReservedWords(value);
+                        String newValue = replaceReservedWordsAndSymbols(value);
                         field.set(entity, newValue);
                     } else {
-                        log.info("El campo " + field.getName() + " es nulo.");
+                        System.out.println("El campo " + field.getName() + " es nulo.");
                     }
                 } catch (IllegalAccessException e) {
-                    log.error(e.getMessage(), e);
+                    log.warn("No se pudo remplazar el campo " + field.getName(), e);
                 }
             }
         }
     }
 
-    private static String replaceReservedWords(String value) {
+    private static String replaceReservedWordsAndSymbols(String value) {
         for (String reservedWord : RESERVED_WORDS) {
             if (value.contains(reservedWord)) {
                 value = value.replaceAll("\\b" + reservedWord + "\\b", "");
             }
+        }
+        for (Map.Entry<String, String> entry : SYMBOLS_TO_HTML.entrySet()) {
+            value = value.replace(entry.getKey(), entry.getValue());
         }
         return value;
     }
