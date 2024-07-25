@@ -50,11 +50,12 @@ public class RolPermisoServiceImpl implements IRolPermisoService {
     }
 
     @Override
-    public List<RolPermiso> findByRol(Rol rol) {
+    public List<RolPermiso> findByRol(Rol rol, Permiso permisoFilter) {
 
         // Se buscan todos los permisos activos de la aplicacion
         List<Permiso> permisoList = permisoService.findAllDynamic(Permiso.builder()
                 .estatus(EstatusRegistro.ACTIVO)
+                .nombre(permisoFilter.getNombre())
                 .build());
 
         // Se buscan todos los permisos que tiene asignado el rol

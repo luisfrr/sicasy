@@ -80,7 +80,8 @@
                                                  iconPos="right" icon="fi fi-rr-angle-small-down" styleClass="ui-button-outlined"/>
                                 <p:menu overlay="true" trigger="btn_descarga_vehiculos" my="left top" at="left bottom" maxHeight="250">
                                     <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'VEHICULOS_READ_EXPORTAR_VEHICULOS')">
-                                        <p:menuitem value="Exportar vehículos" ajax="false" onclick="PrimeFaces.monitorDownload(start, stop);">
+                                        <p:menuitem value="Exportar vehículos" ajax="false" onclick="PrimeFaces.monitorDownload(start, stop);"
+                                                    disabled="#{vehiculoView.vehiculoList == null or vehiculoView.vehiculoList.size() == 0}">
                                             <p:fileDownload value="#{fileDownloadBean.downloadFile(vehiculoView.exportarVehiculos())}"/>
                                         </p:menuitem>
                                     </sec:authorize>
@@ -196,9 +197,9 @@
                         <p:outputPanel styleClass="flex flex-row gap-4 justify-content-end">
                             <p:commandButton value="Limpiar filtros" styleClass="ui-button-outlined"
                                              ajax="true" action="#{vehiculoView.limpiarFiltros()}"
-                                             update="form_filtros form_datatable"/>
+                                             update="form_filtros form_datatable form_toolbar"/>
                             <p:commandButton value="Buscar" ajax="true" action="#{vehiculoView.buscar()}"
-                                             update="form_datatable"/>
+                                             update="form_datatable form_toolbar"/>
                         </p:outputPanel>
                     </f:facet>
                 </p:panel>
@@ -327,13 +328,14 @@
 
                     <sec:authorize access="hasAuthority('ROLE_OWNER')">
 
-                        <p:column headerText="Estatus" width="150">
+                        <p:column headerText="Estatus registro" width="150">
                             <h:outputText value="#{vehiculo.estatusRegistro.label}">
                             </h:outputText>
                         </p:column>
 
                         <p:column headerText="Fecha creación" width="150">
                             <h:outputText value="#{vehiculo.fechaCreacion}">
+                                <f:convertDateTime pattern="dd/MM/yyyy HH:mm:ss a"/>
                             </h:outputText>
                         </p:column>
 
@@ -344,6 +346,7 @@
 
                         <p:column headerText="Fecha modificación" width="150">
                             <h:outputText value="#{vehiculo.fechaModificacion}">
+                                <f:convertDateTime pattern="dd/MM/yyyy HH:mm:ss a"/>
                             </h:outputText>
                         </p:column>
 
@@ -354,6 +357,7 @@
 
                         <p:column headerText="Fecha borrado" width="150">
                             <h:outputText value="#{vehiculo.fechaBorrado}">
+                                <f:convertDateTime pattern="dd/MM/yyyy HH:mm:ss a"/>
                             </h:outputText>
                         </p:column>
 
