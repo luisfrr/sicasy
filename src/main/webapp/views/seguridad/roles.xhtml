@@ -56,6 +56,7 @@
                         <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4 xl:col-3">
                             <p:outputLabel for="@next" value="Nombre" styleClass="block"/>
                             <p:inputText styleClass="block w-full" placeholder="Ingresa un nombre..."
+                                         onkeyup="Validator.validateInputText(this)"
                                          value="#{rolView.rolFilter.nombre}"/>
                             <span class="text-sm hidden"> </span>
                         </p:outputPanel>
@@ -232,13 +233,14 @@
                     <p:outputLabel for="@next" value="Código" styleClass="block"/>
                     <p:inputText styleClass="block w-full" required="true"
                                  value="#{rolView.rolSelected.codigo}"
-                                 onkeyup="this.value = this.value.replace(/\s/g, '')"/>
+                                 onkeyup="Validator.validateInputText(this);this.value = this.value.replace(/\s/g, '')"/>
                     <span class="text-sm">Código único para identificar un rol. No se permiten espacios en blanco.</span>
                 </p:outputPanel>
 
                 <p:outputPanel styleClass="field col-12">
                     <p:outputLabel for="@next" value="Nombre" styleClass="block"/>
                     <p:inputText styleClass="block w-full" required="true"
+                                 onkeyup="Validator.validateInputText(this);"
                                  value="#{rolView.rolSelected.nombre}"/>
                     <span class="text-sm">Ingresa un nombre único</span>
                 </p:outputPanel>
@@ -246,7 +248,8 @@
                 <p:outputPanel styleClass="field col-12">
                     <p:outputLabel for="@next" value="Descripción" styleClass="block"/>
                     <p:inputTextarea styleClass="block w-full" rows="3"
-                                 value="#{rolView.rolSelected.descripcion}"/>
+                                     onkeyup="Validator.validateInputText(this);"
+                                     value="#{rolView.rolSelected.descripcion}"/>
                     <span class="text-sm hidden"> </span>
                 </p:outputPanel>
 

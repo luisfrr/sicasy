@@ -67,6 +67,7 @@
                         <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4 xl:col-3">
                             <p:outputLabel for="@next" value="licitación" styleClass="block"/>
                             <p:inputText styleClass="block w-full" placeholder="Buscar por número de licitación"
+                                         onkeyup="Validator.validateInputText(this);"
                                          value="#{licitacionView.licitacionFilter.numeroLicitacion}"/>
                             <span class="text-sm hidden"> </span>
                         </p:outputPanel>
@@ -265,6 +266,7 @@
                     <p:outputPanel styleClass="field col-12">
                         <p:outputLabel for="@next" value="Número licitación" styleClass="block "/>
                         <p:inputText styleClass="block w-full" required="true"
+                                     onkeyup="Validator.validateInputText(this);"
                                      value="#{licitacionView.licitacionSelected.numeroLicitacion}"/>
                         <span class="text-sm hidden"> </span>
                     </p:outputPanel>
@@ -272,6 +274,7 @@
                     <p:outputPanel styleClass="field col-12">
                         <p:outputLabel for="@next" value="Nombre" styleClass="block w-full"/>
                         <p:inputText styleClass="block w-full" required="true"
+                                     onkeyup="Validator.validateInputText(this);"
                                      value="#{licitacionView.licitacionSelected.nombre}"/>
                         <span class="text-sm hidden"> </span>
                     </p:outputPanel>
@@ -279,6 +282,7 @@
                     <p:outputPanel styleClass="field col-12">
                         <p:outputLabel for="@next" value="Descripción" styleClass="block"/>
                         <p:inputTextarea styleClass="block w-full" rows="3"
+                                         onkeyup="Validator.validateInputText(this);"
                                          value="#{licitacionView.licitacionSelected.descripcion}"/>
                         <span class="text-sm hidden"> </span>
                     </p:outputPanel>

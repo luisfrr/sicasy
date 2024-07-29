@@ -19,6 +19,7 @@
                   <div class="flex flex-column align-items-start w-full mr-3">
                      <p:outputLabel for="no_serie_vehiculo" value="No. Serie Vehículo" styleClass="block"/>
                      <p:inputText id="no_serie_vehiculo" styleClass="block w-full" required="true"
+                                  onkeyup="Validator.validateInputText(this);"
                                   value="#{siniestrosView.siniestroForm.vehiculo.noSerie}"/>
                      <span class="text-sm hidden"> </span>
                   </div>
@@ -34,6 +35,7 @@
             <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4">
                <p:outputLabel for="@next" value="Marca" styleClass="block"/>
                <p:inputText id="vehiculo_marca" styleClass="block w-full" readonly="true" required="true"
+                            onkeyup="Validator.validateInputText(this);"
                             value="#{siniestrosView.siniestroForm.vehiculo.marca}"/>
                <span class="text-sm hidden"> </span>
             </p:outputPanel>
@@ -41,6 +43,7 @@
             <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4">
                <p:outputLabel for="@next" value="Año" styleClass="block"/>
                <p:inputText id="vehiculo_anio" styleClass="block w-full" readonly="true" required="true"
+                            onkeyup="Validator.validateInputText(this);"
                             value="#{siniestrosView.siniestroForm.vehiculo.anio}"/>
                <span class="text-sm hidden"> </span>
             </p:outputPanel>
@@ -48,6 +51,7 @@
             <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4">
                <p:outputLabel for="@next" value="Modelo" styleClass="block"/>
                <p:inputText id="vehiculo_modelo" styleClass="block w-full" readonly="true" required="true"
+                            onkeyup="Validator.validateInputText(this);"
                             value="#{siniestrosView.siniestroForm.vehiculo.modelo}"/>
                <span class="text-sm hidden"> </span>
             </p:outputPanel>
@@ -55,6 +59,7 @@
             <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4">
                <p:outputLabel for="@next" value="Placa" styleClass="block"/>
                <p:inputText id="vehiculo_placa" styleClass="block w-full" readonly="true" required="true"
+                            onkeyup="Validator.validateInputText(this);"
                             value="#{siniestrosView.siniestroForm.vehiculo.placa}"/>
                <span class="text-sm hidden"> </span>
             </p:outputPanel>
@@ -62,6 +67,7 @@
             <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4">
                <p:outputLabel for="@next" value="Color" styleClass="block"/>
                <p:inputText id="vehiculo_color" styleClass="block w-full" readonly="true"
+                            onkeyup="Validator.validateInputText(this);"
                             value="#{siniestrosView.siniestroForm.vehiculo.color}"/>
                <span class="text-sm hidden"> </span>
             </p:outputPanel>
@@ -69,6 +75,7 @@
             <p:outputPanel styleClass="field col-12 md:col-6 lg:col-8">
                <p:outputLabel for="@next" value="Dependencia" styleClass="block"/>
                <p:inputText id="vehiculo_dependencia" styleClass="block w-full" readonly="true"
+                            onkeyup="Validator.validateInputText(this);"
                             value="#{siniestrosView.siniestroForm.vehiculo.dependencia.nombre}"/>
                <span class="text-sm hidden"> </span>
             </p:outputPanel>
@@ -76,6 +83,7 @@
             <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4">
                <p:outputLabel for="@next" value="Póliza" styleClass="block"/>
                <p:inputText id="vehiculo_poliza" styleClass="block w-full" readonly="true"
+                            onkeyup="Validator.validateInputText(this);"
                             value="#{siniestrosView.siniestroForm.vehiculo.incisoVigente.poliza.numeroPoliza}"/>
                <span class="text-sm hidden"> </span>
             </p:outputPanel>
@@ -83,6 +91,7 @@
             <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4">
                <p:outputLabel for="@next" value="Inciso" styleClass="block"/>
                <p:inputText id="vehiculo_inciso" styleClass="block w-full" readonly="true"
+                            onkeyup="Validator.validateInputText(this);"
                             value="#{siniestrosView.siniestroForm.vehiculo.incisoVigente.numeroInciso}"/>
                <span class="text-sm hidden"> </span>
             </p:outputPanel>
@@ -90,6 +99,7 @@
             <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4">
                <p:outputLabel for="@next" value="No. Siniestro" styleClass="block"/>
                <p:inputText styleClass="block w-full" required="true"
+                            onkeyup="Validator.validateInputText(this);"
                             value="#{siniestrosView.siniestroForm.noSiniestroAseguradora}"/>
                <span class="text-sm hidden"> </span>
             </p:outputPanel>
@@ -97,6 +107,7 @@
             <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4">
                <p:outputLabel for="@next" value="No. Siniestro SAF" styleClass="block"/>
                <p:inputText styleClass="block w-full" required="true"
+                            onkeyup="Validator.validateInputText(this);"
                             value="#{siniestrosView.siniestroForm.noSiniestroSAF}"/>
                <span class="text-sm hidden"> </span>
             </p:outputPanel>
@@ -104,6 +115,7 @@
             <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4">
                <p:outputLabel for="@next" value="Ajustador" styleClass="block"/>
                <p:inputText styleClass="block w-full" required="true"
+                            onkeyup="Validator.validateInputText(this);"
                             value="#{siniestrosView.siniestroForm.ajustadorAseguradora}"/>
                <span class="text-sm hidden"> </span>
             </p:outputPanel>
@@ -111,6 +123,7 @@
             <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4">
                <p:outputLabel for="@next" value="Ajustador SAF" styleClass="block"/>
                <p:inputText styleClass="block w-full" required="true"
+                            onkeyup="Validator.validateInputText(this);"
                             value="#{siniestrosView.siniestroForm.ajustadorSAF}"/>
                <span class="text-sm hidden"> </span>
             </p:outputPanel>
@@ -149,6 +162,7 @@
             <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4">
                <p:outputLabel for="@next" value="Reporta" styleClass="block"/>
                <p:inputText styleClass="block w-full"
+                            onkeyup="Validator.validateInputText(this);"
                             value="#{siniestrosView.siniestroForm.reporta}"/>
                <span class="text-sm hidden"> </span>
             </p:outputPanel>
@@ -156,6 +170,7 @@
             <p:outputPanel styleClass="field col-12 md:col-6 lg:col-8">
                <p:outputLabel for="@next" value="Causa" styleClass="block"/>
                <p:inputText styleClass="block w-full" required="true" maxlength="120"
+                            onkeyup="Validator.validateInputText(this);"
                             value="#{siniestrosView.siniestroForm.causa}"/>
                <span class="text-sm hidden"> </span>
             </p:outputPanel>
@@ -170,6 +185,7 @@
             <p:outputPanel styleClass="field col-12">
                <p:outputLabel for="@next" value="Declaración siniestro" styleClass="block"/>
                <p:inputTextarea styleClass="block w-full" rows="5" required="true"
+                                onkeyup="Validator.validateInputText(this);"
                             value="#{siniestrosView.siniestroForm.declaracionSiniestro}"/>
                <span class="text-sm hidden"> </span>
             </p:outputPanel>
@@ -177,6 +193,7 @@
             <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4">
                <p:outputLabel for="@next" value="Estado" styleClass="block"/>
                <p:inputText styleClass="block w-full"
+                            onkeyup="Validator.validateInputText(this);"
                             value="#{siniestrosView.siniestroForm.estado}"/>
                <span class="text-sm hidden"> </span>
             </p:outputPanel>
@@ -184,6 +201,7 @@
             <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4">
                <p:outputLabel for="@next" value="Municipio" styleClass="block"/>
                <p:inputText styleClass="block w-full"
+                            onkeyup="Validator.validateInputText(this);"
                             value="#{siniestrosView.siniestroForm.municipio}"/>
                <span class="text-sm hidden"> </span>
             </p:outputPanel>
@@ -191,6 +209,7 @@
             <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4">
                <p:outputLabel for="@next" value="Localidad" styleClass="block"/>
                <p:inputText styleClass="block w-full"
+                            onkeyup="Validator.validateInputText(this);"
                             value="#{siniestrosView.siniestroForm.localidad}"/>
                <span class="text-sm hidden"> </span>
             </p:outputPanel>
@@ -198,6 +217,7 @@
             <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4">
                <p:outputLabel for="@next" value="Conductor" styleClass="block"/>
                <p:inputText styleClass="block w-full" required="true"
+                            onkeyup="Validator.validateInputText(this);"
                             value="#{siniestrosView.siniestroForm.conductor}"/>
                <span class="text-sm hidden"> </span>
             </p:outputPanel>
@@ -205,6 +225,7 @@
             <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4">
                <p:outputLabel for="@next" value="No. Licencia" styleClass="block"/>
                <p:inputText styleClass="block w-full" required="true"
+                            onkeyup="Validator.validateInputText(this);"
                             value="#{siniestrosView.siniestroForm.noLicencia}"/>
                <span class="text-sm hidden"> </span>
             </p:outputPanel>
@@ -212,6 +233,7 @@
             <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4">
                <p:outputLabel for="@next" value="Tipo de licencia" styleClass="block"/>
                <p:inputText styleClass="block w-full"
+                            onkeyup="Validator.validateInputText(this);"
                             value="#{siniestrosView.siniestroForm.tipoLicencia}"/>
                <span class="text-sm hidden"> </span>
             </p:outputPanel>

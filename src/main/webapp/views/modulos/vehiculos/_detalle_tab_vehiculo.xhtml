@@ -28,12 +28,14 @@
             <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4 xl:col-3">
                <p:outputLabel for="@next" value="No. Serie" styleClass="block"/>
                <p:inputText styleClass="block w-full" required="true" disabled="#{vehiculoView.readOnlyEditForm}"
+                            onkeyup="Validator.validateInputText(this);"
                             value="#{vehiculoView.vehiculoSelected.noSerie}"/>
                <span class="text-sm hidden"> </span>
             </p:outputPanel>
             <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4 xl:col-3">
                <p:outputLabel for="@next" value="Placa" styleClass="block"/>
                <p:inputText styleClass="block w-full" required="true" disabled="#{vehiculoView.readOnlyEditForm}"
+                            onkeyup="Validator.validateInputText(this);"
                             value="#{vehiculoView.vehiculoSelected.placa}"/>
                <span class="text-sm hidden"> </span>
             </p:outputPanel>
@@ -41,6 +43,7 @@
                <p:outputLabel for="@next" value="Marca" styleClass="block"/>
                <p:inputText styleClass="block w-full" required="true"
                             placeholder="Ej. Nissan" disabled="#{vehiculoView.readOnlyEditForm}"
+                            onkeyup="Validator.validateInputText(this);"
                             value="#{vehiculoView.vehiculoSelected.marca}"/>
                <span class="text-sm hidden"> </span>
             </p:outputPanel>
@@ -48,6 +51,7 @@
                <p:outputLabel for="@next" value="Modelo" styleClass="block"/>
                <p:inputText styleClass="block w-full" required="true"
                             placeholder="Ej. Altima" disabled="#{vehiculoView.readOnlyEditForm}"
+                            onkeyup="Validator.validateInputText(this);"
                             value="#{vehiculoView.vehiculoSelected.modelo}"/>
                <span class="text-sm hidden"> </span>
             </p:outputPanel>
@@ -61,6 +65,7 @@
             <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4 xl:col-3">
                <p:outputLabel for="@next" value="No. Motor" styleClass="block"/>
                <p:inputText styleClass="block w-full" required="true" disabled="#{vehiculoView.readOnlyEditForm}"
+                            onkeyup="Validator.validateInputText(this);"
                             value="#{vehiculoView.vehiculoSelected.noMotor}"/>
                <span class="text-sm hidden"> </span>
             </p:outputPanel>
@@ -68,6 +73,7 @@
                <p:outputLabel for="@next" value="Color" styleClass="block"/>
                <p:inputText styleClass="block w-full" required="true"
                             placeholder="Ej. Rojo" disabled="#{vehiculoView.readOnlyEditForm}"
+                            onkeyup="Validator.validateInputText(this);"
                             value="#{vehiculoView.vehiculoSelected.color}"/>
                <span class="text-sm hidden"> </span>
             </p:outputPanel>
@@ -84,6 +90,7 @@
             <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4 xl:col-3">
                <p:outputLabel for="@next" value="No. Factura" styleClass="block"/>
                <p:inputText styleClass="block w-full" required="true" disabled="#{vehiculoView.readOnlyEditForm}"
+                            onkeyup="Validator.validateInputText(this);"
                             value="#{vehiculoView.vehiculoSelected.noFactura}"/>
                <span class="text-sm hidden"> </span>
             </p:outputPanel>
@@ -102,6 +109,7 @@
             <p:outputPanel styleClass="field col-12">
                <p:outputLabel for="@next" value="Descripción" styleClass="block"/>
                <p:inputTextarea styleClass="block w-full" rows="2" autoResize="true"
+                                onkeyup="Validator.validateInputText(this);"
                                 disabled="#{vehiculoView.readOnlyEditForm}"
                                 value="#{vehiculoView.vehiculoSelected.descripcionVehiculo}"/>
                <span class="text-sm hidden"> </span>
@@ -143,30 +151,35 @@
             <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4 xl:col-3">
                <p:outputLabel for="@next" value="Resguardante" styleClass="block"/>
                <p:inputText styleClass="block w-full" disabled="#{vehiculoView.readOnlyEditForm}"
+                            onkeyup="Validator.validateInputText(this);"
                             value="#{vehiculoView.vehiculoSelected.resguardante}"/>
                <span class="text-sm hidden"> </span>
             </p:outputPanel>
             <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4 xl:col-3">
                <p:outputLabel for="@next" value="Área resguardante" styleClass="block"/>
                <p:inputText styleClass="block w-full" disabled="#{vehiculoView.readOnlyEditForm}"
+                            onkeyup="Validator.validateInputText(this);"
                             value="#{vehiculoView.vehiculoSelected.areaResguardante}"/>
                <span class="text-sm hidden"> </span>
             </p:outputPanel>
             <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4 xl:col-3">
                <p:outputLabel for="@next" value="Proveedor" styleClass="block"/>
                <p:inputText styleClass="block w-full" disabled="#{vehiculoView.readOnlyEditForm}"
+                            onkeyup="Validator.validateInputText(this);"
                             value="#{vehiculoView.vehiculoSelected.proveedor}"/>
                <span class="text-sm hidden"> </span>
             </p:outputPanel>
             <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4 xl:col-3">
                <p:outputLabel for="@next" value="Director Administrativo" styleClass="block"/>
                <p:inputText styleClass="block w-full" disabled="#{vehiculoView.readOnlyEditForm}"
+                            onkeyup="Validator.validateInputText(this);"
                             value="#{vehiculoView.vehiculoSelected.autorizaDirectorAdmin}"/>
                <span class="text-sm hidden"> </span>
             </p:outputPanel>
             <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4 xl:col-3">
                <p:outputLabel for="@next" value="Director General" styleClass="block"/>
                <p:inputText styleClass="block w-full" disabled="#{vehiculoView.readOnlyEditForm}"
+                            onkeyup="Validator.validateInputText(this);"
                             value="#{vehiculoView.vehiculoSelected.autorizaDirectorGeneral}"/>
                <span class="text-sm hidden"> </span>
             </p:outputPanel>
@@ -242,18 +255,21 @@
                   <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4">
                      <p:outputLabel for="@next" value="Aseguradora" styleClass="block"/>
                      <p:inputText styleClass="block w-full" readonly="true"
+                                  onkeyup="Validator.validateInputText(this);"
                                   value="#{vehiculoView.vehiculoSelected.incisoVigente.poliza.aseguradora.nombre}"/>
                      <span class="text-sm hidden"> </span>
                   </p:outputPanel>
                   <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4">
                      <p:outputLabel for="@next" value="Póliza" styleClass="block"/>
                      <p:inputText styleClass="block w-full" readonly="true"
+                                  onkeyup="Validator.validateInputText(this);"
                                   value="#{vehiculoView.vehiculoSelected.incisoVigente.poliza.numeroPoliza}"/>
                      <span class="text-sm hidden"> </span>
                   </p:outputPanel>
                   <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4">
                      <p:outputLabel for="@next" value="Inciso" styleClass="block"/>
                      <p:inputText styleClass="block w-full" readonly="true"
+                                  onkeyup="Validator.validateInputText(this);"
                                   value="#{vehiculoView.vehiculoSelected.incisoVigente.numeroInciso}"/>
                      <span class="text-sm hidden"> </span>
                   </p:outputPanel>

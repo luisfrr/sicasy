@@ -12,6 +12,7 @@
             <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4 xl:col-3">
                <p:outputLabel for="@next" value="No. Serie" styleClass="block"/>
                <p:inputText styleClass="block w-full" required="true" disabled="#{vehiculoView.readOnlyEditForm}"
+                            onkeyup="Validator.validateInputText(this);"
                             value="#{vehiculoView.vehiculoSelected.noSerie}"/>
                <span class="text-sm hidden"> </span>
             </p:outputPanel>
@@ -19,6 +20,7 @@
             <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4 xl:col-2">
                <p:outputLabel for="@next" value="Placa" styleClass="block"/>
                <p:inputText styleClass="block w-full" required="true" disabled="#{vehiculoView.readOnlyEditForm}"
+                            onkeyup="Validator.validateInputText(this);"
                             value="#{vehiculoView.vehiculoSelected.placa}"/>
                <span class="text-sm hidden"> </span>
             </p:outputPanel>
@@ -27,6 +29,7 @@
                <p:outputLabel for="@next" value="Marca" styleClass="block"/>
                <p:inputText styleClass="block w-full" required="true"
                             placeholder="Ej. Nissan" disabled="#{vehiculoView.readOnlyEditForm}"
+                            onkeyup="Validator.validateInputText(this);"
                             value="#{vehiculoView.vehiculoSelected.marca}"/>
                <span class="text-sm hidden"> </span>
             </p:outputPanel>
@@ -35,6 +38,7 @@
                <p:outputLabel for="@next" value="Modelo" styleClass="block"/>
                <p:inputText styleClass="block w-full" required="true"
                             placeholder="Ej. Altima" disabled="#{vehiculoView.readOnlyEditForm}"
+                            onkeyup="Validator.validateInputText(this);"
                             value="#{vehiculoView.vehiculoSelected.modelo}"/>
                <span class="text-sm hidden"> </span>
             </p:outputPanel>
@@ -88,6 +92,7 @@
                <p:outputLabel for="@next" value="Estatus" styleClass="block"/>
                <p:inputText styleClass="block w-full" required="true"
                             disabled="#{vehiculoView.readOnlyEditForm}"
+                            onkeyup="Validator.validateInputText(this);"
                             value="#{vehiculoView.vehiculoSelected.estatusVehiculo.descripcion}"/>
                <span class="text-sm hidden"> </span>
             </p:outputPanel>

@@ -44,6 +44,7 @@
                   <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4">
                      <p:outputLabel for="@next" value="Inciso" styleClass="block"/>
                      <p:inputText styleClass="block w-full" required="true"
+                                  onkeyup="Validator.validateInputText(this);"
                                   value="#{polizaView.incisoForm.numeroInciso}"/>
                      <span class="text-sm hidden"> </span>
                   </p:outputPanel>
@@ -53,6 +54,7 @@
                         <div class="flex flex-column align-items-start w-full mr-3">
                            <p:outputLabel for="no_serie_vehiculo" value="No. Serie Vehículo" styleClass="block"/>
                            <p:inputText id="no_serie_vehiculo" styleClass="block w-full" required="true"
+                                        onkeyup="Validator.validateInputText(this);"
                                         value="#{polizaView.incisoForm.vehiculo.noSerie}"/>
                            <span class="text-sm hidden"> </span>
                         </div>
@@ -70,6 +72,7 @@
                      <p:outputLabel for="info_vehiculo" value="Información del vehículo" styleClass="block"/>
                      <p:inputTextarea id="info_vehiculo" styleClass="block w-full" required="true"
                                       readonly="true" rows="2" cols="50"
+                                      onkeyup="Validator.validateInputText(this);"
                                       value="#{polizaView.informacionVehiculo}"/>
                      <span class="text-sm hidden"> </span>
                   </p:outputPanel>
@@ -77,6 +80,7 @@
                   <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4">
                      <p:outputLabel for="@next" value="Folio factura" styleClass="block"/>
                      <p:inputText styleClass="block w-full" required="true"
+                                  onkeyup="Validator.validateInputText(this);"
                                   value="#{polizaView.incisoForm.folioFactura}"/>
                      <span class="text-sm hidden"> </span>
                   </p:outputPanel>

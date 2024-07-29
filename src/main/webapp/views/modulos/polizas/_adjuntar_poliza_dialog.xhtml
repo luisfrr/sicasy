@@ -18,13 +18,17 @@
 
             <p:outputPanel styleClass="field col-12 md:col-6">
                <p:outputLabel for="@next" value="Aseguradora" styleClass="block"/>
-               <p:inputText styleClass="block w-full" readonly="true" value="#{polizaView.polizaForm.aseguradora.nombre}"/>
+               <p:inputText styleClass="block w-full" readonly="true"
+                            onkeyup="Validator.validateInputText(this);"
+                            value="#{polizaView.polizaForm.aseguradora.nombre}"/>
                <span class="text-sm hidden"> </span>
             </p:outputPanel>
 
             <p:outputPanel styleClass="field col-12 md:col-6">
                <p:outputLabel for="@next" value="Número póliza" styleClass="block"/>
-               <p:inputText styleClass="block w-full" readonly="true" value="#{polizaView.polizaForm.numeroPoliza}"/>
+               <p:inputText styleClass="block w-full" readonly="true"
+                            onkeyup="Validator.validateInputText(this);"
+                            value="#{polizaView.polizaForm.numeroPoliza}"/>
                <span class="text-sm hidden"> </span>
             </p:outputPanel>
 

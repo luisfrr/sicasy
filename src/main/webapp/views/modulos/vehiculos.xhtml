@@ -189,6 +189,7 @@
                         <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4 xl:col-3">
                             <p:outputLabel for="@next" value="No. Serie" styleClass="block"/>
                             <p:inputText styleClass="block w-full" placeholder="Ingresa el número de serie..."
+                                         onkeyup="Validator.validateInputText(this);"
                                          value="#{vehiculoView.vehiculoFilter.noSerie}"/>
                             <span class="text-sm hidden"> </span>
                         </p:outputPanel>

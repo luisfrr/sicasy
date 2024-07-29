@@ -55,6 +55,7 @@
                         <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4 xl:col-3">
                             <p:outputLabel for="@next" value="Aseguradora" styleClass="block"/>
                             <p:inputText styleClass="block w-full" placeholder="Ingresa un nombre..."
+                                         onkeyup="Validator.validateInputText(this);"
                                          value="#{aseguradoraView.aseguradoraFiltroHelper.nombre}"/>
                             <span class="text-sm hidden"> </span>
                         </p:outputPanel>
@@ -240,6 +241,7 @@
                     <p:outputPanel styleClass="field col-12">
                         <p:outputLabel for="@next" value="Nombre" styleClass="block"/>
                         <p:inputText styleClass="block w-full" required="true"
+                                     onkeyup="Validator.validateInputText(this);"
                                      value="#{aseguradoraView.aseguradoraSelected.nombre}"/>
                         <span class="text-sm hidden"> </span>
                     </p:outputPanel>
@@ -247,6 +249,7 @@
                     <p:outputPanel styleClass="field col-12">
                         <p:outputLabel for="@next" value="Descripción" styleClass="block"/>
                         <p:inputTextarea styleClass="block w-full" rows="3"
+                                         onkeyup="Validator.validateInputText(this);"
                                          value="#{aseguradoraView.aseguradoraSelected.descripcion}"/>
                         <span class="text-sm hidden"> </span>
                     </p:outputPanel>
@@ -254,6 +257,7 @@
                     <p:outputPanel styleClass="field col-12">
                         <p:outputLabel for="@next" value="Representante" styleClass="block"/>
                         <p:inputTextarea styleClass="block w-full" rows="3"
+                                         onkeyup="Validator.validateInputText(this);"
                                          value="#{aseguradoraView.aseguradoraSelected.representante}"/>
                         <span class="text-sm hidden"> </span>
                     </p:outputPanel>
