@@ -6,7 +6,7 @@ import java.lang.reflect.Field;
 import java.util.*;
 
 @Slf4j
-public class ReservedWordsReplace {
+public class ReplaceSymbolsUtil {
 
     private static final Set<String> RESERVED_WORDS = new HashSet<>(Arrays.asList(
             "create", "insert", "update", "delete", "drop", "alter", "select", "union",
@@ -19,7 +19,6 @@ public class ReservedWordsReplace {
         SYMBOLS_TO_HTML.put("-", "&minus;");
         SYMBOLS_TO_HTML.put("*", "&ast;");
         SYMBOLS_TO_HTML.put("/", "&sol;");
-        SYMBOLS_TO_HTML.put("%", "&percnt;");
         SYMBOLS_TO_HTML.put("=", "&equals;");
         SYMBOLS_TO_HTML.put("==", "&equals;&equals;");
         SYMBOLS_TO_HTML.put("!=", "&excl;&equals;");
@@ -43,8 +42,6 @@ public class ReservedWordsReplace {
         SYMBOLS_TO_HTML.put("::", "&colon;&colon;");
         SYMBOLS_TO_HTML.put("?", "&quest;");
         SYMBOLS_TO_HTML.put(":", "&colon;");
-        SYMBOLS_TO_HTML.put(".", "&period;");
-        SYMBOLS_TO_HTML.put(",", "&comma;");
         SYMBOLS_TO_HTML.put(";", "&semi;");
         SYMBOLS_TO_HTML.put("(", "&lpar;");
         SYMBOLS_TO_HTML.put(")", "&rpar;");
@@ -55,26 +52,30 @@ public class ReservedWordsReplace {
     }
 
     public static void processEntity(Object entity) {
-        Field[] fields = entity.getClass().getDeclaredFields();
-        for (Field field : fields) {
-            if (field.getType().equals(String.class)) {
-                field.setAccessible(true);
-                try {
-                    String value = (String) field.get(entity);
-                    if (value != null) {
-                        String newValue = replaceReservedWordsAndSymbols(value);
-                        field.set(entity, newValue);
-                    } else {
-                        System.out.println("El campo " + field.getName() + " es nulo.");
+        try {
+            Field[] fields = entity.getClass().getDeclaredFields();
+            for (Field field : fields) {
+                if (field.getType().equals(String.class)) {
+                    field.setAccessible(true);
+                    try {
+                        String value = (String) field.get(entity);
+                        if (value != null) {
+                            String newValue = replaceReservedWordsAndSymbols(value);
+                            field.set(entity, newValue);
+                        } else {
+                            System.out.println("El campo " + field.getName() + " es nulo.");
+                        }
+                    } catch (IllegalAccessException e) {
+                        log.warn("No se pudo remplazar el campo " + field.getName(), e);
                     }
-                } catch (IllegalAccessException e) {
-                    log.warn("No se pudo remplazar el campo " + field.getName(), e);
                 }
             }
+        }catch (Exception e) {
+            log.error("No se logro procesar la entidad.", e);
         }
     }
 
-    private static String replaceReservedWordsAndSymbols(String value) {
+    public static String replaceReservedWordsAndSymbols(String value) {
         for (String reservedWord : RESERVED_WORDS) {
             if (value.contains(reservedWord)) {
                 value = value.replaceAll("\\b" + reservedWord + "\\b", "");

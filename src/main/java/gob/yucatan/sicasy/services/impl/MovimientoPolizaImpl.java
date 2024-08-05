@@ -3,6 +3,7 @@ package gob.yucatan.sicasy.services.impl;
 import gob.yucatan.sicasy.business.entities.MovimientoPoliza;
 import gob.yucatan.sicasy.repository.iface.IMovimientoPolizaRepository;
 import gob.yucatan.sicasy.services.iface.IMovimientoPolizaService;
+import gob.yucatan.sicasy.utils.strings.ReplaceSymbolsUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -18,6 +19,7 @@ public class MovimientoPolizaImpl implements IMovimientoPolizaService {
 
     @Override
     public void save(MovimientoPoliza movimientoPoliza, String username) {
+        ReplaceSymbolsUtil.processEntity(movimientoPoliza);
         movimientoPoliza.setFechaCreacion(new Date());
         movimientoPoliza.setCreadoPor(username);
         movimientoPolizaRepository.save(movimientoPoliza);

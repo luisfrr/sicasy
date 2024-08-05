@@ -19,6 +19,7 @@ import gob.yucatan.sicasy.services.iface.IPolizaService;
 import gob.yucatan.sicasy.services.iface.IVehiculoService;
 import gob.yucatan.sicasy.utils.date.DateValidator;
 import gob.yucatan.sicasy.utils.strings.JsonStringConverter;
+import gob.yucatan.sicasy.utils.strings.ReplaceSymbolsUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -47,6 +48,7 @@ public class IncisoServiceImpl implements IIncisoService {
 
     @Override
     public List<Inciso> findAllDynamic(Inciso inciso) {
+        ReplaceSymbolsUtil.processEntity(inciso);
         SearchSpecification<Inciso> specification = new SearchSpecification<>();
 
         if(inciso.getPoliza() != null && inciso.getPoliza().getIdPoliza() != null) {
@@ -145,6 +147,7 @@ public class IncisoServiceImpl implements IIncisoService {
     @Override
     @Transactional
     public void generarEndosoAlta(Inciso inciso, String username) {
+        ReplaceSymbolsUtil.processEntity(inciso);
 
         // Validación de campos
         if(inciso.getPoliza() == null || inciso.getPoliza().getIdPoliza() == null)
@@ -231,7 +234,7 @@ public class IncisoServiceImpl implements IIncisoService {
     @Override
     @Transactional
     public void editar(Inciso inciso, String username) {
-
+        ReplaceSymbolsUtil.processEntity(inciso);
         Inciso incisoToUpdate = this.findById(inciso.getIdInciso());
 
         validateIncisoPoliza(inciso, inciso.getPoliza());
@@ -292,7 +295,7 @@ public class IncisoServiceImpl implements IIncisoService {
     @Override
     @Transactional
     public void registarPagoIncisos(PagoInciso pagoInciso, String username) {
-
+        ReplaceSymbolsUtil.processEntity(pagoInciso);
         if(pagoInciso.getIncisosPorPagar() == null) {
             throw new BadRequestException("No se ha logrado obtener los incisos por pagar");
         }
@@ -406,7 +409,7 @@ public class IncisoServiceImpl implements IIncisoService {
     @Override
     @Transactional
     public void generarEndosoModificacion(EndosoModificacion endosoModificacion, String username) {
-
+        ReplaceSymbolsUtil.processEntity(endosoModificacion);
         int TIPO_MOVIMIENTO_SALDO_EN_CONTRA = 1;
         int TIPO_MOVIMIENTO_SALDO_A_FAVOR = 2;
         Inciso incisoModificacion = endosoModificacion.getInciso();
@@ -455,7 +458,7 @@ public class IncisoServiceImpl implements IIncisoService {
     @Override
     @Transactional
     public void generarEndosoBaja(EndosoBaja endosoBaja, String username) {
-
+        ReplaceSymbolsUtil.processEntity(endosoBaja);
         Inciso incisoBaja = endosoBaja.getInciso();
 
         if(endosoBaja.getCostoMovimiento() <= 0) {
@@ -522,6 +525,8 @@ public class IncisoServiceImpl implements IIncisoService {
         for (Inciso inciso : incisos) {
 
             try {
+                ReplaceSymbolsUtil.processEntity(inciso);
+
                 // Validación de campos
                 if(inciso.getPolizaIdAseguradora() == null)
                     throw new BadRequestException("El campo Aseguradora es obligatorio");

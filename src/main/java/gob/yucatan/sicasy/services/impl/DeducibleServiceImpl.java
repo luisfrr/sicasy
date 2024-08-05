@@ -9,6 +9,7 @@ import gob.yucatan.sicasy.repository.iface.IDeducibleRepository;
 import gob.yucatan.sicasy.repository.iface.ISiniestroRepository;
 import gob.yucatan.sicasy.services.iface.IBitacoraSiniestroService;
 import gob.yucatan.sicasy.services.iface.IDeducibleService;
+import gob.yucatan.sicasy.utils.strings.ReplaceSymbolsUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -27,6 +28,8 @@ public class DeducibleServiceImpl implements IDeducibleService {
 
     @Override
     public void update(Siniestro siniestro, Deducible deducible, String userName) {
+        ReplaceSymbolsUtil.processEntity(siniestro);
+        ReplaceSymbolsUtil.processEntity(deducible);
         Siniestro siniestroAnterior = siniestro.clone();
         Deducible deducibleSaved;
         if(deducible.getIdDeducible() != null) {
