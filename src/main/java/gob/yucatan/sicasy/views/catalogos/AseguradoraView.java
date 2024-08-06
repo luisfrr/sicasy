@@ -29,6 +29,7 @@ import java.util.Optional;
 @Slf4j
 @ConfigPermiso(tipo = TipoPermiso.VIEW, codigo = "CAT_ASEGURADORA_VIEW",
         nombre = "Catálogo de Aseguradoras",
+        descripcion = "Permite ver y filtrar registros del catálogo de aseguradoras.",
         url = "/views/catalogos/aseguradoras.faces")
 @PreAuthorize("hasAnyAuthority('ROLE_OWNER', 'CAT_ASEGURADORA_VIEW')")
 public class AseguradoraView {

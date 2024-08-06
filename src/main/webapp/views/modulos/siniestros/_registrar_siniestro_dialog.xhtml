@@ -44,7 +44,9 @@
                <p:outputLabel for="@next" value="Año" styleClass="block"/>
                <p:inputText id="vehiculo_anio" styleClass="block w-full" readonly="true" required="true"
                             onkeyup="Validator.validateInputText(this);"
-                            value="#{siniestrosView.siniestroForm.vehiculo.anio}"/>
+                            value="#{siniestrosView.siniestroForm.vehiculo.anio}"
+                            decimalSeparator="" thousandSeparator="" symbol="">
+               </p:inputText>
                <span class="text-sm hidden"> </span>
             </p:outputPanel>
 
@@ -59,7 +61,7 @@
             <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4">
                <p:outputLabel for="@next" value="Placa" styleClass="block"/>
                <p:inputText id="vehiculo_placa" styleClass="block w-full" readonly="true" required="true"
-                            onkeyup="Validator.validateInputText(this);"
+                            onkeyup="Validator.validateInputTextPlaca(this);"
                             value="#{siniestrosView.siniestroForm.vehiculo.placa}"/>
                <span class="text-sm hidden"> </span>
             </p:outputPanel>
@@ -170,7 +172,7 @@
             <p:outputPanel styleClass="field col-12 md:col-6 lg:col-8">
                <p:outputLabel for="@next" value="Causa" styleClass="block"/>
                <p:inputText styleClass="block w-full" required="true" maxlength="120"
-                            onkeyup="Validator.validateInputText(this);"
+                            onkeyup="Validator.validateInputTextArea(this);"
                             value="#{siniestrosView.siniestroForm.causa}"/>
                <span class="text-sm hidden"> </span>
             </p:outputPanel>
@@ -185,7 +187,7 @@
             <p:outputPanel styleClass="field col-12">
                <p:outputLabel for="@next" value="Declaración siniestro" styleClass="block"/>
                <p:inputTextarea styleClass="block w-full" rows="5" required="true"
-                                onkeyup="Validator.validateInputText(this);"
+                                onkeyup="Validator.validateInputTextArea(this);"
                             value="#{siniestrosView.siniestroForm.declaracionSiniestro}"/>
                <span class="text-sm hidden"> </span>
             </p:outputPanel>

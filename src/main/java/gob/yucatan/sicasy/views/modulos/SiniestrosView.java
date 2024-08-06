@@ -367,7 +367,7 @@ public class SiniestrosView implements Serializable {
     }
 
     @ConfigPermiso(tipo = TipoPermiso.WRITE, codigo = "SINIESTRO_WRITE_RECHAZAR_SOLICITUD", orden = 9,
-            nombre = "Finalizar registro", descripcion = "Acción que permite rechazar la solicitud de pago de deducible de los registros seleccionados.")
+            nombre = "Rechazar solicitud", descripcion = "Acción que permite rechazar la solicitud de pago de deducible de los registros seleccionados.")
     @PreAuthorize("hasAnyAuthority('ROLE_OWNER', 'SINIESTRO_WRITE_RECHAZAR_SOLICITUD')")
     public void abrirRechazarSolicitudDialog() {
         log.info("abrirRechazarSolicitudDialog - SiniestrosView");
@@ -519,7 +519,7 @@ public class SiniestrosView implements Serializable {
     }
 
     @ConfigPermiso(tipo = TipoPermiso.WRITE, codigo = "SINIESTRO_WRITE_BORRAR_FOTOS", orden = 5,
-            nombre = "Editar", descripcion = "Acción que permite adjuntar fotos del siniestro.")
+            nombre = "Borrar fotos", descripcion = "Acción que permite borrar fotos del siniestro.")
     @PreAuthorize("hasAnyAuthority('ROLE_OWNER', 'SINIESTRO_WRITE_BORRAR_FOTOS')")
     public void borrarFoto(Long idSiniestroFoto) {
         log.info("borrarFoto - SiniestrosView");
@@ -541,7 +541,7 @@ public class SiniestrosView implements Serializable {
     }
 
     @ConfigPermiso(tipo = TipoPermiso.READ, codigo = "SINIESTRO_READ_VER_PANEL_FOTOS", orden = 2,
-            nombre = "Editar", descripcion = "Visualizar el panel de fotos donde se encuentra la galeria de fotos del siniestros y las acciones para adjuntar fotos y borrarlas.")
+            nombre = "Ver panel fotos", descripcion = "Visualizar el panel de fotos donde se encuentra la galeria de fotos del siniestros y las acciones para adjuntar fotos y borrarlas.")
     @PreAuthorize("hasAnyAuthority('ROLE_OWNER', 'SINIESTRO_READ_VER_PANEL_FOTOS')")
     public void presentGallery() {
         log.info("presentGallery - SiniestrosView");

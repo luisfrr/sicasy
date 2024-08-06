@@ -34,7 +34,8 @@
                <p:outputLabel for="@next" value="Año" styleClass="block"/>
                <p:inputText styleClass="block w-full" readonly="true"
                             onkeyup="Validator.validateInputText(this);"
-                            value="#{siniestrosView.siniestroSelected.vehiculo.anio}"/>
+                            value="#{siniestrosView.siniestroSelected.vehiculo.anio}"
+                            decimalSeparator="" thousandSeparator="" symbol=""/>
                <span class="text-sm hidden"> </span>
             </p:outputPanel>
             <p:outputPanel styleClass="field col-12 md:col-6 lg:col-3">
@@ -218,7 +219,7 @@
             <p:outputPanel styleClass="field col-12 md:col-6 lg:col-8">
                <p:outputLabel for="@next" value="Causa" styleClass="block"/>
                <p:inputText styleClass="block w-full" required="true" maxlength="120"
-                            onkeyup="Validator.validateInputText(this);"
+                            onkeyup="Validator.validateInputTextArea(this);"
                             disabled="#{siniestrosView.readOnlyEditForm}"
                             value="#{siniestrosView.siniestroSelected.causa}"/>
                <span class="text-sm hidden"> </span>
@@ -236,7 +237,7 @@
             <p:outputPanel styleClass="field col-12">
                <p:outputLabel for="@next" value="Declaración siniestro" styleClass="block"/>
                <p:inputTextarea styleClass="block w-full" rows="5" required="true"
-                                onkeyup="Validator.validateInputText(this);"
+                                onkeyup="Validator.validateInputTextArea(this);"
                                 disabled="#{siniestrosView.readOnlyEditForm}"
                                 value="#{siniestrosView.siniestroSelected.declaracionSiniestro}"/>
                <span class="text-sm hidden"> </span>
@@ -455,6 +456,7 @@
                      <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'SINIESTRO_READ_VER_PANEL_FOTOS')">
                         <p:commandLink styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default flex justify-content-center align-items-center mr-3"
                                        ajax="true" action="#{siniestrosView.presentGallery()}"
+                                       disabled="#{siniestrosView.siniestroFotoList == null or siniestrosView.siniestroFotoList.size() == 0}"
                                        update="form_galeria:galleria-siniestro"
                                        oncomplete="PF('galleriaSiniestro').show()">
                            <i class="fi fi-rr-play-alt"/>

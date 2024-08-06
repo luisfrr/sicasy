@@ -59,7 +59,8 @@
                <p:outputLabel for="@next" value="Año" styleClass="block"/>
                <p:inputNumber styleClass="block w-full" required="true"
                               placeholder="Ej. 2022" disabled="#{vehiculoView.readOnlyEditForm}"
-                              value="#{vehiculoView.vehiculoSelected.anio}"/>
+                              value="#{vehiculoView.vehiculoSelected.anio}"
+                              decimalSeparator="" thousandSeparator="" symbol=""/>
                <span class="text-sm hidden"> </span>
             </p:outputPanel>
             <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4 xl:col-3">
@@ -109,7 +110,7 @@
             <p:outputPanel styleClass="field col-12">
                <p:outputLabel for="@next" value="Descripción" styleClass="block"/>
                <p:inputTextarea styleClass="block w-full" rows="2" autoResize="true"
-                                onkeyup="Validator.validateInputText(this);"
+                                onkeyup="Validator.validateInputTextArea(this);"
                                 disabled="#{vehiculoView.readOnlyEditForm}"
                                 value="#{vehiculoView.vehiculoSelected.descripcionVehiculo}"/>
                <span class="text-sm hidden"> </span>
@@ -211,6 +212,7 @@
                   </p:commandLink>
                   <p:commandLink styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default flex justify-content-center align-items-center mr-3"
                                  ajax="true" action="#{vehiculoView.presentGallery()}"
+                                 disabled="#{vehiculoView.vehiculoFotoList == null or vehiculoView.vehiculoFotoList.size() == 0}"
                                  update="form_galeria:galleria-vehiculo"
                                  oncomplete="PF('galleriaVehiculo').show()">
                      <i class="fi fi-rr-play-alt"/>

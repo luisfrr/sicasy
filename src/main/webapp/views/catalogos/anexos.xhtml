@@ -25,32 +25,43 @@
             </h:form>
 
             <h:form id="form_toolbar">
-                <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'CAT_ANEXO_WRITE_AGREGAR', 'CAT_ANEXO_WRITE_IMPORTAR', 'CAT_ANEXO_READ_EXPORTAR')">
+                <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'CAT_ANEXO_WRITE_AGREGAR', 'CAT_ANEXO_WRITE_IMPORTAR', 'CAT_ANEXO_READ_EXPORTAR', 'CAT_ANEXO_READ_EXPORTAR_LAYOUT')">
                     <p:toolbar styleClass="mb-5">
                         <p:toolbarGroup>
-                            <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'CAT_ANEXO_WRITE_AGREGAR')">
-                                <p:commandButton value="Nuevo"
-                                                 action="#{anexoView.agregarAnexo()}"
-                                                 oncomplete="PF('formDialog').show()"
-                                                 update="form_dialog"
-                                                 styleClass="mr-4">
-                                    <p:resetInput target="form_dialog:dialogContent"/>
-                                </p:commandButton>
+                            <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'CAT_ANEXO_WRITE_AGREGAR', 'CAT_ANEXO_WRITE_IMPORTAR')">
+                                <p:commandButton id="btn_acciones_anexos" type="button" value="Acciones"
+                                                 iconPos="right" icon="fi fi-rr-angle-small-down"/>
+                                <p:menu overlay="true" trigger="btn_acciones_anexos" my="left top" at="left bottom" maxHeight="250">
+                                    <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'CAT_ANEXO_WRITE_AGREGAR')">
+                                        <p:menuitem value="Nuevo" ajax="true" action="#{anexoView.agregarAnexo()}"
+                                                    oncomplete="PF('formDialog').show()" update="form_dialog">
+                                            <p:resetInput target="form_dialog:dialogContent"/>
+                                        </p:menuitem>
+                                    </sec:authorize>
+                                    <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'CAT_ANEXO_WRITE_IMPORTAR')">
+                                        <p:menuitem value="Importar layout" ajax="false" action="#{anexoView.abrirModalImport()}">
+                                        </p:menuitem>
+                                    </sec:authorize>
+                                </p:menu>
                             </sec:authorize>
                         </p:toolbarGroup>
 
                         <p:toolbarGroup align="right">
-                            <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'CAT_ANEXO_WRITE_IMPORTAR')">
-                                <p:commandButton value="Importar" ajax="false" action="#{anexoView.abrirModalImport()}"
-                                                 styleClass="ui-button-outlined mr-4">
-                                </p:commandButton>
-                            </sec:authorize>
-
-                            <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'CAT_ANEXO_READ_EXPORTAR')">
-                                <p:commandButton value="Exportar" ajax="false" onclick="PrimeFaces.monitorDownload(start, stop);"
-                                                 styleClass="ui-button-outlined">
-                                    <p:fileDownload value="#{fileDownloadBean.downloadFile(anexoView.exportFileExcel())}"/>
-                                </p:commandButton>
+                            <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'CAT_ANEXO_READ_EXPORTAR', 'CAT_ANEXO_READ_EXPORTAR_LAYOUT')">
+                                <p:commandButton id="btn_acciones_export" type="button" value="Exportar"
+                                                 styleClass="ui-button-outlined" iconPos="right" icon="fi fi-rr-angle-small-down"/>
+                                <p:menu overlay="true" trigger="btn_acciones_export" my="left top" at="left bottom" maxHeight="250">
+                                    <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'CAT_ANEXO_READ_EXPORTAR')">
+                                        <p:menuitem value="Exportar registros" ajax="false" onclick="PrimeFaces.monitorDownload(start, stop);">
+                                            <p:fileDownload value="#{fileDownloadBean.downloadFile(anexoView.exportFileExcel())}"/>
+                                        </p:menuitem>
+                                    </sec:authorize>
+                                    <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'CAT_ANEXO_READ_EXPORTAR_LAYOUT')">
+                                        <p:menuitem value="Layout de importación" ajax="false" onclick="PrimeFaces.monitorDownload(start, stop);">
+                                            <p:fileDownload value="#{fileDownloadBean.downloadFileByPath(anexoView.LAYOUT_ANEXO)}"/>
+                                        </p:menuitem>
+                                    </sec:authorize>
+                                </p:menu>
                             </sec:authorize>
                         </p:toolbarGroup>
                     </p:toolbar>
@@ -304,7 +315,7 @@
                     <p:outputPanel styleClass="field col-12">
                         <p:outputLabel for="@next" value="Descripción" styleClass="block"/>
                         <p:inputTextarea styleClass="block w-full" rows="3"
-                                         onkeyup="Validator.validateInputText(this);"
+                                         onkeyup="Validator.validateInputTextArea(this);"
                                          value="#{anexoView.anexoSelected.descripcion}"/>
                         <span class="text-sm hidden"> </span>
                     </p:outputPanel>

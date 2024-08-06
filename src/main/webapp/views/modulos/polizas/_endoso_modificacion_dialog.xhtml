@@ -64,7 +64,6 @@
                <p:outputLabel for="info_vehiculo" value="Información del vehículo" styleClass="block"/>
                <p:inputTextarea id="info_vehiculo" styleClass="block w-full" required="true"
                                 readonly="true" rows="2" cols="50"
-                                onkeyup="Validator.validateInputText(this);"
                                 value="#{polizaView.informacionVehiculo}"/>
                <span class="text-sm hidden"> </span>
             </p:outputPanel>
@@ -117,7 +116,7 @@
                <p:outputLabel for="@next" value="Motivo" styleClass="block"/>
                <p:inputTextarea styleClass="block w-full" required="true"
                                 rows="2" cols="50"
-                                onkeyup="Validator.validateInputText(this);"
+                                onkeyup="Validator.validateInputTextArea(this);"
                                 value="#{polizaView.endosoModificacion.motivo}"/>
                <span class="text-sm hidden"> </span>
             </p:outputPanel>

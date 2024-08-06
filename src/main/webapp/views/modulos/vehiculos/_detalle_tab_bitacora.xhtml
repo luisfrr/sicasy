@@ -47,7 +47,8 @@
                <p:outputLabel for="@next" value="Año" styleClass="block"/>
                <p:inputNumber styleClass="block w-full" required="true"
                               placeholder="Ej. 2022" disabled="#{vehiculoView.readOnlyEditForm}"
-                              value="#{vehiculoView.vehiculoSelected.anio}"/>
+                              value="#{vehiculoView.vehiculoSelected.anio}"
+                              decimalSeparator="" thousandSeparator="" symbol=""/>
                <span class="text-sm hidden"> </span>
             </p:outputPanel>
 

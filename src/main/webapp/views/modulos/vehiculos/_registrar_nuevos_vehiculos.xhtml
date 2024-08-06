@@ -41,7 +41,7 @@
                   <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4">
                      <p:outputLabel for="@next" value="Placa" styleClass="block"/>
                      <p:inputText styleClass="block w-full" required="true"
-                                  onkeyup="Validator.validateInputTextUsername(this);"
+                                  onkeyup="Validator.validateInputTextPlaca(this);"
                                   value="#{vehiculoView.vehiculoSelected.placa}"/>
                      <span class="text-sm hidden"> </span>
                   </p:outputPanel>
@@ -68,7 +68,8 @@
                      <p:outputLabel for="@next" value="Año" styleClass="block"/>
                      <p:inputNumber styleClass="block w-full" required="true"
                                     placeholder="Ej. 2022"
-                                    value="#{vehiculoView.vehiculoSelected.anio}"/>
+                                    value="#{vehiculoView.vehiculoSelected.anio}"
+                                    decimalSeparator="" thousandSeparator="" symbol=""/>
                      <span class="text-sm hidden"> </span>
                   </p:outputPanel>
 
@@ -125,7 +126,7 @@
                   <p:outputPanel styleClass="field col-12">
                      <p:outputLabel for="@next" value="Descripción" styleClass="block"/>
                      <p:inputTextarea styleClass="block w-full" rows="2"  autoResize="true"
-                                      onkeyup="Validator.validateInputText(this);"
+                                      onkeyup="Validator.validateInputTextArea(this);"
                                       value="#{vehiculoView.vehiculoSelected.descripcionVehiculo}"/>
                      <span class="text-sm hidden"> </span>
                   </p:outputPanel>
@@ -262,7 +263,7 @@
                                   currentPageReportTemplate="{startRecord}-{endRecord} de {totalRecords} registros"
                                   rowsPerPageTemplate="25,100,200,{ShowAll|'Todos'}">
                         <f:facet name="header">
-                           Se encontraron error al importar el layout
+                           Se encontraron errores al importar el layout
                         </f:facet>
 
                         <p:column headerText="Vehículo" width="180">

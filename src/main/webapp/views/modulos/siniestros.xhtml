@@ -30,34 +30,36 @@
                 <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'SINIESTRO_WRITE_REGISTRO_SINIESTRO', 'SINIESTRO_WRITE_SOLICITAR_PAGO_DEDUCIBLE', 'SINIESTRO_WRITE_AUTORIZAR_PAGO_DEDUCIBLE', 'SINIESTRO_WRITE_RECHAZAR_SOLICITUD', 'SINIESTRO_WRITE_FINALIZAR_REGISTRO', 'SINIESTRO_READ_EXPORTAR')">
                     <p:toolbar>
                         <p:toolbarGroup>
-                            <p:commandButton id="btn_acciones_siniestros" type="button" value="Acciones"
-                                             iconPos="right" icon="fi fi-rr-angle-small-down"/>
-                            <p:menu overlay="true" trigger="btn_acciones_siniestros" my="left top" at="left bottom" maxHeight="250">
-                                <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'SINIESTRO_WRITE_REGISTRO_SINIESTRO')">
-                                    <p:menuitem value="Registrar siniestro" ajax="true" action="#{siniestrosView.abrirRegistroSiniestroDialog()}"/>
-                                </sec:authorize>
-                                <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'SINIESTRO_WRITE_SOLICITAR_PAGO_DEDUCIBLE')">
-                                    <p:menuitem value="Solicitar pago de deducible" ajax="true" action="#{siniestrosView.solicitarPagoDeducible()}">
-                                        <p:confirm header="Confirmación" message="¿Está seguro que desea solicitar el pago de deducible de los registros seleccionados?" icon="pi pi-exclamation-triangle"/>
-                                    </p:menuitem>
-                                </sec:authorize>
-                                <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'SINIESTRO_WRITE_AUTORIZAR_PAGO_DEDUCIBLE')">
-                                    <p:menuitem value="Autorizar solicitud" ajax="true" action="#{siniestrosView.autorizarPagoDeducible()}">
-                                        <p:confirm header="Confirmación" message="¿Está seguro que desea autorizar el pago de deducible de los registros seleccionados?" icon="pi pi-exclamation-triangle"/>
-                                    </p:menuitem>
-                                </sec:authorize>
-                                <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'SINIESTRO_WRITE_RECHAZAR_SOLICITUD')">
-                                    <p:menuitem value="Rechazar solicitud" ajax="true"
-                                                action="#{siniestrosView.abrirRechazarSolicitudDialog()}">
-                                        <p:resetInput target="rechazar-solicitud-dialog"/>
-                                    </p:menuitem>
-                                </sec:authorize>
-                                <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'SINIESTRO_WRITE_FINALIZAR_REGISTRO')">
-                                    <p:menuitem value="Finalizar registro" ajax="true" action="#{siniestrosView.finalizarRegistro()}">
-                                        <p:confirm header="Confirmación" message="¿Está seguro que desea finalizar el registro de los siniestros seleccionados?" icon="pi pi-exclamation-triangle"/>
-                                    </p:menuitem>
-                                </sec:authorize>
-                            </p:menu>
+                            <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'SINIESTRO_WRITE_REGISTRO_SINIESTRO', 'SINIESTRO_WRITE_SOLICITAR_PAGO_DEDUCIBLE', 'SINIESTRO_WRITE_AUTORIZAR_PAGO_DEDUCIBLE', 'SINIESTRO_WRITE_RECHAZAR_SOLICITUD', 'SINIESTRO_WRITE_FINALIZAR_REGISTRO')">
+                                <p:commandButton id="btn_acciones_siniestros" type="button" value="Acciones"
+                                                 iconPos="right" icon="fi fi-rr-angle-small-down"/>
+                                <p:menu overlay="true" trigger="btn_acciones_siniestros" my="left top" at="left bottom" maxHeight="250">
+                                    <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'SINIESTRO_WRITE_REGISTRO_SINIESTRO')">
+                                        <p:menuitem value="Registrar siniestro" ajax="true" action="#{siniestrosView.abrirRegistroSiniestroDialog()}"/>
+                                    </sec:authorize>
+                                    <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'SINIESTRO_WRITE_SOLICITAR_PAGO_DEDUCIBLE')">
+                                        <p:menuitem value="Solicitar pago de deducible" ajax="true" action="#{siniestrosView.solicitarPagoDeducible()}">
+                                            <p:confirm header="Confirmación" message="¿Está seguro que desea solicitar el pago de deducible de los registros seleccionados?" icon="pi pi-exclamation-triangle"/>
+                                        </p:menuitem>
+                                    </sec:authorize>
+                                    <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'SINIESTRO_WRITE_AUTORIZAR_PAGO_DEDUCIBLE')">
+                                        <p:menuitem value="Autorizar solicitud" ajax="true" action="#{siniestrosView.autorizarPagoDeducible()}">
+                                            <p:confirm header="Confirmación" message="¿Está seguro que desea autorizar el pago de deducible de los registros seleccionados?" icon="pi pi-exclamation-triangle"/>
+                                        </p:menuitem>
+                                    </sec:authorize>
+                                    <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'SINIESTRO_WRITE_RECHAZAR_SOLICITUD')">
+                                        <p:menuitem value="Rechazar solicitud" ajax="true"
+                                                    action="#{siniestrosView.abrirRechazarSolicitudDialog()}">
+                                            <p:resetInput target="rechazar-solicitud-dialog"/>
+                                        </p:menuitem>
+                                    </sec:authorize>
+                                    <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'SINIESTRO_WRITE_FINALIZAR_REGISTRO')">
+                                        <p:menuitem value="Finalizar registro" ajax="true" action="#{siniestrosView.finalizarRegistro()}">
+                                            <p:confirm header="Confirmación" message="¿Está seguro que desea finalizar el registro de los siniestros seleccionados?" icon="pi pi-exclamation-triangle"/>
+                                        </p:menuitem>
+                                    </sec:authorize>
+                                </p:menu>
+                            </sec:authorize>
                         </p:toolbarGroup>
                         <p:toolbarGroup align="right">
                             <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'SINIESTRO_READ_EXPORTAR')">
