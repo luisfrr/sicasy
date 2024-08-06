@@ -33,6 +33,7 @@
                   <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4">
                      <p:outputLabel for="@next" value="No. Serie" styleClass="block"/>
                      <p:inputText styleClass="block w-full" required="true"
+                                  onkeyup="Validator.validateInputText(this);"
                                   value="#{vehiculoView.vehiculoSelected.noSerie}"/>
                      <span class="text-sm hidden"> </span>
                   </p:outputPanel>
@@ -40,6 +41,7 @@
                   <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4">
                      <p:outputLabel for="@next" value="Placa" styleClass="block"/>
                      <p:inputText styleClass="block w-full" required="true"
+                                  onkeyup="Validator.validateInputTextPlaca(this);"
                                   value="#{vehiculoView.vehiculoSelected.placa}"/>
                      <span class="text-sm hidden"> </span>
                   </p:outputPanel>
@@ -48,6 +50,7 @@
                      <p:outputLabel for="@next" value="Marca" styleClass="block"/>
                      <p:inputText styleClass="block w-full" required="true"
                                   placeholder="Ej. Nissan"
+                                  onkeyup="Validator.validateInputText(this);"
                                   value="#{vehiculoView.vehiculoSelected.marca}"/>
                      <span class="text-sm hidden"> </span>
                   </p:outputPanel>
@@ -56,6 +59,7 @@
                      <p:outputLabel for="@next" value="Modelo" styleClass="block"/>
                      <p:inputText styleClass="block w-full" required="true"
                                   placeholder="Ej. Altima"
+                                  onkeyup="Validator.validateInputText(this);"
                                   value="#{vehiculoView.vehiculoSelected.modelo}"/>
                      <span class="text-sm hidden"> </span>
                   </p:outputPanel>
@@ -64,13 +68,15 @@
                      <p:outputLabel for="@next" value="Año" styleClass="block"/>
                      <p:inputNumber styleClass="block w-full" required="true"
                                     placeholder="Ej. 2022"
-                                    value="#{vehiculoView.vehiculoSelected.anio}"/>
+                                    value="#{vehiculoView.vehiculoSelected.anio}"
+                                    decimalSeparator="" thousandSeparator="" symbol=""/>
                      <span class="text-sm hidden"> </span>
                   </p:outputPanel>
 
                   <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4">
                      <p:outputLabel for="@next" value="No. Motor" styleClass="block"/>
                      <p:inputText styleClass="block w-full" required="true"
+                                  onkeyup="Validator.validateInputText(this);"
                                   value="#{vehiculoView.vehiculoSelected.noMotor}"/>
                      <span class="text-sm hidden"> </span>
                   </p:outputPanel>
@@ -79,6 +85,7 @@
                      <p:outputLabel for="@next" value="Color" styleClass="block"/>
                      <p:inputText styleClass="block w-full" required="true"
                                   placeholder="Ej. Rojo"
+                                  onkeyup="Validator.validateInputText(this);"
                                   value="#{vehiculoView.vehiculoSelected.color}"/>
                      <span class="text-sm hidden"> </span>
                   </p:outputPanel>
@@ -97,6 +104,7 @@
                   <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4">
                      <p:outputLabel for="@next" value="No. Factura" styleClass="block"/>
                      <p:inputText styleClass="block w-full" required="true"
+                                  onkeyup="Validator.validateInputText(this);"
                                   value="#{vehiculoView.vehiculoSelected.noFactura}"/>
                      <span class="text-sm hidden"> </span>
                   </p:outputPanel>
@@ -118,6 +126,7 @@
                   <p:outputPanel styleClass="field col-12">
                      <p:outputLabel for="@next" value="Descripción" styleClass="block"/>
                      <p:inputTextarea styleClass="block w-full" rows="2"  autoResize="true"
+                                      onkeyup="Validator.validateInputTextArea(this);"
                                       value="#{vehiculoView.vehiculoSelected.descripcionVehiculo}"/>
                      <span class="text-sm hidden"> </span>
                   </p:outputPanel>
@@ -159,6 +168,7 @@
                   <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4">
                      <p:outputLabel for="@next" value="Reguardante" styleClass="block"/>
                      <p:inputText styleClass="block w-full"
+                                  onkeyup="Validator.validateInputText(this);"
                                   value="#{vehiculoView.vehiculoSelected.resguardante}"/>
                      <span class="text-sm hidden"> </span>
                   </p:outputPanel>
@@ -166,6 +176,7 @@
                   <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4">
                      <p:outputLabel for="@next" value="Área reguardante" styleClass="block"/>
                      <p:inputText styleClass="block w-full"
+                                  onkeyup="Validator.validateInputText(this);"
                                   value="#{vehiculoView.vehiculoSelected.areaResguardante}"/>
                      <span class="text-sm hidden"> </span>
                   </p:outputPanel>
@@ -173,6 +184,7 @@
                   <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4">
                      <p:outputLabel for="@next" value="Proveedor" styleClass="block"/>
                      <p:inputText styleClass="block w-full"
+                                  onkeyup="Validator.validateInputText(this);"
                                   value="#{vehiculoView.vehiculoSelected.proveedor}"/>
                      <span class="text-sm hidden"> </span>
                   </p:outputPanel>
@@ -180,6 +192,7 @@
                   <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4">
                      <p:outputLabel for="@next" value="Director Administrativo" styleClass="block"/>
                      <p:inputText styleClass="block w-full"
+                                  onkeyup="Validator.validateInputText(this);"
                                   value="#{vehiculoView.vehiculoSelected.autorizaDirectorAdmin}"/>
                      <span class="text-sm hidden"> </span>
                   </p:outputPanel>
@@ -187,6 +200,7 @@
                   <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4">
                      <p:outputLabel for="@next" value="Director General" styleClass="block"/>
                      <p:inputText styleClass="block w-full"
+                                  onkeyup="Validator.validateInputText(this);"
                                   value="#{vehiculoView.vehiculoSelected.autorizaDirectorGeneral}"/>
                      <span class="text-sm hidden"> </span>
                   </p:outputPanel>
@@ -249,7 +263,7 @@
                                   currentPageReportTemplate="{startRecord}-{endRecord} de {totalRecords} registros"
                                   rowsPerPageTemplate="25,100,200,{ShowAll|'Todos'}">
                         <f:facet name="header">
-                           Se encontraron error al importar el layout
+                           Se encontraron errores al importar el layout
                         </f:facet>
 
                         <p:column headerText="Vehículo" width="180">

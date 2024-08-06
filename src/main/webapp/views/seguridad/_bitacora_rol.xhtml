@@ -23,12 +23,14 @@
                     <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4 xl:col-3">
                         <p:outputLabel for="@next" value="Código" styleClass="block"/>
                         <p:inputText styleClass="block w-full" readonly="true"
+                                     onkeyup="Validator.validateInputText(this);"
                                      value="#{rolView.rolSelected.codigo}"/>
                     </p:outputPanel>
 
                     <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4 xl:col-3">
                         <p:outputLabel for="@next" value="Nombre" styleClass="block"/>
                         <p:inputText styleClass="block w-full" readonly="true"
+                                     onkeyup="Validator.validateInputText(this);"
                                      value="#{rolView.rolSelected.nombre}"/>
                     </p:outputPanel>
 

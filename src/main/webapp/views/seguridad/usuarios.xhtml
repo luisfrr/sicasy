@@ -56,6 +56,7 @@
                             <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4 xl:col-3">
                                 <p:outputLabel for="@next" value="Usuario" styleClass="block"/>
                                 <p:inputText styleClass="block w-full" placeholder="Ingresa un usuario..."
+                                             onkeyup="Validator.validateInputTextUsername(this)"
                                              value="#{usuarioView.usuarioFilter.usuario}"/>
                                 <span class="text-sm hidden"> </span>
                             </p:outputPanel>
@@ -63,6 +64,7 @@
                             <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4 xl:col-3">
                                 <p:outputLabel for="@next" value="Nombre" styleClass="block"/>
                                 <p:inputText styleClass="block w-full" placeholder="Ingresa un nombre..."
+                                             onkeyup="Validator.validateInputText(this)"
                                              value="#{usuarioView.usuarioFilter.nombre}"/>
                                 <span class="text-sm hidden"> </span>
                             </p:outputPanel>
@@ -70,7 +72,9 @@
                             <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4 xl:col-3">
                                 <p:outputLabel for="@next" value="Correo electrónico" styleClass="block"/>
                                 <p:inputText styleClass="block w-full" placeholder="Ingresa un correo electrónico..."
-                                             value="#{usuarioView.usuarioFilter.email}"/>
+                                             value="#{usuarioView.usuarioFilter.email}">
+                                    <f:validateRegex pattern="^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$" />
+                                </p:inputText>
                                 <span class="text-sm hidden"> </span>
                             </p:outputPanel>
 
@@ -285,13 +289,15 @@
                     <p:outputPanel styleClass="field col-12">
                         <p:outputLabel for="@next" value="Usuario" styleClass="block"/>
                         <p:inputText styleClass="block w-full" required="true"
+                                     onkeyup="Validator.validateInputTextUsername(this)"
                                      value="#{usuarioView.usuarioSelected.usuario}"/>
-                        <span class="text-sm hidden"> </span>
+                        <span class="text-sm">Se permite guión bajo y punto</span>
                     </p:outputPanel>
 
                     <p:outputPanel styleClass="field col-12">
                         <p:outputLabel for="@next" value="Nombre" styleClass="block"/>
                         <p:inputText styleClass="block w-full" required="true"
+                                     onkeyup="Validator.validateInputText(this)"
                                      value="#{usuarioView.usuarioSelected.nombre}"/>
                         <span class="text-sm hidden"> </span>
                     </p:outputPanel>

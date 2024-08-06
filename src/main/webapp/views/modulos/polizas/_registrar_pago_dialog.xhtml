@@ -49,6 +49,7 @@
             <p:outputPanel styleClass="field col-12 mb-5">
                <p:outputLabel for="@next" value="Folio factura" styleClass="block"/>
                <p:inputText value="#{polizaView.pagoInciso.folioFactura}" styleClass="w-full mb-3"
+                            onkeyup="Validator.validateInputText(this);"
                               required="true"/>
             </p:outputPanel>
 

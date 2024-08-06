@@ -12,6 +12,7 @@ import gob.yucatan.sicasy.repository.iface.IIncisoRepository;
 import gob.yucatan.sicasy.repository.iface.ISiniestroRepository;
 import gob.yucatan.sicasy.services.iface.IBitacoraSiniestroService;
 import gob.yucatan.sicasy.services.iface.ISiniestroService;
+import gob.yucatan.sicasy.utils.strings.ReplaceSymbolsUtil;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -43,7 +44,7 @@ public class SiniestroServiceImpl implements ISiniestroService {
 
     @Override
     public List<Siniestro> findAllDynamic(Siniestro siniestro) {
-
+        ReplaceSymbolsUtil.processEntity(siniestro);
         SearchSpecification<Siniestro> specification = new SearchSpecification<>();
 
         if(siniestro.getResponsable() != null && !siniestro.getResponsable().isEmpty()) {
@@ -135,7 +136,7 @@ public class SiniestroServiceImpl implements ISiniestroService {
     @Override
     @Transactional
     public void registrarNuevoSiniestro(Siniestro siniestro, String userName) {
-
+        ReplaceSymbolsUtil.processEntity(siniestro);
         if(siniestro.getVehiculo() != null && siniestro.getVehiculo().getIncisoVigente() != null) {
             siniestro.setInciso(siniestro.getVehiculo().getIncisoVigente());
         }
@@ -175,6 +176,7 @@ public class SiniestroServiceImpl implements ISiniestroService {
     @Override
     @Transactional
     public void rechazarSolicitud(List<Long> idSiniestroList, String motivo, String userName) {
+        ReplaceSymbolsUtil.replaceReservedWordsAndSymbols(motivo);
         // Al rechazar la solicitud cambia a estatus registrado
         this.cambioEstatus(ACCION_RECHAZAR_SOLICITUD, ESTATUS_SINIESTRO_REGISTRADO,
                 idSiniestroList, motivo, userName);
@@ -191,7 +193,7 @@ public class SiniestroServiceImpl implements ISiniestroService {
     @Override
     @Transactional
     public void editar(Siniestro siniestro, String userName) {
-
+        ReplaceSymbolsUtil.processEntity(siniestro);
         Siniestro siniestroAnterior = siniestroRepository.findById(siniestro.getIdSiniestro())
                         .orElseThrow(() -> new NotFoundException("No se ha logrado obtener la información del siniestro"));
 
@@ -279,6 +281,8 @@ public class SiniestroServiceImpl implements ISiniestroService {
 
             List<BitacoraSiniestro> bitacoraSiniestroList = new ArrayList<>();
             for(Siniestro siniestro : siniestroToUpdateList) {
+
+                ReplaceSymbolsUtil.processEntity(siniestro);
 
                 // Se genera la copia de siniestro
                 Siniestro siniestroAnterior = siniestro.clone();

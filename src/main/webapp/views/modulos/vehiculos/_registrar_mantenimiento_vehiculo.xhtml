@@ -18,7 +18,9 @@
 
             <p:outputPanel styleClass="field col-12">
                <p:outputLabel for="@next" value="No. Serie" styleClass="block"/>
-               <p:inputText styleClass="block w-full" readonly="true" value="#{vehiculoView.vehiculoSelected.noSerie}"/>
+               <p:inputText styleClass="block w-full" readonly="true"
+                            onkeyup="Validator.validateInputText(this);"
+                            value="#{vehiculoView.vehiculoSelected.noSerie}"/>
                <span class="text-sm hidden"> </span>
             </p:outputPanel>
 
@@ -35,6 +37,7 @@
             <p:outputPanel styleClass="field col-12">
                <p:outputLabel for="@next" value="Descripción" styleClass="block"/>
                <p:inputTextarea styleClass="block w-full" rows="3"
+                                onkeyup="Validator.validateInputText(this);"
                                 value="#{vehiculoView.mantenimientoVehiculo.descripcion}"/>
                <span class="text-sm hidden"> </span>
             </p:outputPanel>

@@ -18,7 +18,9 @@
 
             <p:outputPanel styleClass="field col-12">
                <p:outputLabel for="@next" value="No. Serie" styleClass="block"/>
-               <p:inputText styleClass="block w-full" readonly="true" value="#{vehiculoView.vehiculoFotoSelected.noSerie}"/>
+               <p:inputText styleClass="block w-full" readonly="true"
+                            onkeyup="Validator.validateInputText(this);"
+                            value="#{vehiculoView.vehiculoFotoSelected.noSerie}"/>
                <span class="text-sm hidden"> </span>
             </p:outputPanel>
 

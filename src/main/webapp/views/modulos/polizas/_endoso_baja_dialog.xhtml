@@ -20,6 +20,7 @@
             <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4">
                <p:outputLabel for="@next" value="Aseguradora" styleClass="block"/>
                <p:inputText styleClass="block w-full" required="true" disabled="true"
+                            onkeyup="Validator.validateInputText(this);"
                             value="#{polizaView.endosoBaja.inciso.poliza.aseguradora.nombre}"/>
                <span class="text-sm hidden"> </span>
             </p:outputPanel>
@@ -27,6 +28,7 @@
             <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4">
                <p:outputLabel for="@next" value="No. Póliza" styleClass="block"/>
                <p:inputText styleClass="block w-full" required="true" disabled="true"
+                            onkeyup="Validator.validateInputText(this);"
                             value="#{polizaView.endosoBaja.inciso.poliza.numeroPoliza}"/>
                <span class="text-sm hidden"> </span>
             </p:outputPanel>
@@ -34,6 +36,7 @@
             <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4">
                <p:outputLabel for="@next" value="Inciso" styleClass="block"/>
                <p:inputText styleClass="block w-full" required="true" disabled="true"
+                            onkeyup="Validator.validateInputText(this);"
                             value="#{polizaView.endosoBaja.inciso.numeroInciso}"/>
                <span class="text-sm hidden"> </span>
             </p:outputPanel>
@@ -43,6 +46,7 @@
                   <div class="flex flex-column align-items-start w-full mr-3">
                      <p:outputLabel for="no_serie_vehiculo" value="No. Serie Vehículo" styleClass="block"/>
                      <p:inputText id="no_serie_vehiculo" styleClass="block w-full" required="true" disabled="true"
+                                  onkeyup="Validator.validateInputText(this);"
                                   value="#{polizaView.endosoBaja.inciso.vehiculo.noSerie}"/>
                      <span class="text-sm hidden"> </span>
                   </div>
@@ -104,6 +108,7 @@
             <p:outputPanel styleClass="field col-12">
                <p:outputLabel for="@next" value="Motivo" styleClass="block"/>
                <p:inputTextarea styleClass="block w-full" required="true"
+                                onkeyup="Validator.validateInputTextArea(this);"
                                 rows="2" cols="50"
                                 value="#{polizaView.endosoBaja.motivo}"/>
                <span class="text-sm hidden"> </span>
@@ -119,6 +124,7 @@
             <p:outputPanel styleClass="field col-12 md:col-6">
                <p:outputLabel for="@next" value="Folio factura" styleClass="block"/>
                <p:inputText value="#{polizaView.endosoBaja.folioFactura}" styleClass="w-full mb-3"
+                            onkeyup="Validator.validateInputText(this);"
                               required="true"/>
             </p:outputPanel>
 

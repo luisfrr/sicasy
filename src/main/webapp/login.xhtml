@@ -28,7 +28,8 @@
 
         <h:form styleClass="w-full flex flex-column gap-4 justify-content-center"
                 prependId="false">
-            <p:inputText placeholder="Usuario" id="username" styleClass="w-full" required="true"/>
+            <p:inputText placeholder="Usuario" id="username" styleClass="w-full" required="true"
+                         onkeyup="Validator.validateInputTextUsername(this);"/>
             <p:password placeholder="Contraseña" id="password" styleClass="w-full mb-4" required="true"/>
 
             <p:captcha required="true" theme="light" language="es"

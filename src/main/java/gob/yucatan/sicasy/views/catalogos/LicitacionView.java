@@ -48,6 +48,7 @@ import java.util.*;
 @Slf4j
 @ConfigPermiso(tipo = TipoPermiso.VIEW, codigo = "CAT_LICITACION_VIEW",
         nombre = "Catálogo de Licitaciones",
+        descripcion = "Permite ver y filtrar registros del catálogo de licitaciones.",
         url = "/views/catalogos/licitaciones.faces")
 @PreAuthorize("hasAnyAuthority('ROLE_OWNER', 'CAT_LICITACION_VIEW')")
 public class LicitacionView {
@@ -55,6 +56,9 @@ public class LicitacionView {
     // Constantes
     @Value("${app.files.folder.licitaciones}")
     private @Getter String FOLDER_LICITACION;
+
+    @Value("${app.files.folder.layouts.importar-licitacion}")
+    private @Getter String LAYOUT_LICITACION;
 
     // Inyección de dependencias
     private final ILicitacionService licitacionService;
@@ -93,7 +97,9 @@ public class LicitacionView {
 
     @ConfigPermisoArray({
             @ConfigPermiso(tipo = TipoPermiso.READ, codigo = "CAT_LICITACION_READ_DESCARGAR_ARCHIVO", orden = 1,
-                    nombre = "Descargar archivo", descripcion = "Permite descargar el archivo de  la licitación."),
+                    nombre = "Descargar archivo", descripcion = "Permite descargar el archivo de la licitación."),
+            @ConfigPermiso(tipo = TipoPermiso.READ, codigo = "CAT_LICITACION_READ_EXPORTAR_LAYOUT", orden = 3,
+                    nombre = "Exportar layout de importación", descripcion = "Permite exportar el archivo layout para importación de licitaciones."),
     })
     public void limpiarFiltros() {
         log.info("limpiarFiltros - LicitacionView");
@@ -342,7 +348,7 @@ public class LicitacionView {
     }
 
     @PreAuthorize("hasAnyAuthority('ROLE_OWNER', 'CAT_LICITACION_WRITE_IMPORT')")
-    public void importarLayout(FileUploadEvent event) throws IOException {
+    public void importarLayout(FileUploadEvent event) {
         log.info("importarLayout - LicitacionView");
         UploadedFile file = event.getFile();
         String fileName = file.getFileName();

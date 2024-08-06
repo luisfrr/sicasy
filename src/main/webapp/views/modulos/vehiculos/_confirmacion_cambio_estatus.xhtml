@@ -21,6 +21,7 @@
             <p:outputPanel styleClass="field col-12 mb-5">
                <p:outputLabel for="@next" value="Motivo" styleClass="block"/>
                <p:inputTextarea styleClass="block w-full" rows="2"  autoResize="true" required="true"
+                                onkeyup="Validator.validateInputText(this);"
                                 value="#{vehiculoView.confirmMotivo}"/>
                <span class="text-sm hidden"> </span>
             </p:outputPanel>

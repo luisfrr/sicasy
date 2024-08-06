@@ -48,6 +48,7 @@ import java.util.*;
 @Slf4j
 @ConfigPermiso(tipo = TipoPermiso.VIEW, codigo = "CAT_ANEXO_VIEW",
         nombre = "Catálogo de Anexos",
+        descripcion = "Permite ver y filtrar registros del catálogo de anexos.",
         url = "/views/catalogos/anexos.faces")
 @PreAuthorize("hasAnyAuthority('ROLE_OWNER', 'CAT_ANEXO_VIEW')")
 public class AnexoView implements Serializable {
@@ -55,6 +56,9 @@ public class AnexoView implements Serializable {
     // Constantes
     @Value("${app.files.folder.anexos}")
     private @Getter String FOLDER_ANEXO;
+
+    @Value("${app.files.folder.layouts.importar-anexo}")
+    private @Getter String LAYOUT_ANEXO;
 
     // Inyección de dependencias
     private final IAnexoService anexoService;
@@ -94,6 +98,8 @@ public class AnexoView implements Serializable {
     @ConfigPermisoArray({
             @ConfigPermiso(tipo = TipoPermiso.READ, codigo = "CAT_ANEXO_READ_DESCARGAR_ARCHIVO", orden = 1,
                     nombre = "Descargar archivo", descripcion = "Permite descargar el archivo del anexo."),
+            @ConfigPermiso(tipo = TipoPermiso.READ, codigo = "CAT_ANEXO_READ_EXPORTAR_LAYOUT", orden = 3,
+                    nombre = "Exportar layout de importación", descripcion = "Permite exportar el archivo layout para importación de anexos."),
     })
     public void limpiarFiltros(){
         log.info("limpiarFiltros - AnexoView");

@@ -11,6 +11,7 @@ import gob.yucatan.sicasy.repository.criteria.SearchSpecification;
 import gob.yucatan.sicasy.repository.iface.IAnexoRepository;
 import gob.yucatan.sicasy.repository.iface.ILicitacionRepository;
 import gob.yucatan.sicasy.services.iface.IAnexoService;
+import gob.yucatan.sicasy.utils.strings.ReplaceSymbolsUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -47,6 +48,7 @@ public class AnexoServiceImpl implements IAnexoService {
 
     @Override
     public List<Anexo> findAllDynamic(Anexo anexo) {
+        ReplaceSymbolsUtil.processEntity(anexo);
 
         SearchSpecification<Anexo> searchSpecification = new SearchSpecification<>();
 
@@ -93,11 +95,11 @@ public class AnexoServiceImpl implements IAnexoService {
 
     @Override
     public void save(Anexo anexo) {
+        ReplaceSymbolsUtil.processEntity(anexo);
 
         anexo.setEstatusRegistro(EstatusRegistro.ACTIVO);
         anexo.setFechaCreacion(new Date());
         anexoRepository.save(anexo);
-
     }
 
     @Override
@@ -108,17 +110,16 @@ public class AnexoServiceImpl implements IAnexoService {
         if (optionalAnexo.isEmpty())
             throw new NotFoundException("No se encontró ninguna información");
 
-
         Anexo anexoToUpdate = optionalAnexo.get();
         anexoToUpdate.setFechaBorrado(new Date());
         anexoToUpdate.setBorradoPor(anexo.getBorradoPor());
         anexoToUpdate.setEstatusRegistro(EstatusRegistro.BORRADO);
         anexoRepository.save(anexoToUpdate);
-
     }
 
     @Override
     public void update(Anexo anexo) {
+        ReplaceSymbolsUtil.processEntity(anexo);
 
         Optional<Anexo> optionalAnexo = anexoRepository.findById(anexo.getIdAnexo());
 
@@ -169,6 +170,7 @@ public class AnexoServiceImpl implements IAnexoService {
 
         for (Anexo anexo : anexos) {
             try {
+                ReplaceSymbolsUtil.processEntity(anexo);
                 // validar campos obligatorios
                 if(anexo.getNumLicitacionString() == null || anexo.getNumLicitacionString().isEmpty())
                     throw new BadRequestException("El campo Num. Licitación es obligatorio");

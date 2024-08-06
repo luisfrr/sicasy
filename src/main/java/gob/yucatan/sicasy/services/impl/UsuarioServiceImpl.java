@@ -12,6 +12,7 @@ import gob.yucatan.sicasy.repository.iface.IUsuarioRepository;
 import gob.yucatan.sicasy.repository.iface.IUsuarioRolRepository;
 import gob.yucatan.sicasy.services.iface.IBitacoraUsuarioService;
 import gob.yucatan.sicasy.services.iface.IUsuarioService;
+import gob.yucatan.sicasy.utils.strings.ReplaceSymbolsUtil;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -34,7 +35,7 @@ public class UsuarioServiceImpl implements IUsuarioService {
 
     @Override
     public List<Usuario> findAllDynamic(Usuario usuario) {
-
+        ReplaceSymbolsUtil.processEntity(usuario);
         SearchSpecification<Usuario> specification = new SearchSpecification<>();
 
         if(usuario.getUsuario() != null && !usuario.getUsuario().isEmpty())
@@ -88,6 +89,7 @@ public class UsuarioServiceImpl implements IUsuarioService {
     @Override
     @Transactional
     public Usuario create(Usuario usuario) {
+        this.validarCampos(usuario);
         List<UsuarioRol> usuarioRolList = new ArrayList<>();
         Usuario finalUsuario = usuario;
         usuario.getIdRolList().forEach(idRol -> {
@@ -154,6 +156,8 @@ public class UsuarioServiceImpl implements IUsuarioService {
 
         if(usuarioOptional.isEmpty())
             throw new NotFoundException("Usuario no encontrado");
+
+        this.validarCampos(usuario);
 
         // Roles que se van a reemplazar por los nuevos
         final Usuario usuarioAnterior = usuarioRepository.findById(usuario.getIdUsuario()).orElse(null);
@@ -390,6 +394,19 @@ public class UsuarioServiceImpl implements IUsuarioService {
         usuario.setToken(tokenActivacion);
         usuario.setVigenciaToken(calendar.getTime());
         usuario.setTokenType(tokenType);
+    }
+
+
+    private void validarCampos(Usuario usuario) {
+        if(usuario.getUsuario() != null)
+            ReplaceSymbolsUtil.replaceReservedWordsAndSymbols(usuario.getUsuario());
+
+        if(usuario.getNombre() != null)
+            ReplaceSymbolsUtil.replaceReservedWordsAndSymbols(usuario.getNombre());
+
+        if(usuario.getEmail() != null)
+            ReplaceSymbolsUtil.replaceReservedWordsAndSymbols(usuario.getEmail());
+
     }
 
 }

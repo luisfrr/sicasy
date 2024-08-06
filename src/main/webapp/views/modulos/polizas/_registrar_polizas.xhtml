@@ -33,6 +33,7 @@
                   <p:outputPanel styleClass="field col-12 md:col-6">
                      <p:outputLabel for="@next" value="No. Póliza" styleClass="block"/>
                      <p:inputText styleClass="block w-full" required="true"
+                                  onkeyup="Validator.validateInputText(this);"
                                   value="#{polizaView.polizaForm.numeroPoliza}"/>
                      <span class="text-sm hidden"> </span>
                   </p:outputPanel>
@@ -82,6 +83,7 @@
                   <p:outputPanel styleClass="field col-12 md:col-6">
                      <p:outputLabel for="@next" value="Beneficiario" styleClass="block"/>
                      <p:inputText styleClass="block w-full"
+                                  onkeyup="Validator.validateInputText(this);"
                                   value="#{polizaView.polizaForm.beneficiarioPreferente}"/>
                      <span class="text-sm hidden"> </span>
                   </p:outputPanel>
