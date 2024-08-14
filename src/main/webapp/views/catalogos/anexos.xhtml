@@ -76,13 +76,13 @@
 
                         <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4 xl:col-3">
                             <p:outputLabel for="@next" value="Anexo" styleClass="block"/>
-                            <p:inputText styleClass="block w-full" placeholder="Ingresa un nombre..."
-                                         onkeyup="Validator.validateInputText(this);"
+                            <p:inputText styleClass="block w-full" placeholder="Ingresa un anexo..."
+                                         onkeyup="Validator.validateInputTextCode(this);"
                                          value="#{anexoView.anexoFilter.nombre}"/>
                         </p:outputPanel>
 
                         <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4 xl:col-3">
-                            <p:outputLabel for="@next" value="Número de licitación" styleClass="block"/>
+                            <p:outputLabel for="@next" value="Número licitación" styleClass="block"/>
                             <p:selectOneMenu styleClass="block w-full" value="#{anexoView.anexoFilter.licitacion.numeroLicitacion}" >
                                 <f:selectItem  itemValue="#{null}" itemLabel="----"/>
                                 <f:selectItems value="#{anexoView.licitacionesActivasList}" var="licitacion" itemLabel="#{licitacion.numeroLicitacion}"
@@ -139,15 +139,15 @@
                         <h:outputText value="#{index + 1}" />
                     </p:column>
 
-                    <p:column headerText="Anexo" width="150">
+                    <p:column headerText="Anexo" width="220">
                         <h:outputText value="#{anexo.nombre}"/>
                     </p:column>
 
-                    <p:column headerText="Número licitación" width="150">
+                    <p:column headerText="Número licitación" width="220">
                         <h:outputText value="#{anexo.licitacion.numeroLicitacion}"/>
                     </p:column>
 
-                    <p:column headerText="Descripción" width="250">
+                    <p:column headerText="Descripción" width="350">
                         <h:outputText value="#{anexo.descripcion}"/>
                     </p:column>
 
@@ -294,9 +294,9 @@
                 <p:outputPanel id="dialogContent" styleClass="formgrid grid" rendered="#{anexoView.anexoSelected != null}">
 
                     <p:outputPanel styleClass="field col-12">
-                        <p:outputLabel for="@next" value="Nombre" styleClass="block"/>
+                        <p:outputLabel for="@next" value="Anexo" styleClass="block"/>
                         <p:inputText styleClass="block w-full" required="true"
-                                     onkeyup="Validator.validateInputText(this);"
+                                     onkeyup="Validator.validateInputTextCode(this);"
                                      value="#{anexoView.anexoSelected.nombre}"/>
                         <span class="text-sm hidden"> </span>
                     </p:outputPanel>
@@ -424,7 +424,7 @@
                                      currentPageReportTemplate="{startRecord}-{endRecord} de {totalRecords} registros"
                                      rowsPerPageTemplate="25,100,200,{ShowAll|'Todos'}">
                             <f:facet name="header">
-                                Se encontraron error al importar el layout
+                                Se encontraron errores al importar el layout
                             </f:facet>
 
                             <p:column headerText="Anexo" width="180">

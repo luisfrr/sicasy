@@ -72,7 +72,8 @@
                             <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4 xl:col-3">
                                 <p:outputLabel for="@next" value="Correo electrónico" styleClass="block"/>
                                 <p:inputText styleClass="block w-full" placeholder="Ingresa un correo electrónico..."
-                                             value="#{usuarioView.usuarioFilter.email}">
+                                             value="#{usuarioView.usuarioFilter.email}"
+                                             onkeyup="Validator.validateInputTextEmail(this)">
                                     <f:validateRegex pattern="^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$" />
                                 </p:inputText>
                                 <span class="text-sm hidden"> </span>
@@ -305,7 +306,8 @@
                     <p:outputPanel styleClass="field col-12">
                         <p:outputLabel for="@next" value="Correo electrónico" styleClass="block"/>
                         <p:inputText styleClass="block w-full" rows="3" required="true"
-                                     value="#{usuarioView.usuarioSelected.email}">
+                                     value="#{usuarioView.usuarioSelected.email}"
+                                     onkeyup="Validator.validateInputTextEmail(this)">
                             <f:validateRegex pattern="^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$" />
                         </p:inputText>
                         <span class="text-sm hidden"> </span>

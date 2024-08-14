@@ -1,23 +1,23 @@
 let Validator = {
 
     validateInputText: function (input) {
-        let regex = /^[a-zA-Z0-9,. ]*$/; // Incluye el espacio
+        let regex = /^[\p{L}0-9 ]*$/u;
         if (!regex.test(input.value)) {
-            input.value = input.value.replace(/[^a-zA-Z0-9,. ]/g, '');
+            input.value = input.value.replace(/[^\p{L}0-9 ]/gu, '');
         }
     },
 
-    validateInputTextPlaca: function (input) {
-        let regex = /^[a-zA-Z0-9-]*$/;
+    validateInputTextCode: function (input) {
+        let regex = /^[\p{L}0-9-]*$/u;
         if (!regex.test(input.value)) {
-            input.value = input.value.replace(/[^a-zA-Z0-9-]/g, '');
+            input.value = input.value.replace(/[^\p{L}0-9-]/gu, '');
         }
     },
 
     validateInputTextArea: function (input) {
-        let regex = /^[a-zA-Z0-9,. ]*$/;
+        let regex = /^[\p{L}0-9/(),. ]*$/u;
         if (!regex.test(input.value)) {
-            input.value = input.value.replace(/[^a-zA-Z0-9,. ]/g, '');
+            input.value = input.value.replace(/[^\p{L}0-9/(),. ]/gu, '');
         }
     },
 
@@ -25,6 +25,13 @@ let Validator = {
         let regex = /^[a-zA-Z0-9._]*$/;
         if (!regex.test(input.value)) {
             input.value = input.value.replace(/[^a-zA-Z0-9._]/g, '');
+        }
+    },
+
+    validateInputTextEmail: function (input) {
+        let regex = /^[a-zA-Z0-9._@]*$/;
+        if (!regex.test(input.value)) {
+            input.value = input.value.replace(/[^a-zA-Z0-9._@]/g, '');
         }
     }
 

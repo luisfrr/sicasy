@@ -23,7 +23,7 @@
                     <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4 xl:col-3">
                         <p:outputLabel for="@next" value="Usuario" styleClass="block"/>
                         <p:inputText styleClass="block w-full" readonly="true"
-                                     onkeyup="Validator.validateInputText(this);"
+                                     onkeyup="Validator.validateInputTextUsername(this);"
                                      value="#{usuarioView.usuarioSelected.usuario}"/>
                     </p:outputPanel>
 
@@ -37,14 +37,14 @@
                     <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4 xl:col-3">
                         <p:outputLabel for="@next" value="Correo" styleClass="block"/>
                         <p:inputText styleClass="block w-full" readonly="true"
-                                     onkeyup="Validator.validateInputText(this);"
+                                     onkeyup="Validator.validateInputTextEmail(this);"
                                      value="#{usuarioView.usuarioSelected.email}"/>
                     </p:outputPanel>
 
                     <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4 xl:col-3">
                         <p:outputLabel for="@next" value="Roles" styleClass="block"/>
                         <p:inputText styleClass="block w-full" readonly="true"
-                                     onkeyup="Validator.validateInputText(this);"
+                                     onkeyup="Validator.validateInputTextArea(this);"
                                      value="#{usuarioView.usuarioSelected.roles}"/>
                     </p:outputPanel>
 

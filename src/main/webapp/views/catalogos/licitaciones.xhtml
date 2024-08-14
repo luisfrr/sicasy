@@ -76,8 +76,8 @@
 
                         <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4 xl:col-3">
                             <p:outputLabel for="@next" value="Licitación" styleClass="block"/>
-                            <p:inputText styleClass="block w-full" placeholder="Buscar por número de licitación"
-                                         onkeyup="Validator.validateInputText(this);"
+                            <p:inputText styleClass="block w-full" placeholder="Filtrar por número de licitación..."
+                                         onkeyup="Validator.validateInputTextCode(this);"
                                          value="#{licitacionView.licitacionFilter.numeroLicitacion}"/>
                             <span class="text-sm hidden"> </span>
                         </p:outputPanel>
@@ -130,11 +130,11 @@
                         <h:outputText value="#{index + 1}" />
                     </p:column>
 
-                    <p:column headerText="Número licitación" width="180">
+                    <p:column headerText="Número licitación" width="220">
                         <h:outputText value="#{licitacion.numeroLicitacion}"/>
                     </p:column>
 
-                    <p:column headerText="Nombre" width="180">
+                    <p:column headerText="Nombre" width="250">
                         <h:outputText value="#{licitacion.nombre}"/>
                     </p:column>
 
@@ -276,7 +276,7 @@
                     <p:outputPanel styleClass="field col-12">
                         <p:outputLabel for="@next" value="Número licitación" styleClass="block "/>
                         <p:inputText styleClass="block w-full" required="true"
-                                     onkeyup="Validator.validateInputText(this);"
+                                     onkeyup="Validator.validateInputTextCode(this);"
                                      value="#{licitacionView.licitacionSelected.numeroLicitacion}"/>
                         <span class="text-sm hidden"> </span>
                     </p:outputPanel>

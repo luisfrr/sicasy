@@ -35,7 +35,7 @@ import java.util.Optional;
 public class AseguradoraView {
 
     // Inyección de dependencias
-    private final IAseguradoraService  aseguradoraService;
+    private final IAseguradoraService aseguradoraService;
     private final UserSessionBean userSessionBean;
 
     // Variables Generales
