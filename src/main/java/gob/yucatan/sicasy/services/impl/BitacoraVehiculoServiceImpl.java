@@ -6,6 +6,7 @@ import gob.yucatan.sicasy.repository.criteria.SearchOperation;
 import gob.yucatan.sicasy.repository.criteria.SearchSpecification;
 import gob.yucatan.sicasy.repository.iface.IBitacoraVehiculoRepository;
 import gob.yucatan.sicasy.services.iface.IBitacoraVehiculoService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -54,6 +55,7 @@ public class BitacoraVehiculoServiceImpl implements IBitacoraVehiculoService {
         bitacoraVehiculoRepository.saveAll(bitacoraVehiculo);
     }
 
+    @Transactional
     @Override
     public BitacoraVehiculo getBitacoraVehiculo(String accion, Vehiculo vehiculoAnterior, Vehiculo vehiculoNuevo, String username) {
 
@@ -94,7 +96,7 @@ public class BitacoraVehiculoServiceImpl implements IBitacoraVehiculoService {
                         campo.setAccessible(true); // Permitir acceso a campos privados
                         // Obtener el valor del campo en el rol nuevo
                         Object valorNuevo = campo.get(vehiculoNuevo);
-                        String tipoDato = valorNuevo.getClass().getSimpleName();
+                        String tipoDato = valorNuevo != null ? valorNuevo.getClass().getSimpleName() : "";
                         // Agregar un registro a la bitácora con el campo y el valor nuevo
                         bitacoraVehiculoCambios.add(this.getBitacoraCambio(bitacoraVehiculo, nombreCampo, tipoDato, null, valorNuevo.toString()));
                     }

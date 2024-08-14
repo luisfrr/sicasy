@@ -138,14 +138,14 @@
                         <f:selectItem itemLabel="Seleccione una..." itemValue="#{null}"/>
                         <f:selectItems value="#{vehiculoView.licitacionFormList}" var="licitacion"
                                        itemValue="#{licitacion.idLicitacion}" itemLabel="#{licitacion.numeroLicitacion}"/>
-                        <p:ajax event="change" listener="#{vehiculoView.onChangeLicitacionForm()}" update="registrar-vehiculo-dialog-content"/>
+                        <p:ajax event="change" listener="#{vehiculoView.onChangeLicitacionForm()}" update="individual-form:select_anexo"/>
                      </p:selectOneMenu>
                      <span class="text-sm hidden"> </span>
                   </p:outputPanel>
 
                   <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4">
                      <p:outputLabel for="@next" value="Anexo" styleClass="block"/>
-                     <p:selectOneMenu value="#{vehiculoView.vehiculoSelected.anexo.idAnexo}"
+                     <p:selectOneMenu id="select_anexo" value="#{vehiculoView.vehiculoSelected.anexo.idAnexo}"
                                       styleClass="w-full mw-auto">
                         <f:selectItem itemLabel="Seleccione una..." itemValue="#{null}"/>
                         <f:selectItems value="#{vehiculoView.anexoFormList}" var="anexo"
