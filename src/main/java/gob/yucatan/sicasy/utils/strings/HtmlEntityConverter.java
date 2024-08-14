@@ -8,48 +8,19 @@ import java.util.*;
 public class HtmlEntityConverter {
 
     private static final Set<String> RESERVED_WORDS = Set.of(
-            "create", "insert", "update", "delete", "drop", "alter", "select", "union",
+            "create", "insert", "update", "delete", "drop", "alter", "select", "union", "from",
             "grant", "truncate", "between", "or", "jquery", "javascript"
     );
 
     private static final Map<String, String> SYMBOLS_TO_HTML = Map.ofEntries(
-            Map.entry("+", "&plus;"),
-            Map.entry("-", "&minus;"),
-            Map.entry("*", "&ast;"),
-            Map.entry("/", "&sol;"),
-            Map.entry("%", "&percnt;"),
-            Map.entry("=", "&equals;"),
-            Map.entry("==", "&equals;&equals;"),
-            Map.entry("!=", "&excl;&equals;"),
             Map.entry("<", "&lt;"),
             Map.entry(">", "&gt;"),
-            Map.entry("<=", "&lt;&equals;"),
-            Map.entry(">=", "&gt;&equals;"),
-            Map.entry("&&", "&amp;&amp;"),
-            Map.entry("||", "&vert;&vert;"),
-            Map.entry("!", "&excl;"),
-            Map.entry("&", "&amp;"),
-            Map.entry("|", "&vert;"),
-            Map.entry("^", "&circ;"),
-            Map.entry("~", "&tilde;"),
-            Map.entry("<<", "&lt;&lt;"),
-            Map.entry(">>", "&gt;&gt;"),
-            Map.entry(">>>", "&gt;&gt;&gt;"),
-            Map.entry("++", "&plus;&plus;"),
-            Map.entry("--", "&minus;&minus;"),
-            Map.entry("->", "&minus;&gt;"),
-            Map.entry("::", "&colon;&colon;"),
-            Map.entry("?", "&quest;"),
-            Map.entry(":", "&colon;"),
-            Map.entry(".", "&period;"),
-            Map.entry(",", "&comma;"),
-            Map.entry(";", "&semi;"),
+            Map.entry("%", "&percnt;"),
+            Map.entry("$", "&#36;"),
             Map.entry("(", "&lpar;"),
             Map.entry(")", "&rpar;"),
-            Map.entry("{", "&lcub;"),
-            Map.entry("}", "&rcub;"),
-            Map.entry("[", "&lsqb;"),
-            Map.entry("]", "&rsqb;")
+            Map.entry("\"", "&quot;"),
+            Map.entry("'", "&#39;")
     );
 
     private static final Map<String, String> HTML_TO_SYMBOLS = new HashMap<>();
