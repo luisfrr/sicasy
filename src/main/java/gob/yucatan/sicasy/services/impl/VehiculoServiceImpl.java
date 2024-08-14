@@ -178,6 +178,7 @@ public class VehiculoServiceImpl implements IVehiculoService {
                 .orElseThrow(() -> new NotFoundException("No se ha encontrado el vehículo con el número de serie: " + noSerie));
     }
 
+    @Transactional
     @Override
     public Vehiculo agregar(Vehiculo vehiculo) {
         Integer ESTATUS_VEHICULO_REGISTRADO = 1;
@@ -205,6 +206,7 @@ public class VehiculoServiceImpl implements IVehiculoService {
         return vehiculoSaved;
     }
 
+    @Transactional
     @Override
     public void editar(Vehiculo vehiculo) {
         Vehiculo vehiculoToUpdate = this.findById(vehiculo.getIdVehiculo());

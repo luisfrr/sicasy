@@ -55,7 +55,6 @@ public class BitacoraVehiculoServiceImpl implements IBitacoraVehiculoService {
         bitacoraVehiculoRepository.saveAll(bitacoraVehiculo);
     }
 
-    @Transactional
     @Override
     public BitacoraVehiculo getBitacoraVehiculo(String accion, Vehiculo vehiculoAnterior, Vehiculo vehiculoNuevo, String username) {
 
