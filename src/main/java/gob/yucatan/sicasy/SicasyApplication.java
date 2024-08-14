@@ -8,17 +8,15 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.List;
+import java.util.TimeZone;
 
 @SpringBootApplication
-
 @RequiredArgsConstructor
 @Slf4j
 public class SicasyApplication implements CommandLineRunner {
 
-    private final PasswordEncoder passwordEncoder;
     private final IPermisoService permisoService;
     private final IPermisoScannerService permisoScannerService;
 
@@ -28,9 +26,16 @@ public class SicasyApplication implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
-        String passwordEncoded = passwordEncoder.encode("sicasySaF.5");
-        log.info(passwordEncoded);
+        setTimeZone();
+        loadPermisos();
+    }
 
+    private void setTimeZone() {
+        // Establecer la zona horaria por defecto
+        TimeZone.setDefault(TimeZone.getTimeZone("GMT-6"));
+    }
+
+    private void loadPermisos() {
         try {
             List<Permiso> permisos = permisoScannerService.getPermisos("gob.yucatan.sicasy",
                     "SICASY");
