@@ -2,7 +2,7 @@ package gob.yucatan.sicasy.business.entities;
 
 import gob.yucatan.sicasy.business.enums.EstatusRegistro;
 import gob.yucatan.sicasy.utils.date.DateFormatUtil;
-import gob.yucatan.sicasy.utils.strings.ReplaceSymbolsUtil;
+import gob.yucatan.sicasy.utils.strings.HtmlEntityConverter;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
@@ -16,65 +16,132 @@ import java.util.Date;
 @Table(name = "anexo")
 @AllArgsConstructor
 @NoArgsConstructor
-@Getter
-@Setter
 @Builder
 @Slf4j
 public class Anexo implements Cloneable {
 
+    @Setter
+    @Getter
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "anexo_id")
     private Long idAnexo;
 
+    @Setter
+    @Getter
     @ManyToOne
     @JoinColumn(name = "licitacion_id", nullable = false)
     private Licitacion licitacion;
 
     @Column(name = "nombre", nullable = false)
-    @Getter(AccessLevel.NONE)
     private String nombre;
 
     @Column(name = "descripcion")
-    @Getter(AccessLevel.NONE)
     private String descripcion;
 
+    @Setter
+    @Getter
     @Column(name = "fecha_inicio")
     private Date fechaInicio;
 
+    @Setter
+    @Getter
     @Column(name = "fecha_final")
     private Date fechaFinal;
 
+    @Setter
+    @Getter
     @Column(name = "fecha_firma")
     private Date fechaFirma;
 
+    @Setter
+    @Getter
     @Column(name = "ruta_archivo")
     private String rutaArchivo;
 
+    @Setter
+    @Getter
     @Column(name = "estatus_registro", nullable = false)
     @Enumerated(EnumType.ORDINAL)
     private EstatusRegistro estatusRegistro;
 
+    @Setter
+    @Getter
     @Column(name = "fecha_creacion")
     private Date fechaCreacion;
 
     @Column(name = "creado_por")
     private String creadoPor;
 
+    @Setter
+    @Getter
     @Column(name = "fecha_modificacion")
     private Date fechaModificacion;
 
     @Column(name = "modificado_por")
     private String modificadoPor;
 
+    @Setter
+    @Getter
     @Column(name = "fecha_borrado")
     private Date fechaBorrado;
 
     @Column(name = "borrado_por")
     private String borradoPor;
 
+
+    //region Transients
+
+    @Setter
+    @Getter
     @Transient
     private String numLicitacionString;
+
+    //endregion Transients
+
+    //region Getters & Setters
+
+    public String getNombre() {
+        return HtmlEntityConverter.convertHtmlEntitiesToSymbols(nombre);
+    }
+
+    public void setNombre(String nombre) {
+        this.nombre = HtmlEntityConverter.convertSymbolsAndReservedWordsToHtmlEntities(nombre);
+    }
+
+    public String getDescripcion() {
+        return HtmlEntityConverter.convertHtmlEntitiesToSymbols(descripcion);
+    }
+
+    public void setDescripcion(String descripcion) {
+        this.descripcion = HtmlEntityConverter.convertSymbolsAndReservedWordsToHtmlEntities(descripcion);
+    }
+
+    public String getCreadoPor() {
+        return HtmlEntityConverter.convertHtmlEntitiesToSymbols(creadoPor);
+    }
+
+    public void setCreadoPor(String creadoPor) {
+        this.creadoPor = HtmlEntityConverter.convertSymbolsAndReservedWordsToHtmlEntities(creadoPor);
+    }
+
+    public String getModificadoPor() {
+        return HtmlEntityConverter.convertHtmlEntitiesToSymbols(modificadoPor);
+    }
+
+    public void setModificadoPor(String modificadoPor) {
+        this.modificadoPor = HtmlEntityConverter.convertSymbolsAndReservedWordsToHtmlEntities(modificadoPor);
+    }
+
+    public String getBorradoPor() {
+        return HtmlEntityConverter.convertHtmlEntitiesToSymbols(borradoPor);
+    }
+
+    public void setBorradoPor(String borradoPor) {
+        this.borradoPor = HtmlEntityConverter.convertSymbolsAndReservedWordsToHtmlEntities(borradoPor);
+    }
+
+    //endregion Getters & Setters
 
     public String fechaInicioString(){
         return DateFormatUtil.convertToFormat(fechaInicio,"dd-MM-yyyy");
@@ -88,8 +155,7 @@ public class Anexo implements Cloneable {
         return DateFormatUtil.convertToFormat(fechaFirma, "dd-MM-yyyy");
     }
 
-    public Boolean getIsExpirationDateFechaFinal(){
-
+    public Boolean getIsExpirationDateFechaFinal() {
         if (fechaFinal != null){
             Instant instant = fechaFinal.toInstant();
 
@@ -99,16 +165,7 @@ public class Anexo implements Cloneable {
             // return true si la fecha esta despues de la fecha de hoy menos 30 dias
             return date.isAfter(today.minusDays(30));
         }
-
         return false;
-    }
-
-    public String getNombre() {
-        return ReplaceSymbolsUtil.replaceSymbolsCode(this.nombre);
-    }
-
-    public String getDescripcion() {
-        return ReplaceSymbolsUtil.replaceSymbolsCode(this.descripcion);
     }
 
     @Override
@@ -121,4 +178,5 @@ public class Anexo implements Cloneable {
             throw new AssertionError();
         }
     }
+
 }

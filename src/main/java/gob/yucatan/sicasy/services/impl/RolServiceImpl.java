@@ -12,7 +12,6 @@ import gob.yucatan.sicasy.repository.criteria.SearchSpecification;
 import gob.yucatan.sicasy.repository.iface.IRolRepository;
 import gob.yucatan.sicasy.services.iface.IBitacoraRolService;
 import gob.yucatan.sicasy.services.iface.IRolService;
-import gob.yucatan.sicasy.utils.strings.ReplaceSymbolsUtil;
 import jakarta.persistence.criteria.JoinType;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -34,7 +33,6 @@ public class RolServiceImpl implements IRolService {
 
     @Override
     public List<Rol> findAllDynamic(Rol rol) {
-        ReplaceSymbolsUtil.processEntity(rol);
         SearchSpecification<Rol> specification = new SearchSpecification<>();
 
         if(rol.getNombre() != null && !rol.getNombre().isEmpty())
@@ -62,7 +60,6 @@ public class RolServiceImpl implements IRolService {
     @Override
     @Transactional
     public void save(Rol rol) {
-        ReplaceSymbolsUtil.processEntity(rol);
         if(rol.getNombre() != null && !rol.getNombre().isEmpty()) {
             // Se agrega validación si ya existe un rol con el mismo nombre
             boolean existsByNombre = rolRepository.existsByNombreAndEstatus(rol.getNombre(), EstatusRegistro.ACTIVO);
@@ -113,7 +110,6 @@ public class RolServiceImpl implements IRolService {
     @Override
     @Transactional
     public void update(Rol rol) {
-        ReplaceSymbolsUtil.processEntity(rol);
         Long ID_ROL_OWNER = 1L;
         if(Objects.equals(rol.getIdRol(), ID_ROL_OWNER))
             throw new BadRequestException("No es posible actualizar el rol propietario.");

@@ -2,7 +2,7 @@ package gob.yucatan.sicasy.business.entities;
 
 import gob.yucatan.sicasy.business.enums.EstatusRegistro;
 import gob.yucatan.sicasy.utils.date.DateValidator;
-import gob.yucatan.sicasy.utils.strings.ReplaceSymbolsUtil;
+import gob.yucatan.sicasy.utils.strings.HtmlEntityConverter;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -22,17 +22,17 @@ import java.util.Set;
 @ToString
 public class Vehiculo implements Cloneable, Serializable {
 
+    @Setter
+    @Getter
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "vehiculo_id", nullable = false)
     private Long idVehiculo;
 
     @Column(name = "no_serie", nullable = false)
-    @Getter(AccessLevel.NONE)
     private String noSerie;
 
     @Column(name = "placa", nullable = false)
-    @Getter(AccessLevel.NONE)
     private String placa;
 
     @Column(name = "marca", nullable = false)
@@ -41,6 +41,8 @@ public class Vehiculo implements Cloneable, Serializable {
     @Column(name = "modelo", nullable = false)
     private String modelo;
 
+    @Setter
+    @Getter
     @Column(name = "anio", nullable = false)
     private Integer anio;
 
@@ -51,41 +53,56 @@ public class Vehiculo implements Cloneable, Serializable {
     private String color;
 
     @Column(name = "descripcion_vehiculo")
-    @Getter(AccessLevel.NONE)
     private String descripcionVehiculo;
 
+    @Setter
+    @Getter
     @Column(name = "monto_factura", nullable = false)
     private Double montoFactura;
 
     @Column(name = "no_factura", nullable = false)
     private String noFactura;
 
+    @Setter
+    @Getter
     @Column(name = "renta_mensual", nullable = false)
     private Double rentaMensual;
 
     @Column(name = "proveedor")
     private String proveedor;
 
+    @Setter
+    @Getter
     @ManyToOne
     @JoinColumn(name = "licitacion_id")
     private Licitacion licitacion;
 
+    @Setter
+    @Getter
     @ManyToOne
     @JoinColumn(name = "anexo_id")
     private Anexo anexo;
 
+    @Setter
+    @Getter
     @ManyToOne
     @JoinColumn(name = "dependencia_id", nullable = false)
     private Dependencia dependencia;
 
+    @Setter
+    @Getter
     @ManyToOne
     @JoinColumn(name = "asignada_dependencia_id")
     private Dependencia dependenciaAsignada;
 
+    @Setter
+    @Getter
     @ManyToOne
     @JoinColumn(name = "estatus_vehiculo_id", nullable = false)
     private EstatusVehiculo estatusVehiculo;
 
+    @Setter
+    @Getter
     @ManyToOne
     @JoinColumn(name = "condicion_vehiculo_id", nullable = false)
     private CondicionVehiculo condicionVehiculo;
@@ -103,17 +120,22 @@ public class Vehiculo implements Cloneable, Serializable {
     private String autorizaDirectorGeneral;
 
     @Column(name = "observaciones")
-    @Getter(AccessLevel.NONE)
     private String observaciones;
 
+    @Setter
+    @Getter
     @OneToMany(mappedBy = "vehiculo", fetch = FetchType.LAZY)
     @ToString.Exclude
     private Set<Inciso> incisoSet;
 
+    @Setter
+    @Getter
     @Column(name = "estatus_registro", nullable = false)
     @Enumerated(EnumType.ORDINAL)
     private EstatusRegistro estatusRegistro;
 
+    @Setter
+    @Getter
     @Column(name = "fecha_creacion", nullable = false, updatable = false)
     @Temporal(TemporalType.TIMESTAMP)
     private Date fechaCreacion;
@@ -121,6 +143,8 @@ public class Vehiculo implements Cloneable, Serializable {
     @Column(name = "creado_por", nullable = false, updatable = false)
     private String creadoPor;
 
+    @Setter
+    @Getter
     @Column(name = "fecha_modificacion")
     @Temporal(TemporalType.TIMESTAMP)
     private Date fechaModificacion;
@@ -128,6 +152,8 @@ public class Vehiculo implements Cloneable, Serializable {
     @Column(name = "modificado_por")
     private String modificadoPor;
 
+    @Setter
+    @Getter
     @Column(name = "fecha_borrado")
     @Temporal(TemporalType.TIMESTAMP)
     private Date fechaBorrado;
@@ -135,39 +161,181 @@ public class Vehiculo implements Cloneable, Serializable {
     @Column(name = "borrado_por")
     private String borradoPor;
 
+
+    //region Transients
+
+    @Setter
+    @Getter
     @Transient
     private Integer condicionId;
 
+    @Setter
+    @Getter
     @Transient
     private String numLicitacion;
 
+    @Setter
+    @Getter
     @Transient
     private String anexoValue;
 
+    @Setter
+    @Getter
     @Transient
     private List<Integer> idEstatusVehiculoList;
 
+    @Setter
+    @Getter
     @Transient
     private List<String> noSerieList;
 
+    @Setter
+    @Getter
     @Transient
     private boolean fetchIncisoSet;
 
+    //endregion Transients
+
+    //region Getters & Setters
+
     public String getNoSerie() {
-        return ReplaceSymbolsUtil.replaceSymbolsCode(this.noSerie);
+        return HtmlEntityConverter.convertHtmlEntitiesToSymbols(noSerie);
+    }
+
+    public void setNoSerie(String noSerie) {
+        this.noSerie = HtmlEntityConverter.convertSymbolsAndReservedWordsToHtmlEntities(noSerie);
     }
 
     public String getPlaca() {
-        return ReplaceSymbolsUtil.replaceSymbolsCode(this.placa);
+        return HtmlEntityConverter.convertHtmlEntitiesToSymbols(placa);
+    }
+
+    public void setPlaca(String placa) {
+        this.placa = HtmlEntityConverter.convertSymbolsAndReservedWordsToHtmlEntities(placa);
+    }
+
+    public String getMarca() {
+        return HtmlEntityConverter.convertHtmlEntitiesToSymbols(marca);
+    }
+
+    public void setMarca(String marca) {
+        this.marca = HtmlEntityConverter.convertSymbolsAndReservedWordsToHtmlEntities(marca);
+    }
+
+    public String getModelo() {
+        return HtmlEntityConverter.convertHtmlEntitiesToSymbols(modelo);
+    }
+
+    public void setModelo(String modelo) {
+        this.modelo = HtmlEntityConverter.convertSymbolsAndReservedWordsToHtmlEntities(modelo);
+    }
+
+    public String getNoMotor() {
+        return HtmlEntityConverter.convertHtmlEntitiesToSymbols(noMotor);
+    }
+
+    public void setNoMotor(String noMotor) {
+        this.noMotor = HtmlEntityConverter.convertSymbolsAndReservedWordsToHtmlEntities(noMotor);
+    }
+
+    public String getColor() {
+        return HtmlEntityConverter.convertHtmlEntitiesToSymbols(color);
+    }
+
+    public void setColor(String color) {
+        this.color = HtmlEntityConverter.convertSymbolsAndReservedWordsToHtmlEntities(color);
     }
 
     public String getDescripcionVehiculo() {
-        return ReplaceSymbolsUtil.replaceSymbolsCode(this.descripcionVehiculo);
+        return HtmlEntityConverter.convertHtmlEntitiesToSymbols(descripcionVehiculo);
+    }
+
+    public void setDescripcionVehiculo(String descripcionVehiculo) {
+        this.descripcionVehiculo = HtmlEntityConverter.convertSymbolsAndReservedWordsToHtmlEntities(descripcionVehiculo);
+    }
+
+    public String getNoFactura() {
+        return HtmlEntityConverter.convertHtmlEntitiesToSymbols(noFactura);
+    }
+
+    public void setNoFactura(String noFactura) {
+        this.noFactura = HtmlEntityConverter.convertSymbolsAndReservedWordsToHtmlEntities(noFactura);
+    }
+
+    public String getProveedor() {
+        return HtmlEntityConverter.convertHtmlEntitiesToSymbols(proveedor);
+    }
+
+    public void setProveedor(String proveedor) {
+        this.proveedor = HtmlEntityConverter.convertSymbolsAndReservedWordsToHtmlEntities(proveedor);
+    }
+
+    public String getResguardante() {
+        return HtmlEntityConverter.convertHtmlEntitiesToSymbols(resguardante);
+    }
+
+    public void setResguardante(String resguardante) {
+        this.resguardante = HtmlEntityConverter.convertSymbolsAndReservedWordsToHtmlEntities(resguardante);
+    }
+
+    public String getAreaResguardante() {
+        return HtmlEntityConverter.convertHtmlEntitiesToSymbols(areaResguardante);
+    }
+
+    public void setAreaResguardante(String areaResguardante) {
+        this.areaResguardante = HtmlEntityConverter.convertSymbolsAndReservedWordsToHtmlEntities(areaResguardante);
+    }
+
+    public String getAutorizaDirectorAdmin() {
+        return HtmlEntityConverter.convertHtmlEntitiesToSymbols(autorizaDirectorAdmin);
+    }
+
+    public void setAutorizaDirectorAdmin(String autorizaDirectorAdmin) {
+        this.autorizaDirectorAdmin = HtmlEntityConverter.convertHtmlEntitiesToSymbols(autorizaDirectorAdmin);
+    }
+
+    public String getAutorizaDirectorGeneral() {
+        return HtmlEntityConverter.convertHtmlEntitiesToSymbols(autorizaDirectorGeneral);
+    }
+
+    public void setAutorizaDirectorGeneral(String autorizaDirectorGeneral) {
+        this.autorizaDirectorGeneral = HtmlEntityConverter.convertSymbolsAndReservedWordsToHtmlEntities(autorizaDirectorGeneral);
     }
 
     public String getObservaciones() {
-        return ReplaceSymbolsUtil.replaceSymbolsCode(this.observaciones);
+        return HtmlEntityConverter.convertHtmlEntitiesToSymbols(observaciones);
     }
+
+    public void setObservaciones(String observaciones) {
+        this.observaciones = HtmlEntityConverter.convertSymbolsAndReservedWordsToHtmlEntities(observaciones);
+    }
+
+    public String getCreadoPor() {
+        return HtmlEntityConverter.convertHtmlEntitiesToSymbols(creadoPor);
+    }
+
+    public void setCreadoPor(String creadoPor) {
+        this.creadoPor = HtmlEntityConverter.convertSymbolsAndReservedWordsToHtmlEntities(creadoPor);
+    }
+
+    public String getModificadoPor() {
+        return HtmlEntityConverter.convertHtmlEntitiesToSymbols(modificadoPor);
+    }
+
+    public void setModificadoPor(String modificadoPor) {
+        this.modificadoPor = HtmlEntityConverter.convertSymbolsAndReservedWordsToHtmlEntities(modificadoPor);
+    }
+
+    public String getBorradoPor() {
+        return HtmlEntityConverter.convertHtmlEntitiesToSymbols(borradoPor);
+    }
+
+    public void setBorradoPor(String borradoPor) {
+        this.borradoPor = HtmlEntityConverter.convertSymbolsAndReservedWordsToHtmlEntities(borradoPor);
+    }
+
+    //endregion Getters & Setters
+
 
     @Override
     public Vehiculo clone() {

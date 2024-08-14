@@ -8,7 +8,6 @@ import gob.yucatan.sicasy.repository.criteria.SearchOperation;
 import gob.yucatan.sicasy.repository.criteria.SearchSpecification;
 import gob.yucatan.sicasy.repository.iface.IAseguradoraRepository;
 import gob.yucatan.sicasy.services.iface.IAseguradoraService;
-import gob.yucatan.sicasy.utils.strings.ReplaceSymbolsUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -26,7 +25,6 @@ public class AseguradoraServiceImpl implements IAseguradoraService {
 
     @Override
     public List<Aseguradora> findAllDynamic(Aseguradora aseguradora) {
-        ReplaceSymbolsUtil.processEntity(aseguradora);
         SearchSpecification<Aseguradora> searchSpecification =new SearchSpecification<>();
 
         if (aseguradora.getNombre() != null && !aseguradora.getNombre().isEmpty()) {
@@ -63,10 +61,8 @@ public class AseguradoraServiceImpl implements IAseguradoraService {
 
     @Override
     public void save(Aseguradora aseguradora) {
-        ReplaceSymbolsUtil.processEntity(aseguradora);
         aseguradora.setEstatus(EstatusRegistro.ACTIVO);
         aseguradoraRepository.save(aseguradora);
-
     }
 
     @Override
@@ -80,7 +76,6 @@ public class AseguradoraServiceImpl implements IAseguradoraService {
 
     @Override
     public void update(Aseguradora aseguradora) {
-        ReplaceSymbolsUtil.processEntity(aseguradora);
         aseguradoraRepository.save(aseguradora);
     }
 }

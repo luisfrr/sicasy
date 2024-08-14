@@ -1,5 +1,6 @@
 package gob.yucatan.sicasy.business.entities;
 
+import gob.yucatan.sicasy.utils.strings.HtmlEntityConverter;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -36,6 +37,8 @@ public class VehiculoFoto {
     @Temporal(TemporalType.TIMESTAMP)
     private Date fechaCreacion;
 
+    @Getter(AccessLevel.NONE)
+    @Setter(AccessLevel.NONE)
     @Column(name = "creado_por", nullable = false, updatable = false)
     private String creadoPor;
 
@@ -43,7 +46,30 @@ public class VehiculoFoto {
     @Temporal(TemporalType.TIMESTAMP)
     private Date fechaBorrado;
 
+    @Getter(AccessLevel.NONE)
+    @Setter(AccessLevel.NONE)
     @Column(name = "borrado_por", insertable = false)
     private String borradoPor;
+
+
+    //region Getters & Setters
+
+    public String getCreadoPor() {
+        return HtmlEntityConverter.convertHtmlEntitiesToSymbols(creadoPor);
+    }
+
+    public void setCreadoPor(String creadoPor) {
+        this.creadoPor = HtmlEntityConverter.convertSymbolsAndReservedWordsToHtmlEntities(creadoPor);
+    }
+
+    public String getBorradoPor() {
+        return HtmlEntityConverter.convertHtmlEntitiesToSymbols(borradoPor);
+    }
+
+    public void setBorradoPor(String borradoPor) {
+        this.borradoPor = HtmlEntityConverter.convertSymbolsAndReservedWordsToHtmlEntities(borradoPor);
+    }
+
+    //endregion Getters & Setters
 
 }

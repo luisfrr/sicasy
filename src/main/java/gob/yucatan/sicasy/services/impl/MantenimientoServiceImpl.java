@@ -11,7 +11,6 @@ import gob.yucatan.sicasy.repository.criteria.SearchOperation;
 import gob.yucatan.sicasy.repository.criteria.SearchSpecification;
 import gob.yucatan.sicasy.repository.iface.IMantenimientoRepository;
 import gob.yucatan.sicasy.services.iface.IMantenimientoService;
-import gob.yucatan.sicasy.utils.strings.ReplaceSymbolsUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -28,7 +27,6 @@ public class MantenimientoServiceImpl implements IMantenimientoService {
 
     @Override
     public List<Mantenimiento> findAllDynamic(Mantenimiento mantenimiento) {
-        ReplaceSymbolsUtil.processEntity(mantenimiento);
         SearchSpecification<Mantenimiento> specification = new SearchSpecification<>();
 
         if(mantenimiento.getVehiculo() != null && mantenimiento.getVehiculo().getIdVehiculo() != null) {
@@ -65,7 +63,6 @@ public class MantenimientoServiceImpl implements IMantenimientoService {
 
     @Override
     public Mantenimiento save(Mantenimiento mantenimiento) {
-        ReplaceSymbolsUtil.processEntity(mantenimiento);
         if(mantenimiento.getIdMantenimiento() != null) {
             Mantenimiento mantenimientoToUpdate = this.findById(mantenimiento.getIdMantenimiento());
             //mantenimientoToUpdate.setVehiculo(mantenimiento.getVehiculo()); // Vehiculo no se puede actualizar

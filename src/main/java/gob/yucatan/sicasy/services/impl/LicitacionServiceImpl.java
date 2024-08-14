@@ -10,7 +10,6 @@ import gob.yucatan.sicasy.repository.criteria.SearchOperation;
 import gob.yucatan.sicasy.repository.criteria.SearchSpecification;
 import gob.yucatan.sicasy.repository.iface.ILicitacionRepository;
 import gob.yucatan.sicasy.services.iface.ILicitacionService;
-import gob.yucatan.sicasy.utils.strings.ReplaceSymbolsUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -29,7 +28,6 @@ public class LicitacionServiceImpl implements ILicitacionService {
 
     @Override
     public List<Licitacion> findAllDynamic(Licitacion licitacion) {
-        ReplaceSymbolsUtil.processEntity(licitacion);
         SearchSpecification<Licitacion> specification = new SearchSpecification<>();
 
         if (licitacion.getNombre() != null && !licitacion.getNombre().trim().isEmpty())
@@ -75,7 +73,6 @@ public class LicitacionServiceImpl implements ILicitacionService {
 
     @Override
     public void save(Licitacion licitacion) {
-        ReplaceSymbolsUtil.processEntity(licitacion);
         licitacion.setEstatusRegistro(EstatusRegistro.ACTIVO);
         licitacion.setFechaCreacion(new Date());
 
@@ -93,7 +90,6 @@ public class LicitacionServiceImpl implements ILicitacionService {
 
     @Override
     public void update(Licitacion licitacion) {
-        ReplaceSymbolsUtil.processEntity(licitacion);
         Optional<Licitacion> licitacionOptional = licitacionRepository.findById(licitacion.getIdLicitacion());
 
         if (licitacionOptional.isEmpty())
@@ -141,8 +137,6 @@ public class LicitacionServiceImpl implements ILicitacionService {
         for(Licitacion licitacion : licitacionList){
 
             try {
-                ReplaceSymbolsUtil.processEntity(licitacion);
-
                 // válida campos obligatorios
                 if(licitacion.getNombre() == null || licitacion.getNombre().trim().isEmpty())
                     throw new BadRequestException("El campo nombre es obligatorio");

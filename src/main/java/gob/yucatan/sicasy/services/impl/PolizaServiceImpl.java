@@ -12,7 +12,6 @@ import gob.yucatan.sicasy.repository.criteria.SearchSpecification;
 import gob.yucatan.sicasy.repository.iface.IAseguradoraRepository;
 import gob.yucatan.sicasy.repository.iface.IPolizaRepository;
 import gob.yucatan.sicasy.services.iface.IPolizaService;
-import gob.yucatan.sicasy.utils.strings.ReplaceSymbolsUtil;
 import jakarta.persistence.criteria.JoinType;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -31,7 +30,6 @@ public class PolizaServiceImpl implements IPolizaService {
 
     @Override
     public List<Poliza> findAllDynamic(Poliza poliza) {
-        ReplaceSymbolsUtil.processEntity(poliza);
         SearchSpecification<Poliza> specification = new SearchSpecification<>();
 
         if(poliza.getIdPoliza() != null) {
@@ -143,15 +141,12 @@ public class PolizaServiceImpl implements IPolizaService {
     @Override
     @Transactional
     public void save(Poliza poliza) {
-        ReplaceSymbolsUtil.processEntity(poliza);
         polizaRepository.save(poliza);
     }
 
     @Override
     @Transactional
     public void registrarPoliza(Poliza poliza, String username) {
-        ReplaceSymbolsUtil.processEntity(poliza);
-
         boolean alreadyExists = polizaRepository.existsByIdAseguradoraAndNumeroPolizaAndActiva(poliza.getAseguradora().getIdAseguradora(), poliza.getNumeroPoliza());
 
         if(alreadyExists)
@@ -227,7 +222,6 @@ public class PolizaServiceImpl implements IPolizaService {
         for(Poliza poliza : polizas) {
 
             try {
-                ReplaceSymbolsUtil.processEntity(poliza);
                 // Validación de campos obligatorios
                 if(poliza.getIdAseguradora() == null)
                     throw new BadRequestException("El campo Aseguradora es obligatorio");

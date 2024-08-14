@@ -12,7 +12,6 @@ import gob.yucatan.sicasy.repository.criteria.SearchSpecification;
 import gob.yucatan.sicasy.repository.iface.*;
 import gob.yucatan.sicasy.services.iface.IBitacoraVehiculoService;
 import gob.yucatan.sicasy.services.iface.IVehiculoService;
-import gob.yucatan.sicasy.utils.strings.ReplaceSymbolsUtil;
 import jakarta.persistence.criteria.JoinType;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -47,7 +46,6 @@ public class VehiculoServiceImpl implements IVehiculoService {
 
     @Override
     public List<Vehiculo> findAllDynamic(Vehiculo vehiculo) {
-        ReplaceSymbolsUtil.processEntity(vehiculo);
         SearchSpecification<Vehiculo> specification = new SearchSpecification<>();
 
         if(vehiculo.getDependencia() != null && vehiculo.getDependencia().getIdDependencia() != null)
@@ -182,7 +180,6 @@ public class VehiculoServiceImpl implements IVehiculoService {
 
     @Override
     public Vehiculo agregar(Vehiculo vehiculo) {
-        ReplaceSymbolsUtil.processEntity(vehiculo);
         Integer ESTATUS_VEHICULO_REGISTRADO = 1;
 
         // Validar si ya existe un vehiculo con ese no. de serie
@@ -210,7 +207,6 @@ public class VehiculoServiceImpl implements IVehiculoService {
 
     @Override
     public void editar(Vehiculo vehiculo) {
-        ReplaceSymbolsUtil.processEntity(vehiculo);
         Vehiculo vehiculoToUpdate = this.findById(vehiculo.getIdVehiculo());
         Vehiculo vehiculoAnterior = vehiculoToUpdate.clone();
 
@@ -311,7 +307,6 @@ public class VehiculoServiceImpl implements IVehiculoService {
     @Override
     @Transactional
     public void rechazarSolicitud(List<Long> idVehiculoList, String motivo, String username) {
-        ReplaceSymbolsUtil.replaceReservedWordsAndSymbols(motivo);
         // Al rechazar una solicitud regresa a estatus registrado
         this.cambioEstatus(ACCION_RECHAZAR_SOLICITUD, ESTATUS_VEHICULO_REGISTRADO,
                 idVehiculoList, motivo, username);
@@ -320,7 +315,6 @@ public class VehiculoServiceImpl implements IVehiculoService {
     @Override
     @Transactional
     public void cancelarSolicitud(List<Long> idVehiculoList, String motivo, String username) {
-        ReplaceSymbolsUtil.replaceReservedWordsAndSymbols(motivo);
         // Al cancelar una solicitud cambia a estatus cancelado
         Integer ESTATUS_VEHICULO_CANCELADO = 5;
         this.cambioEstatus(ACCION_CANCELAR_SOLICITUD, ESTATUS_VEHICULO_CANCELADO,
@@ -330,7 +324,6 @@ public class VehiculoServiceImpl implements IVehiculoService {
     @Override
     @Transactional
     public void solicitarModificacion(List<Long> idVehiculoList, String motivo, String username) {
-        ReplaceSymbolsUtil.replaceReservedWordsAndSymbols(motivo);
         // Al solicitar una modificación cambia a estatus registrado
         this.cambioEstatus(ACCION_SOLICITAR_MODIFICACION, ESTATUS_VEHICULO_REGISTRADO,
                 idVehiculoList, motivo, username);
@@ -339,7 +332,6 @@ public class VehiculoServiceImpl implements IVehiculoService {
     @Override
     @Transactional
     public void solicitarBaja(List<Long> idVehiculoList, String motivo, String username) {
-        ReplaceSymbolsUtil.replaceReservedWordsAndSymbols(motivo);
         // Al solicitar una baja cambia a estatus baja
         this.cambioEstatus(ACCION_SOLICITAR_BAJA, ESTATUS_VEHICULO_BAJA,
                 idVehiculoList, motivo, username);
@@ -350,7 +342,6 @@ public class VehiculoServiceImpl implements IVehiculoService {
 
         for (Vehiculo vehiculo : vehiculos) {
             try {
-                ReplaceSymbolsUtil.processEntity(vehiculo);
                 // Validacion de campos obligatorios
                 if(vehiculo.getNoSerie() == null || vehiculo.getNoSerie().isEmpty())
                     throw new BadRequestException("El campo No. Serie es obligatorio");

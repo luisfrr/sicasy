@@ -1,7 +1,7 @@
 package gob.yucatan.sicasy.business.entities;
 
 import gob.yucatan.sicasy.business.enums.EstatusUsuario;
-import gob.yucatan.sicasy.utils.strings.ReplaceSymbolsUtil;
+import gob.yucatan.sicasy.utils.strings.HtmlEntityConverter;
 import jakarta.persistence.*;
 import lombok.*;
 import org.apache.logging.log4j.util.Strings;
@@ -15,51 +15,66 @@ import java.util.stream.Collectors;
 @Table(name = "usuario", schema = "sec")
 @AllArgsConstructor
 @NoArgsConstructor
-@Getter
-@Setter
 @Builder
 @ToString
 public class Usuario implements UserDetails {
 
+    @Setter
+    @Getter
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "usuario_id")
     private Long idUsuario;
 
+    @Setter
+    @Getter
     @Column(name = "usuario", nullable = false)
-    @Getter(AccessLevel.NONE)
     private String usuario;
 
+    @Setter
+    @Getter
     @Column(name = "contrasenia", nullable = false)
     private String contrasenia;
 
     @Column(name = "nombre", nullable = false)
-    @Getter(AccessLevel.NONE)
     private String nombre;
 
     @Column(name = "email", nullable = false)
-    @Getter(AccessLevel.NONE)
     private String email;
 
+    @Setter
+    @Getter
     @Column(name = "correo_confirmado")
     private Integer correoConfirmado;
 
+    @Setter
+    @Getter
     @Column(name = "token")
     private String token;
 
+    @Setter
+    @Getter
     @Column(name = "vigencia_token")
     private Date vigenciaToken;
 
+    @Setter
+    @Getter
     @Column(name = "token_type")
     private String tokenType;
 
+    @Setter
+    @Getter
     @OneToMany(cascade=CascadeType.ALL, mappedBy="usuario", fetch = FetchType.EAGER)
     private Set<UsuarioRol> usuarioRolSet;
 
+    @Setter
+    @Getter
     @Column(name = "estatus", nullable = false)
     @Enumerated(EnumType.ORDINAL)
     private EstatusUsuario estatus;
 
+    @Setter
+    @Getter
     @Column(name = "fecha_creacion", nullable = false, updatable = false)
     @Temporal(TemporalType.TIMESTAMP)
     private Date fechaCreacion;
@@ -67,6 +82,8 @@ public class Usuario implements UserDetails {
     @Column(name = "creado_por", nullable = false, updatable = false)
     private String creadoPor;
 
+    @Setter
+    @Getter
     @Column(name = "fecha_modificacion")
     @Temporal(TemporalType.TIMESTAMP)
     private Date fechaModificacion;
@@ -74,6 +91,8 @@ public class Usuario implements UserDetails {
     @Column(name = "modificado_por")
     private String modificadoPor;
 
+    @Setter
+    @Getter
     @Column(name = "fecha_borrado")
     @Temporal(TemporalType.TIMESTAMP)
     private Date fechaBorrado;
@@ -81,15 +100,69 @@ public class Usuario implements UserDetails {
     @Column(name = "borrado_por")
     private String borradoPor;
 
+    //region Transients
+
+    @Setter
+    @Getter
     @Transient
     private boolean rolOwner;
 
+    @Setter
+    @Getter
     @Transient
     private List<Long> idRolList;
 
+    @Setter
     @Transient
     @Getter(AccessLevel.NONE)
     private Collection<? extends GrantedAuthority> authorities;
+
+    //endregion Transients
+
+    //region Getters & Setters
+
+    public String getNombre() {
+        return HtmlEntityConverter.convertHtmlEntitiesToSymbols(nombre);
+    }
+
+    public void setNombre(String nombre) {
+        this.nombre = HtmlEntityConverter.convertSymbolsAndReservedWordsToHtmlEntities(nombre);
+    }
+
+    public String getEmail() {
+        return HtmlEntityConverter.convertHtmlEntitiesToSymbols(email);
+    }
+
+    public void setEmail(String email) {
+        this.email = HtmlEntityConverter.convertSymbolsAndReservedWordsToHtmlEntities(email);
+    }
+
+    public String getCreadoPor() {
+        return HtmlEntityConverter.convertHtmlEntitiesToSymbols(creadoPor);
+    }
+
+    public void setCreadoPor(String creadoPor) {
+        this.creadoPor = HtmlEntityConverter.convertSymbolsAndReservedWordsToHtmlEntities(creadoPor);
+    }
+
+    public String getModificadoPor() {
+        return HtmlEntityConverter.convertHtmlEntitiesToSymbols(modificadoPor);
+    }
+
+    public void setModificadoPor(String modificadoPor) {
+        this.modificadoPor = HtmlEntityConverter.convertSymbolsAndReservedWordsToHtmlEntities(modificadoPor);
+    }
+
+    public String getBorradoPor() {
+        return HtmlEntityConverter.convertHtmlEntitiesToSymbols(borradoPor);
+    }
+
+    public void setBorradoPor(String borradoPor) {
+        this.borradoPor = HtmlEntityConverter.convertSymbolsAndReservedWordsToHtmlEntities(borradoPor);
+    }
+
+    //endregion Getters & Setters
+
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -134,18 +207,6 @@ public class Usuario implements UserDetails {
                     .collect(Collectors.joining(", "));
         }
         return roles;
-    }
-
-    public String getUsuario() {
-        return ReplaceSymbolsUtil.replaceSymbolsCode(this.usuario);
-    }
-
-    public String getNombre() {
-        return ReplaceSymbolsUtil.replaceSymbolsCode(this.nombre);
-    }
-
-    public String getEmail() {
-        return ReplaceSymbolsUtil.replaceSymbolsCode(this.email);
     }
 
     public Usuario(Usuario original) {
