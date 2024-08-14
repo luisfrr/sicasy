@@ -2,6 +2,7 @@ package gob.yucatan.sicasy.business.entities;
 
 import gob.yucatan.sicasy.business.enums.EstatusRegistro;
 import gob.yucatan.sicasy.utils.date.DateValidator;
+import gob.yucatan.sicasy.utils.strings.ReplaceSymbolsUtil;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -27,9 +28,11 @@ public class Vehiculo implements Cloneable, Serializable {
     private Long idVehiculo;
 
     @Column(name = "no_serie", nullable = false)
+    @Getter(AccessLevel.NONE)
     private String noSerie;
 
     @Column(name = "placa", nullable = false)
+    @Getter(AccessLevel.NONE)
     private String placa;
 
     @Column(name = "marca", nullable = false)
@@ -48,6 +51,7 @@ public class Vehiculo implements Cloneable, Serializable {
     private String color;
 
     @Column(name = "descripcion_vehiculo")
+    @Getter(AccessLevel.NONE)
     private String descripcionVehiculo;
 
     @Column(name = "monto_factura", nullable = false)
@@ -99,6 +103,7 @@ public class Vehiculo implements Cloneable, Serializable {
     private String autorizaDirectorGeneral;
 
     @Column(name = "observaciones")
+    @Getter(AccessLevel.NONE)
     private String observaciones;
 
     @OneToMany(mappedBy = "vehiculo", fetch = FetchType.LAZY)
@@ -148,6 +153,21 @@ public class Vehiculo implements Cloneable, Serializable {
     @Transient
     private boolean fetchIncisoSet;
 
+    public String getNoSerie() {
+        return ReplaceSymbolsUtil.replaceSymbolsCode(this.noSerie);
+    }
+
+    public String getPlaca() {
+        return ReplaceSymbolsUtil.replaceSymbolsCode(this.placa);
+    }
+
+    public String getDescripcionVehiculo() {
+        return ReplaceSymbolsUtil.replaceSymbolsCode(this.descripcionVehiculo);
+    }
+
+    public String getObservaciones() {
+        return ReplaceSymbolsUtil.replaceSymbolsCode(this.observaciones);
+    }
 
     @Override
     public Vehiculo clone() {

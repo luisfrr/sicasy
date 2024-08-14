@@ -1,12 +1,11 @@
 package gob.yucatan.sicasy.business.entities;
 
 import gob.yucatan.sicasy.business.enums.EstatusRegistro;
-import gob.yucatan.sicasy.business.enums.EstatusUsuario;
+import gob.yucatan.sicasy.utils.strings.ReplaceSymbolsUtil;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.Date;
-import java.util.HashSet;
 import java.util.Set;
 
 @Entity
@@ -33,9 +32,11 @@ public class Mantenimiento {
     private TipoMantenimiento tipoMantenimiento;
 
     @Column(name = "descripcion", nullable = false)
+    @Getter(AccessLevel.NONE)
     private String descripcion;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "mantenimiento")
+    @ToString.Exclude
     private Set<MantenimientoFoto> mantenimientoFotoSet;
 
     @Column(name = "fecha_inicio")
@@ -71,4 +72,7 @@ public class Mantenimiento {
     @Column(name = "borrado_por", insertable = false)
     private String borradoPor;
 
+    public String getDescripcion() {
+        return ReplaceSymbolsUtil.replaceSymbolsCode(this.descripcion);
+    }
 }

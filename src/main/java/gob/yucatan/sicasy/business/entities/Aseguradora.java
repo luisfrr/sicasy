@@ -2,6 +2,7 @@ package gob.yucatan.sicasy.business.entities;
 
 
 import gob.yucatan.sicasy.business.enums.EstatusRegistro;
+import gob.yucatan.sicasy.utils.strings.ReplaceSymbolsUtil;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -24,12 +25,15 @@ public class Aseguradora implements Cloneable, Serializable {
     private Integer idAseguradora;
 
     @Column(name = "nombre", nullable = false)
+    @Getter(AccessLevel.NONE)
     private String nombre;
 
     @Column(name = "descripcion", nullable = false)
+    @Getter(AccessLevel.NONE)
     private String descripcion;
 
     @Column(name = "representante", nullable = false)
+    @Getter(AccessLevel.NONE)
     private String representante;
 
     @Column(name = "estatus_registro", nullable = false)
@@ -57,6 +61,18 @@ public class Aseguradora implements Cloneable, Serializable {
     @Column(name = "borrado_por")
     private String borradoPor;
 
+
+    public String getNombre() {
+        return ReplaceSymbolsUtil.replaceSymbolsCode(this.nombre);
+    }
+
+    public String getDescripcion() {
+        return ReplaceSymbolsUtil.replaceSymbolsCode(this.descripcion);
+    }
+
+    public String getRepresentante() {
+        return ReplaceSymbolsUtil.replaceSymbolsCode(this.representante);
+    }
 
     @Override
     public Aseguradora clone() {

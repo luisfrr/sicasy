@@ -1,6 +1,7 @@
 package gob.yucatan.sicasy.business.entities;
 
 import gob.yucatan.sicasy.business.enums.EstatusRegistro;
+import gob.yucatan.sicasy.utils.strings.ReplaceSymbolsUtil;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
@@ -30,6 +31,7 @@ public class Poliza implements Cloneable, Serializable {
     private Aseguradora aseguradora;
 
     @Column(name = "numero_poliza", nullable = false)
+    @Getter(AccessLevel.NONE)
     private String numeroPoliza;
 
     @Column(name = "fecha_inicio")
@@ -107,6 +109,10 @@ public class Poliza implements Cloneable, Serializable {
 
     @Transient
     private String fechaFinStr;
+
+    public String getNumeroPoliza() {
+        return ReplaceSymbolsUtil.replaceSymbolsCode(this.numeroPoliza);
+    }
 
     @Override
     public boolean equals(Object o) {

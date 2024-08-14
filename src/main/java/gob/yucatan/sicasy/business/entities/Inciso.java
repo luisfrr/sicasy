@@ -2,6 +2,7 @@ package gob.yucatan.sicasy.business.entities;
 
 import gob.yucatan.sicasy.business.enums.EstatusRegistro;
 import gob.yucatan.sicasy.utils.date.DateValidator;
+import gob.yucatan.sicasy.utils.strings.ReplaceSymbolsUtil;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -29,6 +30,7 @@ public class Inciso implements Cloneable, Serializable {
     private Poliza poliza;
 
     @Column(name = "numero_inciso", nullable = false)
+    @Getter(AccessLevel.NONE)
     private String numeroInciso;
 
     @ManyToOne
@@ -36,6 +38,7 @@ public class Inciso implements Cloneable, Serializable {
     private Vehiculo vehiculo;
 
     @Column(name = "folio_factura", nullable = false)
+    @Getter(AccessLevel.NONE)
     private String folioFactura;
 
     @Column(name = "fecha_inicio_vigencia", nullable = false)
@@ -61,6 +64,7 @@ public class Inciso implements Cloneable, Serializable {
     private String frecuenciaPago;
 
     @Column(name = "observaciones")
+    @Getter(AccessLevel.NONE)
     private String observaciones;
 
     @Column(name = "baja_pendiente_siniestro")
@@ -126,6 +130,19 @@ public class Inciso implements Cloneable, Serializable {
         Date hoy = new Date();
         return DateValidator.isDateBetween(this.fechaInicioVigencia, this.fechaFinVigencia, hoy);
     }
+
+    public String getNumeroInciso() {
+        return ReplaceSymbolsUtil.replaceSymbolsCode(this.numeroInciso);
+    }
+
+    public String getFolioFactura() {
+        return ReplaceSymbolsUtil.replaceSymbolsCode(this.folioFactura);
+    }
+
+    public String getObservaciones() {
+        return ReplaceSymbolsUtil.replaceSymbolsCode(this.observaciones);
+    }
+
 
     @Override
     public boolean equals(Object o) {

@@ -3,6 +3,7 @@ package gob.yucatan.sicasy.business.entities;
 
 import gob.yucatan.sicasy.business.enums.EstatusRegistro;
 import gob.yucatan.sicasy.utils.date.DateFormatUtil;
+import gob.yucatan.sicasy.utils.strings.ReplaceSymbolsUtil;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -23,12 +24,15 @@ public class Licitacion implements Cloneable {
     private Integer idLicitacion;
 
     @Column(name = "numero_licitacion", nullable = false)
+    @Getter(AccessLevel.NONE)
     private String numeroLicitacion;
 
     @Column(name = "nombre", nullable = false)
+    @Getter(AccessLevel.NONE)
     private String nombre;
 
     @Column(name = "descripcion")
+    @Getter(AccessLevel.NONE)
     private String descripcion;
 
     @Column(name = "fecha_inicio")
@@ -70,6 +74,18 @@ public class Licitacion implements Cloneable {
 
     public String fechaFinalString(){
         return DateFormatUtil.convertToFormat(fechaFinal, "dd-MM-yyyy");
+    }
+
+    public String getNumeroLicitacion() {
+        return ReplaceSymbolsUtil.replaceSymbolsCode(this.numeroLicitacion);
+    }
+
+    public String getNombre() {
+        return ReplaceSymbolsUtil.replaceSymbolsCode(this.nombre);
+    }
+
+    public String getDescripcion() {
+        return ReplaceSymbolsUtil.replaceSymbolsCode(this.descripcion);
     }
 
     @Override

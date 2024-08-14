@@ -1,6 +1,7 @@
 package gob.yucatan.sicasy.business.entities;
 
 import gob.yucatan.sicasy.business.enums.EstatusRegistro;
+import gob.yucatan.sicasy.utils.strings.ReplaceSymbolsUtil;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -25,9 +26,11 @@ public class Deducible implements Cloneable, Serializable {
     private String tipoDeducicle;
 
     @Column(name = "vehiculo_no_serie", nullable = false)
+    @Getter(AccessLevel.NONE)
     private String vehiculoNoSerie;
 
     @Column(name = "vehiculo_placa", nullable = false)
+    @Getter(AccessLevel.NONE)
     private String vehiculoPlaca;
 
     @Column(name = "vehiculo_marca", nullable = false)
@@ -43,12 +46,14 @@ public class Deducible implements Cloneable, Serializable {
     private Double vehiculoValorFactura;
 
     @Column(name = "poliza_numero", nullable = false)
+    @Getter(AccessLevel.NONE)
     private String polizaNumero;
 
     @Column(name = "poliza_aseguradora", nullable = false)
     private String polizaAseguradora;
 
     @Column(name = "inciso_numero", nullable = false)
+    @Getter(AccessLevel.NONE)
     private String incisoNumero;
 
     @Column(name = "inciso_tipo_cobertura")
@@ -72,6 +77,7 @@ public class Deducible implements Cloneable, Serializable {
     private Double costoTotalDeducible;
 
     @Column(name = "folio_factura_deducible", nullable = false)
+    @Getter(AccessLevel.NONE)
     private String folioFacturaDeducible;
 
     @Column(name = "nombre_archivo_factura", nullable = false)
@@ -115,5 +121,25 @@ public class Deducible implements Cloneable, Serializable {
         } catch (CloneNotSupportedException e) {
             throw new AssertionError();
         }
+    }
+
+    public String getVehiculoNoSerie() {
+        return ReplaceSymbolsUtil.replaceSymbolsCode(this.vehiculoNoSerie);
+    }
+
+    public String getVehiculoPlaca() {
+        return ReplaceSymbolsUtil.replaceSymbolsCode(this.vehiculoPlaca);
+    }
+
+    public String getPolizaNumero() {
+        return ReplaceSymbolsUtil.replaceSymbolsCode(this.polizaNumero);
+    }
+
+    public String getIncisoNumero() {
+        return ReplaceSymbolsUtil.replaceSymbolsCode(this.incisoNumero);
+    }
+
+    public String getFolioFacturaDeducible() {
+        return ReplaceSymbolsUtil.replaceSymbolsCode(this.folioFacturaDeducible);
     }
 }

@@ -1,6 +1,7 @@
 package gob.yucatan.sicasy.business.entities;
 
 import gob.yucatan.sicasy.business.enums.EstatusUsuario;
+import gob.yucatan.sicasy.utils.strings.ReplaceSymbolsUtil;
 import jakarta.persistence.*;
 import lombok.*;
 import org.apache.logging.log4j.util.Strings;
@@ -26,15 +27,18 @@ public class Usuario implements UserDetails {
     private Long idUsuario;
 
     @Column(name = "usuario", nullable = false)
+    @Getter(AccessLevel.NONE)
     private String usuario;
 
     @Column(name = "contrasenia", nullable = false)
     private String contrasenia;
 
     @Column(name = "nombre", nullable = false)
+    @Getter(AccessLevel.NONE)
     private String nombre;
 
     @Column(name = "email", nullable = false)
+    @Getter(AccessLevel.NONE)
     private String email;
 
     @Column(name = "correo_confirmado")
@@ -132,6 +136,17 @@ public class Usuario implements UserDetails {
         return roles;
     }
 
+    public String getUsuario() {
+        return ReplaceSymbolsUtil.replaceSymbolsCode(this.usuario);
+    }
+
+    public String getNombre() {
+        return ReplaceSymbolsUtil.replaceSymbolsCode(this.nombre);
+    }
+
+    public String getEmail() {
+        return ReplaceSymbolsUtil.replaceSymbolsCode(this.email);
+    }
 
     public Usuario(Usuario original) {
         this.idUsuario = original.getIdUsuario();

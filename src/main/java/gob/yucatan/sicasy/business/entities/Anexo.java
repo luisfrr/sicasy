@@ -2,6 +2,7 @@ package gob.yucatan.sicasy.business.entities;
 
 import gob.yucatan.sicasy.business.enums.EstatusRegistro;
 import gob.yucatan.sicasy.utils.date.DateFormatUtil;
+import gob.yucatan.sicasy.utils.strings.ReplaceSymbolsUtil;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
@@ -31,9 +32,11 @@ public class Anexo implements Cloneable {
     private Licitacion licitacion;
 
     @Column(name = "nombre", nullable = false)
+    @Getter(AccessLevel.NONE)
     private String nombre;
 
     @Column(name = "descripcion")
+    @Getter(AccessLevel.NONE)
     private String descripcion;
 
     @Column(name = "fecha_inicio")
@@ -100,6 +103,13 @@ public class Anexo implements Cloneable {
         return false;
     }
 
+    public String getNombre() {
+        return ReplaceSymbolsUtil.replaceSymbolsCode(this.nombre);
+    }
+
+    public String getDescripcion() {
+        return ReplaceSymbolsUtil.replaceSymbolsCode(this.descripcion);
+    }
 
     @Override
     public Anexo clone() {

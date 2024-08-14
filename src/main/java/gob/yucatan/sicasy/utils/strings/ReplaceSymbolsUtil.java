@@ -19,6 +19,7 @@ public class ReplaceSymbolsUtil {
         SYMBOLS_TO_HTML.put("-", "&minus;");
         SYMBOLS_TO_HTML.put("*", "&ast;");
         SYMBOLS_TO_HTML.put("/", "&sol;");
+        SYMBOLS_TO_HTML.put("%", "&percnt;");
         SYMBOLS_TO_HTML.put("=", "&equals;");
         SYMBOLS_TO_HTML.put("==", "&equals;&equals;");
         SYMBOLS_TO_HTML.put("!=", "&excl;&equals;");
@@ -42,6 +43,8 @@ public class ReplaceSymbolsUtil {
         SYMBOLS_TO_HTML.put("::", "&colon;&colon;");
         SYMBOLS_TO_HTML.put("?", "&quest;");
         SYMBOLS_TO_HTML.put(":", "&colon;");
+        SYMBOLS_TO_HTML.put(".", "&period;");
+        SYMBOLS_TO_HTML.put(",", "&comma;");
         SYMBOLS_TO_HTML.put(";", "&semi;");
         SYMBOLS_TO_HTML.put("(", "&lpar;");
         SYMBOLS_TO_HTML.put(")", "&rpar;");
@@ -49,6 +52,47 @@ public class ReplaceSymbolsUtil {
         SYMBOLS_TO_HTML.put("}", "&rcub;");
         SYMBOLS_TO_HTML.put("[", "&lsqb;");
         SYMBOLS_TO_HTML.put("]", "&rsqb;");
+    }
+
+    private static final Map<String, String> HTML_TO_SYMBOLS = new HashMap<>();
+    static {
+        HTML_TO_SYMBOLS.put("&plus;", "+");
+        HTML_TO_SYMBOLS.put("&minus;", "-");
+        HTML_TO_SYMBOLS.put("&ast;", "*");
+        HTML_TO_SYMBOLS.put("&sol;", "/");
+        HTML_TO_SYMBOLS.put("&percnt;", "%");
+        HTML_TO_SYMBOLS.put("&equals;", "=");
+        HTML_TO_SYMBOLS.put("&equals;&equals;", "==");
+        HTML_TO_SYMBOLS.put("&excl;&equals;", "!=");
+        HTML_TO_SYMBOLS.put("&lt;", "<");
+        HTML_TO_SYMBOLS.put("&gt;", ">");
+        HTML_TO_SYMBOLS.put("&lt;&equals;", "<=");
+        HTML_TO_SYMBOLS.put("&gt;&equals;", ">=");
+        HTML_TO_SYMBOLS.put("&amp;&amp;", "&&");
+        HTML_TO_SYMBOLS.put("&vert;&vert;", "||");
+        HTML_TO_SYMBOLS.put("&excl;", "!");
+        HTML_TO_SYMBOLS.put("&amp;", "&");
+        HTML_TO_SYMBOLS.put("&vert;", "|");
+        HTML_TO_SYMBOLS.put("&circ;", "^");
+        HTML_TO_SYMBOLS.put("&tilde;", "~");
+        HTML_TO_SYMBOLS.put("&lt;&lt;", "<<");
+        HTML_TO_SYMBOLS.put("&gt;&gt;", ">>");
+        HTML_TO_SYMBOLS.put("&gt;&gt;&gt;", ">>>");
+        HTML_TO_SYMBOLS.put("&plus;&plus;", "++");
+        HTML_TO_SYMBOLS.put("&minus;&minus;", "--");
+        HTML_TO_SYMBOLS.put("&minus;&gt;", "->");
+        HTML_TO_SYMBOLS.put("&colon;&colon;", "::");
+        HTML_TO_SYMBOLS.put("&quest;", "?");
+        HTML_TO_SYMBOLS.put("&colon;", ":");
+        HTML_TO_SYMBOLS.put("&period;", ".");
+        HTML_TO_SYMBOLS.put("&comma;", ",");
+        HTML_TO_SYMBOLS.put("&semi;", ";");
+        HTML_TO_SYMBOLS.put("&lpar;", "(");
+        HTML_TO_SYMBOLS.put("&rpar;", ")");
+        HTML_TO_SYMBOLS.put("&lcub;", "{");
+        HTML_TO_SYMBOLS.put("&rcub;", "}");
+        HTML_TO_SYMBOLS.put("&lsqb;", "[");
+        HTML_TO_SYMBOLS.put("&rsqb;", "]");
     }
 
     public static void processEntity(Object entity) {
@@ -87,4 +131,15 @@ public class ReplaceSymbolsUtil {
         return value;
     }
 
+    public static String replaceSymbolsCode(String value) {
+        try {
+            for (Map.Entry<String, String> entry : HTML_TO_SYMBOLS.entrySet()) {
+                value = value.replace(entry.getKey(), entry.getValue());
+            }
+            return value;
+        } catch (Exception e) {
+            return null;
+        }
+    }
 }
+

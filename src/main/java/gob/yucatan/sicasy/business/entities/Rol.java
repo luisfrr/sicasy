@@ -1,6 +1,7 @@
 package gob.yucatan.sicasy.business.entities;
 
 import gob.yucatan.sicasy.business.enums.EstatusRegistro;
+import gob.yucatan.sicasy.utils.strings.ReplaceSymbolsUtil;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -23,12 +24,15 @@ public class Rol {
     private Long idRol;
 
     @Column(name = "codigo", nullable = false)
+    @Getter(AccessLevel.NONE)
     private String codigo;
 
     @Column(name = "nombre", nullable = false)
+    @Getter(AccessLevel.NONE)
     private String nombre;
 
     @Column(name = "descripcion")
+    @Getter(AccessLevel.NONE)
     private String descripcion;
 
     @OneToMany(mappedBy = "rol")
@@ -63,6 +67,17 @@ public class Rol {
     @Transient
     private boolean leftJoinUsuarioRolSet;
 
+    public String getNombre() {
+        return ReplaceSymbolsUtil.replaceSymbolsCode(this.nombre);
+    }
+
+    public String getDescripcion() {
+        return ReplaceSymbolsUtil.replaceSymbolsCode(this.descripcion);
+    }
+
+    public String getCodigo() {
+        return ReplaceSymbolsUtil.replaceSymbolsCode(this.codigo);
+    }
 
     @Override
     public boolean equals(Object o) {
