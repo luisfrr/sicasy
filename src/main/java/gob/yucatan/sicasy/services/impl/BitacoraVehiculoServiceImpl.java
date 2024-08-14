@@ -98,7 +98,8 @@ public class BitacoraVehiculoServiceImpl implements IBitacoraVehiculoService {
                         Object valorNuevo = campo.get(vehiculoNuevo);
                         String tipoDato = valorNuevo != null ? valorNuevo.getClass().getSimpleName() : "";
                         // Agregar un registro a la bitácora con el campo y el valor nuevo
-                        bitacoraVehiculoCambios.add(this.getBitacoraCambio(bitacoraVehiculo, nombreCampo, tipoDato, null, valorNuevo.toString()));
+                        bitacoraVehiculoCambios.add(this.getBitacoraCambio(bitacoraVehiculo, nombreCampo, tipoDato, null,
+                                valorNuevo != null ? valorNuevo.toString() : ""));
                     }
 
                     if(campo.getName().equals(Vehiculo_.LICITACION)) {
