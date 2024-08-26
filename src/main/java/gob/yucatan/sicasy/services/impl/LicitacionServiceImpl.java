@@ -73,6 +73,7 @@ public class LicitacionServiceImpl implements ILicitacionService {
 
     @Override
     public void save(Licitacion licitacion) {
+        licitacion.setNumeroLicitacion(licitacion.getNumeroLicitacion().trim());
         licitacion.setEstatusRegistro(EstatusRegistro.ACTIVO);
         licitacion.setFechaCreacion(new Date());
 
@@ -92,10 +93,19 @@ public class LicitacionServiceImpl implements ILicitacionService {
     public void update(Licitacion licitacion) {
         Optional<Licitacion> licitacionOptional = licitacionRepository.findById(licitacion.getIdLicitacion());
 
+        boolean existsDuplicado = licitacionRepository.existsByNumeroLicitacionAndIdLicitacionNotAndEstatusRegistro(
+                licitacion.getNumeroLicitacion().trim(),
+                licitacion.getIdLicitacion(),
+                EstatusRegistro.ACTIVO);
+
+        if(existsDuplicado)
+            throw new BadRequestException("Ya se encuentra registrado ese número de licitación");
+
         if (licitacionOptional.isEmpty())
             throw new NotFoundException("No se ha encontrado información de esta Licitación.");
 
         Licitacion licitacionToUpdate = licitacionOptional.get();
+        licitacionToUpdate.setNumeroLicitacion(licitacion.getNumeroLicitacion().trim());
         licitacionToUpdate.setNombre(licitacion.getNombre());
         licitacionToUpdate.setDescripcion(licitacion.getDescripcion());
         licitacionToUpdate.setFechaInicio(licitacion.getFechaInicio());
@@ -105,8 +115,6 @@ public class LicitacionServiceImpl implements ILicitacionService {
         licitacionToUpdate.setRutaArchivo(licitacion.getRutaArchivo());
 
         licitacionRepository.save(licitacionToUpdate);
-
-
     }
 
     @Override

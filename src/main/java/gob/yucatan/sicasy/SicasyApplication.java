@@ -32,7 +32,7 @@ public class SicasyApplication implements CommandLineRunner {
 
     private void setTimeZone() {
         // Establecer la zona horaria por defecto
-        TimeZone.setDefault(TimeZone.getTimeZone("GMT-6"));
+        TimeZone.setDefault(TimeZone.getTimeZone("America/Mexico_City"));
     }
 
     private void loadPermisos() {

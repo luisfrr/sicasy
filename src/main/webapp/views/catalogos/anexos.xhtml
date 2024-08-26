@@ -153,14 +153,14 @@
 
                     <p:column headerText="Fecha inicio" width="90">
                         <h:outputText value="#{anexo.fechaInicio}">
-                            <f:convertDateTime pattern="dd-MM-yyyy" />
+                            <f:convertDateTime pattern="dd/MM/yyyy" />
                         </h:outputText>
                     </p:column>
 
                     <p:column headerText="Fecha final" width="110">
                         <p:outputPanel styleClass="flex flex-row gap-1">
                             <h:outputText value="#{anexo.fechaFinal}">
-                                <f:convertDateTime pattern="dd-MM-yyyy"/>
+                                <f:convertDateTime pattern="dd/MM/yyyy"/>
                             </h:outputText>
                             <p:badge severity="danger" rendered="false">
                                 <i class="pi pi-bell "/>
@@ -170,7 +170,7 @@
 
                     <p:column headerText="Fecha firma" width="90">
                         <h:outputText value="#{anexo.fechaFirma}">
-                            <f:convertDateTime pattern="dd-MM-yyyy"/>
+                            <f:convertDateTime pattern="dd/MM/yyyy"/>
                         </h:outputText>
                     </p:column>
 
@@ -183,7 +183,7 @@
 
                         <p:column headerText="Fecha creación" width="180">
                             <h:outputText value="#{anexo.fechaCreacion}">
-                                <f:convertDateTime pattern="dd/MM/yyyy HH:mm:ss a"/>
+                                <f:convertDateTime pattern="dd/MM/yyyy hh:mm a" timeZone="America/Mexico_City"/>
                             </h:outputText>
                         </p:column>
 
@@ -194,7 +194,7 @@
 
                         <p:column headerText="Fecha modificación" width="180">
                             <h:outputText value="#{anexo.fechaModificacion}">
-                                <f:convertDateTime pattern="dd/MM/yyyy HH:mm:ss a"/>
+                                <f:convertDateTime pattern="dd/MM/yyyy hh:mm a" timeZone="America/Mexico_City"/>
                             </h:outputText>
                         </p:column>
 
@@ -205,7 +205,7 @@
 
                         <p:column headerText="Fecha borrado" width="180">
                             <h:outputText value="#{anexo.fechaBorrado}">
-                                <f:convertDateTime pattern="dd/MM/yyyy HH:mm:ss a"/>
+                                <f:convertDateTime pattern="dd/MM/yyyy hh:mm a" timeZone="America/Mexico_City"/>
                             </h:outputText>
                         </p:column>
 
@@ -324,7 +324,7 @@
                         <p:outputLabel for="@next" styleClass="block" value="Fecha inicio "/>
                         <p:calendar value="#{anexoView.anexoSelected.fechaInicio}" id="id_calendar1"
                                     inputStyleClass="w-full"
-                                    pattern="dd-MM-yyyy" locale="es">
+                                    pattern="dd/MM/yyyy" locale="es">
                             <p:ajax
                                     event="dateSelect" listener="#{anexoView.validateFechaInicioFinal}"
                                     update=":form_dialog:id_message2 :form_dialog:id_message :form_dialog:id_calendar2 :form_dialog:id_calendar1"/>
@@ -339,7 +339,7 @@
                         <p:calendar  value="#{anexoView.anexoSelected.fechaFinal}"
                                      inputStyleClass="w-full" id="id_calendar2"
                                      disabled="#{anexoView.anexoSelected.fechaInicio == null}"
-                                     pattern="dd-MM-yyyy" locale="es">
+                                     pattern="dd/MM/yyyy" locale="es">
                             <p:ajax
                                     event="dateSelect" listener="#{anexoView.validateFechaInicioFinal}"
                                     update=":form_dialog:id_message :form_dialog:id_message2 :form_dialog:id_calendar1 :form_dialog:id_calendar2"/>
@@ -353,7 +353,7 @@
                         <p:outputLabel for="@next" styleClass="block"  value="Fecha firma "/>
                         <p:calendar  value="#{anexoView.anexoSelected.fechaFirma}"
                                      inputStyleClass="w-full"
-                                     pattern="dd-MM-yyyy" locale="es"/>
+                                     pattern="dd/MM/yyyy" locale="es"/>
                     </p:outputPanel>
 
                     <p:outputPanel styleClass="field col-12">

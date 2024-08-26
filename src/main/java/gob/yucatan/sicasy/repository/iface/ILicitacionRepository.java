@@ -20,4 +20,6 @@ public interface ILicitacionRepository extends JpaRepository<Licitacion, Integer
     @Query("select l from Licitacion l where l.estatusRegistro = 1 and l.numeroLicitacion in ?1")
     List<Licitacion> findLicitacionesActivasByNumeroLicitacion(List<String> numLicitaciones);
 
+    boolean existsByNumeroLicitacionAndIdLicitacionNotAndEstatusRegistro(String numeroLicitacion, Integer idLicitacion, EstatusRegistro estatusRegistro);
+
 }
