@@ -185,13 +185,27 @@ public class VehiculoView implements Serializable {
         this.mantenimientoFotoList = new ArrayList<>();
         this.mantenimientoVehiculoList = new ArrayList<>();
         this.bitacoraVehiculoList = new ArrayList<>();
-        PrimeFaces.current().ajax().update("form_filtros");
+
+        this.buscar();
+        PrimeFaces.current().ajax().update("form_filtros", "form_datatable");
     }
 
     public void buscar() {
         log.info("buscar - VehiculoView");
         this.vehiculoList = vehiculoService.findAllDynamic(this.vehiculoFilter);
+        List<Vehiculo> vehiculos = vehiculoService.findAllDynamic(this.vehiculoFilter);
+        if(!vehiculos.isEmpty()) {
+            this.vehiculoList = vehiculos.stream()
+                    .sorted(Comparator
+                            .comparing((Vehiculo v) -> v.getFechaModificacion() != null ? v.getFechaModificacion() : v.getFechaCreacion(), Comparator.reverseOrder())
+                    )
+                    .toList();
+        }
+        else {
+            this.vehiculoList = new ArrayList<>();
+        }
         PrimeFaces.current().ajax().update("form_datatable");
+        PrimeFaces.current().executeScript("PF('dt_vehiculos').unselectAllRows()");
     }
 
     @ConfigPermisoArray({
@@ -427,8 +441,10 @@ public class VehiculoView implements Serializable {
                 success = true;
             }
 
-            if(success)
+            if(success) {
                 this.buscar();
+                PrimeFaces.current().executeScript("PF('confirmEstatusDialog').hide()");
+            }
 
         } catch (Exception e) {
             log.error(e.getMessage());

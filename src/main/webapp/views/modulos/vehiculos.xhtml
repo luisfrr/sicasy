@@ -208,7 +208,7 @@
 
             <h:form id="form_datatable" styleClass="mb-5">
 
-                <p:dataTable id="dt_vehiculos"
+                <p:dataTable id="dt_vehiculos" widgetVar="dt_vehiculos"
                              var="vehiculo" value="#{vehiculoView.vehiculoList}"
                              rows="50" rowHover="true"
                              rowKey="#{vehiculo.idVehiculo}" rowIndexVar="index"
@@ -277,11 +277,11 @@
                         <h:outputText value="#{vehiculo.dependenciaAsignada != null ? vehiculo.dependenciaAsignada.abreviatura : ''}"/>
                     </p:column>
 
-                    <p:column headerText="Licitación" width="150" styleClass="text-center">
+                    <p:column headerText="Licitación" width="180" styleClass="text-center">
                         <h:outputText value="#{vehiculo.licitacion != null ? vehiculo.licitacion.numeroLicitacion : ''}"/>
                     </p:column>
 
-                    <p:column headerText="Anexo" width="150">
+                    <p:column headerText="Anexo" width="180">
                         <h:outputText value="#{vehiculo.anexo != null ? vehiculo.anexo.nombre : ''}"/>
                     </p:column>
 
@@ -327,6 +327,10 @@
                         <h:outputText value="#{vehiculo.proveedor}"/>
                     </p:column>
 
+                    <p:column headerText="Observaciones" width="300">
+                        <h:outputText value="#{vehiculo.observaciones}"/>
+                    </p:column>
+
                     <sec:authorize access="hasAuthority('ROLE_OWNER')">
 
                         <p:column headerText="Estatus registro" width="150">
@@ -334,9 +338,9 @@
                             </h:outputText>
                         </p:column>
 
-                        <p:column headerText="Fecha creación" width="150">
+                        <p:column headerText="Fecha creación" width="180">
                             <h:outputText value="#{vehiculo.fechaCreacion}">
-                                <f:convertDateTime pattern="dd/MM/yyyy HH:mm:ss a"/>
+                                <f:convertDateTime pattern="dd/MM/yyyy hh:mm a" timeZone="America/Mexico_City"/>
                             </h:outputText>
                         </p:column>
 
@@ -345,9 +349,9 @@
                             </h:outputText>
                         </p:column>
 
-                        <p:column headerText="Fecha modificación" width="150">
+                        <p:column headerText="Fecha modificación" width="180">
                             <h:outputText value="#{vehiculo.fechaModificacion}">
-                                <f:convertDateTime pattern="dd/MM/yyyy HH:mm:ss a"/>
+                                <f:convertDateTime pattern="dd/MM/yyyy hh:mm a" timeZone="America/Mexico_City"/>
                             </h:outputText>
                         </p:column>
 
@@ -356,9 +360,9 @@
                             </h:outputText>
                         </p:column>
 
-                        <p:column headerText="Fecha borrado" width="150">
+                        <p:column headerText="Fecha borrado" width="180">
                             <h:outputText value="#{vehiculo.fechaBorrado}">
-                                <f:convertDateTime pattern="dd/MM/yyyy HH:mm:ss a"/>
+                                <f:convertDateTime pattern="dd/MM/yyyy hh:mm a" timeZone="America/Mexico_City"/>
                             </h:outputText>
                         </p:column>
 

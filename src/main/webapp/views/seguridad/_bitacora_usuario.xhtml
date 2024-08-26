@@ -82,7 +82,7 @@
 
                 <p:column headerText="Fecha" width="180">
                     <h:outputText value="#{bitacora.fechaModificacion}">
-                        <f:convertDateTime pattern="dd/MM/yyyy HH:mm a"/>
+                        <f:convertDateTime pattern="dd/MM/yyyy hh:mm a" timeZone="America/Mexico_City"/>
                     </h:outputText>
                 </p:column>
 

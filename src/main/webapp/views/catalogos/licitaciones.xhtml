@@ -144,13 +144,13 @@
 
                     <p:column headerText="Fecha inicio" width="90">
                         <h:outputText value="#{licitacion.fechaInicio}">
-                            <f:convertDateTime pattern="dd-MM-yyyy"/>
+                            <f:convertDateTime pattern="dd/MM/yyyy"/>
                         </h:outputText>
                     </p:column>
 
                     <p:column headerText="Fecha final" width="90">
                         <h:outputText value="#{licitacion.fechaFinal}">
-                            <f:convertDateTime pattern="dd-MM-yyyy"/>
+                            <f:convertDateTime pattern="dd/MM/yyyy"/>
                         </h:outputText>
                     </p:column>
 
@@ -163,7 +163,7 @@
 
                         <p:column headerText="Fecha creación" width="180">
                             <h:outputText value="#{licitacion.fechaCreacion}">
-                                <f:convertDateTime pattern="dd/MM/yyyy HH:mm:ss a"/>
+                                <f:convertDateTime pattern="dd/MM/yyyy hh:mm a" timeZone="America/Mexico_City"/>
                             </h:outputText>
                         </p:column>
 
@@ -174,7 +174,7 @@
 
                         <p:column headerText="Fecha modificación" width="180">
                             <h:outputText value="#{licitacion.fechaModificacion}">
-                                <f:convertDateTime pattern="dd/MM/yyyy HH:mm:ss a"/>
+                                <f:convertDateTime pattern="dd/MM/yyyy hh:mm a" timeZone="America/Mexico_City"/>
                             </h:outputText>
                         </p:column>
 
@@ -185,7 +185,7 @@
 
                         <p:column headerText="Fecha borrado" width="180">
                             <h:outputText value="#{licitacion.fechaBorrado}">
-                                <f:convertDateTime pattern="dd/MM/yyyy HH:mm:ss a"/>
+                                <f:convertDateTime pattern="dd/MM/yyyy hh:mm a" timeZone="America/Mexico_City"/>
                             </h:outputText>
                         </p:column>
 
@@ -301,7 +301,7 @@
                         <p:outputLabel value="Fecha inicio " styleClass="block"/>
                         <p:calendar value="#{licitacionView.licitacionSelected.fechaInicio}" id="id_calendar1"
                                     inputStyleClass="w-full"
-                                    pattern="dd-MM-yyyy" locale="es">
+                                    pattern="dd/MM/yyyy" locale="es">
                             <p:ajax
                                     event="dateSelect" listener="#{licitacionView.validateFechaInicioFinal}"
                                     update=":form_dialog:id_message2 :form_dialog:id_message :form_dialog:id_calendar2"/>
@@ -315,7 +315,7 @@
                         <p:outputLabel  value="Fecha final " styleClass="block"/>
                         <p:calendar  id="id_calendar2" value="#{licitacionView.licitacionSelected.fechaFinal}"
                                      inputStyleClass="w-full" disabled="#{licitacionView.licitacionSelected.fechaInicio == null}"
-                                     pattern="dd-MM-yyyy" locale="es">
+                                     pattern="dd/MM/yyyy" locale="es">
                             <p:ajax
                                     event="dateSelect" listener="#{licitacionView.validateFechaInicioFinal}"
                                     update=":form_dialog:id_message :form_dialog:id_message2"/>

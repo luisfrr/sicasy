@@ -63,7 +63,9 @@ public class VehiculoServiceImpl implements IVehiculoService {
             specification.add(new SearchCriteria(SearchOperation.IN,
                     vehiculo.getIdEstatusVehiculoList(),
                     Vehiculo_.ESTATUS_VEHICULO, EstatusVehiculo_.ID_ESTATUS_VEHICULO));
-        } else if(vehiculo.getEstatusVehiculo() != null) {
+        }
+
+        if(vehiculo.getEstatusVehiculo() != null && vehiculo.getEstatusVehiculo().getIdEstatusVehiculo() != null) {
             specification.add(new SearchCriteria(SearchOperation.EQUAL,
                     vehiculo.getEstatusVehiculo().getIdEstatusVehiculo(),
                     Vehiculo_.ESTATUS_VEHICULO, EstatusVehiculo_.ID_ESTATUS_VEHICULO));
