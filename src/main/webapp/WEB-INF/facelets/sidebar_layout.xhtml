@@ -10,7 +10,8 @@
         <h:form id="form_sidebar">
             <div class="menu-container">
 
-                <p:commandLink styleClass="menu-item menu-item-active" ajax="false" action="#{menuSessionBean.goToHome()}">
+                <p:commandLink ajax="false" action="#{menuSessionBean.goToHome()}"
+                               styleClass="menu-item #{menuSessionBean.currentPage.contains('/home') ? 'menu-item-active' : ''}">
                     <div class="icon">
                         <i class="fi fi-rr-home"/>
                     </div>
@@ -18,7 +19,8 @@
                 </p:commandLink>
 
                 <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'VEHICULOS_VIEW')">
-                    <p:commandLink styleClass="menu-item" ajax="false" action="#{menuSessionBean.goToVehiculos()}">
+                    <p:commandLink ajax="false" action="#{menuSessionBean.goToVehiculos()}"
+                                   styleClass="menu-item #{menuSessionBean.currentPage.contains('/views/modulos/vehiculos') ? 'menu-item-active' : ''}">
                         <div class="icon">
                             <i class="fi fi-rr-car-alt"/>
                         </div>
@@ -27,7 +29,8 @@
                 </sec:authorize>
 
                 <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'POLIZA_VIEW')">
-                    <p:commandLink styleClass="menu-item" ajax="false" action="#{menuSessionBean.goToPolizas()}">
+                    <p:commandLink ajax="false" action="#{menuSessionBean.goToPolizas()}"
+                                   styleClass="menu-item #{menuSessionBean.currentPage.contains('/views/modulos/polizas') ? 'menu-item-active' : ''}">
                         <div class="icon">
                             <i class="fi fi-rr-compliance-document"/>
                         </div>
@@ -36,7 +39,8 @@
                 </sec:authorize>
 
                 <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'SINIESTRO_VIEW')">
-                    <p:commandLink styleClass="menu-item" ajax="false" action="#{menuSessionBean.goToSiniestros()}">
+                    <p:commandLink ajax="false" action="#{menuSessionBean.goToSiniestros()}"
+                                   styleClass="menu-item #{menuSessionBean.currentPage.contains('/views/modulos/siniestros') ? 'menu-item-active' : ''}">
                         <div class="icon">
                             <i class="fi fi-rr-car-crash"/>
                         </div>
@@ -45,7 +49,8 @@
                 </sec:authorize>
 
                 <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'CAT_ASEGURADORA_VIEW')">
-                    <p:commandLink styleClass="menu-item" ajax="false" action="#{menuSessionBean.goToAseguradoras()}">
+                    <p:commandLink ajax="false" action="#{menuSessionBean.goToAseguradoras()}"
+                                   styleClass="menu-item #{menuSessionBean.currentPage.contains('/views/catalogos/aseguradoras') ? 'menu-item-active' : ''}">
                         <div class="icon">
                             <i class="fi fi-rr-shield"/>
                         </div>
@@ -54,7 +59,8 @@
                 </sec:authorize>
 
                 <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'CAT_LICITACION_VIEW')">
-                    <p:commandLink styleClass="menu-item" ajax="false" action="#{menuSessionBean.goToLicitaciones()}">
+                    <p:commandLink ajax="false" action="#{menuSessionBean.goToLicitaciones()}"
+                                   styleClass="menu-item #{menuSessionBean.currentPage.contains('/views/catalogos/licitaciones') ? 'menu-item-active' : ''}">
                         <div class="icon">
                             <i class="fi-rr-poll-h"/>
                         </div>
@@ -63,7 +69,8 @@
                 </sec:authorize>
 
                 <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'CAT_ANEXO_VIEW')">
-                    <p:commandLink styleClass="menu-item" ajax="false" action="#{menuSessionBean.goToAnexos()}">
+                    <p:commandLink ajax="false" action="#{menuSessionBean.goToAnexos()}"
+                                   styleClass="menu-item #{menuSessionBean.currentPage.contains('/views/catalogos/anexos') ? 'menu-item-active' : ''}">
                         <div class="icon">
                             <i class="fi-rr-document-signed"/>
                         </div>
@@ -72,7 +79,8 @@
                 </sec:authorize>
 
                 <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'SEGURIDAD_ROLES_VIEW')">
-                    <p:commandLink styleClass="menu-item" ajax="false" action="#{menuSessionBean.goToRoles()}">
+                    <p:commandLink ajax="false" action="#{menuSessionBean.goToRoles()}"
+                                   styleClass="menu-item #{menuSessionBean.currentPage.contains('/views/seguridad/roles') ? 'menu-item-active' : ''}">
                         <div class="icon">
                             <i class="fi fi-rr-tags"/>
                         </div>
@@ -81,7 +89,8 @@
                 </sec:authorize>
 
                 <sec:authorize access="hasAnyAuthority('ROLE_OWNER', 'SEGURIDAD_USUARIOS_VIEW')">
-                    <p:commandLink styleClass="menu-item" ajax="false" action="#{menuSessionBean.goToUsuarios()}">
+                    <p:commandLink ajax="false" action="#{menuSessionBean.goToUsuarios()}"
+                                   styleClass="menu-item #{menuSessionBean.currentPage.contains('/views/seguridad/usuarios') ? 'menu-item-active' : ''}">
                         <div class="icon">
                             <i class="fi fi-rr-users-alt"/>
                         </div>
