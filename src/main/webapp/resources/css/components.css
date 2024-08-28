@@ -579,3 +579,7 @@ body .ui-datepicker .ui-datepicker-title select {
 body .p-datepicker input {
     width: 100%;
 }
+
+body .ui-password.ui-inputwrapper {
+    width: 100%;
+}
