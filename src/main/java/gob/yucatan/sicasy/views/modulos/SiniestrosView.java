@@ -96,6 +96,8 @@ public class SiniestrosView implements Serializable {
     private @Getter boolean showRechazarSolicitudDialog;
     private @Getter boolean showDetalleSiniestroPanel;
     private @Getter boolean showAdjuntarFotos;
+    private @Getter boolean showMessageVehiculoPoliza;
+    private @Getter boolean showMessageVehiculoInciso;
 
 
     @PostConstruct
@@ -249,6 +251,8 @@ public class SiniestrosView implements Serializable {
         this.showNuevoSiniestroDialog = true;
         this.siniestroForm = new Siniestro();
         this.siniestroForm.setVehiculo(new Vehiculo());
+        this.showMessageVehiculoPoliza = false;
+        this.showMessageVehiculoInciso = false;
         PrimeFaces.current().ajax().update("registrar-siniestro-dialog-content");
         PrimeFaces.current().executeScript("PF('registrarSiniestroDialog').show()");
     }
@@ -295,6 +299,12 @@ public class SiniestrosView implements Serializable {
                 this.siniestroForm = new Siniestro();
                 this.siniestroForm.setVehiculo(new Vehiculo());
             }
+
+            if(this.siniestroForm.getVehiculo() != null && this.siniestroForm.getVehiculo().getIncisoVigente() == null) {
+                this.showMessageVehiculoPoliza = true;
+                this.showMessageVehiculoInciso = true;
+            }
+
             PrimeFaces.current().ajax().update("registro-siniestro-form:vehiculo_marca",
                     "registro-siniestro-form:vehiculo_anio",
                     "registro-siniestro-form:vehiculo_modelo",
@@ -302,7 +312,9 @@ public class SiniestrosView implements Serializable {
                     "registro-siniestro-form:vehiculo_color",
                     "registro-siniestro-form:vehiculo_dependencia",
                     "registro-siniestro-form:vehiculo_poliza",
-                    "registro-siniestro-form:vehiculo_inciso");
+                    "registro-siniestro-form:vehiculo_inciso",
+                    "registro-siniestro-form:input_vehiculo_poliza",
+                    "registro-siniestro-form:input_vehiculo_inciso");
         } catch (Exception e) {
             log.warn("No se ha encontrado el vehiculo con el No. Serie: {}", noSerie, e);
             Messages.addWarn("No se ha encontrado el vehículo");

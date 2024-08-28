@@ -30,7 +30,10 @@
                 prependId="false">
             <p:inputText placeholder="Usuario" id="username" styleClass="w-full" required="true"
                          onkeyup="Validator.validateInputTextUsername(this);"/>
-            <p:password placeholder="Contraseña" id="password" styleClass="w-full mb-4" required="true"/>
+            <p:outputPanel styleClass="mb-4 w-full">
+                <p:password placeholder="Contraseña" id="password" redisplay="true" toggleMask="true"
+                            styleClass="w-full" required="true"/>
+            </p:outputPanel>
 
             <p:captcha required="true" theme="light" language="es"
                        value="#{loginView.captcha}" callback="callbackCaptcha"

@@ -1,5 +1,7 @@
 package gob.yucatan.sicasy.views.beans;
 
+import jakarta.faces.context.ExternalContext;
+import jakarta.faces.context.FacesContext;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -10,6 +12,11 @@ import java.io.Serializable;
 @Scope("session")
 @Slf4j
 public class MenuSessionBean implements Serializable {
+
+    public String getCurrentPage() {
+        ExternalContext externalContext = FacesContext.getCurrentInstance().getExternalContext();
+        return externalContext.getRequestServletPath();
+    }
 
     public String goToHome() {
         return "/views/home?faces-redirect=true";

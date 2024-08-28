@@ -10,6 +10,7 @@ import gob.yucatan.sicasy.services.iface.IBitacoraSiniestroService;
 import gob.yucatan.sicasy.utils.strings.JsonStringConverter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.logging.log4j.util.Strings;
 import org.springframework.stereotype.Service;
 
 import java.lang.reflect.Field;
@@ -97,9 +98,9 @@ public class BitacoraSiniestroServiceImpl implements IBitacoraSiniestroService {
                         // Obtener el valor del campo
                         Object valorNuevo = switch (campo.getName()) {
                             case Siniestro_.VEHICULO -> siniestroNuevo.getVehiculo().getNoSerie();
-                            case Siniestro_.INCISO -> String.format("Póliza: %s | Inciso: %s",
+                            case Siniestro_.INCISO ->  siniestroNuevo.getInciso() != null ? String.format("Póliza: %s | Inciso: %s",
                                     siniestroNuevo.getInciso().getPoliza().getNumeroPoliza(),
-                                    siniestroNuevo.getInciso().getNumeroInciso());
+                                    siniestroNuevo.getInciso().getNumeroInciso()) : Strings.EMPTY;
                             case Siniestro_.ESTATUS_SINIESTRO -> siniestroNuevo.getEstatusSiniestro().getNombre();
                             default -> campo.get(siniestroNuevo);
                         };
@@ -127,12 +128,12 @@ public class BitacoraSiniestroServiceImpl implements IBitacoraSiniestroService {
                                 valorNuevo = siniestroNuevo.getVehiculo().getNoSerie();
                             }
                             case Siniestro_.INCISO -> {
-                                valorAnterior = String.format("Póliza: %s | Inciso: %s",
+                                valorAnterior = siniestroAnterior.getInciso() != null ? String.format("Póliza: %s | Inciso: %s",
                                         siniestroAnterior.getInciso().getPoliza().getNumeroPoliza(),
-                                        siniestroAnterior.getInciso().getNumeroInciso());
-                                valorNuevo = String.format("Póliza: %s | Inciso: %s",
+                                        siniestroAnterior.getInciso().getNumeroInciso()) : Strings.EMPTY;
+                                valorNuevo = siniestroNuevo.getInciso() != null ? String.format("Póliza: %s | Inciso: %s",
                                         siniestroNuevo.getInciso().getPoliza().getNumeroPoliza(),
-                                        siniestroNuevo.getInciso().getNumeroInciso());
+                                        siniestroNuevo.getInciso().getNumeroInciso()) : Strings.EMPTY;
                             }
                             case Siniestro_.ESTATUS_SINIESTRO -> {
                                 valorAnterior = siniestroAnterior.getEstatusSiniestro().getNombre();
