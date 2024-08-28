@@ -82,20 +82,28 @@
                <span class="text-sm hidden"> </span>
             </p:outputPanel>
 
-            <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4">
+            <p:outputPanel id="input_vehiculo_poliza" styleClass="field col-12 md:col-6 lg:col-4">
                <p:outputLabel for="@next" value="Póliza" styleClass="block"/>
                <p:inputText id="vehiculo_poliza" styleClass="block w-full" readonly="true"
                             onkeyup="Validator.validateInputText(this);"
                             value="#{siniestrosView.siniestroForm.vehiculo.incisoVigente.poliza.numeroPoliza}"/>
-               <span class="text-sm hidden"> </span>
+               <p:outputPanel rendered="#{siniestrosView.showMessageVehiculoPoliza}">
+                  <span class="text-sm text-warning">
+                     No tiene una póliza vigente
+                  </span>
+               </p:outputPanel>
             </p:outputPanel>
 
-            <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4">
+            <p:outputPanel id="input_vehiculo_inciso" styleClass="field col-12 md:col-6 lg:col-4">
                <p:outputLabel for="@next" value="Inciso" styleClass="block"/>
                <p:inputText id="vehiculo_inciso" styleClass="block w-full" readonly="true"
                             onkeyup="Validator.validateInputText(this);"
                             value="#{siniestrosView.siniestroForm.vehiculo.incisoVigente.numeroInciso}"/>
-               <span class="text-sm hidden"> </span>
+               <p:outputPanel rendered="#{siniestrosView.showMessageVehiculoInciso}">
+                  <span class="text-sm text-warning">
+                     No tiene un inciso vigente
+                  </span>
+               </p:outputPanel>
             </p:outputPanel>
 
             <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4">
