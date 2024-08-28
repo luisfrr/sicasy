@@ -2,12 +2,16 @@
         xmlns="http://www.w3.org/1999/xhtml"
         xmlns:ui="jakarta.faces.facelets">
 
-    <footer class="footer">
+    <footer class="footer md:justify-content-between gap-2">
 
         <div class="copyright">
             <span class="fw-semibold">#{appBean.year}</span>
             <i class="fi fi-rr-copyright"/>
             <span>Todos los derechos reservados</span>
+        </div>
+
+        <div class="app-footer">
+            <span class="text-alternative-color text-sm">#{appBean.appName.toUpperCase()} v#{appBean.appVersion}</span>
         </div>
 
     </footer>

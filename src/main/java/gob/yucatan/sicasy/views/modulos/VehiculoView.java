@@ -409,7 +409,7 @@ public class VehiculoView implements Serializable {
         } else if (Objects.equals(confirmAccion, ACCION_SOLICITAR_BAJA)) {
             this.confirmMensaje = "¿Está seguro que desea solicitar la baja de los vehículos? Una vez dados de baja, solo se muestran en reportes históricos.";
         } else if (Objects.equals(confirmAccion, ACCION_SOLICITAR_MODIFICACION)) {
-            this.confirmMensaje = "¿Está seguro que desea solicitar la baja de los vehículos? Una vez dados de baja, solo se muestran en reportes históricos.";
+            this.confirmMensaje = "¿Está seguro que desea solicitar la modificación de los vehículos?";
         }
 
         PrimeFaces.current().ajax().update("confirm-estatus-dialog");
