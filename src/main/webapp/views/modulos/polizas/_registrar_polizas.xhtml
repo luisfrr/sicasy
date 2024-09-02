@@ -82,7 +82,7 @@
 
                   <p:outputPanel styleClass="field col-12 md:col-6">
                      <p:outputLabel for="@next" value="Beneficiario" styleClass="block"/>
-                     <p:inputText styleClass="block w-full"
+                     <p:inputText styleClass="block w-full" required="true"
                                   onkeyup="Validator.validateInputText(this);"
                                   value="#{polizaView.polizaForm.beneficiarioPreferente}"/>
                      <span class="text-sm hidden"> </span>

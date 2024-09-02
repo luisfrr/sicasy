@@ -291,7 +291,7 @@
 
                     <p:outputPanel styleClass="field col-12">
                         <p:outputLabel for="@next" value="Descripción" styleClass="block"/>
-                        <p:inputTextarea styleClass="block w-full" rows="3"
+                        <p:inputTextarea styleClass="block w-full" rows="3" required="true"
                                          onkeyup="Validator.validateInputTextArea(this);"
                                          value="#{licitacionView.licitacionSelected.descripcion}"/>
                         <span class="text-sm hidden"> </span>
@@ -300,7 +300,7 @@
                     <p:outputPanel styleClass="field col-12">
                         <p:outputLabel value="Fecha inicio " styleClass="block"/>
                         <p:calendar value="#{licitacionView.licitacionSelected.fechaInicio}" id="id_calendar1"
-                                    inputStyleClass="w-full"
+                                    inputStyleClass="w-full" required="true"
                                     pattern="dd/MM/yyyy" locale="es">
                             <p:ajax
                                     event="dateSelect" listener="#{licitacionView.validateFechaInicioFinal}"
@@ -313,7 +313,7 @@
 
                     <p:outputPanel styleClass="field col-12">
                         <p:outputLabel  value="Fecha final " styleClass="block"/>
-                        <p:calendar  id="id_calendar2" value="#{licitacionView.licitacionSelected.fechaFinal}"
+                        <p:calendar  id="id_calendar2" value="#{licitacionView.licitacionSelected.fechaFinal}" required="true"
                                      inputStyleClass="w-full" disabled="#{licitacionView.licitacionSelected.fechaInicio == null}"
                                      pattern="dd/MM/yyyy" locale="es">
                             <p:ajax
