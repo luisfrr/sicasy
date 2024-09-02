@@ -535,6 +535,21 @@ public class IncisoServiceImpl implements IIncisoService {
                 if(inciso.getVehiculoNoSerie() == null || inciso.getVehiculoNoSerie().isEmpty())
                     throw new BadRequestException("El campo No. Serie es obligatorio");
 
+                if(inciso.getFechaInicioVigencia() == null)
+                    throw new BadRequestException("El campo Fecha inicio vigencia es obligatorio");
+
+                if(inciso.getFechaFinVigencia() == null)
+                    throw new BadRequestException("El campo Fecha fin vigencia es obligatorio");
+
+                if(inciso.getFolioFactura() == null || inciso.getFolioFactura().isEmpty())
+                    throw new BadRequestException("El campo folio factura es obligatorio");
+
+                if(inciso.getCosto() == null)
+                    throw new BadRequestException("El campo costo vigencia es obligatorio");
+
+                if(inciso.getFrecuenciaPago() == null || inciso.getFrecuenciaPago().isEmpty())
+                    throw new BadRequestException("El campo frecuencia de pago es obligatorio");
+
                 Vehiculo vehiculo = vehiculoDbList.stream()
                         .filter(v -> Objects.equals(v.getNoSerie(), inciso.getVehiculoNoSerie()))
                         .findFirst()

@@ -75,7 +75,7 @@
 
                   <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4">
                      <p:outputLabel for="@next" value="No. Motor" styleClass="block"/>
-                     <p:inputText styleClass="block w-full" required="true"
+                     <p:inputText styleClass="block w-full"
                                   onkeyup="Validator.validateInputText(this);"
                                   value="#{vehiculoView.vehiculoSelected.noMotor}"/>
                      <span class="text-sm hidden"> </span>
@@ -83,7 +83,7 @@
 
                   <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4">
                      <p:outputLabel for="@next" value="Color" styleClass="block"/>
-                     <p:inputText styleClass="block w-full" required="true"
+                     <p:inputText styleClass="block w-full"
                                   placeholder="Ej. Rojo"
                                   onkeyup="Validator.validateInputText(this);"
                                   value="#{vehiculoView.vehiculoSelected.color}"/>
@@ -103,7 +103,7 @@
 
                   <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4">
                      <p:outputLabel for="@next" value="No. Factura" styleClass="block"/>
-                     <p:inputText styleClass="block w-full" required="true"
+                     <p:inputText styleClass="block w-full"
                                   onkeyup="Validator.validateInputText(this);"
                                   value="#{vehiculoView.vehiculoSelected.noFactura}"/>
                      <span class="text-sm hidden"> </span>
@@ -111,7 +111,7 @@
 
                   <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4">
                      <p:outputLabel for="@next" value="Valor factura" styleClass="block"/>
-                     <p:inputNumber styleClass="block w-full" required="true"
+                     <p:inputNumber styleClass="block w-full"
                                     value="#{vehiculoView.vehiculoSelected.montoFactura}"/>
                      <span class="text-sm hidden"> </span>
                   </p:outputPanel>
@@ -126,7 +126,7 @@
                   <p:outputPanel styleClass="field col-12">
                      <p:outputLabel for="@next" value="Descripción" styleClass="block"/>
                      <p:inputTextarea styleClass="block w-full" rows="2"  autoResize="true"
-                                      onkeyup="Validator.validateInputTextArea(this);"
+                                      onkeyup="Validator.validateInputTextArea(this);" required="true"
                                       value="#{vehiculoView.vehiculoSelected.descripcionVehiculo}"/>
                      <span class="text-sm hidden"> </span>
                   </p:outputPanel>
@@ -134,7 +134,7 @@
                   <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4">
                      <p:outputLabel for="@next" value="Licitación" styleClass="block"/>
                      <p:selectOneMenu value="#{vehiculoView.vehiculoSelected.licitacion.idLicitacion}"
-                                      styleClass="w-full mw-auto">
+                                      styleClass="w-full mw-auto" required="true">
                         <f:selectItem itemLabel="Seleccione una..." itemValue="#{null}"/>
                         <f:selectItems value="#{vehiculoView.licitacionFormList}" var="licitacion"
                                        itemValue="#{licitacion.idLicitacion}" itemLabel="#{licitacion.numeroLicitacion}"/>
@@ -146,7 +146,7 @@
                   <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4">
                      <p:outputLabel for="@next" value="Anexo" styleClass="block"/>
                      <p:selectOneMenu id="select_anexo" value="#{vehiculoView.vehiculoSelected.anexo.idAnexo}"
-                                      styleClass="w-full mw-auto">
+                                      styleClass="w-full mw-auto" required="true">
                         <f:selectItem itemLabel="Seleccione una..." itemValue="#{null}"/>
                         <f:selectItems value="#{vehiculoView.anexoFormList}" var="anexo"
                                        itemValue="#{anexo.idAnexo}" itemLabel="#{anexo.nombre}"/>
@@ -157,7 +157,7 @@
                   <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4">
                      <p:outputLabel for="@next" value="Dependencia asignada" styleClass="block"/>
                      <p:selectOneMenu value="#{vehiculoView.vehiculoSelected.dependenciaAsignada.idDependencia}"
-                                      styleClass="w-full mw-auto">
+                                      styleClass="w-full mw-auto" required="true">
                         <f:selectItem itemLabel="Seleccione una..." itemValue="#{null}"/>
                         <f:selectItems value="#{vehiculoView.dependenciaList}" var="dependencia"
                                        itemValue="#{dependencia.idDependencia}" itemLabel="#{dependencia.abreviatura} - #{dependencia.nombre}"/>
@@ -167,7 +167,7 @@
 
                   <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4">
                      <p:outputLabel for="@next" value="Reguardante" styleClass="block"/>
-                     <p:inputText styleClass="block w-full"
+                     <p:inputText styleClass="block w-full" required="true"
                                   onkeyup="Validator.validateInputText(this);"
                                   value="#{vehiculoView.vehiculoSelected.resguardante}"/>
                      <span class="text-sm hidden"> </span>
@@ -175,7 +175,7 @@
 
                   <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4">
                      <p:outputLabel for="@next" value="Área reguardante" styleClass="block"/>
-                     <p:inputText styleClass="block w-full"
+                     <p:inputText styleClass="block w-full" required="true"
                                   onkeyup="Validator.validateInputText(this);"
                                   value="#{vehiculoView.vehiculoSelected.areaResguardante}"/>
                      <span class="text-sm hidden"> </span>
@@ -191,7 +191,7 @@
 
                   <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4">
                      <p:outputLabel for="@next" value="Director Administrativo" styleClass="block"/>
-                     <p:inputText styleClass="block w-full"
+                     <p:inputText styleClass="block w-full" required="true"
                                   onkeyup="Validator.validateInputText(this);"
                                   value="#{vehiculoView.vehiculoSelected.autorizaDirectorAdmin}"/>
                      <span class="text-sm hidden"> </span>
@@ -199,7 +199,7 @@
 
                   <p:outputPanel styleClass="field col-12 md:col-6 lg:col-4">
                      <p:outputLabel for="@next" value="Director General" styleClass="block"/>
-                     <p:inputText styleClass="block w-full"
+                     <p:inputText styleClass="block w-full" required="true"
                                   onkeyup="Validator.validateInputText(this);"
                                   value="#{vehiculoView.vehiculoSelected.autorizaDirectorGeneral}"/>
                      <span class="text-sm hidden"> </span>

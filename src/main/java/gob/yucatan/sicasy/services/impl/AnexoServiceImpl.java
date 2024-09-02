@@ -171,10 +171,20 @@ public class AnexoServiceImpl implements IAnexoService {
                 if(anexo.getNombre() == null || anexo.getNombre().isEmpty())
                     throw new BadRequestException("El campo Nombre es obligatorio");
 
-                if (anexo.getFechaInicio() != null && anexo.getFechaFinal() != null){
-                    if (anexo.getFechaInicio().after(anexo.getFechaFinal())){
-                        throw new BadRequestException("La fecha de inicio no puede ser una fecha posterior a la fecha final");
-                    }
+                if(anexo.getDescripcion() == null || anexo.getDescripcion().isEmpty())
+                    throw new BadRequestException("El campo Descripción es obligatorio");
+
+                if(anexo.getFechaInicio() == null)
+                    throw new BadRequestException("El campo Fecha inicio es obligatorio");
+
+                if(anexo.getFechaFinal() == null)
+                    throw new BadRequestException("El campo Fecha final es obligatorio");
+
+                if(anexo.getFechaFirma() == null)
+                    throw new BadRequestException("El campo Fecha firma es obligatorio");
+
+                if (anexo.getFechaInicio().after(anexo.getFechaFinal())){
+                    throw new BadRequestException("La fecha de inicio no puede ser una fecha posterior a la fecha final");
                 }
 
                 Licitacion licitacion = licitacionRepository
@@ -189,7 +199,7 @@ public class AnexoServiceImpl implements IAnexoService {
                 anexo.setCreadoPor(username);
 
 
-            }catch (Exception e) {
+            } catch (Exception e) {
                 acuseImportacionList.add(AcuseImportacion.builder()
                         .titulo(anexo.getNombre())
                         .mensaje(e.getMessage())

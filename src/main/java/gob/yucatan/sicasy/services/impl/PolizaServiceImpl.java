@@ -157,7 +157,7 @@ public class PolizaServiceImpl implements IPolizaService {
         }
 
         if(poliza.getFechaFinVigencia() == null) {
-            throw new BadRequestException("El campo Fecha Inicio es obligatorio.");
+            throw new BadRequestException("El campo Fecha Fin es obligatorio.");
         }
 
         if(poliza.getFechaInicioVigencia().after(poliza.getFechaFinVigencia())) {
@@ -234,11 +234,15 @@ public class PolizaServiceImpl implements IPolizaService {
                 }
 
                 if(poliza.getFechaFinVigencia() == null) {
-                    throw new BadRequestException("El campo Fecha Inicio es obligatorio. Revise el formato de fecha.");
+                    throw new BadRequestException("El campo Fecha Fin es obligatorio. Revise el formato de fecha.");
                 }
 
                 if(poliza.getTipoCobertura() == null || poliza.getTipoCobertura().isEmpty()) {
                     throw new BadRequestException("El campo Cobertura es obligatorio.");
+                }
+
+                if(poliza.getBeneficiarioPreferente() == null || poliza.getBeneficiarioPreferente().isEmpty()) {
+                    throw new BadRequestException("El campo Beneficiario es obligatorio.");
                 }
 
                 if(polizaDbList.stream()
