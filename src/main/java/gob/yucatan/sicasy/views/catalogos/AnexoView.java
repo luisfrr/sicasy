@@ -380,9 +380,9 @@ public class AnexoView implements Serializable {
             list.add(ConfigHeaderExcelModel.builder().header("NUM_LICITACION").fieldName("numLicitacionString").columnIndex(0).build());
             list.add(ConfigHeaderExcelModel.builder().header("NUM_ANEXO").fieldName("nombre").columnIndex(1).build());
             list.add(ConfigHeaderExcelModel.builder().header("DESCRIPCION").fieldName("descripcion").columnIndex(2).build());
-            list.add(ConfigHeaderExcelModel.builder().header("FECHA_INICIO").fieldName("fechaInicio").columnIndex(3).build());
-            list.add(ConfigHeaderExcelModel.builder().header("FECHA_FIN").fieldName("fechaFinal").columnIndex(4).build());
-            list.add(ConfigHeaderExcelModel.builder().header("FECHA_FIRMA").fieldName("fechaFirma").columnIndex(5).build());
+            list.add(ConfigHeaderExcelModel.builder().header("FECHA_INICIO").fieldName("fechaInicio").dateFormat("dd/MM/yyyy").columnIndex(3).build());
+            list.add(ConfigHeaderExcelModel.builder().header("FECHA_FIN").fieldName("fechaFinal").dateFormat("dd/MM/yyyy").columnIndex(4).build());
+            list.add(ConfigHeaderExcelModel.builder().header("FECHA_FIRMA").fieldName("fechaFirma").dateFormat("dd/MM/yyyy").columnIndex(5).build());
 
 
             ImportExcelFile<Anexo> importExcelFile = new ImportExcelFile<>();
