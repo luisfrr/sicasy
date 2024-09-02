@@ -93,7 +93,7 @@
             </p:outputPanel>
 
             <p:outputPanel styleClass="field col-12 md:col-6">
-               <p:outputLabel for="@next" value="Frecuencia de pago" styleClass="block"/>
+               <p:outputLabel for="@next" value="Frecuencia de pago" styleClass="block" required="true"/>
                <p:selectOneMenu value="#{polizaView.endosoModificacion.inciso.frecuenciaPago}"
                                 styleClass="w-full mw-auto">
                   <f:selectItem itemLabel="Selecciona uno..."
@@ -130,7 +130,7 @@
 
             <p:outputPanel styleClass="field col-12 md:col-6">
                <p:outputLabel for="@next" value="Saldo del movimiento" styleClass="block"/>
-               <p:selectOneMenu id="select_anexo" value="#{polizaView.endosoModificacion.tipoMovimiento}"
+               <p:selectOneMenu id="select_anexo" value="#{polizaView.endosoModificacion.tipoMovimiento}" required="true"
                                 styleClass="w-full mw-auto">
                   <f:selectItem itemLabel="Selecciona uno..."
                                 itemValue="#{null}"/>

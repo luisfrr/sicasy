@@ -362,26 +362,28 @@ public class VehiculoServiceImpl implements IVehiculoService {
                 if(vehiculo.getAnio() == null)
                     throw new BadRequestException("El campo Año es obligatorio");
 
-                if(vehiculo.getNoMotor() == null || vehiculo.getNoMotor().isEmpty())
-                    throw new BadRequestException("El campo No. Motor es obligatorio");
+                if(vehiculo.getNoMotor() == null)
+                    vehiculo.setNoMotor("");
 
-                if(vehiculo.getColor() == null || vehiculo.getColor().isEmpty())
-                    throw new BadRequestException("El campo Color es obligatorio");
+                if(vehiculo.getColor() == null)
+                    vehiculo.setColor("");
 
                 if(vehiculo.getCondicionId() == null)
                     throw new BadRequestException("El campo Condición es obligatorio");
                 else if(vehiculo.getCondicionId() < 1 || vehiculo.getCondicionId() > 3)
                     throw new BadRequestException("El campo Condición solo acepta valor 1, 2 o 3.");
 
-
-                if(vehiculo.getNoFactura() == null || vehiculo.getNoFactura().isEmpty())
-                    throw new BadRequestException("El campo No. Factura es obligatorio");
+                if(vehiculo.getNoFactura() == null)
+                    vehiculo.setNoFactura("");
 
                 if(vehiculo.getMontoFactura() == null)
-                    throw new BadRequestException("El campo Valor Factura es obligatorio");
+                    vehiculo.setMontoFactura(0d);
 
                 if(vehiculo.getRentaMensual() == null)
                     throw new BadRequestException("El campo Renta Mensual es obligatorio");
+
+                if(vehiculo.getDescripcionVehiculo() == null || vehiculo.getDescripcionVehiculo().isEmpty())
+                    throw new BadRequestException("El campo Descripción es obligatorio");
 
                 // Se agregan los campos que hacen referencia a otras tablas
                 vehiculo.setDependencia(Dependencia.builder().idDependencia(idDependencia).build());
@@ -398,9 +400,11 @@ public class VehiculoServiceImpl implements IVehiculoService {
                             .orElseThrow(() -> new NotFoundException("No se encontro la licitacion con el número de licitacion: "
                                     + vehiculo.getNumLicitacion()));
                     vehiculo.setLicitacion(licitacion);
+                } else {
+                    throw new BadRequestException("El campo Número de licitación es obligatorio");
                 }
 
-                if(vehiculo.getNumLicitacion() != null) {
+                if(vehiculo.getAnexoValue() != null && vehiculo.getNumLicitacion() != null) {
                     Anexo anexo = anexoRepository
                             .findAnexoActivoByNombreAndLicitacion(vehiculo.getAnexoValue(),
                                     vehiculo.getLicitacion())
@@ -408,6 +412,21 @@ public class VehiculoServiceImpl implements IVehiculoService {
                                     ", número de licitación: "+ vehiculo.getNumLicitacion()));
                     vehiculo.setAnexo(anexo);
                 }
+                else {
+                    throw new BadRequestException("El campo Anexo es obligatorio");
+                }
+
+                if(vehiculo.getResguardante() == null || vehiculo.getResguardante().isEmpty())
+                    throw new BadRequestException("El campo Resguardante es obligatorio");
+
+                if(vehiculo.getAreaResguardante() == null || vehiculo.getAreaResguardante().isEmpty())
+                    throw new BadRequestException("El campo Área resguardante es obligatorio");
+
+                if(vehiculo.getAutorizaDirectorAdmin() == null || vehiculo.getAutorizaDirectorAdmin().isEmpty())
+                    throw new BadRequestException("El campo Director Administrativo es obligatorio");
+
+                if(vehiculo.getAutorizaDirectorGeneral() == null || vehiculo.getAutorizaDirectorGeneral().isEmpty())
+                    throw new BadRequestException("El campo Director General es obligatorio");
 
                 vehiculo.setEstatusVehiculo(EstatusVehiculo.builder()
                         .idEstatusVehiculo(ESTATUS_VEHICULO_REGISTRADO)
