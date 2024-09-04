@@ -362,8 +362,8 @@ public class LicitacionView {
                 list.add(ConfigHeaderExcelModel.builder().header("NUM_LICITACION").fieldName("numeroLicitacion").columnIndex(0).build());
                 list.add(ConfigHeaderExcelModel.builder().header("NOMBRE").fieldName("nombre").columnIndex(1).build());
                 list.add(ConfigHeaderExcelModel.builder().header("DESCRIPCION").fieldName("descripcion").columnIndex(2).build());
-                list.add(ConfigHeaderExcelModel.builder().header("FECHA_INICIO").fieldName("fechaInicio").columnIndex(3).build());
-                list.add(ConfigHeaderExcelModel.builder().header("FECHA_FIN").fieldName("fechaFinal").columnIndex(4).build());
+                list.add(ConfigHeaderExcelModel.builder().header("FECHA_INICIO").fieldName("fechaInicio").dateFormat("dd/MM/yyyy").columnIndex(3).build());
+                list.add(ConfigHeaderExcelModel.builder().header("FECHA_FIN").fieldName("fechaFinal").dateFormat("dd/MM/yyyy").columnIndex(4).build());
 
                 ImportExcelFile<Licitacion> importExcelFile = new ImportExcelFile<>();
                 this.licitacionImportList = importExcelFile.processExcelFile(fileContent, licitacionClass, list);
