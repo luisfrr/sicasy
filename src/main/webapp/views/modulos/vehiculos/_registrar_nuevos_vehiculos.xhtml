@@ -249,7 +249,7 @@
                      <p:fileUpload widgetVar="uploadLayout" listener="#{vehiculoView.importarLayout}"
                                    fileLimit="1" fileLimitMessage="Solo se permite subir un archivo"
                                    sizeLimit="50000000" allowTypes="/(\.|\/)(xlsx|)$/" accept=".xlsx" dropZone="dropZoneLayout"
-                                   update="growl" style="display: none"/>
+                                   update="growl @this" style="display: none"/>
                   </p:outputPanel>
 
                   <p:outputPanel styleClass="field col-12 mb-5" rendered="#{vehiculoView.showErrorImportacion}">

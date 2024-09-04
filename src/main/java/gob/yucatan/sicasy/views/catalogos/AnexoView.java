@@ -367,34 +367,48 @@ public class AnexoView implements Serializable {
     }
 
     @PreAuthorize("hasAnyAuthority('ROLE_OWNER', 'CAT_ANEXO_WRITE_IMPORTAR')")
-    public void importarLayout(FileUploadEvent event) throws IOException {
-        log.info("importarLayout - AnexoView");
-        UploadedFile file = event.getFile();
-        String fileName = file.getFileName();
-        byte[] fileContent = file.getContent();
+    public void importarLayout(FileUploadEvent event) {
+        try {
+            log.info("importarLayout - AnexoView");
+            UploadedFile file = event.getFile();
+            String fileName = file.getFileName();
+            byte[] fileContent = file.getContent();
 
-        if (fileName.endsWith(".xls") || fileName.endsWith(".xlsx")) {
-            //procesarlo utilizando Apache POI
-            Class<Anexo> anexoClass = Anexo.class;
-            List<ConfigHeaderExcelModel> list = new ArrayList<>();
-            list.add(ConfigHeaderExcelModel.builder().header("NUM_LICITACION").fieldName("numLicitacionString").columnIndex(0).build());
-            list.add(ConfigHeaderExcelModel.builder().header("NUM_ANEXO").fieldName("nombre").columnIndex(1).build());
-            list.add(ConfigHeaderExcelModel.builder().header("DESCRIPCION").fieldName("descripcion").columnIndex(2).build());
-            list.add(ConfigHeaderExcelModel.builder().header("FECHA_INICIO").fieldName("fechaInicio").columnIndex(3).build());
-            list.add(ConfigHeaderExcelModel.builder().header("FECHA_FIN").fieldName("fechaFinal").columnIndex(4).build());
-            list.add(ConfigHeaderExcelModel.builder().header("FECHA_FIRMA").fieldName("fechaFirma").columnIndex(5).build());
+            if (fileName.endsWith(".xls") || fileName.endsWith(".xlsx")) {
+                //procesarlo utilizando Apache POI
+                Class<Anexo> anexoClass = Anexo.class;
+                List<ConfigHeaderExcelModel> list = new ArrayList<>();
+                list.add(ConfigHeaderExcelModel.builder().header("NUM_LICITACION").fieldName("numLicitacionString").columnIndex(0).build());
+                list.add(ConfigHeaderExcelModel.builder().header("NUM_ANEXO").fieldName("nombre").columnIndex(1).build());
+                list.add(ConfigHeaderExcelModel.builder().header("DESCRIPCION").fieldName("descripcion").columnIndex(2).build());
+                list.add(ConfigHeaderExcelModel.builder().header("FECHA_INICIO").fieldName("fechaInicio").dateFormat("dd/MM/yyyy").columnIndex(3).build());
+                list.add(ConfigHeaderExcelModel.builder().header("FECHA_FIN").fieldName("fechaFinal").dateFormat("dd/MM/yyyy").columnIndex(4).build());
+                list.add(ConfigHeaderExcelModel.builder().header("FECHA_FIRMA").fieldName("fechaFirma").dateFormat("dd/MM/yyyy").columnIndex(5).build());
 
+                ImportExcelFile<Anexo> importExcelFile = new ImportExcelFile<>();
+                this.anexoImportList = importExcelFile.processExcelFile(fileContent, anexoClass, list);
 
-            ImportExcelFile<Anexo> importExcelFile = new ImportExcelFile<>();
-            this.anexoImportList = importExcelFile.processExcelFile(fileContent, anexoClass, list);
+                this.anexoImportList.forEach(Anexo -> Anexo.setLicitacion(new Licitacion()));
 
-            this.anexoImportList.forEach(Anexo -> Anexo.setLicitacion(new Licitacion()));
-
-            this.layoutFileUpload = fileName;
-            PrimeFaces.current().ajax().update(":form_import:dropZoneLayout");
-            log.info("Se ha cargado la información del layout correctamente. Vehículos a importar: {}", this.anexoImportList.size());
-        } else {
-            Messages.addError("Error", "Tipo de archivo no válido");
+                this.layoutFileUpload = fileName;
+                PrimeFaces.current().ajax().update(":form_import:dropZoneLayout");
+                log.info("Se ha cargado la información del layout correctamente. Registros a importar: {}", this.anexoImportList.size());
+            } else {
+                Messages.addError("Error", "Tipo de archivo no válido");
+                PrimeFaces.current().executeScript("PF('uploadLayout').clear();");
+            }
+        } catch (Exception e) {
+            if(e instanceof NotFoundException) {
+                log.warn(e.getMessage());
+                Messages.addWarn(e.getMessage());
+            } else if(e instanceof BadRequestException) {
+                log.warn(e.getMessage());
+                Messages.addError(e.getMessage());
+            } else {
+                log.error(e.getMessage(), e);
+                Messages.addError("Ocurrió un error al procesar la información del archivo. Consulte el log.");
+            }
+            PrimeFaces.current().executeScript("PF('uploadLayout').clear();");
         }
     }
 

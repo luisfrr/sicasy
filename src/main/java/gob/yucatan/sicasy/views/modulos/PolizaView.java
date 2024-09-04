@@ -240,12 +240,12 @@ public class PolizaView implements Serializable {
             nombre = "Importar pólizas", descripcion = "Acción que permite importar nuevos registros de pólizas")
     @PreAuthorize("hasAnyAuthority('ROLE_OWNER', 'POLIZA_WRITE_IMPORTAR_POLIZA')")
     public void importarLayoutRegistroPolizas(FileUploadEvent event) {
-        log.info("importarLayoutRegistroPolizas - PolizaView");
-        UploadedFile file = event.getFile();
-        String fileName = file.getFileName();
-        byte[] fileContent = file.getContent();
-
         try {
+            log.info("importarLayoutRegistroPolizas - PolizaView");
+            UploadedFile file = event.getFile();
+            String fileName = file.getFileName();
+            byte[] fileContent = file.getContent();
+
             // Aquí puedes procesar el archivo según su tipo o contenido
             if (fileName.endsWith(".xls") || fileName.endsWith(".xlsx")) {
                 // Si es un archivo Excel, procesarlo utilizando Apache POI
@@ -265,13 +265,22 @@ public class PolizaView implements Serializable {
                 PrimeFaces.current().ajax().update("tab-view:layout-form:dropZoneLayout");
                 log.info("Se ha cargado la información del layout correctamente. Pólizas a importar: {}", this.importPolizaList.size());
             } else {
-                // Manejar otros tipos de archivos si es necesario
-                // Por ejemplo, mostrar un mensaje de error
                 Messages.addError("Error", "Tipo de archivo no válido");
+                PrimeFaces.current().executeScript("PF('uploadLayout').clear();");
             }
+
         } catch (Exception e) {
-            log.error("Ocurrió un error al importar el layout de registro de pólizas", e);
-            Messages.addError("Ocurrió un error al importar el layout de registro de pólizas");
+            if(e instanceof NotFoundException) {
+                log.warn(e.getMessage());
+                Messages.addWarn(e.getMessage());
+            } else if(e instanceof BadRequestException) {
+                log.warn(e.getMessage());
+                Messages.addError(e.getMessage());
+            } else {
+                log.error(e.getMessage(), e);
+                Messages.addError("Ocurrió un error al procesar la información del archivo. Consulte el log.");
+            }
+            PrimeFaces.current().executeScript("PF('uploadLayout').clear();");
         }
     }
 
@@ -471,12 +480,12 @@ public class PolizaView implements Serializable {
             nombre = "Importar endoso de alta", descripcion = "Acción que permite importar registros de endoso de alta")
     @PreAuthorize("hasAnyAuthority('ROLE_OWNER', 'POLIZA_WRITE_IMPORTAR_ENDOSO_ALTA')")
     public void importarLayoutEndosoAlta(FileUploadEvent event) {
-        log.info("importarLayoutEndosoAlta - PolizaView");
-        UploadedFile file = event.getFile();
-        String fileName = file.getFileName();
-        byte[] fileContent = file.getContent();
-
         try {
+            log.info("importarLayoutEndosoAlta - PolizaView");
+            UploadedFile file = event.getFile();
+            String fileName = file.getFileName();
+            byte[] fileContent = file.getContent();
+
             // Aquí puedes procesar el archivo según su tipo o contenido
             if (fileName.endsWith(".xls") || fileName.endsWith(".xlsx")) {
                 // Si es un archivo Excel, procesarlo utilizando Apache POI
@@ -502,10 +511,20 @@ public class PolizaView implements Serializable {
                 // Manejar otros tipos de archivos si es necesario
                 // Por ejemplo, mostrar un mensaje de error
                 Messages.addError("Error", "Tipo de archivo no válido");
+                PrimeFaces.current().executeScript("PF('uploadLayout').clear();");
             }
         } catch (Exception e) {
-            log.error("Ocurrió un error al importar el layout de endoso de alta", e);
-            Messages.addError("Ocurrió un error al importar el layout de endoso de alta");
+            if(e instanceof NotFoundException) {
+                log.warn(e.getMessage());
+                Messages.addWarn(e.getMessage());
+            } else if(e instanceof BadRequestException) {
+                log.warn(e.getMessage());
+                Messages.addError(e.getMessage());
+            } else {
+                log.error(e.getMessage(), e);
+                Messages.addError("Ocurrió un error al procesar la información del archivo. Consulte el log.");
+            }
+            PrimeFaces.current().executeScript("PF('uploadLayout').clear();");
         }
     }
 
