@@ -369,7 +369,7 @@ public class LicitacionView {
 
             this.layoutFileUpload = fileName;
             PrimeFaces.current().ajax().update(":form_import:dropZoneLayout");
-            log.info("Se ha cargado la información del layout correctamente. Vehículos a importar: {}", this.licitacionImportList.size());
+            log.info("Se ha cargado la información del layout correctamente. Licitaciones a importar: {}", this.licitacionImportList.size());
         } else {
             Messages.addError("Error", "Tipo de archivo no válido");
         }
@@ -389,7 +389,7 @@ public class LicitacionView {
                 }
                 else {
                     // Si no, entonces se guardó correctamente
-                    Messages.addInfo("Todos los anexos se han registrado correctamente");
+                    Messages.addInfo("Todos las licitaciones se han registrado correctamente");
                     this.limpiarFiltros();
                     this.buscar();
                     this.cerrarModalImport();
@@ -397,7 +397,7 @@ public class LicitacionView {
 
             }
         } catch (Exception e) {
-            log.error("Error al guardar nuevo anexo", e);
+            log.error("Error al guardar nueva licitacion", e);
             String message;
             if(e instanceof BadRequestException)
                 message = e.getMessage();
