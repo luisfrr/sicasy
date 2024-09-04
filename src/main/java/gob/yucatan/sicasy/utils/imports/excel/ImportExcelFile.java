@@ -90,7 +90,7 @@ public class ImportExcelFile<T> {
                 Class<?> fieldType = getFieldClass(entity, fieldName);
 
                 // Convertir el valor de la celda al tipo de dato apropiado
-                Object cellValue = getCellValue(cell, fieldType, header.getDateFormat());
+                Object cellValue = getCellValue(header.getHeader(), cell, fieldType, header.getDateFormat());
 
                 // Obtener el método setter del campo correspondiente
                 Method setterMethod = entity.getClass().getMethod("set" + StringUtils.capitalize(fieldName), fieldType);
@@ -107,7 +107,7 @@ public class ImportExcelFile<T> {
         return field.getType();
     }
 
-    private Object getCellValue(Cell cell, Class<?> fieldType, String dateFormat) throws BadRequestException {
+    private Object getCellValue(String header, Cell cell, Class<?> fieldType, String dateFormat) throws BadRequestException {
         // Convertir el valor de la celda al tipo de dato apropiado
         if (fieldType == String.class) {
             try {
@@ -117,20 +117,35 @@ public class ImportExcelFile<T> {
                 return df.format(cell.getNumericCellValue());
             }
         } else if (fieldType == Integer.class) {
-            return DoubleUtil.parse(String.valueOf(cell.getNumericCellValue())).intValue();
+            try {
+                return DoubleUtil.parse(String.valueOf(cell.getNumericCellValue())).intValue();
+            } catch (Exception e) {
+                throw new BadRequestException("Se espera un campo númerico entero. Columna: " + header);
+            }
         } else if (fieldType == Double.class) {
-            return DoubleUtil.parse(String.valueOf(cell.getNumericCellValue()));
+            try {
+                return DoubleUtil.parse(String.valueOf(cell.getNumericCellValue()));
+            } catch (Exception e) {
+                throw new BadRequestException("Se espera un campo númerico decimal. Columna: " + header);
+            }
         } else if (fieldType == Date.class) {
             try {
-                return cell.getDateCellValue();
+                if(cell.getDateCellValue() != null)
+                    return cell.getDateCellValue();
+                else
+                    return DateFormatUtil.convertToDate(cell.getStringCellValue(), dateFormat);
             } catch (Exception e) {
-                return DateFormatUtil.convertToDate(cell.getStringCellValue(), dateFormat);
+                throw new BadRequestException("Formato de fecha no válido o la columna no corresponde a una fecha. Columna: " + header);
             }
         } else if (fieldType == Boolean.class) {
-            return cell.getBooleanCellValue();
+            try {
+                return cell.getBooleanCellValue();
+            } catch (Exception e) {
+                throw new BadRequestException("Formato del campo no válido. Columna: " + header);
+            }
         } else {
             // Otros tipos de datos podrían manejarse de manera similar
-            throw new BadRequestException("Tipo de dato no compatible: " + fieldType.getName());
+            throw new BadRequestException("Tipo de dato no compatible. Columna: " + header);
         }
     }
 
