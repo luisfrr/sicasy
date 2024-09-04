@@ -6,7 +6,6 @@ import gob.yucatan.sicasy.repository.criteria.SearchOperation;
 import gob.yucatan.sicasy.repository.criteria.SearchSpecification;
 import gob.yucatan.sicasy.repository.iface.IBitacoraVehiculoRepository;
 import gob.yucatan.sicasy.services.iface.IBitacoraVehiculoService;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -80,7 +79,7 @@ public class BitacoraVehiculoServiceImpl implements IBitacoraVehiculoService {
                 Vehiculo_.DESCRIPCION_VEHICULO, Vehiculo_.MONTO_FACTURA, Vehiculo_.NO_FACTURA, Vehiculo_.RENTA_MENSUAL,
                 Vehiculo_.PROVEEDOR, Vehiculo_.RESGUARDANTE, Vehiculo_.AREA_RESGUARDANTE,
                 Vehiculo_.AUTORIZA_DIRECTOR_ADMIN, Vehiculo_.AUTORIZA_DIRECTOR_GENERAL,
-                Vehiculo_.OBSERVACIONES
+                Vehiculo_.OBSERVACIONES, Vehiculo_.ESTATUS_REGISTRO
         );
 
         try {
@@ -162,6 +161,7 @@ public class BitacoraVehiculoServiceImpl implements IBitacoraVehiculoService {
                         Object valorNuevo = campo.get(vehiculoNuevo);
                         // Comparar los valores y agregar un registro a la bitácora si hay cambios
                         if (!Objects.equals(valorAnterior, valorNuevo)) {
+                            //String tipoDato = valorNuevo != null ? valorNuevo.getClass().getSimpleName() : "";
                             String tipoDato = valorNuevo.getClass().getSimpleName();
                             String datoAnterior = valorAnterior != null ? valorAnterior.toString() : null;
                             // Agregar un registro a la bitácora con el campo y el valor nuevo
@@ -249,7 +249,7 @@ public class BitacoraVehiculoServiceImpl implements IBitacoraVehiculoService {
 
                 }
             }
-        } catch (IllegalAccessException e) {
+        } catch (Exception e) {
             // Manejo del error, por ejemplo, loggearlo
             log.error("Error al generar Bitacora Vehiculo Cambios: {}", e.getMessage());
         }
