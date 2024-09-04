@@ -314,7 +314,7 @@
 
                     <p:outputPanel styleClass="field col-12">
                         <p:outputLabel for="@next" value="Descripción" styleClass="block"/>
-                        <p:inputTextarea styleClass="block w-full" rows="3"
+                        <p:inputTextarea styleClass="block w-full" rows="3" required="true"
                                          onkeyup="Validator.validateInputTextArea(this);"
                                          value="#{anexoView.anexoSelected.descripcion}"/>
                         <span class="text-sm hidden"> </span>
@@ -323,7 +323,7 @@
                     <p:outputPanel styleClass="field col-12">
                         <p:outputLabel for="@next" styleClass="block" value="Fecha inicio "/>
                         <p:calendar value="#{anexoView.anexoSelected.fechaInicio}" id="id_calendar1"
-                                    inputStyleClass="w-full"
+                                    inputStyleClass="w-full" required="true"
                                     pattern="dd/MM/yyyy" locale="es">
                             <p:ajax
                                     event="dateSelect" listener="#{anexoView.validateFechaInicioFinal}"
@@ -337,7 +337,7 @@
                     <p:outputPanel styleClass="field col-12">
                         <p:outputLabel for="@next" styleClass="block"  value="Fecha final "/>
                         <p:calendar  value="#{anexoView.anexoSelected.fechaFinal}"
-                                     inputStyleClass="w-full" id="id_calendar2"
+                                     inputStyleClass="w-full" id="id_calendar2" required="true"
                                      disabled="#{anexoView.anexoSelected.fechaInicio == null}"
                                      pattern="dd/MM/yyyy" locale="es">
                             <p:ajax
@@ -352,7 +352,7 @@
                     <p:outputPanel styleClass="field col-12">
                         <p:outputLabel for="@next" styleClass="block"  value="Fecha firma "/>
                         <p:calendar  value="#{anexoView.anexoSelected.fechaFirma}"
-                                     inputStyleClass="w-full"
+                                     inputStyleClass="w-full" required="true"
                                      pattern="dd/MM/yyyy" locale="es"/>
                     </p:outputPanel>
 

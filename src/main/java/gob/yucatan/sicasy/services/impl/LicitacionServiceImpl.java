@@ -152,10 +152,17 @@ public class LicitacionServiceImpl implements ILicitacionService {
                 if (licitacion.getNumeroLicitacion() == null || licitacion.getNumeroLicitacion().trim().isEmpty())
                     throw new BadRequestException("El campo número licitación es obligatorio");
 
-                if (licitacion.getFechaInicio() != null && licitacion.getFechaFinal() != null){
-                    if (licitacion.getFechaInicio().after(licitacion.getFechaFinal())){
-                        throw new BadRequestException("La fecha de inicio no puede ser una fecha posterior a la fecha final");
-                    }
+                if (licitacion.getDescripcion() == null || licitacion.getDescripcion().trim().isEmpty())
+                    throw new BadRequestException("El campo descripción es obligatorio");
+
+                if (licitacion.getFechaInicio() == null)
+                    throw new BadRequestException("El campo fecha inicio es obligatorio");
+
+                if (licitacion.getFechaFinal() == null)
+                    throw new BadRequestException("El campo fecha final es obligatorio");
+
+                if (licitacion.getFechaInicio().after(licitacion.getFechaFinal())){
+                    throw new BadRequestException("La fecha de inicio no puede ser una fecha posterior a la fecha final");
                 }
 
                 licitacion.setEstatusRegistro(EstatusRegistro.ACTIVO);
