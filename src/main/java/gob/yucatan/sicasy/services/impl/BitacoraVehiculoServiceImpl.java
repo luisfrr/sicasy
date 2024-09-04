@@ -6,7 +6,6 @@ import gob.yucatan.sicasy.repository.criteria.SearchOperation;
 import gob.yucatan.sicasy.repository.criteria.SearchSpecification;
 import gob.yucatan.sicasy.repository.iface.IBitacoraVehiculoRepository;
 import gob.yucatan.sicasy.services.iface.IBitacoraVehiculoService;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
