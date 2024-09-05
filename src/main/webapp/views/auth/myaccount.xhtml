@@ -1,0 +1,115 @@
+<ui:composition template="../../WEB-INF/facelets/main_layout.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="jakarta.faces.facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="jakarta.faces.html"
+                xmlns:f="jakarta.faces.core"
+                xmlns:sec="https://joinfaces.org/security">
+
+<ui:define name="title">
+    #{myAccountView.title}
+</ui:define>
+
+<ui:define name="content">
+
+    <style>
+        .profile-container-links {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-2);
+            padding: var(--spacing-4);
+        }
+        .profile-link {
+            padding: 1rem 0.75rem;
+            width: 100%;
+            display: flex;
+            flex-direction: row;
+            gap: var(--spacing-3);
+            border-radius: var(--border-radius-elements);
+        }
+
+        .profile-icon {
+            font-size: var(--font-size-base);
+            color: var(--text-alternative-color);
+        }
+
+        .profile-option {
+            font-size: var(--font-size-base);
+            color: var(--text-alternative-color);
+        }
+
+        .profile-icon:hover, .profile-option:hover  {
+            color: var(--text-color);
+        }
+
+        .profile-link.link-active {
+            background: var(--highlight-bg);
+        }
+        .profile-link.link-active .profile-icon, .profile-link.link-active .profile-option  {
+            color: var(--highlight-text-color);
+        }
+
+    </style>
+
+    <p:outputPanel styleClass="container-xl">
+        <p:growl id="growl" showDetail="true" showSummary="true" skipDetailIfEqualsSummary="true" globalOnly="true"/>
+
+        <h:form id="form_breadcum">
+            <p:breadCrumb homeDisplay="text" styleClass="mb-5">
+                <p:menuitem value="Inicio" ajax="false" action="#{menuSessionBean.goToHome()}"/>
+                <p:menuitem value="Mi cuenta"/>
+            </p:breadCrumb>
+        </h:form>
+
+        <p:outputPanel id="account_panel" styleClass="grid">
+
+            <h:form id="form_options" styleClass="col-12 md:col-4">
+
+                <p:outputPanel styleClass="flex flex-row gap-2 align-items-center">
+                    <p:avatar label="#{userSessionBean.firstLetterName}"
+                              styleClass="mr-2" shape="circle" size="large"/>
+                    <div class="flex flex-column">
+                        <span class="fw-semibold">#{userSessionBean.fullName}</span>
+                        <span class="text-sm text-alternative-color">#{userSessionBean.userName}</span>
+                    </div>
+                </p:outputPanel>
+
+                <p:outputPanel styleClass="profile-container-links">
+
+                    <p:commandLink styleClass="profile-link">
+                        <i class="profile-icon fi fi-rr-user"/>
+                        <span class="profile-option">Información general</span>
+                    </p:commandLink>
+
+                    <p:commandLink styleClass="profile-link">
+                        <i class="profile-icon fi fi-rr-user"/>
+                        <span class="profile-option">Cambiar contraseña</span>
+                    </p:commandLink>
+
+                    <p:commandLink styleClass="profile-link">
+                        <i class="profile-icon fi fi-rr-user"/>
+                        <span class="profile-option">Configuraciones</span>
+                    </p:commandLink>
+
+                    <p:commandLink styleClass="profile-link">
+                        <i class="profile-icon fi fi-rr-user"/>
+                        <span class="profile-option">Cerrar sesión</span>
+                    </p:commandLink>
+
+                </p:outputPanel>
+            </h:form>
+
+            <p:outputPanel id="option_selected_panel" styleClass="col-12 md:col-8">
+
+
+            </p:outputPanel>
+
+
+        </p:outputPanel>
+
+
+    </p:outputPanel>
+
+</ui:define>
+
+</ui:composition>

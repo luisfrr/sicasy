@@ -28,10 +28,14 @@
             <a class="header-link user-info" href="#" onclick="Main.toggleUserDropdown();">
                 <p:avatar label="#{userSessionBean.firstLetterName}"
                           styleClass="mr-2" shape="circle"/>
-                <span class="username">#{userSessionBean.userName}</span>
+                <span class="username">#{userSessionBean.firstName}</span>
             </a>
             <div class="user-info-dropdown" id="userInfoDropdown">
                 <h:form>
+                    <p:commandLink action="#{userSessionBean.goToMyAccount()}" ajax="false" immediate="true">
+                        <i class="fi fi-rr-user text-base"/>
+                        <span class="text-base text-color">Mi perfil</span>
+                    </p:commandLink>
                     <p:commandLink action="#{userSessionBean.doLogout()}" ajax="false" immediate="true">
                         <i class="fi fi-rr-sign-out-alt text-base"/>
                         <span class="text-base text-color">Cerrar sesión</span>
