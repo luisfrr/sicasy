@@ -19,6 +19,7 @@
             gap: var(--spacing-2);
             padding: var(--spacing-4);
         }
+
         .profile-link {
             padding: 1rem 0.75rem;
             width: 100%;
@@ -28,30 +29,35 @@
             border-radius: var(--border-radius-elements);
         }
 
-        .profile-icon {
+        .profile-link .profile-icon {
             font-size: var(--font-size-base);
             color: var(--text-alternative-color);
         }
 
-        .profile-option {
+        .profile-link .profile-option {
             font-size: var(--font-size-base);
             color: var(--text-alternative-color);
         }
 
-        .profile-icon:hover, .profile-option:hover  {
+        .profile-link:hover {
+            background: var(--surface-section);
+        }
+        .profile-link:hover .profile-icon,
+        .profile-link:hover .profile-option  {
             color: var(--text-color);
         }
 
         .profile-link.link-active {
             background: var(--highlight-bg);
         }
-        .profile-link.link-active .profile-icon, .profile-link.link-active .profile-option  {
+        .profile-link.link-active .profile-icon,
+        .profile-link.link-active .profile-option  {
             color: var(--highlight-text-color);
         }
 
     </style>
 
-    <p:outputPanel styleClass="container-xl">
+    <p:outputPanel styleClass="container-fluid">
         <p:growl id="growl" showDetail="true" showSummary="true" skipDetailIfEqualsSummary="true" globalOnly="true"/>
 
         <h:form id="form_breadcum">
@@ -61,52 +67,56 @@
             </p:breadCrumb>
         </h:form>
 
-        <p:outputPanel id="account_panel" styleClass="grid">
+        <p:outputPanel styleClass="container-lg">
 
-            <h:form id="form_options" styleClass="col-12 md:col-4">
+            <p:outputPanel id="account_panel" styleClass="grid">
 
-                <p:outputPanel styleClass="flex flex-row gap-2 align-items-center">
-                    <p:avatar label="#{userSessionBean.firstLetterName}"
-                              styleClass="mr-2" shape="circle" size="large"/>
-                    <div class="flex flex-column">
-                        <span class="fw-semibold">#{userSessionBean.fullName}</span>
-                        <span class="text-sm text-alternative-color">#{userSessionBean.userName}</span>
-                    </div>
+                <h:form id="form_options" styleClass="col-12 md:col-4">
+
+                    <p:outputPanel styleClass="flex flex-row gap-2 align-items-center">
+                        <p:avatar label="#{userSessionBean.firstLetterName}"
+                                  styleClass="mr-2" shape="circle" size="large"/>
+                        <div class="flex flex-column">
+                            <span class="fw-semibold">#{userSessionBean.fullName}</span>
+                            <span class="text-sm text-alternative-color">#{userSessionBean.userName}</span>
+                        </div>
+                    </p:outputPanel>
+
+                    <p:outputPanel styleClass="profile-container-links">
+
+                        <p:commandLink styleClass="profile-link">
+                            <i class="profile-icon fi fi-rr-user"/>
+                            <span class="profile-option">Información general</span>
+                        </p:commandLink>
+
+                        <p:commandLink styleClass="profile-link">
+                            <i class="profile-icon fi fi-rr-user"/>
+                            <span class="profile-option">Cambiar contraseña</span>
+                        </p:commandLink>
+
+                        <p:commandLink styleClass="profile-link">
+                            <i class="profile-icon fi fi-rr-user"/>
+                            <span class="profile-option">Configuraciones</span>
+                        </p:commandLink>
+
+                        <p:commandLink styleClass="profile-link">
+                            <i class="profile-icon fi fi-rr-user"/>
+                            <span class="profile-option">Cerrar sesión</span>
+                        </p:commandLink>
+
+                    </p:outputPanel>
+                </h:form>
+
+                <p:outputPanel id="option_selected_panel" styleClass="col-12 md:col-8">
+
+
                 </p:outputPanel>
-
-                <p:outputPanel styleClass="profile-container-links">
-
-                    <p:commandLink styleClass="profile-link">
-                        <i class="profile-icon fi fi-rr-user"/>
-                        <span class="profile-option">Información general</span>
-                    </p:commandLink>
-
-                    <p:commandLink styleClass="profile-link">
-                        <i class="profile-icon fi fi-rr-user"/>
-                        <span class="profile-option">Cambiar contraseña</span>
-                    </p:commandLink>
-
-                    <p:commandLink styleClass="profile-link">
-                        <i class="profile-icon fi fi-rr-user"/>
-                        <span class="profile-option">Configuraciones</span>
-                    </p:commandLink>
-
-                    <p:commandLink styleClass="profile-link">
-                        <i class="profile-icon fi fi-rr-user"/>
-                        <span class="profile-option">Cerrar sesión</span>
-                    </p:commandLink>
-
-                </p:outputPanel>
-            </h:form>
-
-            <p:outputPanel id="option_selected_panel" styleClass="col-12 md:col-8">
 
 
             </p:outputPanel>
 
 
         </p:outputPanel>
-
 
     </p:outputPanel>
 
