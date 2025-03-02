@@ -55,13 +55,13 @@
     --border-component-color: #CED4DA;
 
     /* Primary Color */
-    --primary-color: #3C7CF5;
-    --primary-light-color: #C0D9FD;
-    --primary-dark-color: #275EE9;
-    --primary-darker-color: #1E49D7;
+    --primary-color: #9D2449;
+    --primary-light-color: #FFC4D6;
+    --primary-dark-color: #621132;
+    --primary-darker-color: #4E232E;
     --primary-text-color: #FFFFFF;
-    --highlight-bg: #DBE9FE;
-    --highlight-text-color: #1F3789;
+    --highlight-bg: #FFC4D6;
+    --highlight-text-color: #621132;
 
     /* Brand Colors */
     --brand-50: #EFF6FF;
