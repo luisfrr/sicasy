@@ -75,8 +75,8 @@ public class BitacoraSiniestroServiceImpl implements IBitacoraSiniestroService {
 
         List<String> camposToAudit = List.of(Siniestro_.ID_SINIESTRO,
                 Siniestro_.VEHICULO, Siniestro_.INCISO, Siniestro_.NO_SINIESTRO_ASEGURADORA,
-                Siniestro_.NO_SINIESTRO_SA_F, Siniestro_.AJUSTADOR_ASEGURADORA,
-                Siniestro_.AJUSTADOR_SA_F, Siniestro_.ESTADO, Siniestro_.MUNICIPIO,
+                Siniestro_.NO_SINIESTRO_SAF, Siniestro_.AJUSTADOR_ASEGURADORA,
+                Siniestro_.AJUSTADOR_SAF, Siniestro_.ESTADO, Siniestro_.MUNICIPIO,
                 Siniestro_.LOCALIDAD, Siniestro_.ESTATUS_SINIESTRO, Siniestro_.CAUSA,
                 Siniestro_.RESPONSABLE, Siniestro_.REPORTA, Siniestro_.CONDUCTOR,
                 Siniestro_.FECHA_SINIESTRO, Siniestro_.FECHA_REPORTE, Siniestro_.DECLARACION_SINIESTRO,

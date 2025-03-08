@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.2.6</version>
+        <version>3.4.3</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
 
@@ -18,7 +18,7 @@
 
     <properties>
         <java.version>21</java.version>
-        <joinfaces.version>5.2.6</joinfaces.version>
+        <joinfaces.version>5.4.3</joinfaces.version>
         <apache-poi.version>5.2.3</apache-poi.version>
         <commons-csv.version>1.8</commons-csv.version>
     </properties>

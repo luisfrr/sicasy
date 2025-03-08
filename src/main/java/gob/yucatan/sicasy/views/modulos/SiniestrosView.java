@@ -193,11 +193,11 @@ public class SiniestrosView implements Serializable {
 
             cellList.add(ExcelCell.builder().columnName("ID").propertyExpression(Siniestro_.ID_SINIESTRO).cellStyle(centerTopStyle).cellAutoSize(true).build());
             cellList.add(ExcelCell.builder().columnName("NO. SINIESTRO").propertyExpression(Siniestro_.NO_SINIESTRO_ASEGURADORA).cellStyle(leftTopStyle).cellAutoSize(true).build());
-            cellList.add(ExcelCell.builder().columnName("NO. SINIESTRO SAF").propertyExpression(Siniestro_.NO_SINIESTRO_SA_F).cellStyle(leftTopStyle).cellAutoSize(true).build());
+            cellList.add(ExcelCell.builder().columnName("NO. SINIESTRO SAF").propertyExpression(Siniestro_.NO_SINIESTRO_SAF).cellStyle(leftTopStyle).cellAutoSize(true).build());
             cellList.add(ExcelCell.builder().columnName("FECHA SINIESTRO").propertyExpression(Siniestro_.FECHA_SINIESTRO).cellStyle(centerDateTopStyle).cellAutoSize(true).build());
             cellList.add(ExcelCell.builder().columnName("RESPONSABLE").propertyExpression(Siniestro_.RESPONSABLE).cellStyle(leftTopStyle).cellAutoSize(true).build());
             cellList.add(ExcelCell.builder().columnName("AJUSTADOR").propertyExpression(Siniestro_.AJUSTADOR_ASEGURADORA).cellStyle(leftTopStyle).cellAutoSize(true).build());
-            cellList.add(ExcelCell.builder().columnName("AJUSTADOR SAF").propertyExpression(Siniestro_.AJUSTADOR_SA_F).cellStyle(leftTopStyle).cellAutoSize(true).build());
+            cellList.add(ExcelCell.builder().columnName("AJUSTADOR SAF").propertyExpression(Siniestro_.AJUSTADOR_SAF).cellStyle(leftTopStyle).cellAutoSize(true).build());
             cellList.add(ExcelCell.builder().columnName("CAUSA").propertyExpression(Siniestro_.CAUSA).cellStyle(leftTopStyle).cellAutoSize(true).build());
             cellList.add(ExcelCell.builder().columnName("NO. SERIE").propertyExpression(String.join(".", Siniestro_.VEHICULO, Vehiculo_.NO_SERIE)).cellStyle(leftTopStyle).cellAutoSize(true).build());
             cellList.add(ExcelCell.builder().columnName("MARCA").propertyExpression(String.join(".", Siniestro_.VEHICULO, Vehiculo_.MARCA)).cellStyle(leftTopStyle).cellAutoSize(true).build());
